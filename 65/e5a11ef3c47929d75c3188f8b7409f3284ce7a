@@ -1,0 +1,2279 @@
+.agents/skills/review-code-dev/scripts/collect_review_context.py
+  s_3181443b264428::t_cbdde223f0dc2a 1-418
+packages/contracts/schemas/companion-manifest.v2.schema.json
+  s_3181443b264428::t_78bf1d4cdce201 1-214
+packages/billing/src/index.ts
+  s_3181443b264428::t_828363601a9e5e 1-334
+.agents/skills/design-frontend-dev/reference/distill.md
+  s_3181443b264428::t_ed1827d7f35bd5 1-111
+.claude/skills/prototype/UI.md
+  s_3181443b264428::t_f7036dc5c32128 1-112
+packages/db/drizzle/0129_companion_decision_waits.sql
+  s_3181443b264428::t_e0ded03521a5d6 1-280
+packages/db/drizzle/0023_drop_teams.sql
+  s_3181443b264428::t_2e97ac8d2acd1b 1-9
+.agents/skills/xcodebuildmcp-cli/SOURCE.md
+  s_3181443b264428::t_c372716345184d 1-12
+apps/web/src/app/(app)/@settings/(.)settings/loading.tsx
+  s_3181443b264428::t_7aceaffbc68195 1-50
+packages/db/drizzle/0117_companion_plugin_trigger_keys.sql
+  s_3181443b264428::t_aa4aed24c96975 1-169
+apps/web/src/components/cds.tsx
+  s_3181443b264428::t_2a4d5e01bc0794 1-96
+packages/contracts/src/token.ts
+  s_3181443b264428::t_c95a780fc65afd 1-108
+.claude/skills/review-code-dev/references/reviewers/api-contract.md
+  s_3181443b264428::t_0b8c218c90d604 1-29
+packages/db/drizzle/0145_companion_routine_queue_cleanup.sql
+  s_3181443b264428::t_11273100991d4c 1-705
+packages/billing/tsconfig.json
+  s_3181443b264428::t_dfaf7f93aa1c7a 1-5
+packages/core/test/skillPublicPreview.test.ts
+  s_3181443b264428::t_faff08257f395c 1-126
+.claude/skills/design-frontend-dev/reference/optimize.md
+  s_3181443b264428::t_cb3b5196fbb7c9 1-258
+packages/db/drizzle/0015_skill_dependency_org_fks.sql
+  s_3181443b264428::t_6ed5635106228e 1-5
+apps/web/src/lib/types.ts
+  s_3181443b264428::t_c50977ba8f3568 1-192
+scripts/agent-browser-box-center.test.mjs
+  s_3181443b264428::t_1a02d3f797daec 1-23
+packages/db/drizzle/0041_run_artifacts.sql
+  s_3181443b264428::t_a665d6bf715d66 1-246
+apps/api/src/sentry.ts
+  s_3181443b264428::t_ad9c50a7bcfe4c 1-44
+apps/api/test/integration/skillGroupPreferenceMigration.integration.test.ts
+  s_3181443b264428::t_3e3e158d1a0edf 1-116
+.agents/skills/ask-matt/SKILL.md
+  s_3181443b264428::t_ed2e387ed0551d 1-90
+apps/web/src/components/skills/listGrouping.test.ts
+  s_3181443b264428::t_b2fb268a605d48 1-290
+packages/db/drizzle/0106_companion_routines.sql
+  s_3181443b264428::t_7de2b3a363da8e 1-2114
+.claude/skills/xcodebuildmcp-cli/SKILL.md
+  s_3181443b264428::t_cfa3f89da9d7ea 1-81
+apps/web/src/components/skills/filters.test.ts
+  s_3181443b264428::t_d6dbf35ab068bc 1-141
+apps/web/src/app/(app)/settings/loading.tsx
+  s_3181443b264428::t_f3c75abc2fc6a8 1-38
+.claude/skills/review-code-dev/references/review-playbook.md
+  s_3181443b264428::t_1890d9e9a25b1f 1-155
+packages/db/drizzle/0059_getting_started_states.sql
+  s_3181443b264428::t_240360991483f8 1-40
+.agents/skills/ship-pr-dev/scripts/prepare_ship_run.py
+  s_3181443b264428::t_3fc11adb15ff8e 1-91
+.agents/skills/grilling/SKILL.md
+  s_3181443b264428::t_e54d1359314b35 1-28
+apps/web/src/app/(app)/@settings/(.)settings/page.tsx
+  s_3181443b264428::t_efd6e9aa06dc98 1-45
+.agents/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md
+  s_3181443b264428::t_de392f17a99e52 1-46
+apps/api/src/seed-test-user.ts
+  s_3181443b264428::t_ee5d96f82fe52e 1-514
+packages/db/drizzle/0006_first_gambit.sql
+  s_3181443b264428::t_4b4b9c8c19453e 1-22
+.agents/skills/wizard/SKILL.md
+  s_3181443b264428::t_e4df553be900bf 1-44
+apps/web/src/components/skills/fileFormat.ts
+  s_3181443b264428::t_4e9fc465c49633 1-217
+.claude/skills/triage/agents/openai.yaml
+  s_3181443b264428::t_425a82d31ad570 1-5
+.claude/skills/design-frontend-dev/reference/onboard.md
+  s_3181443b264428::t_e62df832e007fb 1-234
+apps/web/src/styles/tokens.css
+  s_3181443b264428::t_41011b36e055d0 1-236
+packages/db/drizzle/0175_companion_runtime_v3_deferred_pi_restart.sql
+  s_3181443b264428::t_afb92b6c41e1f6 1-109
+packages/db/src/seed.ts
+  s_3181443b264428::t_81a231a1795925 1-47
+.claude/skills/research/SKILL.md
+  s_3181443b264428::t_d0bbd6c8268905 1-12
+apps/api/src/skillListRoute.test.ts
+  s_3181443b264428::t_9d8e15f985084a 1-975
+packages/auth/src/agent-auth-origin.ts
+  s_3181443b264428::t_cadb3c23dad765 1-189
+.claude/skills/capture-learning-tools/references/examples.md
+  s_3181443b264428::t_b04d2482d87196 1-61
+.claude/skills/swiftui-expert-dev/SOURCE.md
+  s_3181443b264428::t_4afd7d56ed31cb 1-12
+packages/db/drizzle/0108_companion_turn_stop.sql
+  s_3181443b264428::t_3f9f6906e42aec 1-1859
+packages/db/drizzle/0139_companion_routine_parallel_scheduling.sql
+  s_3181443b264428::t_42ae9781fa7167 1-796
+.claude/skills/design-frontend-dev/reference/interaction-design.md
+  s_3181443b264428::t_2a3b6067b0cb1a 1-189
+packages/db/drizzle/0024_drop_owner_filter_prefs.sql
+  s_3181443b264428::t_5bcf66eb1125a5 1-12
+apps/api/tsconfig.test.json
+  s_3181443b264428::t_9064c3e0f34b64 1-9
+.gitleaks.toml
+  s_3181443b264428::t_2099e65465b5a3 1-25
+packages/skills/test/semver.test.ts
+  s_3181443b264428::t_b32c9e69f1d77f 1-40
+tools/oxlint/anti-slop/rules/no-unknown-type-aliases.ts
+  s_3181443b264428::t_a50143ff645067 1-70
+packages/db/drizzle/0149_companion_trigger_proposal_account_fallback.sql
+  s_3181443b264428::t_121d1aacc01048 1-99
+packages/db/drizzle/0167_companion_runtime_v3_pi_native_admission.sql
+  s_3181443b264428::t_caa50c5ee2d9a3 1-508
+packages/db/drizzle/0082_companion_transcript_reasoning.sql
+  s_3181443b264428::t_f563d6b7f6db4a 1-18
+packages/db/drizzle/0028_skill_share_token.sql
+  s_3181443b264428::t_63a988590bda64 1-9
+.agents/skills/design-frontend-dev/reference/shape.md
+  s_3181443b264428::t_36112c0647722d 1-165
+apps/web/src/components/org/WorkspaceAvatar.tsx
+  s_3181443b264428::t_d68f0a7a44de6e 1-39
+packages/db/drizzle/0098_companion_message_attachments.sql
+  s_3181443b264428::t_f37ccf52691de8 1-844
+packages/db/drizzle/0045_github_skill_sync.sql
+  s_3181443b264428::t_76abed7832fddf 1-123
+packages/core/src/skillDatabaseCleanup.ts
+  s_3181443b264428::t_1f181c95341d93 1-48
+docs/repository-cutover.md
+  s_3181443b264428::t_72db320a230f23 1-10
+apps/web/test/sentry.shared.test.ts
+  s_3181443b264428::t_c5e109c94a800a 1-39
+.agents/skills/capture-learning-tools/references/conversation-analysis.md
+  s_3181443b264428::t_64e7650ef68b01 1-44
+apps/web/src/app/join/[token]/page.tsx
+  s_3181443b264428::t_ee9ef3752a4b54 1-12
+apps/web/src/app/page.test.ts
+  s_3181443b264428::t_5bfb02d5dfa21f 1-86
+packages/db/drizzle/0079_companion_mcp_attach.sql
+  s_3181443b264428::t_6a342fd5e6ed05 1-8
+.agents/skills/grill-me/agents/openai.yaml
+  s_3181443b264428::t_a6cfa5e955b5be 1-5
+apps/web/src/components/org/PreferencesPane.tsx
+  s_3181443b264428::t_f02d16845f8434 1-143
+packages/github/package.json
+  s_3181443b264428::t_ba8116c16c671d 1-21
+packages/db/drizzle/0047_skill_group_preference.sql
+  s_3181443b264428::t_e39f292588bd53 1-46
+apps/api/src/githubRoutes.test.ts
+  s_3181443b264428::t_9a39c6dba7c88e 1-263
+.claude/skills/review-code-dev/SKILL.md
+  s_3181443b264428::t_0bd52642e9ce6d 1-134
+.claude/skills/design-frontend-dev/reference/adapt.md
+  s_3181443b264428::t_720ae568490eac 1-311
+.claude/skills/teach/LEARNING-RECORD-FORMAT.md
+  s_3181443b264428::t_eb7877fc67f507 1-46
+packages/db/src/ids.ts
+  s_3181443b264428::t_0b1a4024c1e55d 1-15
+packages/core/test/skillVersions.test.ts
+  s_3181443b264428::t_4dff0ee00d9afb 1-73
+apps/web/src/components/org/SettingsView.tsx
+  s_3181443b264428::t_d81eb70d1bfd2a 1-123
+packages/db/drizzle/0097_companion_runtime_warm_send_dispatch.sql
+  s_3181443b264428::t_9ee1de880a1846 1-164
+scripts/setup-conductor.sh
+  s_3181443b264428::t_96f0691d074e9e 1-20
+packages/core/vitest.config.ts
+  s_3181443b264428::t_c98104fb0e5faf 1-7
+packages/skills/test/zip.test.ts
+  s_3181443b264428::t_6ee81e7a411473 1-192
+packages/contracts/test/orgSettings.test.ts
+  s_3181443b264428::t_3f05eff3c507e9 1-165
+apps/api/src/localSkills.test.ts
+  s_3181443b264428::t_8f0075f35db04a 1-492
+apps/web/src/app/(app)/secrets/page.tsx
+  s_3181443b264428::t_dd1c1206285c99 1-81
+apps/web/src/app/(app)/companion-setup/page.tsx
+  s_3181443b264428::t_62545d84f4dfff 1-11
+apps/web/vitest.config.ts
+  s_3181443b264428::t_83f345bf543fc4 1-19
+.agents/skills/review-code-dev/references/review-intelligence.md
+  s_3181443b264428::t_21ee8c8057de7c 1-113
+.agents/skills/review-code-dev/scripts/prepare_review_run.py
+  s_3181443b264428::t_d0d962ca651c6a 1-137
+packages/db/drizzle/0034_skill_runs.sql
+  s_3181443b264428::t_5fea1db0863bd0 1-1149
+.claude/skills/capture-learning-tools/scripts/classify_learning.py
+  s_3181443b264428::t_0e101081734ad8 1-72
+packages/db/drizzle/0011_everyone_skill_visibility.sql
+  s_3181443b264428::t_51f2df5f301bb4 1-75
+apps/web/src/components/skills/LocalSkillsView.test.ts
+  s_3181443b264428::t_930f2283e36711 1-305
+packages/db/drizzle/0001_sparkling_squadron_sinister.sql
+  s_3181443b264428::t_284cc046142d48 1-14
+.claude/skills/wait-what/SKILL.md
+  s_3181443b264428::t_53d0e04dc4d638 1-7
+.agents/skills/ship-pr-dev/evals/evals.json
+  s_3181443b264428::t_a2050b058516ef 1-70
+.claude/skills/to-tickets/SKILL.md
+  s_3181443b264428::t_bc7087abc0a9d7 1-105
+packages/core/test/skillSearchQuery.test.ts
+  s_3181443b264428::t_66e3cf99b3acb0 1-30
+apps/web/src/lib/theme.ts
+  s_3181443b264428::t_f1a2a0b15f37e7 1-101
+apps/web/src/components/skills/InstallDialog.test.ts
+  s_3181443b264428::t_ad8d76634637fe 1-138
+.claude/skills/triage/AGENT-BRIEF.md
+  s_3181443b264428::t_57f70616aeee8c 1-207
+scripts/dev-environment.sh
+  s_3181443b264428::t_de2050aafa1f3f 1-30
+.agents/skills/to-spec/agents/openai.yaml
+  s_3181443b264428::t_09c1672db380e5 1-5
+packages/contracts/test/tokenRefresh.test.ts
+  s_3181443b264428::t_6e358fa0471e8b 1-36
+packages/contracts/test/skillDatabase.test.ts
+  s_3181443b264428::t_850ae31330e840 1-213
+packages/core/test/onboarding.test.ts
+  s_3181443b264428::t_4d108c9b113273 1-123
+packages/db/drizzle/0029_skill_display_name.sql
+  s_3181443b264428::t_c2ff73fe252e40 1
+packages/contracts/test/skillDependencies.test.ts
+  s_3181443b264428::t_ede6c03d117987 1-170
+apps/web/tsconfig.json
+  s_3181443b264428::t_35ba0d83c90f08 1-38
+apps/web/src/middleware.test.ts
+  s_3181443b264428::t_45b8fad5435b55 1-75
+apps/web/src/components/skills/sidebarTree.ts
+  s_3181443b264428::t_3b39494084302e 1-157
+.agents/skills/to-tickets/agents/openai.yaml
+  s_3181443b264428::t_475aca7143ba35 1-5
+packages/db/drizzle/0093_companion_runtime_desktop_replay.sql
+  s_3181443b264428::t_ff3b28064be44a 1-87
+.agents/skills/setup-matt-pocock-skills/issue-tracker-github.md
+  s_3181443b264428::t_a7eae7dc63659b 1-45
+tools/oxlint/anti-slop/rules/no-runtime-typeof.ts
+  s_3181443b264428::t_362198e3011027 1-67
+packages/db/drizzle/0154_companion_archived_box_recovery.sql
+  s_3181443b264428::t_7f8082077b404d 1-76
+docs/PRD.md
+  s_3181443b264428::t_de65b0cc5d60cb 1-39
+packages/core/src/billing.ts
+  s_3181443b264428::t_0a746e84007774 1-297
+packages/db/drizzle/0138_companion_routine_cancel_identity.sql
+  s_3181443b264428::t_348f9a7073252d 1-154
+packages/db/drizzle/0071_companion_mcp_accounts.sql
+  s_3181443b264428::t_5b7710c616e512 1-90
+packages/core/src/secrets.ts
+  s_3181443b264428::t_a534f3e72da687 1-939
+.agents/skills/improve-codebase-architecture/HTML-REPORT.md
+  s_3181443b264428::t_a8c080e1a0409a 1-123
+apps/api/src/cutover.ts
+  s_3181443b264428::t_2b13dead2c0092 1-469
+packages/storage/src/index.ts
+  s_3181443b264428::t_711dfc82d3d3f2 1-506
+apps/worker/src/index.ts
+  s_3181443b264428::t_b60f859b0963a0 1-42
+.agents/skills/setup-matt-pocock-skills/domain.md
+  s_3181443b264428::t_a976c6994858e3 1-51
+.agents/skills/design-frontend-dev/reference/polish.md
+  s_3181443b264428::t_2d6a207f3ec2aa 1-236
+.agents/skills/code-review/agents/openai.yaml
+  s_3181443b264428::t_c0342ef10bb920 1-3
+packages/db/drizzle/0096_companion_runtime_settings_claim_revisions.sql
+  s_3181443b264428::t_f6718f43554287 1-1289
+apps/web/src/app/privacy/page.tsx
+  s_3181443b264428::t_74cde2ad5b6833 1-111
+apps/web/src/lib/queries.ts
+  s_3181443b264428::t_0f913f30406cb2 1-484
+apps/web/src/components/skills/DetailView.tsx
+  s_3181443b264428::t_e58c63113dcf4a 1-671
+.claude/skills/design-frontend-dev/reference/typeset.md
+  s_3181443b264428::t_8e9656085f4b0e 1-279
+docs/product.md
+  s_3181443b264428::t_b46da63d472018 1-30
+packages/db/drizzle/0046_api_token_refresh.sql
+  s_3181443b264428::t_5edc0a6015d171 1-33
+apps/web/src/components/org/InvitationsPane.tsx
+  s_3181443b264428::t_da6f27201ff7f4 1-106
+tools/oxlint/anti-slop/rules/no-known-value-widening.ts
+  s_3181443b264428::t_232e5a5775f35a 1-247
+packages/billing/package.json
+  s_3181443b264428::t_1a67b42007d4d0 1-20
+.claude/skills/codebase-design/agents/openai.yaml
+  s_3181443b264428::t_965d084950db16 1-3
+scripts/ci-playwright-policy.mjs
+  s_3181443b264428::t_7b99f4435f5db1 1-45
+apps/api/src/agentAuthRoutes.test.ts
+  s_3181443b264428::t_f51983712925d5 1-157
+packages/db/drizzle/0134_slack_gmail_config_proposal.sql
+  s_3181443b264428::t_7f1946f6c3e8d5 1-32
+packages/db/drizzle/0069_companion_transcript_author.sql
+  s_3181443b264428::t_a6c8ef294c3eb8 1-5
+.agents/skills/resolving-merge-conflicts/SKILL.md
+  s_3181443b264428::t_e1d2f7121110c7 1-14
+packages/skills/src/archive.ts
+  s_3181443b264428::t_a56a9b894debb3 1-822
+packages/core/src/authz.ts
+  s_3181443b264428::t_db865f90491ab9 1-132
+apps/web/src/components/org/dialogs.tsx
+  s_3181443b264428::t_0e2135521235ff 1-78
+scripts/agent-browser-box-center.mjs
+  s_3181443b264428::t_a2bb107210f025 1-29
+.claude/skills/tdd/mocking.md
+  s_3181443b264428::t_61dfb1c0504ef3 1-59
+scripts/wait-http-ready.mjs
+  s_3181443b264428::t_eadf6bdc8703d7 1-73
+packages/db/drizzle/0068_companion_threads.sql
+  s_3181443b264428::t_f1ce3237a9c911 1-112
+apps/web/src/components/skills/SkillsApp.test.ts
+  s_3181443b264428::t_c4b7d7f5280488 1-2211
+.claude/skills/research/agents/openai.yaml
+  s_3181443b264428::t_4f70415f4aa34b 1-3
+deploy/railway/api.railway.json
+  s_3181443b264428::t_29493c3179fb23 1-27
+.env.example
+  s_3181443b264428::t_ea3f995a32bbdf 1-139
+.claude/skills/ios-product-dev/companion.json
+  s_3181443b264428::t_73ac37fbdee690 1-41
+packages/db/drizzle/0112_companion_answer_trigger_decision.sql
+  s_3181443b264428::t_9a2437fbb49fd2 1-224
+apps/web/src/components/skills/updateFlow.test.ts
+  s_3181443b264428::t_5306ed281108ad 1-293
+.claude/skills/xcodebuildmcp-cli/evals/evals.json
+  s_3181443b264428::t_5ae2332304c283 1-25
+examples/skills/incident-summary/companion.json
+  s_3181443b264428::t_e786e60ce5d21e 1-26
+apps/api/src/skillFileContentRoute.test.ts
+  s_3181443b264428::t_c5b4f9933a5221 1-968
+apps/web/src/components/skills/detailParts.test.ts
+  s_3181443b264428::t_90584a99899520 1-191
+.agents/skills/prototype/agents/openai.yaml
+  s_3181443b264428::t_61dcb0b12d6f05 1-3
+tools/oxlint/anti-slop/rules/no-unknown-returns.ts
+  s_3181443b264428::t_cd076965885b1e 1-115
+pnpm-lock.yaml
+  s_3181443b264428::t_04e3cfe52fb5bb 1-11255
+apps/web/src/components/skills/DetailView.test.ts
+  s_3181443b264428::t_5da8a84d45c8f2 1-285
+docs/vision.md
+  s_3181443b264428::t_9ecf66ee6ca4c5 1-14
+.agents/skills/design-frontend-dev/reference/audit.md
+  s_3181443b264428::t_e34daeee4e7051 1-133
+packages/db/drizzle/0013_local_skill_installs.sql
+  s_3181443b264428::t_f8e09522eca57b 1-18
+packages/db/drizzle/0131_companion_notification_avatar.sql
+  s_3181443b264428::t_4669a3688799f2 1-175
+.agents/skills/ask-matt/PHASE-BOUNDARIES.md
+  s_3181443b264428::t_e000ee3b308af5 1-55
+apps/web/package.json
+  s_3181443b264428::t_ed2c54450afd99 1-41
+apps/web/sentry.shared.ts
+  s_3181443b264428::t_c5457d506798aa 1-62
+packages/db/drizzle/meta/0000_snapshot.json
+  s_3181443b264428::t_18d07b3c58fa54 1-1506
+packages/db/drizzle/0087_companion_reconciler.sql
+  s_3181443b264428::t_237fb34930c619 1-297
+.agents/skills/review-code-dev/references/reviewers/red-team.md
+  s_3181443b264428::t_d78a0d21e1055f 1-30
+.claude/skills/writing-for-agents/agents/openai.yaml
+  s_3181443b264428::t_bd138bfad0bb7f 1-3
+packages/core/test/billing.test.ts
+  s_3181443b264428::t_af801922de11a6 1-70
+packages/db/drizzle/0044_remove_skill_stars.sql
+  s_3181443b264428::t_2adcb150db5926 1-45
+apps/web/src/middleware.ts
+  s_3181443b264428::t_f4dc3cb088b090 1-75
+.claude/skills/codebase-design/SKILL.md
+  s_3181443b264428::t_1f094327de60e4 1-114
+.claude/skills/wizard/template.sh
+  s_3181443b264428::t_3ed20f51063977 1-204
+packages/db/drizzle/0104_companion_mint_hub_token.sql
+  s_3181443b264428::t_845922205c7fc7 1-176
+.claude/skills/ship-pr-dev/references/readiness-gates.md
+  s_3181443b264428::t_c1129c49a6c8f1 1-93
+e2e/critical-flows.spec.ts
+  s_3181443b264428::t_db0ca3946cd45e 1-247
+packages/db/drizzle/0062_agent_delegation_tokens.sql
+  s_3181443b264428::t_35ad74cfdeaa1f 1-218
+.agents/skills/ship-pr-dev/references/agent-routing.md
+  s_3181443b264428::t_ebfee389f24f07 1-122
+packages/db/drizzle/0161_companion_runtime_v3_warm_turn.sql
+  s_3181443b264428::t_215a61a2c9da52 1-679
+apps/web/src/app/v1/auth/verify-email/route.test.ts
+  s_3181443b264428::t_44350065052a69 1-78
+.claude/skills/teach/agents/openai.yaml
+  s_3181443b264428::t_facebc29acb4fb 1-5
+apps/web/src/app/s/[token]/PublicSkillActions.test.ts
+  s_3181443b264428::t_e56e12c32e4826 1-128
+apps/web/src/components/org/model.ts
+  s_3181443b264428::t_e72ca29acb5b6c 1-189
+.agents/skills/capture-learning-tools/references/cross-agent-linking.md
+  s_3181443b264428::t_5dc1c3736a6b85 1-56
+apps/web/src/app/PostHogProvider.tsx
+  s_3181443b264428::t_dc7a4165e7cc1b 1-26
+packages/db/drizzle/0184_companion_runtime_v3_background_retry_identity.sql
+  s_3181443b264428::t_e4e9c10368d308 1-199
+apps/api/test/integration/secretLifecycle.integration.test.ts
+  s_3181443b264428::t_3d399c1f09791d 1-431
+.agents/skills/research/SKILL.md
+  s_3181443b264428::t_afb9b8a5a3edfd 1-12
+apps/api/test/integration/skillsHubCutover.integration.test.ts
+  s_3181443b264428::t_d520290cadc761 1-231
+.agents/skills/review-code-dev/references/reviewers/api-contract.md
+  s_3181443b264428::t_58609cd2960a6f 1-29
+apps/web/src/components/skills/GettingStartedCard.tsx
+  s_3181443b264428::t_6899a61fe27dbc 1-259
+packages/db/drizzle/0063_skills_hub_only.sql
+  s_3181443b264428::t_9ad5f1ae4fdb9c 1-193
+packages/db/drizzle/0012_skill_owner_team.sql
+  s_3181443b264428::t_3af81fcddd0e78 1-4
+tools/oxlint/anti-slop/shared/lexical-type-parameters.ts
+  s_3181443b264428::t_e431d1b9639055 1-61
+.agents/skills/review-code-dev/references/output-contract.md
+  s_3181443b264428::t_ec79f020f83e80 1-375
+tools/oxlint/anti-slop/index.ts
+  s_3181443b264428::t_1912d2ab8f751f 1-41
+apps/web/src/styles/org.css
+  s_3181443b264428::t_b93e5f0fc8250e 1-240
+apps/api/test/integration/skillSidebarOrderPreferenceMigration.integration.test.ts
+  s_3181443b264428::t_8042bc8d6a16c1 1-137
+.agents/skills/setup-matt-pocock-skills/issue-tracker-local.md
+  s_3181443b264428::t_e49c02575940c3 1-30
+tools/oxlint/anti-slop/README.md
+  s_3181443b264428::t_ec51d23afefe8f 1-9
+apps/web/src/components/skills/filters.ts
+  s_3181443b264428::t_8ce69610be1fc7 1-50
+apps/web/src/lib/format.ts
+  s_3181443b264428::t_6710ec72b35202 1-54
+apps/web/src/app/v1/auth/verify-email/route.ts
+  s_3181443b264428::t_665afc7eff223e 1-37
+packages/db/drizzle/0109_companion_runtime_health_identity.sql
+  s_3181443b264428::t_58ec289bbf8d31 1-530
+packages/db/drizzle/0179_companion_runtime_v3_contraction.sql
+  s_3181443b264428::t_daa9b845759e86 1-1138
+turbo.json
+  s_3181443b264428::t_2b1846562cb652 1-41
+apps/api/src/trpc.test.ts
+  s_3181443b264428::t_06179041d439a9 1-18
+apps/web/src/app/v1/auth/logout/route.test.ts
+  s_3181443b264428::t_da72c37361248e 1-66
+apps/web/src/lib/authRouteStates.test.ts
+  s_3181443b264428::t_c654c7eb70f3e0 1-72
+.agents/skills/review-code-dev/agents/openai.yaml
+  s_3181443b264428::t_a134891b0a1264 1-4
+packages/db/drizzle/0056_project_prompt_file_reconciliation.sql
+  s_3181443b264428::t_943bdb0bb24af3 1-243
+.agents/skills/capture-learning-tools/references/non-technical-mode.md
+  s_3181443b264428::t_9350512defc702 1-36
+packages/db/drizzle/0057_project_runtime_process_identity.sql
+  s_3181443b264428::t_1a57746150d321 1-129
+.agents/skills/prototype/LOGIC.md
+  s_3181443b264428::t_0de98c940eb9f4 1-67
+.claude/skills/grill-with-docs/agents/openai.yaml
+  s_3181443b264428::t_8098a91abd865a 1-5
+.agents/skills/codebase-design/DEEPENING.md
+  s_3181443b264428::t_b722ab7203c242 1-37
+scripts/ensure-skill-bucket.mjs
+  s_3181443b264428::t_9cdf900f7fa62f 1-35
+.agents/skills/tdd/SKILL.md
+  s_3181443b264428::t_03f8b906ec68d3 1-38
+packages/db/drizzle/0128_companion_retry_absent_box.sql
+  s_3181443b264428::t_da0ba24652fa21 1-478
+.agents/skills/design-frontend-dev/reference/overdrive.md
+  s_3181443b264428::t_1c252339333069 1-130
+.agents/skills/setup-matt-pocock-skills/triage-labels.md
+  s_3181443b264428::t_45d919eb0967eb 1-15
+packages/db/drizzle/0148_companion_trigger_prepare_result.sql
+  s_3181443b264428::t_f4a0d4b4b7af80 1-105
+.agents/skills/design-frontend-dev/LICENSE
+  s_3181443b264428::t_b0e749c86b757b 1-191
+.claude/skills/code-review/agents/openai.yaml
+  s_3181443b264428::t_f608339224f100 1-3
+apps/web/src/lib/onboarding.test.ts
+  s_3181443b264428::t_f97413339063d3 1-46
+packages/db/drizzle/0040_sandbox_usage.sql
+  s_3181443b264428::t_b891b85fbbdf42 1-52
+packages/db/drizzle/0095_companion_runtime_desktop_replay_recovery.sql
+  s_3181443b264428::t_a9e63e3db7c0ae 1-276
+docs/agents/domain.md
+  s_3181443b264428::t_bb9ed01156b37b 1-51
+.claude/skills/design-frontend-dev/reference/layout.md
+  s_3181443b264428::t_9b61850dde615e 1-161
+.claude/skills/review-code-dev/references/reviewers/performance.md
+  s_3181443b264428::t_d2ebc67c6998a3 1-28
+.agents/skills/teach/SKILL.md
+  s_3181443b264428::t_ae77697f802023 1-140
+apps/web/src/components/skills/detailParts.tsx
+  s_3181443b264428::t_3c21533f486285 1-541
+.agents/skills/ship-pr-dev/scripts/test_collect_ship_context.py
+  s_3181443b264428::t_321cc9bf95723b 1-66
+apps/web/src/styles/deps.css
+  s_3181443b264428::t_d2f45f691e36b7 1-190
+.agents/skills/design-frontend-dev/reference/quieter.md
+  s_3181443b264428::t_956f0a38e29f08 1-99
+.agents/skills/domain-modeling/CONTEXT-FORMAT.md
+  s_3181443b264428::t_9ec70427f5358b 1-60
+scripts/ci-playwright-policy.test.mjs
+  s_3181443b264428::t_a04e9f0e6455b6 1-36
+packages/db/drizzle/0077_companion_tool_runs.sql
+  s_3181443b264428::t_bdc4dcf47affe9 1-55
+.claude/skills/ship-pr-dev/scripts/prepare_ship_run.py
+  s_3181443b264428::t_be4adfe9df0b4f 1-91
+apps/web/src/lib/apiClient.test.ts
+  s_3181443b264428::t_83db1e443eadee 1-83
+.claude/skills/design-frontend-dev/reference/bolder.md
+  s_3181443b264428::t_0603a6f4e6c3e7 1-113
+scripts/ci-create-db-roles.sh
+  s_3181443b264428::t_91e1af9fa11c01 1-45
+packages/db/drizzle/0176_companion_runtime_v3_control_followups.sql
+  s_3181443b264428::t_609f3780b41c77 1-142
+packages/core/test/filterPreferences.test.ts
+  s_3181443b264428::t_ccd1b40835ece2 1-171
+packages/db/drizzle/0008_verify_existing_users.sql
+  s_3181443b264428::t_c6f3b2612d37f6 1-5
+scripts/verify-change.test.mjs
+  s_3181443b264428::t_405fb5ed9b7acc 1-292
+packages/db/drizzle/0035_runtime_credentials.sql
+  s_3181443b264428::t_c837eb15c82ac4 1-182
+apps/web/src/components/skills/dragGeometry.test.ts
+  s_3181443b264428::t_c272ee21b571ee 1-168
+apps/web/src/components/skills/ArchivedListView.test.ts
+  s_3181443b264428::t_142ed797a0653e 1-63
+packages/db/drizzle/0140_companion_routine_notify_projection.sql
+  s_3181443b264428::t_a96df2b517a8d2 1-142
+packages/db/drizzle/0136_companion_sections.sql
+  s_3181443b264428::t_73f415be1276ec 1-443
+scripts/dev-process.sh
+  s_3181443b264428::t_8a45f4d9cd5210 1-98
+packages/db/drizzle/0031_org_skill_naming_policy.sql
+  s_3181443b264428::t_08e202328019ea 1
+apps/web/src/components/skills/CommandPalette.tsx
+  s_3181443b264428::t_b240b058cae627 1-205
+.agents/skills/design-frontend-dev/companion.json
+  s_3181443b264428::t_d4ab87d419faa9 1-48
+apps/web/src/app/s/[token]/go/route.ts
+  s_3181443b264428::t_3e045085087ad5 1-57
+scripts/lint-anti-slop.test.mjs
+  s_3181443b264428::t_419202092e746b 1-109
+apps/web/src/components/skills/DependenciesTab.tsx
+  s_3181443b264428::t_934e82783af9ec 1-356
+.claude/skills/codebase-design/DEEPENING.md
+  s_3181443b264428::t_716c5a2cd70a61 1-37
+apps/api/tsup.config.ts
+  s_3181443b264428::t_fb28a3f5f1cac8 1-37
+cli/src/commands/auth.ts
+  s_3181443b264428::t_74f7fa289cc463 1-94
+apps/web/src/instrumentation.ts
+  s_3181443b264428::t_2ba17423f19cca 1-13
+.claude/skills/capture-learning-tools/references/ci-policy.md
+  s_3181443b264428::t_c97d75df8098de 1-84
+packages/db/drizzle.config.ts
+  s_3181443b264428::t_7b77b6844711cf 1-13
+packages/db/drizzle/0076_companion_model.sql
+  s_3181443b264428::t_b58a6206559189 1-15
+packages/db/drizzle/0101_companion_answer_config_decision.sql
+  s_3181443b264428::t_67c3e85cee9586 1-392
+.claude/skills/design-frontend-dev/reference/harden.md
+  s_3181443b264428::t_73ff6134893587 1-347
+.agents/skills/writing-for-agents/agents/openai.yaml
+  s_3181443b264428::t_908c8ebe3c069c 1-3
+packages/core/src/email-domains.ts
+  s_3181443b264428::t_6923632a7fdd0b 1-38
+packages/skills/test/extractArchiveFiles.test.ts
+  s_3181443b264428::t_949f6bed4d43aa 1-265
+.claude/skills/review-code-dev/references/output-contract.md
+  s_3181443b264428::t_1cf317b5909cb0 1-375
+.claude/skills/tdd/SKILL.md
+  s_3181443b264428::t_bcfaf4753a0a77 1-38
+packages/db/drizzle/0166_companion_runtime_v3_persistent_box_lifecycle.sql
+  s_3181443b264428::t_723fc6481f2e60 1-603
+scripts/ci-scope.mjs
+  s_3181443b264428::t_5f6c442693fb5e 1-197
+.agents/skills/design-frontend-dev/reference/clarify.md
+  s_3181443b264428::t_786c083875608f 1-288
+.dockerignore
+  s_3181443b264428::t_9f647cb15044a6 1-25
+packages/db/drizzle/0158_companion_recovery_lane_interlock.sql
+  s_3181443b264428::t_fdeb5d233a5839 1-105
+packages/db/drizzle/0051_run_file_previews.sql
+  s_3181443b264428::t_7d9b0e53f59ddb 1-227
+apps/web/src/components/org/ProfilePane.tsx
+  s_3181443b264428::t_6bde617bc7ecc5 1-210
+.claude/skills/improve-codebase-architecture/agents/openai.yaml
+  s_3181443b264428::t_46b72e093f066f 1-5
+.agents/skills/teach/RESOURCES-FORMAT.md
+  s_3181443b264428::t_9cbd04b02ccfcf 1-32
+apps/web/src/lib/apiClient.ts
+  s_3181443b264428::t_956615bd997297 1-105
+packages/contracts/test/skillRename.test.ts
+  s_3181443b264428::t_37902fdbbbcd77 1-41
+packages/skills/src/checksum.ts
+  s_3181443b264428::t_3ae6ef5c46954b 1-14
+packages/billing/test/stripeGateway.test.ts
+  s_3181443b264428::t_c7b96a7e6a5610 1-262
+apps/web/src/components/org/SettingsSidebar.tsx
+  s_3181443b264428::t_349ff990bf40aa 1-200
+packages/db/drizzle/0083_companion_skills_sync.sql
+  s_3181443b264428::t_5a01477c93e65f 1-19
+packages/db/drizzle/0002_colorful_trauma.sql
+  s_3181443b264428::t_b085fe69bb657f 1
+apps/web/src/lib/skillDatabaseQueries.test.ts
+  s_3181443b264428::t_6a53bc3633b266 1-20
+apps/web/src/app/v1/auth/signup/route.test.ts
+  s_3181443b264428::t_7d38be3d2fcfc6 1-76
+packages/core/test/skillDependencies.test.ts
+  s_3181443b264428::t_1c36303ff3f3df 1-22
+.claude/skills/design-frontend-dev/reference/product.md
+  s_3181443b264428::t_f408477bf21ca0 1-60
+docker-compose.yml
+  s_3181443b264428::t_997887702bfd1f 1-58
+packages/github/tsconfig.json
+  s_3181443b264428::t_e87c2dfca21bee 1-5
+.agents/skills/wait-what/agents/openai.yaml
+  s_3181443b264428::t_017733bc1833dc 1-5
+.agents/skills/capture-learning-tools/references/promotion-matrix.md
+  s_3181443b264428::t_568ab5bb4dd4fe 1-44
+tools/oxlint/anti-slop/rules/no-reflect-get.ts
+  s_3181443b264428::t_1f987d8f28ef2e 1-28
+tools/oxlint/anti-slop/shared/reflect-method.ts
+  s_3181443b264428::t_32f2f7948541da 1-35
+apps/web/src/components/skills/GettingStartedCard.test.ts
+  s_3181443b264428::t_846f775ceafa29 1-298
+apps/worker/src/sentry.ts
+  s_3181443b264428::t_90e0e6ea5bc133 1-40
+apps/web/src/components/skills/route.test.ts
+  s_3181443b264428::t_294f8f0ff2c413 1-169
+.claude/skills/to-spec/agents/openai.yaml
+  s_3181443b264428::t_e7080ee04aaa19 1-5
+packages/db/drizzle/meta/_journal.json
+  s_3181443b264428::t_755e96585492a2 1-1315
+apps/web/src/lib/types.test.ts
+  s_3181443b264428::t_4807ab6f4f7e1c 1-93
+pnpm-workspace.yaml
+  s_3181443b264428::t_c50b90fdd9da17 1-4
+packages/contracts/src/avatar.ts
+  s_3181443b264428::t_5a9b16a545ff11 1-57
+packages/db/drizzle/0072_drop_companion_member_access.sql
+  s_3181443b264428::t_545759a31a52aa 1-114
+packages/core/src/skillDatabases.ts
+  s_3181443b264428::t_4ace8e1ec78326 1-1120
+packages/contracts/src/gettingStarted.ts
+  s_3181443b264428::t_d0c6dbbf64643d 1-27
+tools/oxlint/anti-slop/rules/no-chained-type-assertions.ts
+  s_3181443b264428::t_95d74c522a56cd 1-77
+packages/db/drizzle/0065_companion_providers.sql
+  s_3181443b264428::t_6f5e518137693c 1-121
+packages/auth/src/postgres-secondary-storage.test.ts
+  s_3181443b264428::t_78b33fff546be3 1-32
+.agents/skills/triage/agents/openai.yaml
+  s_3181443b264428::t_6322f9c63d2dee 1-5
+packages/db/drizzle/0102_companion_config_catalog.sql
+  s_3181443b264428::t_7d35ed5e4dd133 1-164
+packages/db/drizzle/0038_skill_run_prompt_attachments.sql
+  s_3181443b264428::t_0cfa11ba0ba258 1-301
+.agents/skills/swiftui-expert-dev/evals/evals.json
+  s_3181443b264428::t_692e3a1b2c6c27 1-25
+packages/db/drizzle/0157_companion_recovery_cleanup_protocol_7.sql
+  s_3181443b264428::t_5f6383f49b990d 1-2307
+apps/web/src/components/skills/SkillsApp.tsx
+  s_3181443b264428::t_1d0ed0ddad6bee 1-1979
+.agents/skills/design-frontend-dev/reference/onboard.md
+  s_3181443b264428::t_72c350a8052c72 1-234
+packages/contracts/src/onboarding.ts
+  s_3181443b264428::t_bd76de61766fea 1-38
+.agents/skills/capture-learning-tools/scripts/inspect_project_guidance.py
+  s_3181443b264428::t_7fde4ab1ab64bf 1-137
+apps/web/src/styles/upload.css
+  s_3181443b264428::t_e28de89bdc2810 1-323
+apps/web/src/components/skills/fileview.test.ts
+  s_3181443b264428::t_4df49d60803b2a 1-108
+apps/web/src/components/onboarding/screens.tsx
+  s_3181443b264428::t_4246d4dfd37df0 1-634
+.claude/skills/grilling/SKILL.md
+  s_3181443b264428::t_2f9ce70664466c 1-28
+tsconfig.base.json
+  s_3181443b264428::t_33759308239c28 1-24
+examples/skills/incident-summary/scripts/summarize.py
+  s_3181443b264428::t_753cf84956e849 1-6
+scripts/ci-api-smoke.sh
+  s_3181443b264428::t_7e33e70a829382 1-45
+packages/contracts/src/localSkills.ts
+  s_3181443b264428::t_74a8ede2b1deaf 1-102
+packages/email/package.json
+  s_3181443b264428::t_b072c5e8498b70 1-21
+cli/src/lib/output.ts
+  s_3181443b264428::t_3f1c6d401bf400 1-57
+.claude/skills/tdd/agents/openai.yaml
+  s_3181443b264428::t_62e679e3e3cdec 1-3
+packages/contracts/test/agentOperations.test.ts
+  s_3181443b264428::t_0d0f9fc0218fed 1-61
+packages/contracts/test/gettingStarted.test.ts
+  s_3181443b264428::t_806d41d2bcad58 1-63
+packages/db/drizzle/0009_settings_team_description.sql
+  s_3181443b264428::t_eeb12fe50cffbe 1
+.agents/skills/review-code-dev/references/review-playbook.md
+  s_3181443b264428::t_f35e8cb5d4cec0 1-155
+packages/skills/test/extractArchiveEntryBuffers.test.ts
+  s_3181443b264428::t_9249c6c6a1a04b 1-47
+.claude/skills/to-spec/SKILL.md
+  s_3181443b264428::t_4ca6d081a952ad 1-75
+.agents/skills/review-code-dev/references/reviewers/architecture.md
+  s_3181443b264428::t_b7e49a56509399 1-29
+packages/db/drizzle/0049_authenticated_public_releases.sql
+  s_3181443b264428::t_985e20da497455 1-536
+packages/db/drizzle/0127_companion_dispatch_resolution.sql
+  s_3181443b264428::t_1ea3a44d565c3f 1-150
+.claude/skills/domain-modeling/SKILL.md
+  s_3181443b264428::t_930fa5284e3bb0 1-74
+packages/core/test/settings.test.ts
+  s_3181443b264428::t_037cfd4ea88f73 1-674
+.claude/skills/capture-learning-tools/scripts/inspect_ci_surface.py
+  s_3181443b264428::t_d2d51f1ee17ed6 1-115
+.agents/skills/design-frontend-dev/reference/bolder.md
+  s_3181443b264428::t_32541b27276d07 1-113
+apps/api/src/skillListQuery.test.ts
+  s_3181443b264428::t_16b82562b0a859 1-47
+apps/web/src/components/org/BillingPane.tsx
+  s_3181443b264428::t_573cf4da313f4e 1-296
+apps/api/src/skillInstall.test.ts
+  s_3181443b264428::t_73d45ca268580a 1-88
+packages/core/src/services.ts
+  s_3181443b264428::t_b9995e302f7c86 1-4880
+.claude/skills/ios-product-dev/SKILL.md
+  s_3181443b264428::t_85ce47ac0d8af2 1-97
+scripts/wait-http-ready.test.mjs
+  s_3181443b264428::t_9e2b7464a25aa5 1-45
+.agents/skills/design-frontend-dev/reference/harden.md
+  s_3181443b264428::t_50bf737c39d093 1-347
+apps/web/src/lib/org.ts
+  s_3181443b264428::t_26c357cabf49b8 1-175
+apps/worker/src/billingSupervisor.test.ts
+  s_3181443b264428::t_87dc26c098cd0a 1-226
+apps/api/test/integration/gettingStarted.integration.test.ts
+  s_3181443b264428::t_eb9be5cf146322 1-310
+packages/db/drizzle/0025_label_display_names.sql
+  s_3181443b264428::t_5b5e6c10d37606 1
+apps/api/src/seed-demo-catalog.test.ts
+  s_3181443b264428::t_8232cf03e2afb5 1-147
+scripts/dev-conductor.sh
+  s_3181443b264428::t_fa3d6d5f9a2974 1-832
+.agents/skills/resolving-merge-conflicts/agents/openai.yaml
+  s_3181443b264428::t_5cca74aec35a9d 1-3
+tools/oxlint/anti-slop/rules/no-unknown-parameters.ts
+  s_3181443b264428::t_3325b7c3049427 1-83
+.agents/skills/design-frontend-dev/reference/adapt.md
+  s_3181443b264428::t_dbde861c330760 1-311
+.claude/skills/prototype/agents/openai.yaml
+  s_3181443b264428::t_f2e4913ccba9a4 1-3
+packages/core/package.json
+  s_3181443b264428::t_7ec5b3143ad961 1-30
+cli/src/lib/errors.ts
+  s_3181443b264428::t_fff77471b04656 1-10
+packages/core/src/onboarding.ts
+  s_3181443b264428::t_70ebbaf25ea952 1-198
+apps/web/src/components/org/BillingPane.test.ts
+  s_3181443b264428::t_91edfd44852701 1-171
+packages/db/drizzle/0180_companion_runtime_v3_terminal_assistant_fallback.sql
+  s_3181443b264428::t_f6158e6a8c7658 1-334
+packages/db/drizzle/0183_companion_runtime_v3_mcp_broker_resolver.sql
+  s_3181443b264428::t_f695e68cdefd23 1-43
+packages/db/drizzle/0126_companion_agent_endpoint_read.sql
+  s_3181443b264428::t_7580e4258af7a1 1-351
+.claude/skills/grill-me/SKILL.md
+  s_3181443b264428::t_a242b95878acb5 1-7
+.agents/skills/handoff/SKILL.md
+  s_3181443b264428::t_cced28d2d91241 1-16
+apps/web/src/lib/skillDatabaseQueries.ts
+  s_3181443b264428::t_d68d24ae5aec26 1-70
+.claude/skills/prototype/SKILL.md
+  s_3181443b264428::t_b5f3fe97717dce 1-26
+SECURITY.md
+  s_3181443b264428::t_82198eafd14489 1-17
+.agents/skills/research/agents/openai.yaml
+  s_3181443b264428::t_2c2103b263ea59 1-3
+apps/web/src/lib/settingsClient.ts
+  s_3181443b264428::t_03bebb418b16bd 1-44
+.agents/skills/improve-codebase-architecture/agents/openai.yaml
+  s_3181443b264428::t_ff32e67ac9e74d 1-5
+.agents/skills/diagnosing-bugs/agents/openai.yaml
+  s_3181443b264428::t_deb169ad9b2038 1-3
+apps/web/src/app/device/capabilities/DeviceCapabilitiesApproval.tsx
+  s_3181443b264428::t_247edc668eb5f5 1-215
+packages/email/test/email.test.ts
+  s_3181443b264428::t_041f87ef5d9fd8 1-10
+scripts/ci-container-smoke.sh
+  s_3181443b264428::t_5397d8792de92c 1-132
+.claude/skills/design-frontend-dev/evals/evals.json
+  s_3181443b264428::t_77a94be96c9526 1-20
+packages/db/drizzle/0113_defer_skill_updates_to_pi_stop.sql
+  s_3181443b264428::t_81bbd52f39775e 1-808
+.agents/skills/ship-pr-dev/references/workflow.md
+  s_3181443b264428::t_06fd5731f816ba 1-64
+packages/core/test/preTenantBilling.test.ts
+  s_3181443b264428::t_0f115c28bfa3eb 1-41
+.agents/skills/review-code-dev/companion.json
+  s_3181443b264428::t_742af4d7222553 1-84
+apps/web/src/app/(app)/onboarding/page.tsx
+  s_3181443b264428::t_85cef6b484edf8 1-41
+.claude/skills/triage/SKILL.md
+  s_3181443b264428::t_814f6eb8fb8760 1-112
+packages/db/drizzle/0142_companion_thread_sync_projection.sql
+  s_3181443b264428::t_ae2e0ed5892340 1-76
+packages/contracts/src/preferences.ts
+  s_3181443b264428::t_57169fbc81b113 1-47
+apps/web/postcss.config.mjs
+  s_3181443b264428::t_3186173b497c06 1-3
+package.json
+  s_3181443b264428::t_05f0629e8f7c0e 1-67
+.github/workflows/ci.yml
+  s_3181443b264428::t_7bab247b5dbd08 1-540
+apps/web/src/app/v1/auth/google/route.ts
+  s_3181443b264428::t_8158cf9e3e85ea 1-55
+.gitleaksignore
+  s_3181443b264428::t_f3224ae47df286 1
+.agents/skills/handoff/agents/openai.yaml
+  s_3181443b264428::t_64a6258ebe3adb 1-5
+oxlint.config.ts
+  s_3181443b264428::t_593cb6d6afe015 1-42
+apps/worker/src/skillDatabaseCleanup.attachments.test.ts
+  s_3181443b264428::t_df0d03e79a731c 1-25
+.claude/skills/review-code-dev/agents/openai.yaml
+  s_3181443b264428::t_3ea8256d6c52ac 1-4
+.claude/skills/design-frontend-dev/reference/brand.md
+  s_3181443b264428::t_8fefac89548833 1-108
+apps/worker/src/billingSupervisor.ts
+  s_3181443b264428::t_0780cba540b452 1-144
+packages/db/drizzle/0118_conductor_config_proposal.sql
+  s_3181443b264428::t_fa592107f33ff1 1-32
+.claude/skills/codebase-design/DESIGN-IT-TWICE.md
+  s_3181443b264428::t_54028191f2f5ec 1-44
+README.md
+  s_3181443b264428::t_01d13b15631097 1-49
+packages/storage/tsconfig.json
+  s_3181443b264428::t_f17836601a4876 1-8
+apps/worker/src/notificationText.ts
+  s_3181443b264428::t_6560648de1530b 1-75
+apps/web/src/app/(app)/layout.tsx
+  s_3181443b264428::t_c5a256b845aec6 1-23
+tools/oxlint/anti-slop/rules/no-unsafe-dictionary-type.ts
+  s_3181443b264428::t_92a858d1968ed8 1-134
+.claude/skills/xcodebuildmcp-cli/SOURCE.md
+  s_3181443b264428::t_2c0674f9550dae 1-12
+.agents/skills/domain-modeling/agents/openai.yaml
+  s_3181443b264428::t_66d3ad11ef0cbf 1-3
+apps/web/src/app/v1/auth/forgot-password/route.ts
+  s_3181443b264428::t_4494009ed2a25c 1-26
+.agents/skills/review-code-dev/references/reviewers/security.md
+  s_3181443b264428::t_7de69decb6f631 1-29
+apps/api/src/context.test.ts
+  s_3181443b264428::t_a29f2c0c67bcf7 1-229
+.claude/skills/design-frontend-dev/reference/polish.md
+  s_3181443b264428::t_38d67a9501f2b2 1-236
+apps/api/src/sentrySanitize.ts
+  s_3181443b264428::t_5e85bcbbe45a3d 1-58
+packages/core/src/free-email-domains.d.ts
+  s_3181443b264428::t_a06e04c8e40076 1-5
+.claude/skills/review-code-dev/scripts/veille_pr_state.py
+  s_3181443b264428::t_a70e319d7f5ff3 1-228
+.github/dependabot.yml
+  s_3181443b264428::t_864801788ae9ab 1-30
+packages/contracts/src/validation.ts
+  s_3181443b264428::t_4a8907bff2980b 1-46
+packages/github/src/index.ts
+  s_3181443b264428::t_eccd966feb2d61 1-910
+.claude/skills/ship-pr-dev/evals/evals.json
+  s_3181443b264428::t_1dd30a1e299183 1-70
+packages/auth/src/agent-auth.ts
+  s_3181443b264428::t_e559e47d1a8122 1-294
+packages/contracts/src/lockfile.ts
+  s_3181443b264428::t_d48493e5eca4de 1-47
+.agents/skills/teach/agents/openai.yaml
+  s_3181443b264428::t_3cf7e5463cb9a3 1-5
+.agents/skills/swiftui-expert-dev/SKILL.md
+  s_3181443b264428::t_2a970a431912bf 1-109
+deploy/railway/Dockerfile.web
+  s_3181443b264428::t_13a0c811a93fd7 1-67
+packages/github/vitest.config.ts
+  s_3181443b264428::t_e39642ec67a99b 1-16
+.agents/skills/to-questionnaire/SKILL.md
+  s_3181443b264428::t_3e444da6febff8 1-54
+.claude/skills/improve-codebase-architecture/SKILL.md
+  s_3181443b264428::t_32ef160a10f0e0 1-71
+.claude/skills/wayfinder/agents/openai.yaml
+  s_3181443b264428::t_4cc73312225558 1-5
+packages/db/drizzle/0088_companion_delivery_lease.sql
+  s_3181443b264428::t_a6c2aba4c7f7da 1-697
+packages/core/test/skillDependencyRename.test.ts
+  s_3181443b264428::t_d7fccc0017db6f 1-344
+.agents/skills/swiftui-expert-dev/SOURCE.md
+  s_3181443b264428::t_78ee2ccc287f5e 1-12
+apps/web/src/lib/org.test.ts
+  s_3181443b264428::t_74d3e15a52c05e 1-22
+.agents/skills/tdd/mocking.md
+  s_3181443b264428::t_ce09b6245f6514 1-59
+scripts/lint-anti-slop.mjs
+  s_3181443b264428::t_978b029fcd9145 1-65
+tools/oxlint/anti-slop/LICENSE
+  s_3181443b264428::t_d6121c5a10d552 1-21
+scripts/railway-config.test.mjs
+  s_3181443b264428::t_291a715218200a 1-50
+apps/api/test/integration/skillsHubOnlyCutoverMigration.integration.test.ts
+  s_3181443b264428::t_c459e1416ea7a8 1-102
+scripts/og/og-preview.html
+  s_3181443b264428::t_974c3ab6e3ac9a 1-58
+packages/db/drizzle/0039_run_prewarms.sql
+  s_3181443b264428::t_20bed169686d29 1-236
+packages/db/package.json
+  s_3181443b264428::t_f5369658c6efd5 1-27
+packages/auth/src/index.ts
+  s_3181443b264428::t_d2a90e18da512e 1-391
+apps/web/src/lib/serverAuth.ts
+  s_3181443b264428::t_046cfe94b63105 1-43
+docs/design.md
+  s_3181443b264428::t_3daf2e89181b02 1-52
+.agents/skills/teach/MISSION-FORMAT.md
+  s_3181443b264428::t_ae9ed0327a2dde 1-31
+.claude/skills/to-questionnaire/agents/openai.yaml
+  s_3181443b264428::t_329bf28491bf66 1-5
+packages/core/src/index.ts
+  s_3181443b264428::t_62e6fa6809f786 1-10
+.agents/skills/review-code-dev/references/finding-rubric.md
+  s_3181443b264428::t_f2600fba700850 1-99
+apps/api/test/integration/agentAuthApproval.integration.test.ts
+  s_3181443b264428::t_de86e02614bd08 1-251
+tools/oxlint/anti-slop/rules/no-conditional-empty-object-spread.ts
+  s_3181443b264428::t_fec9f6afe8686a 1-49
+apps/web/src/components/org/SettingsApp.tsx
+  s_3181443b264428::t_15ab2c38443927 1-537
+apps/web/src/components/org/GitHubPane.tsx
+  s_3181443b264428::t_8dc7773d33c04e 1-509
+apps/web/next.config.ts
+  s_3181443b264428::t_154cb3d8f2c635 1-29
+cli/src/lib/session.ts
+  s_3181443b264428::t_c47739c74e5b3f 1-34
+packages/core/test/authz.test.ts
+  s_3181443b264428::t_07919efd858f34 1-193
+apps/api/test/integration/seedDemoCatalog.integration.test.ts
+  s_3181443b264428::t_c1369c6e1547cd 1-224
+.claude/skills/design-frontend-dev/SOURCE.md
+  s_3181443b264428::t_76085e3a321496 1-26
+packages/skills/test/helpers.ts
+  s_3181443b264428::t_b86a96a1cf4cc7 1-84
+packages/core/test/secretsCrypto.test.ts
+  s_3181443b264428::t_bdf095120a3285 1-69
+apps/web/src/styles/skill-databases.css
+  s_3181443b264428::t_11e3778876d92c 1-606
+packages/core/src/preTenant.ts
+  s_3181443b264428::t_486613cfd52b4f 1-413
+.claude/skills/capture-learning-tools/SKILL.md
+  s_3181443b264428::t_258f0759ef9c3b 1-152
+apps/web/src/styles/cds.css
+  s_3181443b264428::t_7970bd03562f79 1-155
+cli/src/lib/registry.ts
+  s_3181443b264428::t_ffbd392a85160f 1-67
+.agents/skills/teach/LEARNING-RECORD-FORMAT.md
+  s_3181443b264428::t_d0cd1778567d53 1-46
+.claude/skills/design-frontend-dev/reference/delight.md
+  s_3181443b264428::t_a9bc29232d71b6 1-302
+packages/db/drizzle/0078_companion_skills.sql
+  s_3181443b264428::t_a153cc88736d90 1-93
+.claude/skills/writing-for-agents/SKILL-MECHANICS.md
+  s_3181443b264428::t_f25a9a84b49ec4 1-22
+packages/db/drizzle/0007_onboarding.sql
+  s_3181443b264428::t_68cd8dcbac9b79 1-11
+apps/web/src/components/org/RoleSelect.tsx
+  s_3181443b264428::t_b1f7eeccc0a833 1-82
+.agents/skills/design-frontend-dev/reference/delight.md
+  s_3181443b264428::t_d9620874411eb7 1-302
+apps/api/test/integration/rls.integration.test.ts
+  s_3181443b264428::t_8ffce9152254f6 1-295
+apps/api/src/agentAuthRoutes.ts
+  s_3181443b264428::t_558d78ba5f8f66 1-676
+deploy/railway/README.md
+  s_3181443b264428::t_376bcbfbc859f4 1-18
+.agents/skills/review-code-dev/references/reviewers/performance.md
+  s_3181443b264428::t_8bf0dd50805041 1-28
+.claude/skills/ship-pr-dev/references/agent-routing.md
+  s_3181443b264428::t_29ace6b87bff1b 1-122
+packages/db/drizzle/0181_companion_runtime_v3_desktop_authorization.sql
+  s_3181443b264428::t_9e10b5b9c53a63 1-218
+packages/db/drizzle/0171_companion_attachment_retention.sql
+  s_3181443b264428::t_11b4ec8de94c43 1-619
+.claude/skills/review-code-dev/scripts/parse_review_findings.py
+  s_3181443b264428::t_310a4ce729d4da 1-81
+apps/web/src/components/skills/ListView.tsx
+  s_3181443b264428::t_1aacf08aaa33c6 1-673
+apps/web/src/components/org/SettingsDrawer.tsx
+  s_3181443b264428::t_a4816444604829 1-199
+apps/web/src/lib/secrets.ts
+  s_3181443b264428::t_54d33eaeada54f 1-66
+.agents/skills/grill-with-docs/agents/openai.yaml
+  s_3181443b264428::t_826296c43cacc7 1-5
+.agents/skills/design-frontend-dev/reference/optimize.md
+  s_3181443b264428::t_31f1fdf6f6c3a5 1-258
+packages/skilldb/src/index.ts
+  s_3181443b264428::t_efd9307d4c1b71 1-273
+.claude/skills/implement/agents/openai.yaml
+  s_3181443b264428::t_9ffdc65e94cf22 1-5
+cli/src/lib/paths.ts
+  s_3181443b264428::t_c7bbf06d09a2ed 1-13
+.claude/skills/grill-with-docs/SKILL.md
+  s_3181443b264428::t_55fcfc27d02222 1-7
+tools/oxlint/anti-slop/rules/no-object-parameters.ts
+  s_3181443b264428::t_7d68759357a340 1-126
+.agents/skills/grill-me/SKILL.md
+  s_3181443b264428::t_eb008b890f8aa3 1-7
+.agents/skills/codebase-design/DESIGN-IT-TWICE.md
+  s_3181443b264428::t_03d6481d1c14d3 1-44
+apps/web/src/components/skills/DependenciesTab.test.ts
+  s_3181443b264428::t_faa7970cea2ba9 1-142
+.agents/skills/xcodebuildmcp-cli/companion.json
+  s_3181443b264428::t_ebf0bf883ee285 1-39
+.agents/skills/design-frontend-dev/SKILL.md
+  s_3181443b264428::t_28c2e961577d11 1-143
+docs/runbooks/companions-runtime.md
+  s_3181443b264428::t_98928cc46e771b 1-4
+.agents/skills/review-code-dev/references/local-review-rules.md
+  s_3181443b264428::t_b390de708f2607 1-50
+apps/api/src/skillPublishGuards.test.ts
+  s_3181443b264428::t_0acee415e7124a 1-165
+apps/web/src/lib/authProxy.ts
+  s_3181443b264428::t_412dcd6f4dbccf 1-87
+apps/api/src/skillPublishGuards.ts
+  s_3181443b264428::t_1feb656c88a381 1-98
+apps/web/src/components/skills/UploadDialog.tsx
+  s_3181443b264428::t_815d919e57f1a2 1-2016
+.agents/skills/ship-pr-dev/SKILL.md
+  s_3181443b264428::t_dad8eb304b59f5 1-143
+apps/web/.eslintrc.json
+  s_3181443b264428::t_0adfff1e952824 1-6
+.agents/skills/capture-learning-tools/scripts/inspect_ci_surface.py
+  s_3181443b264428::t_638cfa593e167e 1-115
+apps/web/src/components/skills/SkillDatabaseTab.test.ts
+  s_3181443b264428::t_7a92251fcf7f4b 1-530
+apps/api/vitest.integration.config.ts
+  s_3181443b264428::t_b1d03fe7c132ec 1-14
+apps/worker/tsconfig.json
+  s_3181443b264428::t_4b86980e40083e 1-5
+.claude/skills/ship-pr-dev/references/workflow.md
+  s_3181443b264428::t_a9195245b7ef4c 1-64
+apps/api/src/skillPublishRoute.test.ts
+  s_3181443b264428::t_9d64c90575cb02 1-649
+packages/contracts/src/scope.ts
+  s_3181443b264428::t_6311a7a80f47a9 1-49
+apps/web/src/components/org/WorkspaceLoadError.test.ts
+  s_3181443b264428::t_662931dc06278a 1-37
+packages/db/drizzle/0005_api_tokens.sql
+  s_3181443b264428::t_ed5a28b49f2517 1-45
+.claude/skills/triage/OUT-OF-SCOPE.md
+  s_3181443b264428::t_674f70c8665e0e 1-105
+apps/web/src/app/s/[token]/opengraph-image.tsx
+  s_3181443b264428::t_f865848b18e2ed 1-98
+apps/api/src/billingPreviewRoute.test.ts
+  s_3181443b264428::t_37c0e3258d3577 1-116
+packages/db/tsconfig.json
+  s_3181443b264428::t_007289b2f4255d 1-9
+apps/web/src/components/landing/LandingPage.test.ts
+  s_3181443b264428::t_d716283c6c9a68 1-179
+packages/db/drizzle/0162_companion_runtime_v3_acceptance_measurement.sql
+  s_3181443b264428::t_c8bfeec8d57923 1-211
+packages/db/drizzle/0107_companion_answer_routine_decision.sql
+  s_3181443b264428::t_ee34e693bd097d 1-227
+packages/db/drizzle/meta/0001_snapshot.json
+  s_3181443b264428::t_9dde1be4ac586c 1-1595
+packages/db/drizzle/0080_companion_decisions.sql
+  s_3181443b264428::t_69139b3142e3be 1-15
+playwright.config.ts
+  s_3181443b264428::t_80f169a1fcf314 1-17
+packages/db/drizzle/0066_companion_sharing.sql
+  s_3181443b264428::t_0aefe8066c207c 1-281
+packages/db/drizzle/meta/0002_snapshot.json
+  s_3181443b264428::t_929c9ca8a882f9 1-1611
+.claude/skills/design-frontend-dev/reference/animate.md
+  s_3181443b264428::t_620e5f2d04a699 1-201
+apps/web/src/styles/app.css
+  s_3181443b264428::t_f95be87a469e59 1-390
+apps/web/src/lib/onboarding.ts
+  s_3181443b264428::t_04d20beb7c4743 1-82
+.claude/skills/design-frontend-dev/reference/colorize.md
+  s_3181443b264428::t_f58ea8e1135a0c 1-245
+apps/web/src/components/skills/FilterMenu.tsx
+  s_3181443b264428::t_76a2f4c151d94e 1-96
+apps/web/src/app/v1/auth/google/route.test.ts
+  s_3181443b264428::t_efdfdde7fd499c 1-80
+.claude/skills/capture-learning-tools/references/conversation-analysis.md
+  s_3181443b264428::t_5eb3b5471ef398 1-44
+.claude/skills/ship-pr-dev/scripts/test_collect_ship_context.py
+  s_3181443b264428::t_ad5373b45a4485 1-66
+.agents/skills/improve-codebase-architecture/SKILL.md
+  s_3181443b264428::t_d641ca19412158 1-71
+packages/contracts/test/skillListModifiers.test.ts
+  s_3181443b264428::t_778f969ba5724c 1-74
+.agents/skills/capture-learning-tools/evals/evals.json
+  s_3181443b264428::t_e83607901cb06f 1-29
+apps/worker/src/supervisors.test.ts
+  s_3181443b264428::t_3947c5d6a46100 1-41
+apps/web/src/components/skills/discussion.tsx
+  s_3181443b264428::t_024053e1b2c1d4 1-606
+apps/web/sentry.edge.config.ts
+  s_3181443b264428::t_b848ce05f4e422 1-19
+apps/web/src/components/skills/blocks.tsx
+  s_3181443b264428::t_068e1f3524b920 1-114
+.claude/skills/review-code-dev/references/local-review-rules.md
+  s_3181443b264428::t_23c14e4129a8ab 1-50
+scripts/ci-gate.test.mjs
+  s_3181443b264428::t_3f9d1e64b0957d 1-57
+apps/web/src/app/v1/auth/signup/route.ts
+  s_3181443b264428::t_69c0b3dcba9429 1-37
+packages/db/drizzle/0000_rapid_mephisto.sql
+  s_3181443b264428::t_7704b8237b85be 1-208
+.gitignore
+  s_3181443b264428::t_60f28881a3f970 1-47
+tools/oxlint/anti-slop/rules/require-safety-comment-for-type-assertion.ts
+  s_3181443b264428::t_632e80a731f3d7 1-62
+packages/core/test/skillComments.test.ts
+  s_3181443b264428::t_2ae5680ec64648 1-489
+packages/contracts/test/localSkills.test.ts
+  s_3181443b264428::t_36156ace8bd5be 1-58
+apps/worker/tsup.config.ts
+  s_3181443b264428::t_75d2f851ddf164 1-14
+.claude/skills/review-code-dev/references/reviewers/frontend.md
+  s_3181443b264428::t_3257f639d35b14 1-48
+.claude/skills/setup-matt-pocock-skills/agents/openai.yaml
+  s_3181443b264428::t_8a560cabce10ad 1-5
+.agents/skills/review-code-dev/references/reviewers/data-migration.md
+  s_3181443b264428::t_6d1929370cd001 1-28
+packages/contracts/test/onboarding.test.ts
+  s_3181443b264428::t_aeffca6d88b205 1-51
+packages/db/drizzle/0143_companion_delete_routine_preemption.sql
+  s_3181443b264428::t_ccffc7112d9c05 1-255
+packages/contracts/package.json
+  s_3181443b264428::t_53050629960ee5 1-22
+apps/web/src/app/v1/auth/logout/route.ts
+  s_3181443b264428::t_17746775834f89 1-71
+cli/src/commands/skills.ts
+  s_3181443b264428::t_387ffeecb4ceca 1-424
+packages/db/drizzle/0020_skill_owner_only.sql
+  s_3181443b264428::t_68445b783ef868 1-78
+.agents/skills/capture-learning-tools/companion.json
+  s_3181443b264428::t_480d1921c99aea 1-50
+.claude/skills/review-code-dev/references/reviewers/data-migration.md
+  s_3181443b264428::t_a160c088e87810 1-28
+packages/email/test/index.test.ts
+  s_3181443b264428::t_561767f4c1d6da 1-43
+packages/skills/vitest.config.ts
+  s_3181443b264428::t_660642a12a8b86 1-7
+packages/db/drizzle/0164_runtime_images_optional_accelerators.sql
+  s_3181443b264428::t_182c1360c66473 1-307
+apps/api/test/integration/deferredSkillUpdateMigration.integration.test.ts
+  s_3181443b264428::t_8f8aef0e1d952d 1-251
+.claude/skills/design-frontend-dev/reference/critique.md
+  s_3181443b264428::t_0e8d95c7b80649 1-59
+packages/db/drizzle/0091_companion_runtime_executor.sql
+  s_3181443b264428::t_06dd1814feea97 1-1704
+.agents/skills/triage/SKILL.md
+  s_3181443b264428::t_78e1106c71b2a1 1-112
+apps/web/src/app/(app)/skills/page.tsx
+  s_3181443b264428::t_19d894a1dfad07 1-103
+scripts/ci-rsc-smoke.sh
+  s_3181443b264428::t_5c5ca85e17b457 1-208
+apps/web/src/styles/share.css
+  s_3181443b264428::t_6a603cf34a2d23 1-319
+packages/db/drizzle/0163_companion_runtime_v3_async_prepare.sql
+  s_3181443b264428::t_c401ed981b0852 1-472
+packages/core/src/labels.ts
+  s_3181443b264428::t_932f20836013d8 1-487
+.claude/skills/swiftui-expert-dev/SKILL.md
+  s_3181443b264428::t_9fdd67588fee9a 1-109
+packages/auth/package.json
+  s_3181443b264428::t_39912dc0fc029e 1-29
+apps/web/src/app/(app)/settings/page.tsx
+  s_3181443b264428::t_16c7d0ccd3fc5d 1-15
+.agents/skills/implement/agents/openai.yaml
+  s_3181443b264428::t_744a0aad692da3 1-5
+packages/db/drizzle/0156_companion_main_start_budget_and_interruption_projection.sql
+  s_3181443b264428::t_d5002331c74afd 1-243
+.claude/skills/setup-matt-pocock-skills/issue-tracker-local.md
+  s_3181443b264428::t_ee77337fba51de 1-30
+apps/web/src/components/Icon.tsx
+  s_3181443b264428::t_01fc00993dd05c 1-251
+packages/db/drizzle/0058_project_workspace_retry_backoff.sql
+  s_3181443b264428::t_d2edaf7918dac8 1-246
+apps/worker/src/skillDatabaseCleanup.ts
+  s_3181443b264428::t_166fbd2486bf3f 1-99
+.nvmrc
+  s_3181443b264428::t_301581f2bfb999 1
+.agents/skills/wizard/template.sh
+  s_3181443b264428::t_1f666d92d26108 1-204
+.claude/skills/design-frontend-dev/reference/distill.md
+  s_3181443b264428::t_e84afce418cd4b 1-111
+docs/testing.md
+  s_3181443b264428::t_0eabec15805220 1-44
+apps/web/src/components/skills/skillActions.test.ts
+  s_3181443b264428::t_4478320d1d8921 1-201
+apps/api/tsconfig.json
+  s_3181443b264428::t_0ab196d5627643 1-9
+apps/web/src/app/(app)/@settings/default.tsx
+  s_3181443b264428::t_93463f559baeca 1-3
+.claude/skills/capture-learning-tools/references/cross-agent-linking.md
+  s_3181443b264428::t_66278d91163ede 1-56
+.agents/skills/prototype/SKILL.md
+  s_3181443b264428::t_2e9bc35994d738 1-26
+packages/db/drizzle/0153_companion_control_mcp.sql
+  s_3181443b264428::t_24aea06bd552a4 1-1261
+apps/web/src/app/s/[token]/PublicSkillActions.tsx
+  s_3181443b264428::t_a7e234df5d0525 1-162
+apps/api/src/cutover.test.ts
+  s_3181443b264428::t_68fc27f7e30ab1 1-54
+apps/web/src/components/skills/prompts.ts
+  s_3181443b264428::t_d8dfc685ca5ab7 1-31
+apps/api/package.json
+  s_3181443b264428::t_534d3fe7055f97 1-57
+.claude/skills/review-code-dev/references/reviewers/security.md
+  s_3181443b264428::t_0bb88042e2f03f 1-29
+apps/web/src/components/skills/LocalSkillsView.tsx
+  s_3181443b264428::t_fa1f24b6d8cfc5 1-824
+apps/web/src/app/s/[token]/go/route.test.ts
+  s_3181443b264428::t_a3853993c73b8e 1-73
+apps/api/src/whoamiRoute.test.ts
+  s_3181443b264428::t_7632087daaf3b3 1-205
+apps/web/src/app/global-error.tsx
+  s_3181443b264428::t_8e3e20102706a8 1-60
+scripts/anti-slop-targets.mjs
+  s_3181443b264428::t_2369c3d6e90497 1-33
+packages/core/test/githubSync.test.ts
+  s_3181443b264428::t_97a8f97b310f82 1-195
+packages/db/drizzle/0141_companion_routine_proposal_upsert.sql
+  s_3181443b264428::t_9fcbf103022040 1-354
+packages/skills/src/pack.ts
+  s_3181443b264428::t_316f5258905405 1-76
+.agents/skills/implement/SKILL.md
+  s_3181443b264428::t_d338bad9a6e289 1-15
+apps/api/test/integration/runtimeCutoverMigration.integration.test.ts
+  s_3181443b264428::t_97ef9386efb549 1-602
+packages/db/drizzle/0032_billing.sql
+  s_3181443b264428::t_f45e17cfdcec24 1-56
+apps/web/src/components/branding.tsx
+  s_3181443b264428::t_e339b42b222495 1-119
+.agents/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
+  s_3181443b264428::t_788c1aa7ef9cf8 1-44
+cli/README.md
+  s_3181443b264428::t_84998cf8cc2351 1-62
+apps/web/src/components/skills/useSkillDrag.ts
+  s_3181443b264428::t_ca35294b46e3aa 1-253
+apps/web/src/styles/skills.css
+  s_3181443b264428::t_98ea5696c5f35e 1-1627
+apps/web/src/components/org/paneKit.tsx
+  s_3181443b264428::t_9b85b0b94bab40 1-188
+.claude/skills/xcodebuildmcp-cli/companion.json
+  s_3181443b264428::t_5bf994a0e26e5d 1-39
+.claude/skills/design-frontend-dev/LICENSE
+  s_3181443b264428::t_0b631de0f3a01d 1-191
+.claude/skills/capture-learning-tools/references/project-memory.md
+  s_3181443b264428::t_7490a4c1a9ce83 1-46
+packages/db/drizzle/0150_companion_needs_input_claim_damper.sql
+  s_3181443b264428::t_333bd8955abf32 1-1550
+scripts/ci-gate.mjs
+  s_3181443b264428::t_a5288fbd76a7d3 1-61
+.agents/skills/triage/AGENT-BRIEF.md
+  s_3181443b264428::t_760b6e3fd1ae70 1-207
+apps/api/src/migrate.ts
+  s_3181443b264428::t_70d4b62fe9a223 1-512
+packages/email/src/index.ts
+  s_3181443b264428::t_d50d2c8f66d075 1-171
+.claude/skills/review-code-dev/companion.json
+  s_3181443b264428::t_37fceca9169556 1-84
+apps/api/test/integration/skillLifecycle.integration.test.ts
+  s_3181443b264428::t_c6bd9e8c1f88e0 1-318
+.claude/skills/review-code-dev/references/finding-rubric.md
+  s_3181443b264428::t_66e24ecf199f4a 1-99
+cli/src/lib/client.ts
+  s_3181443b264428::t_06c632424f9993 1-48
+.agents/skills/triage/OUT-OF-SCOPE.md
+  s_3181443b264428::t_caeaac9102b046 1-105
+apps/web/src/components/skills/ListView.test.ts
+  s_3181443b264428::t_70216c9b48b0ce 1-566
+.agents/skills/code-review/SKILL.md
+  s_3181443b264428::t_05d72409926be7 1-87
+scripts/disposable-db-roles.sql
+  s_3181443b264428::t_eeacf2bba2dc4c 1-41
+.agents/skills/ship-pr-dev/scripts/.gitignore
+  s_3181443b264428::t_bbe63021b73ca3 1-2
+.agents/skills/review-code-dev/evals/evals.json
+  s_3181443b264428::t_e3ed3ec0b2b805 1-105
+.claude/skills/capture-learning-tools/scripts/inspect_project_guidance.py
+  s_3181443b264428::t_57dc555866c1f1 1-137
+packages/db/drizzle/0121_companion_mcp_selection_lock.sql
+  s_3181443b264428::t_03312bbe68614f 1-103
+apps/web/src/components/org/WorkspaceLoadError.tsx
+  s_3181443b264428::t_1e3083e19e0bb1 1-53
+apps/worker/src/skillDatabaseCleanup.test.ts
+  s_3181443b264428::t_4834122dbd2226 1-100
+apps/web/src/lib/apiServer.ts
+  s_3181443b264428::t_d9c36cf067b23b 1-103
+packages/skilldb/src/worker.mjs
+  s_3181443b264428::t_ac084a1029ff9e 1-304
+apps/web/src/components/skills/dragGeometry.ts
+  s_3181443b264428::t_42b02fef7b8cce 1-127
+apps/web/src/components/skills/listGrouping.ts
+  s_3181443b264428::t_09bac9409e791b 1-242
+packages/db/drizzle/0169_companion_runtime_v3_ambiguous_self_heal.sql
+  s_3181443b264428::t_b3839460f25d34 1-705
+packages/db/drizzle/0147_companion_trigger_v2_engine.sql
+  s_3181443b264428::t_740c8c91ffcfc0 1-972
+apps/web/src/lib/settingsViewModel.ts
+  s_3181443b264428::t_d8862441fe402e 1-149
+packages/skills/src/constants.ts
+  s_3181443b264428::t_697faa214feb55 1-40
+packages/db/drizzle/0182_companion_runtime_v3_thread_projection.sql
+  s_3181443b264428::t_6be5d8d251ac78 1-22
+packages/contracts/src/index.ts
+  s_3181443b264428::t_79eb0ea54518dd 1-21
+.claude/skills/capture-learning-tools/evals/evals.json
+  s_3181443b264428::t_141267e2715670 1-29
+.claude/skills/capture-learning-tools/references/promotion-matrix.md
+  s_3181443b264428::t_fec6d8acd4082b 1-44
+packages/db/drizzle/0085_companion_timeout_restart.sql
+  s_3181443b264428::t_b576fd40a69863 1-14
+.claude/skills/ship-pr-dev/references/pr-template.md
+  s_3181443b264428::t_92dd38d2b84707 1-75
+.agents/skills/review-code-dev/references/reviewers/tests.md
+  s_3181443b264428::t_ef607b7e2ff192 1-28
+cli/src/lib/lockfile.ts
+  s_3181443b264428::t_8695cd8fa180d4 1-38
+packages/db/drizzle/0119_companion_icons.sql
+  s_3181443b264428::t_d82d63295676da 1-362
+.claude/skills/prototype/LOGIC.md
+  s_3181443b264428::t_d859401c7dfa7b 1-67
+scripts/run-skill-guards.sh
+  s_3181443b264428::t_e85cea2dde4e21 1-26
+packages/db/drizzle/0010_skill_comment_threads.sql
+  s_3181443b264428::t_a2b072dc0550a9 1-6
+.agents/skills/teach/GLOSSARY-FORMAT.md
+  s_3181443b264428::t_33abec9a5bf551 1-35
+CLAUDE.md
+  s_3181443b264428::t_aa7138294bcce7 1-48
+apps/web/src/components/org/WorkspaceLogoPicker.tsx
+  s_3181443b264428::t_13b039e897e7ce 1-341
+.claude/skills/review-code-dev/references/reviewers/architecture.md
+  s_3181443b264428::t_0dcf6bec86d25d 1-29
+.agents/skills/README.md
+  s_3181443b264428::t_012886fcd0e87b 1-19
+packages/db/drizzle/meta/0006_snapshot.json
+  s_3181443b264428::t_80238373155703 1-1852
+tools/oxlint/anti-slop/rules/no-shape-in-symbol-names.ts
+  s_3181443b264428::t_0399e7efcf6afc 1-39
+apps/web/src/app/globals.css
+  s_3181443b264428::t_2cd8014a2208da 1-27
+.agents/skills/diagnosing-bugs/SKILL.md
+  s_3181443b264428::t_1aae5d7a753123 1-138
+apps/web/src/components/secrets/SecretsApp.test.ts
+  s_3181443b264428::t_a7db628f22f058 1-267
+apps/web/src/components/skills/SkillDatabaseTab.tsx
+  s_3181443b264428::t_db7b90a33383d5 1-996
+packages/db/drizzle/0030_user_avatar.sql
+  s_3181443b264428::t_be6d74975da772 1
+apps/web/src/components/org/MembersPane.tsx
+  s_3181443b264428::t_1716c77a16f93b 1-113
+apps/api/test/integration/deleteResumeMigration.integration.test.ts
+  s_3181443b264428::t_5a7820319e5776 1-314
+apps/web/src/components/org/Onboarding.tsx
+  s_3181443b264428::t_92e3d5c49593b1 1-171
+packages/db/drizzle/0124_companion_notifications.sql
+  s_3181443b264428::t_4c953ea9a2bcd7 1-732
+.agents/skills/swiftui-expert-dev/companion.json
+  s_3181443b264428::t_091eb63f96a31b 1-39
+packages/core/test/gettingStarted.test.ts
+  s_3181443b264428::t_c59216c375cc48 1-44
+packages/db/drizzle/0084_companion_timeout_recovery.sql
+  s_3181443b264428::t_7c303b25f917f0 1-151
+packages/db/drizzle/0116_companion_trigger_target.sql
+  s_3181443b264428::t_964bb633e94bfd 1-702
+apps/web/src/app/v1/auth/reset-password/route.ts
+  s_3181443b264428::t_e0f243bf6e81e5 1-45
+.agents/skills/tdd/agents/openai.yaml
+  s_3181443b264428::t_3282f63c096d7f 1-3
+apps/web/src/components/secrets/SkillSecretConfiguration.tsx
+  s_3181443b264428::t_71ad76d0d028bb 1-114
+packages/db/drizzle/0048_skill_sidebar_order_preference.sql
+  s_3181443b264428::t_06fe398ee63eea 1-2
+apps/web/src/lib/apiServer.test.ts
+  s_3181443b264428::t_6cf5113a2d0a58 1-39
+packages/db/drizzle/0037_reactivate_runs.sql
+  s_3181443b264428::t_dfb79f273c1d84 1-202
+.claude/skills/design-frontend-dev/reference/clarify.md
+  s_3181443b264428::t_f05252b6564878 1-288
+packages/db/drizzle/meta/0131_snapshot.json
+  s_3181443b264428::t_895fad5323ad2d 1-1852
+apps/api/test/integration/skillsHubOnlyMigration.integration.test.ts
+  s_3181443b264428::t_2059c7e8d44ff4 1-88
+packages/db/drizzle/0019_skill_comment_images.sql
+  s_3181443b264428::t_b9edd81a616059 1-21
+apps/web/src/components/landing/LandingPage.tsx
+  s_3181443b264428::t_8e791fbe756651 1-736
+cli/tsconfig.json
+  s_3181443b264428::t_f8bd64c6725c48 1-9
+packages/db/drizzle/0144_companion_routine_lane_failure_accounting.sql
+  s_3181443b264428::t_b0bfbe957d9f9f 1-187
+packages/skills/src/manifest.ts
+  s_3181443b264428::t_c83ce0568c29ad 1-202
+apps/web/src/components/onboarding/OnboardingFlow.tsx
+  s_3181443b264428::t_776ced09d75316 1-238
+packages/core/test/tokenRefresh.test.ts
+  s_3181443b264428::t_a1600ac8fc2bd6 1-147
+packages/core/test/publicSkillTransferTicket.test.ts
+  s_3181443b264428::t_dbc44394a33c73 1-178
+apps/web/src/app/(app)/error.tsx
+  s_3181443b264428::t_fe70a5bdfc171b 1-37
+scripts/ci-scope.test.mjs
+  s_3181443b264428::t_61a71f9e65d6f7 1-181
+.agents/skills/design-frontend-dev/evals/evals.json
+  s_3181443b264428::t_c5683b391f3700 1-20
+.claude/skills/capture-learning-tools/references/non-technical-mode.md
+  s_3181443b264428::t_27a73c770b5edc 1-36
+packages/db/drizzle/0168_companion_runtime_v3_turn_bounds.sql
+  s_3181443b264428::t_118c858ef64f12 1-529
+.claude/skills/README.md
+  s_3181443b264428::t_3a7b1ac51a2d70 1-19
+cli/src/lib/client.test.ts
+  s_3181443b264428::t_a8483af9c415e2 1-40
+.claude/skills/review-code-dev/scripts/.gitignore
+  s_3181443b264428::t_712351c87a5739 1-2
+packages/contracts/test/secrets.test.ts
+  s_3181443b264428::t_05acde2a8e4140 1-77
+.agents/skills/to-tickets/SKILL.md
+  s_3181443b264428::t_ef8a0a833a230e 1-105
+apps/web/src/components/org/OrgSwitcher.tsx
+  s_3181443b264428::t_cb2cac7a419a82 1-86
+.agents/skills/design-frontend-dev/reference/colorize.md
+  s_3181443b264428::t_2efad70b449d7b 1-245
+apps/web/src/app/privacy/page.test.ts
+  s_3181443b264428::t_1124873e18db90 1-54
+.agents/skills/ask-matt/agents/openai.yaml
+  s_3181443b264428::t_e9e9600f00d719 1-5
+apps/web/src/components/skills/fileview.tsx
+  s_3181443b264428::t_9a887e3ab93dcc 1-467
+tools/oxlint/anti-slop/rules/no-widen-then-assert.ts
+  s_3181443b264428::t_0adb2b201625df 1-366
+packages/core/src/deploymentRelease.ts
+  s_3181443b264428::t_420845693c2e42 1-29
+.claude/skills/wizard/SKILL.md
+  s_3181443b264428::t_74a62af42a47df 1-44
+apps/worker/src/githubSupervisor.test.ts
+  s_3181443b264428::t_c05d5de20a2db2 1-326
+.claude/skills/wayfinder/SKILL.md
+  s_3181443b264428::t_ad1c8817596b3b 1-128
+.claude/skills/design-frontend-dev/SKILL.md
+  s_3181443b264428::t_9d06e9f5dd50a4 1-143
+.agents/skills/xcodebuildmcp-cli/SKILL.md
+  s_3181443b264428::t_e5096298a2defb 1-81
+packages/skills/src/validateSkill.ts
+  s_3181443b264428::t_4ceaaa76cfe560 1-356
+cli/src/index.ts
+  s_3181443b264428::t_40356f98ed611e 1-163
+.claude/skills/ship-pr-dev/SKILL.md
+  s_3181443b264428::t_ea2e5f36667b5a 1-143
+packages/db/drizzle/0042_run_prompt_queue_stop.sql
+  s_3181443b264428::t_86dabba1b8ebcc 1-504
+.agents/skills/capture-learning-tools/references/agent-instructions.md
+  s_3181443b264428::t_81960a51a95a70 1-71
+packages/core/src/secretsCrypto.ts
+  s_3181443b264428::t_22d516e29066b3 1-183
+.agents/skills/xcodebuildmcp-cli/evals/evals.json
+  s_3181443b264428::t_69a5b440cfabfb 1-25
+packages/contracts/src/agentOperations.ts
+  s_3181443b264428::t_a8db706ea98891 1-210
+docs/companions-runtime.md
+  s_3181443b264428::t_aa76e6a82b7ca0 1-20
+packages/db/drizzle/0021_labels.sql
+  s_3181443b264428::t_3f3be1c56cfa28 1-48
+.claude/skills/wait-what/agents/openai.yaml
+  s_3181443b264428::t_ec655b1333a649 1-5
+packages/db/drizzle/0137_companion_routine_isolation.sql
+  s_3181443b264428::t_1ebcc7bdb9234d 1-889
+packages/contracts/src/skillDatabase.ts
+  s_3181443b264428::t_6c0db9287099df 1-452
+apps/api/src/trpc.ts
+  s_3181443b264428::t_be6077c08af65f 1-42
+apps/web/src/app/(auth)/login/LoginForm.tsx
+  s_3181443b264428::t_6a1625b84c4b03 1-915
+packages/db/drizzle/0022_drop_skill_ownership.sql
+  s_3181443b264428::t_51a9cdff9801dd 1-32
+packages/core/tsconfig.json
+  s_3181443b264428::t_bb63478b2abcb5 1-7
+packages/db/drizzle/0135_companion_routine_run_history.sql
+  s_3181443b264428::t_41ccb3c30099c6 1-585
+packages/db/drizzle/0105_companion_subagent_tool_runs.sql
+  s_3181443b264428::t_0af50e6669e65c 1-589
+packages/db/drizzle/0099_companion_attempt_outputs.sql
+  s_3181443b264428::t_b78e924debcd1e 1-302
+apps/web/src/components/org/useOrgActions.ts
+  s_3181443b264428::t_908ce9e10ec0dd 1-64
+packages/storage/test/storage.test.ts
+  s_3181443b264428::t_a8460ba5551ebc 1-332
+apps/web/src/components/skills/route.ts
+  s_3181443b264428::t_d18aaff24683d6 1-167
+scripts/dev-worker.sh
+  s_3181443b264428::t_757f26b44e61a0 1-5
+deploy/railway/Dockerfile.backend
+  s_3181443b264428::t_1daf5294ed0e52 1-61
+.agents/skills/capture-learning-tools/references/ci-policy.md
+  s_3181443b264428::t_83d77ddbf9d8f7 1-84
+deploy/railway/web.railway.json
+  s_3181443b264428::t_3bf1a19087800e 1-31
+apps/web/next-env.d.ts
+  s_3181443b264428::t_dbf9349242951a 1-6
+.claude/skills/teach/RESOURCES-FORMAT.md
+  s_3181443b264428::t_bc1e770e47067d 1-32
+.agents/skills/setup-matt-pocock-skills/agents/openai.yaml
+  s_3181443b264428::t_d552d36841a70c 1-5
+packages/db/drizzle/0115_companion_trigger_plugin_gate.sql
+  s_3181443b264428::t_fce1f66c15d3f4 1-179
+apps/web/src/styles/settings.css
+  s_3181443b264428::t_3ea01104caa019 1-853
+packages/core/src/domainAccess.ts
+  s_3181443b264428::t_0b015278c363a1 1-168
+.claude/skills/review-code-dev/references/review-intelligence.md
+  s_3181443b264428::t_5ef380dc4badc6 1-113
+cli/src/commands/skills.test.ts
+  s_3181443b264428::t_feb21fce0a70cd 1-252
+packages/db/drizzle/0172_companion_runtime_v3_background_routines.sql
+  s_3181443b264428::t_d68d137f159c1c 1-1273
+.claude/skills/design-frontend-dev/reference/overdrive.md
+  s_3181443b264428::t_bd4e97c7ef150d 1-130
+.claude/skills/code-review/SKILL.md
+  s_3181443b264428::t_72f69616fa34f5 1-87
+.agents/skills/capture-learning-tools/references/examples.md
+  s_3181443b264428::t_c47a538a7c3742 1-61
+apps/api/test/integration/skillDatabases.integration.test.ts
+  s_3181443b264428::t_01010bc812ca96 1-1357
+apps/web/src/app/v1/auth/signin/route.ts
+  s_3181443b264428::t_de3e14209b46ec 1-37
+apps/api/src/context.ts
+  s_3181443b264428::t_1bc6ea99123bd0 1-218
+LICENSE
+  s_3181443b264428::t_cc6f9ca561b88b 1-21
+packages/github/src/index.test.ts
+  s_3181443b264428::t_74d82c6d4c3189 1-885
+deploy/railway/release.railway.json
+  s_3181443b264428::t_3fbac8d3b9d699 1-23
+packages/db/drizzle/0159_companion_runtime_v3_progression.sql
+  s_3181443b264428::t_f4920938a99966 1-648
+.agents/skills/codebase-design/SKILL.md
+  s_3181443b264428::t_beb05333e7b175 1-114
+tools/oxlint/anti-slop/rules/no-module-mocking.ts
+  s_3181443b264428::t_bee5e22715f84e 1-91
+packages/db/drizzle/0111_companion_triggers.sql
+  s_3181443b264428::t_2f147eceebaea9 1-2109
+apps/web/src/components/org/BillingPane.client.test.ts
+  s_3181443b264428::t_fadf5deece2f37 1-158
+packages/core/src/gettingStarted.ts
+  s_3181443b264428::t_6694a7c918b5e1 1-240
+packages/db/drizzle/0033_personal_shared_secrets.sql
+  s_3181443b264428::t_2a4fcf06415ed5 1-268
+apps/web/src/components/ResourceList.tsx
+  s_3181443b264428::t_eb9bf050c40d17 1-128
+apps/web/src/components/skills/SkillPanel.test.ts
+  s_3181443b264428::t_71fe02a115d946 1-168
+apps/api/src/migrate.test.ts
+  s_3181443b264428::t_c81f3fc4726a19 1-419
+packages/skilldb/tsconfig.json
+  s_3181443b264428::t_8ba2e8203e7ea7 1-7
+packages/core/test/email-domains.test.ts
+  s_3181443b264428::t_4b65d72979ace2 1-43
+apps/web/src/components/org/roles.ts
+  s_3181443b264428::t_ab670c2a69b7b6 1-21
+apps/web/src/components/skills/markdown.tsx
+  s_3181443b264428::t_2dfe9bb9b583ba 1-204
+.claude/skills/writing-for-agents/SKILL.md
+  s_3181443b264428::t_4443ab994fcd79 1-81
+apps/web/sentry.client.config.ts
+  s_3181443b264428::t_f311f97da68a39 1-18
+.claude/skills/capture-learning-tools/companion.json
+  s_3181443b264428::t_acfc418e68258a 1-50
+apps/api/vitest.config.ts
+  s_3181443b264428::t_1f13fcb7b0bb76 1-11
+apps/web/src/components/org/ConnectedAgentsPane.tsx
+  s_3181443b264428::t_05703716c7a173 1-218
+apps/web/src/components/org/primitives.tsx
+  s_3181443b264428::t_6a1a0c31363ec4 1-108
+.agents/skills/review-code-dev/scripts/veille_pr_state.py
+  s_3181443b264428::t_9125a878d0cd43 1-228
+.claude/skills/teach/SKILL.md
+  s_3181443b264428::t_1ea99b5604851a 1-140
+.claude/skills/ship-pr-dev/scripts/collect_ship_context.py
+  s_3181443b264428::t_7ed57ed894a4a9 1-217
+apps/web/src/lib/currentOrg.ts
+  s_3181443b264428::t_43db501feafda4 1-27
+.conductor/settings.toml
+  s_3181443b264428::t_1878c3204a292c 1-17
+.claude/skills/tdd/tests.md
+  s_3181443b264428::t_e987fa85bb1b2f 1-77
+packages/db/drizzle/0125_companion_box_agent_endpoint.sql
+  s_3181443b264428::t_fe9127aff00c43 1-181
+.agents/skills/review-code-dev/references/subagent-briefs.md
+  s_3181443b264428::t_7f725108b7a2ba 1-335
+packages/core/test/deploymentRelease.test.ts
+  s_3181443b264428::t_b4402199a5bd4b 1-41
+.claude/skills/swiftui-expert-dev/companion.json
+  s_3181443b264428::t_8700fcca0a6469 1-39
+packages/db/drizzle/0165_companion_runtime_v3_complete_preparation.sql
+  s_3181443b264428::t_ce1836c9981309 1-813
+.claude/skills/grilling/agents/openai.yaml
+  s_3181443b264428::t_115207920af69f 1-3
+apps/api/src/runtimeRoleGrants.test.ts
+  s_3181443b264428::t_70703e7c38d523 1-426
+.agents/skills/ios-product-dev/companion.json
+  s_3181443b264428::t_82759fbca8bbe5 1-41
+tools/oxlint/anti-slop/rules/no-reflect-apply.ts
+  s_3181443b264428::t_66090111bd90b6 1-28
+apps/web/src/styles/landing.css
+  s_3181443b264428::t_ad9cea96bdb1bb 1-686
+apps/web/src/components/skills/Sidebar.tsx
+  s_3181443b264428::t_fccf0c4acfe3d9 1-916
+packages/db/drizzle/0074_companion_box_runtime_restore.sql
+  s_3181443b264428::t_0ecbc3e43583c5 1-98
+packages/db/drizzle/0110_companion_material_snapshot_expiry.sql
+  s_3181443b264428::t_9b717740b96482 1-1036
+packages/core/src/skillDatabaseRuntime.ts
+  s_3181443b264428::t_53ce275cc1f046 1-67
+packages/core/src/timezone.ts
+  s_3181443b264428::t_a3b134e8196d24 1-10
+packages/core/src/githubSync.ts
+  s_3181443b264428::t_940c697d73b1be 1-965
+.claude/skills/ios-product-dev/SOURCE.md
+  s_3181443b264428::t_b70306ff8c83ec 1-15
+apps/web/src/app/s/[token]/page.tsx
+  s_3181443b264428::t_bff07268af4e85 1-147
+apps/api/src/seed-demo-catalog.ts
+  s_3181443b264428::t_13613162425a2d 1-384
+packages/db/drizzle/0132_member_timezone.sql
+  s_3181443b264428::t_08f1881252855c 1-128
+packages/db/drizzle/0067_companion_persona.sql
+  s_3181443b264428::t_8bd8a4c87d1185 1-5
+packages/skills/test/secretSlots.test.ts
+  s_3181443b264428::t_10c004f73532e2 1-27
+packages/db/drizzle/0178_companion_runtime_v3_client_recovery.sql
+  s_3181443b264428::t_5f7a138ba7b62e 1-279
+.claude/skills/ship-pr-dev/scripts/.gitignore
+  s_3181443b264428::t_90c5edade00d9b 1-2
+.agents/skills/writing-for-agents/SKILL.md
+  s_3181443b264428::t_cb2ce0e073e887 1-81
+packages/contracts/src/personalLabels.ts
+  s_3181443b264428::t_7bcf9219b3a719 1-38
+packages/skills/package.json
+  s_3181443b264428::t_d5fc456ee8420d 1-26
+apps/api/src/index.ts
+  s_3181443b264428::t_81475a82c41ef7 1-3971
+apps/web/src/lib/settingsData.test.ts
+  s_3181443b264428::t_fb32fe0cc06ce1 1-168
+packages/auth/src/agent-auth-origin.test.ts
+  s_3181443b264428::t_4c6ac874b1a41f 1-115
+packages/skilldb/package.json
+  s_3181443b264428::t_cee22162967969 1-24
+.claude/skills/setup-matt-pocock-skills/issue-tracker-gitlab.md
+  s_3181443b264428::t_07e3ec153bc80c 1-46
+packages/skills/src/frontmatter.ts
+  s_3181443b264428::t_13a743d99ebc38 1-171
+packages/skills/test/requirements.test.ts
+  s_3181443b264428::t_8cc9929c1d901b 1-111
+.agents/skills/ios-product-dev/SKILL.md
+  s_3181443b264428::t_62d7475540312c 1-97
+packages/db/drizzle/0060_skill_databases.sql
+  s_3181443b264428::t_43ff6bf8189fa1 1-334
+packages/auth/tsconfig.json
+  s_3181443b264428::t_fa687b36214117 1-9
+apps/web/src/app/v1/auth/verify-email/send/route.ts
+  s_3181443b264428::t_1be1b65f21c3e8 1-27
+packages/db/drizzle/0120_companion_mcp_token_broker.sql
+  s_3181443b264428::t_0bcf9d5c8e012b 1-315
+packages/core/test/skillListModifiers.test.ts
+  s_3181443b264428::t_af60ef1abaa69d 1-187
+packages/db/drizzle/0170_companion_runtime_v3_human_decisions.sql
+  s_3181443b264428::t_2837fa293adf05 1-760
+.agents/skills/ship-pr-dev/references/pr-template.md
+  s_3181443b264428::t_8991250e8af922 1-75
+.claude/skills/resolving-merge-conflicts/SKILL.md
+  s_3181443b264428::t_25a5557cb50a35 1-14
+.claude/skills/to-questionnaire/SKILL.md
+  s_3181443b264428::t_889eb5df4e5519 1-54
+.agents/skills/review-code-dev/scripts/.gitignore
+  s_3181443b264428::t_5fc1202b106555 1-2
+packages/contracts/src/github.ts
+  s_3181443b264428::t_7d224c2cdeb835 1-143
+.agents/skills/design-frontend-dev/reference/product.md
+  s_3181443b264428::t_3bc6336fe889e8 1-60
+packages/contracts/src/skill.ts
+  s_3181443b264428::t_efc05bda7c9def 1-525
+packages/contracts/src/orgSettings.ts
+  s_3181443b264428::t_8f3df93cb40cb4 1-179
+packages/skilldb/test/runtime.test.ts
+  s_3181443b264428::t_4239b39b9f013a 1-523
+CONTRIBUTING.md
+  s_3181443b264428::t_c40ea5157771ef 1-39
+packages/contracts/src/billing.ts
+  s_3181443b264428::t_54ce350ef2fd28 1-119
+.agents/skills/ios-product-dev/evals/evals.json
+  s_3181443b264428::t_3a4b96a2f59bbf 1-25
+apps/web/src/components/skills/sidebarTree.test.ts
+  s_3181443b264428::t_fadb431a7c52a9 1-71
+apps/web/src/styles/mobile-form-controls.test.ts
+  s_3181443b264428::t_fc10304f3103de 1-87
+.claude/skills/xcodebuildmcp-cli/LICENSE
+  s_3181443b264428::t_76c23cf952897d 1-21
+.agents/skills/design-frontend-dev/reference/brand.md
+  s_3181443b264428::t_4353ca4aef83e6 1-108
+packages/core/test/publicSkillRelease.test.ts
+  s_3181443b264428::t_597035c68e00ce 1-259
+packages/db/drizzle/0086_companion_tool_timeout_v2.sql
+  s_3181443b264428::t_b933f0a9a3832b 1-171
+packages/db/drizzle/0174_companion_runtime_v3_delegations.sql
+  s_3181443b264428::t_77f5d7052053dc 1-765
+.claude/skills/capture-learning-tools/references/agent-instructions.md
+  s_3181443b264428::t_e319ba837ee0b5 1-71
+packages/db/drizzle/0014_skill_dependencies.sql
+  s_3181443b264428::t_48480ca31fc0f3 1-25
+apps/worker/src/notificationText.test.ts
+  s_3181443b264428::t_4fc812ac458a3d 1-81
+.agents/skills/wizard/agents/openai.yaml
+  s_3181443b264428::t_2c7d7053fa6910 1-3
+apps/api/src/sentrySanitize.test.ts
+  s_3181443b264428::t_3a09902b804064 1-27
+packages/db/drizzle/0100_companion_config_proposal.sql
+  s_3181443b264428::t_6462e2e297f6d5 1-1019
+packages/db/drizzle/0130_companion_expired_denial.sql
+  s_3181443b264428::t_1ac033a3ea4969 1-60
+apps/web/test/setup.ts
+  s_3181443b264428::t_1ea40eb73b1e62 1-35
+packages/db/drizzle/0173_companion_runtime_v3_background_triggers.sql
+  s_3181443b264428::t_a208de0b5a3dcb 1-621
+.claude/skills/review-code-dev/scripts/prepare_review_run.py
+  s_3181443b264428::t_5162f5c4af560b 1-137
+packages/db/drizzle/0152_companion_thread_incremental_projection.sql
+  s_3181443b264428::t_130a5617f28930 1-771
+apps/web/src/styles/secrets.css
+  s_3181443b264428::t_9287db0310881e 1-162
+.agents/skills/ship-pr-dev/references/readiness-gates.md
+  s_3181443b264428::t_bc585364803f6e 1-93
+packages/skills/src/index.ts
+  s_3181443b264428::t_60d91222291ee3 1-10
+apps/api/test/integration/publicSkillRelease.integration.test.ts
+  s_3181443b264428::t_5bb1799fe05c98 1-515
+.agents/skills/domain-modeling/SKILL.md
+  s_3181443b264428::t_025a3274f36db5 1-74
+apps/api/test/integration/testDatabase.ts
+  s_3181443b264428::t_a7c0fe2af205b3 1-202
+scripts/agent-browser-smoke.sh
+  s_3181443b264428::t_8f389b5ee5c316 1-616
+packages/skills/test/validateSkill.test.ts
+  s_3181443b264428::t_ce1ed8c97a9f27 1-621
+apps/web/src/components/org/ConnectedAgentsPane.test.ts
+  s_3181443b264428::t_404927b4762605 1-128
+scripts/dev-stack.sh
+  s_3181443b264428::t_32e55216e0a384 1-574
+packages/db/drizzle/0133_companion_tool_identity.sql
+  s_3181443b264428::t_a59a0d69983765 1-29
+packages/db/src/runtimeRole.ts
+  s_3181443b264428::t_0bb847de138416 1-379
+cli/tsup.config.ts
+  s_3181443b264428::t_9e34be439c02e6 1-12
+apps/web/src/components/org/GitHubSkillsPanel.tsx
+  s_3181443b264428::t_87df2654a78040 1-331
+packages/db/drizzle/0160_companion_runtime_v2_purge.sql
+  s_3181443b264428::t_09bf9c34140b25 1-461
+.agents/skills/review-code-dev/scripts/test_veille_pr_state.py
+  s_3181443b264428::t_fefabe3b194f61 1-56
+packages/db/drizzle/0070_companion_runtime_error.sql
+  s_3181443b264428::t_b048540861294a 1-5
+apps/web/src/app/s/[token]/preview.ts
+  s_3181443b264428::t_7512e1617f74c8 1-56
+.claude/skills/diagnosing-bugs/scripts/hitl-loop.template.sh
+  s_3181443b264428::t_291b1641dcae0f 1-44
+deploy/railway/worker.railway.json
+  s_3181443b264428::t_31e9634b35b866 1-29
+apps/web/src/app/(auth)/login/page.tsx
+  s_3181443b264428::t_b84129c658fc5f 1-50
+packages/db/drizzle/0089_legacy_companion_purge.sql
+  s_3181443b264428::t_051207ccd77b39 1-337
+.claude/skills/ios-product-dev/evals/evals.json
+  s_3181443b264428::t_e95393658600cb 1-25
+.claude/skills/design-frontend-dev/companion.json
+  s_3181443b264428::t_92371ae4448b37 1-48
+.claude/skills/review-code-dev/references/subagent-briefs.md
+  s_3181443b264428::t_15209f9d0d101a 1-335
+.agents/skills/capture-learning-tools/references/project-memory.md
+  s_3181443b264428::t_efde8c595af145 1-46
+scripts/lint-anti-slop.integration.test.mjs
+  s_3181443b264428::t_290eb839da401b 1-93
+.claude/skills/review-code-dev/references/reviewers/red-team.md
+  s_3181443b264428::t_402a0c9327010d 1-30
+packages/contracts/test/github.test.ts
+  s_3181443b264428::t_3fb57a3b12ccc4 1-30
+apps/api/test/integration/migrationOwner.integration.test.ts
+  s_3181443b264428::t_1480ee68984170 1-91
+.agents/skills/prototype/UI.md
+  s_3181443b264428::t_5e17027699f5dd 1-112
+.claude/skills/ask-matt/agents/openai.yaml
+  s_3181443b264428::t_7a65de81cdacd0 1-5
+packages/db/drizzle/0075_companion_box_unshare.sql
+  s_3181443b264428::t_41ac964284c3ea 1-28
+.claude/skills/resolving-merge-conflicts/agents/openai.yaml
+  s_3181443b264428::t_352a5b4a8b6236 1-3
+tools/oxlint/anti-slop/shared/dictionary-types.ts
+  s_3181443b264428::t_970d1b46c0f007 1-502
+.claude/skills/diagnosing-bugs/agents/openai.yaml
+  s_3181443b264428::t_4132f6eb121530 1-3
+packages/contracts/test/token.test.ts
+  s_3181443b264428::t_b3c50491096424 1-30
+.agents/skills/ship-pr-dev/companion.json
+  s_3181443b264428::t_32c0821aa13d22 1-76
+apps/web/src/lib/settingsClient.test.ts
+  s_3181443b264428::t_87e728f4faa865 1-13
+packages/db/drizzle/0026_personal_skills.sql
+  s_3181443b264428::t_034ce6a9651131 1-13
+packages/skills/src/zip.ts
+  s_3181443b264428::t_a9d21010bd034c 1-217
+packages/skills/tsconfig.json
+  s_3181443b264428::t_2dc50c04a3dcb9 1-8
+apps/web/src/lib/agentAuth.ts
+  s_3181443b264428::t_695fb5d801ff86 1-78
+.claude/skills/teach/GLOSSARY-FORMAT.md
+  s_3181443b264428::t_5e94e4ea269b78 1-35
+.agents/skills/review-code-dev/SKILL.md
+  s_3181443b264428::t_813c93f2cec2a0 1-134
+.claude/skills/domain-modeling/CONTEXT-FORMAT.md
+  s_3181443b264428::t_3364f79f0b72a5 1-60
+packages/db/drizzle/0151_companion_runtime_self_heal_protocol_5.sql
+  s_3181443b264428::t_3938b6087a029b 1-918
+apps/web/src/components/org/SettingsApp.test.ts
+  s_3181443b264428::t_67221b09b0b365 1-114
+docs/agents/issue-tracker.md
+  s_3181443b264428::t_85c6b7e90e9b8a 1-117
+.claude/skills/improve-codebase-architecture/HTML-REPORT.md
+  s_3181443b264428::t_390fbcb74d2a93 1-123
+.agents/skills/wait-what/SKILL.md
+  s_3181443b264428::t_432543dcd41fb7 1-7
+.claude/skills/design-frontend-dev/reference/shape.md
+  s_3181443b264428::t_360400130b0bbd 1-165
+.claude/skills/ship-pr-dev/companion.json
+  s_3181443b264428::t_72b92c771c6c32 1-76
+apps/web/src/components/skills/skillActions.ts
+  s_3181443b264428::t_dcc411630ba776 1-131
+packages/db/drizzle/0073_companion_runtime_pools.sql
+  s_3181443b264428::t_9a3b4701f0fb8a 1-195
+examples/skills/incident-summary/SKILL.md
+  s_3181443b264428::t_43c9a3fd7ff37d 1-16
+.claude/skills/setup-matt-pocock-skills/SKILL.md
+  s_3181443b264428::t_01709e3e5252d8 1-116
+apps/web/src/components/org/GitHubPane.test.ts
+  s_3181443b264428::t_9117ee84201fbf 1-644
+apps/web/src/lib/github.ts
+  s_3181443b264428::t_b9f98b8bd9cd89 1-74
+.agents/skills/design-frontend-dev/reference/typeset.md
+  s_3181443b264428::t_80d14f88d58422 1-279
+packages/db/drizzle/0122_companion_image_registry.sql
+  s_3181443b264428::t_3aac59532232c7 1-40
+cli/src/lib/config.ts
+  s_3181443b264428::t_af2cd34189cfe5 1-31
+.agents/skills/wayfinder/agents/openai.yaml
+  s_3181443b264428::t_c4d7ad54e10e9d 1-5
+packages/db/drizzle/0123_companion_image_registry_access.sql
+  s_3181443b264428::t_ec4d565d2e0c4c 1-293
+.claude/skills/implement/SKILL.md
+  s_3181443b264428::t_1e9a39d218f893 1-15
+.agents/skills/capture-learning-tools/SKILL.md
+  s_3181443b264428::t_8e4dacf5321353 1-152
+apps/web/src/components/skills/markdown.test.ts
+  s_3181443b264428::t_a9e7ab3a09e5a7 1-102
+packages/core/src/avatar.ts
+  s_3181443b264428::t_3cbc67baa731ed 1-36
+apps/web/src/components/skills/fileFormat.test.ts
+  s_3181443b264428::t_61059041c0ba4e 1-31
+.claude/skills/design-frontend-dev/reference/audit.md
+  s_3181443b264428::t_dc57d7cb22180e 1-133
+apps/web/src/components/auth/SessionKeepAlive.tsx
+  s_3181443b264428::t_641dff1d6b4d9a 1-40
+.agents/skills/setup-matt-pocock-skills/SKILL.md
+  s_3181443b264428::t_030898efa109c5 1-116
+apps/api/test/integration/skillTransferTicket.integration.test.ts
+  s_3181443b264428::t_0a9d06317dd5fa 1-594
+.agents/skills/review-code-dev/references/reviewers/frontend.md
+  s_3181443b264428::t_a2d7dfbc0d6841 1-48
+.agents/skills/grill-with-docs/SKILL.md
+  s_3181443b264428::t_cd97e714344962 1-7
+packages/db/src/schema.ts
+  s_3181443b264428::t_ba3d011e20917e 1-1633
+packages/skills/src/semver.ts
+  s_3181443b264428::t_76f713d7c5dc33 1-122
+.agents/skills/design-frontend-dev/SOURCE.md
+  s_3181443b264428::t_e06a3a1f722ed2 1-26
+apps/web/src/lib/settingsData.ts
+  s_3181443b264428::t_fe1950aaaeff4a 1-92
+.claude/skills/setup-matt-pocock-skills/issue-tracker-github.md
+  s_3181443b264428::t_d1c52a39f44047 1-45
+.agents/skills/capture-learning-tools/references/testing-policy.md
+  s_3181443b264428::t_74cda618cb5890 1-57
+docs/agents/triage-labels.md
+  s_3181443b264428::t_19fac98a751465 1-25
+apps/web/src/components/UserAvatar.tsx
+  s_3181443b264428::t_16cd11cd3ebced 1-40
+packages/db/drizzle/0055_public_skill_ticket_clock_skew.sql
+  s_3181443b264428::t_1606cb4293d8a4 1-86
+.agents/skills/domain-modeling/ADR-FORMAT.md
+  s_3181443b264428::t_0e013e318e0cf5 1-47
+apps/web/src/components/skills/ShareDialog.tsx
+  s_3181443b264428::t_82fc78e23bfdb4 1-155
+packages/contracts/test/labels.test.ts
+  s_3181443b264428::t_adacfd82e58344 1-234
+apps/web/src/components/org/ApiKeysPane.tsx
+  s_3181443b264428::t_a76363f2e45ae7 1-222
+scripts/verify-change.mjs
+  s_3181443b264428::t_d2ed1eaf74b143 1-379
+apps/web/src/components/auth/SessionKeepAlive.test.ts
+  s_3181443b264428::t_1922b641e81c2e 1-65
+packages/db/src/index.ts
+  s_3181443b264428::t_c9ab994451d8ac 1-53
+apps/web/src/components/skills/PublicReleaseDialog.tsx
+  s_3181443b264428::t_b2204394f689bc 1-169
+apps/web/src/components/secrets/SkillSecretConfiguration.test.ts
+  s_3181443b264428::t_057834ced14543 1-132
+.agents/skills/grilling/agents/openai.yaml
+  s_3181443b264428::t_2687ee1c477c4b 1-3
+apps/api/test/integration/removeSkillStarsMigration.integration.test.ts
+  s_3181443b264428::t_75c8b23488d8e2 1-168
+.claude/skills/review-code-dev/evals/evals.json
+  s_3181443b264428::t_72ee3b2f2207d8 1-105
+packages/email/tsconfig.json
+  s_3181443b264428::t_ab4abba5556894 1-8
+apps/web/src/styles/onboarding.css
+  s_3181443b264428::t_33fa68b8ae7ede 1-332
+packages/db/drizzle/0036_model_preferences.sql
+  s_3181443b264428::t_feb891f59771f0 1-36
+packages/db/drizzle/0043_run_prompt_dispatch_barrier.sql
+  s_3181443b264428::t_a51164605eb102 1-473
+.claude/skills/swiftui-expert-dev/evals/evals.json
+  s_3181443b264428::t_d793cb7cc6f711 1-25
+apps/api/test/integration/preTenantRls.integration.test.ts
+  s_3181443b264428::t_c2d58483bb7f21 1-696
+apps/api/test/integration/tokenRefresh.integration.test.ts
+  s_3181443b264428::t_1f4a46ee672e05 1-161
+packages/core/test/skillRename.test.ts
+  s_3181443b264428::t_2333ba64c9db4b 1-247
+packages/db/drizzle/0103_companion_hub_tokens.sql
+  s_3181443b264428::t_7b48e2a7303d5b 1-38
+packages/contracts/src/frontmatter.ts
+  s_3181443b264428::t_c0951431f037bb 1-215
+apps/web/components.json
+  s_3181443b264428::t_73b3fcdb8e0c7d 1-21
+apps/api/test/integration/labelLifecycle.integration.test.ts
+  s_3181443b264428::t_61212b54a81eb8 1-243
+.claude/skills/setup-matt-pocock-skills/triage-labels.md
+  s_3181443b264428::t_aa378610b20059 1-15
+packages/db/drizzle/0052_run_file_preview_function_repair.sql
+  s_3181443b264428::t_53d557f699485e 1-101
+packages/db/drizzle/0004_lightweight_tenant_rls.sql
+  s_3181443b264428::t_ab5bb6afba09ae 1-50
+.claude/skills/review-code-dev/scripts/test_veille_pr_state.py
+  s_3181443b264428::t_58792506cb2da4 1-56
+.agents/skills/to-spec/SKILL.md
+  s_3181443b264428::t_5921e2f30149e8 1-75
+cli/package.json
+  s_3181443b264428::t_ee9c4d036d1190 1-34
+.claude/skills/setup-matt-pocock-skills/domain.md
+  s_3181443b264428::t_e00dbcfd06f85c 1-51
+packages/db/drizzle/0146_companion_restart_box_checkpoint.sql
+  s_3181443b264428::t_aed88d78f26c2b 1-31
+packages/storage/package.json
+  s_3181443b264428::t_0c05cef1211881 1-22
+.claude/skills/review-code-dev/scripts/collect_review_context.py
+  s_3181443b264428::t_373b1f71c8bf40 1-418
+packages/db/drizzle/0090_companion_runtime_v2.sql
+  s_3181443b264428::t_a40c63aa9c0dc3 1-5835
+packages/db/drizzle/0155_companion_interruption_terminal_protocol_6.sql
+  s_3181443b264428::t_723e16e95d7d54 1-593
+packages/db/drizzle/0177_companion_runtime_v3_external_incidents.sql
+  s_3181443b264428::t_921641187ab816 1-952
+apps/web/src/lib/timezones.ts
+  s_3181443b264428::t_1a94016533a98b 1-22
+.claude/skills/diagnosing-bugs/SKILL.md
+  s_3181443b264428::t_076329c9266ca2 1-138
+.claude/skills/wizard/agents/openai.yaml
+  s_3181443b264428::t_8735e726d85405 1-3
+.agents/skills/design-frontend-dev/reference/critique.md
+  s_3181443b264428::t_99a70116d96e0d 1-59
+apps/web/src/app/device/capabilities/DeviceCapabilitiesApproval.test.ts
+  s_3181443b264428::t_87411f14a6d0b0 1-118
+AGENTS.md
+  s_3181443b264428::t_189130946c11c5 1
+packages/db/runtime-role-grants.sql
+  s_3181443b264428::t_c67ad8d17f4cc6 1-1783
+apps/web/src/styles/auth.css
+  s_3181443b264428::t_5384963fcbf70a 1-237
+apps/web/src/app/page.tsx
+  s_3181443b264428::t_fbfdca445afff1 1-11
+packages/db/drizzle/0186_retire_hosted_companions.sql
+  s_3181443b264428::t_9bba9b0f5f8dc4 1-446
+packages/contracts/src/secrets.ts
+  s_3181443b264428::t_399ba0f3d08d20 1-206
+packages/auth/src/postgres-secondary-storage.ts
+  s_3181443b264428::t_29400bbdefd4de 1-112
+packages/db/drizzle/0061_skill_database_realm_shares.sql
+  s_3181443b264428::t_f4f6b0c4c4c0d4 1-217
+apps/web/src/components/secrets/SecretsApp.tsx
+  s_3181443b264428::t_beea2bc808c381 1-508
+packages/db/drizzle/0092_companion_runtime_api.sql
+  s_3181443b264428::t_effa120d4f55b8 1-1856
+apps/web/src/app/device/capabilities/page.tsx
+  s_3181443b264428::t_841caba4930a54 1-35
+scripts/dev-stack-check.sh
+  s_3181443b264428::t_700409851969ca 1-563
+.claude/skills/review-code-dev/references/reviewers/tests.md
+  s_3181443b264428::t_6b1abe498074e2 1-28
+packages/db/drizzle/0185_companion_runtime_v3_reload_staged_credentials.sql
+  s_3181443b264428::t_435f3f01d4f4f4 1-111
+apps/web/src/app/v1/auth/signin/route.test.ts
+  s_3181443b264428::t_437726f6e6cda7 1-101
+.claude/skills/design-frontend-dev/reference/quieter.md
+  s_3181443b264428::t_15256da2ac11de 1-99
+apps/web/src/components/skills/SkillPanel.tsx
+  s_3181443b264428::t_99b0850c014d9c 1-167
+apps/worker/src/supervisors.ts
+  s_3181443b264428::t_c3a38451b5a29b 1-56
+apps/worker/package.json
+  s_3181443b264428::t_6370a83a8a7511 1-33
+apps/web/sentry.server.config.ts
+  s_3181443b264428::t_5bfcc1326ca742 1-19
+.claude/skills/handoff/SKILL.md
+  s_3181443b264428::t_39ddebd0cbc4ed 1-16
+.claude/skills/domain-modeling/agents/openai.yaml
+  s_3181443b264428::t_abea6ee61303fb 1-3
+apps/web/src/components/org/AcceptInvite.tsx
+  s_3181443b264428::t_0cc415f583897d 1-55
+.agents/skills/ios-product-dev/SOURCE.md
+  s_3181443b264428::t_c6d1066352bb86 1-15
+.agents/skills/codebase-design/agents/openai.yaml
+  s_3181443b264428::t_e8cfcfd3040079 1-3
+.claude/skills/handoff/agents/openai.yaml
+  s_3181443b264428::t_79a68d7b33cd90 1-5
+packages/db/drizzle/0017_organization_domains.sql
+  s_3181443b264428::t_355a9089b0f342 1-32
+packages/contracts/tsconfig.json
+  s_3181443b264428::t_4d2cdd8eeb090f 1-7
+.agents/skills/design-frontend-dev/reference/layout.md
+  s_3181443b264428::t_5fa5b80ce1b304 1-161
+.agents/skills/review-code-dev/references/reviewers/backend.md
+  s_3181443b264428::t_9e52bcd64951ab 1-29
+.claude/skills/ask-matt/SKILL.md
+  s_3181443b264428::t_8ee1ccafb95a5d 1-90
+.claude/skills/domain-modeling/ADR-FORMAT.md
+  s_3181443b264428::t_99bf8cb9de75d2 1-47
+packages/contracts/src/labels.ts
+  s_3181443b264428::t_49f78863ad8a4f 1-235
+.agents/skills/writing-for-agents/SKILL-MECHANICS.md
+  s_3181443b264428::t_caa0fbb786a74a 1-22
+packages/db/drizzle/0094_companion_runtime_cutover.sql
+  s_3181443b264428::t_89835ae088d227 1-540
+docs/integrations/slack.md
+  s_3181443b264428::t_07960cb7627090 1-54
+.agents/skills/design-frontend-dev/reference/interaction-design.md
+  s_3181443b264428::t_ba954658d7bddb 1-189
+scripts/rsc-smoke.mjs
+  s_3181443b264428::t_4793efb348ef53 1-159
+.agents/skills/to-questionnaire/agents/openai.yaml
+  s_3181443b264428::t_d6263455b687f0 1-5
+packages/core/src/personalLabels.ts
+  s_3181443b264428::t_8553219f357f87 1-346
+packages/core/src/billingService.ts
+  s_3181443b264428::t_df3d9ad7179eb6 1-395
+.agents/skills/xcodebuildmcp-cli/LICENSE
+  s_3181443b264428::t_d93d960086874d 1-21
+packages/db/drizzle/0053_sandbox_lifecycle_v2.sql
+  s_3181443b264428::t_81f19c8771bcc4 1-463
+packages/db/drizzle/0064_companion_box_runtime.sql
+  s_3181443b264428::t_208ffab9f4e27f 1-96
+.gitattributes
+  s_3181443b264428::t_c10dbf7f077918 1-2
+packages/db/drizzle/0027_personal_labels.sql
+  s_3181443b264428::t_b6b60d007ac17d 1-52
+.agents/skills/wayfinder/SKILL.md
+  s_3181443b264428::t_008bb0c0ae4b3c 1-128
+apps/web/src/components/secrets/VaultSecretField.tsx
+  s_3181443b264428::t_a234efbdcfc5ce 1-248
+apps/web/src/lib/serverAuth.test.ts
+  s_3181443b264428::t_3e1b4ccbf373a0 1-67
+apps/api/test/integration/agentAuthCompatibility.integration.test.ts
+  s_3181443b264428::t_eb442aa43203dc 1-468
+.claude/skills/grill-me/agents/openai.yaml
+  s_3181443b264428::t_00497da6fb9e39 1-5
+apps/api/test/integration/agentDelegation.integration.test.ts
+  s_3181443b264428::t_4639d8e14e4293 1-217
+packages/skills/src/unpack.ts
+  s_3181443b264428::t_9c56df0d80bc32 1-84
+apps/web/src/components/org/WorkspaceGeneralPane.tsx
+  s_3181443b264428::t_339157541fd273 1-228
+.claude/skills/to-tickets/agents/openai.yaml
+  s_3181443b264428::t_a0000fcac11dbc 1-5
+.agents/skills/ship-pr-dev/scripts/collect_ship_context.py
+  s_3181443b264428::t_a4fb6f566cc6db 1-217
+.agents/skills/design-frontend-dev/reference/animate.md
+  s_3181443b264428::t_027b53a5b3d7fc 1-201
+packages/core/test/billingPreview.test.ts
+  s_3181443b264428::t_86b447f8ccd303 1-110
+packages/db/drizzle/0018_skill_version_body.sql
+  s_3181443b264428::t_02793a11bececf 1-3
+packages/db/drizzle/0003_narrow_pending_invitations.sql
+  s_3181443b264428::t_250e53009b6d50 1-2
+.claude/skills/ask-matt/PHASE-BOUNDARIES.md
+  s_3181443b264428::t_4bc5a5544891e2 1-55
+apps/web/src/app/layout.tsx
+  s_3181443b264428::t_ec0e1ab8e3f285 1-55
+packages/db/drizzle/0114_companion_delete_resume.sql
+  s_3181443b264428::t_704a48873c007b 1-266
+apps/web/src/components/skills/ArchivedListView.tsx
+  s_3181443b264428::t_d4b96ed2f54ae4 1-135
+apps/web/src/app/s/[token]/preview.test.ts
+  s_3181443b264428::t_c636a2630c1e8f 1-35
+packages/db/drizzle/0050_agent_auth_identity.sql
+  s_3181443b264428::t_ec0d1b5143b93d 1-257
+packages/auth/src/agent-auth.test.ts
+  s_3181443b264428::t_d739f266a136e2 1-348
+.agents/skills/capture-learning-tools/scripts/classify_learning.py
+  s_3181443b264428::t_4870a7126051f7 1-72
+.claude/skills/review-code-dev/references/reviewers/backend.md
+  s_3181443b264428::t_0452963122e0d5 1-29
+.agents/skills/tdd/tests.md
+  s_3181443b264428::t_af0357ddbd5b12 1-77
+.claude/skills/teach/MISSION-FORMAT.md
+  s_3181443b264428::t_a91cf0f48799d9 1-31
+.agents/skills/review-code-dev/scripts/parse_review_findings.py
+  s_3181443b264428::t_bca23f335a4be6 1-81
+packages/contracts/vitest.config.ts
+  s_3181443b264428::t_ae79faceadffd8 1-7
+packages/db/drizzle/0016_skill_installs.sql
+  s_3181443b264428::t_ae6f33b17b4f85 1-21
+packages/db/drizzle/0054_projects.sql
+  s_3181443b264428::t_d9c7f847876bae 1-2444
+apps/api/test/integration/memberTimezone.integration.test.ts
+  s_3181443b264428::t_f65fcdea18b124 1-42
+apps/worker/src/sentrySanitize.ts
+  s_3181443b264428::t_ed9e8a863f283c 1-58
+apps/api/scripts/copy-migrations.cjs
+  s_3181443b264428::t_691630c11ebdbb 1-33
+apps/web/src/components/skills/Sidebar.test.ts
+  s_3181443b264428::t_407b57213f273c 1-75
+apps/worker/src/githubSupervisor.ts
+  s_3181443b264428::t_787d5aefcb51c6 1-299
+apps/api/src/skillListQuery.ts
+  s_3181443b264428::t_18591a22e655dd 1-29
+.claude/skills/capture-learning-tools/references/testing-policy.md
+  s_3181443b264428::t_412aaf65f924b0 1-57
+packages/db/drizzle/0081_companion_member_state.sql
+  s_3181443b264428::t_d0adc2c3a3e142 1-94
+DESIGN.md
+  s_3181443b264428::t_9b63091bc1d391 1-402
+apps/api/src/skillSkillpackManifest.test.ts
+  s_3181443b264428::t_69209527e12c3e 1-156
+apps/api/src/skillSkillpackManifest.ts
+  s_3181443b264428::t_d77bb3cc7fb74c 1-68
+apps/web/src/lib/skillpackSkillGate.ts
+  s_3181443b264428::t_d8271e06538afc 1-2
+packages/contracts/src/skillpackManifest.ts
+  s_3181443b264428::t_a86498ed7cd590 1-409
+packages/contracts/src/skillpackManifestJsonSchema.ts
+  s_3181443b264428::t_a3ef2deb8e3b44 1-3
+packages/contracts/test/skillpackManifest.test.ts
+  s_3181443b264428::t_70f335367bc9d1 1-210
+packages/skillpack-skill/client/approval.test.ts
+  s_3181443b264428::t_dcebd633d9a505 1-37
+packages/skillpack-skill/client/approval.ts
+  s_3181443b264428::t_8bf74cf80b1267 1-38
+packages/skillpack-skill/client/auth-mode.test.ts
+  s_3181443b264428::t_704d1edcd4910f 1-44
+packages/skillpack-skill/client/auth-mode.ts
+  s_3181443b264428::t_1cda8d3211f73d 1-36
+packages/skillpack-skill/client/bundle.test.ts
+  s_3181443b264428::t_934e9a226fab7c 1-406
+packages/skillpack-skill/client/index.ts
+  s_3181443b264428::t_349b591df00af1 1-781
+packages/skillpack-skill/client/operations.test.ts
+  s_3181443b264428::t_fac3ef47755b95 1-85
+packages/skillpack-skill/client/operations.ts
+  s_3181443b264428::t_5abbc23dce987e 1-110
+packages/skillpack-skill/client/safe-install.test.ts
+  s_3181443b264428::t_3c695cb3fd5d8c 1-317
+packages/skillpack-skill/client/safe-install.ts
+  s_3181443b264428::t_529e3d9f84a004 1-518
+packages/skillpack-skill/client/storage.test.ts
+  s_3181443b264428::t_302666ada2cd94 1-174
+packages/skillpack-skill/client/storage.ts
+  s_3181443b264428::t_9a22db67b8db61 1-378
+packages/skillpack-skill/package.json
+  s_3181443b264428::t_e4ed2d78f1a552 1-39
+packages/skillpack-skill/scripts/check-agent-client.mjs
+  s_3181443b264428::t_8ed3cf56b92542 1-42
+packages/skillpack-skill/scripts/check-version-bump.mjs
+  s_3181443b264428::t_4a30de1bd41197 1-131
+packages/skillpack-skill/scripts/update-integrity.mjs
+  s_3181443b264428::t_2909c167a37a76 1-64
+packages/skillpack-skill/skill/SKILL.md
+  s_3181443b264428::t_dd48a6df89349c 1-1345
+packages/skillpack-skill/skill/companion.integrity.json
+  s_3181443b264428::t_b4a38d8e04c071 1-23
+packages/skillpack-skill/skill/companion.json
+  s_3181443b264428::t_7d3619be52cd83 1-1308
+packages/skillpack-skill/skill/evals/evals.json
+  s_3181443b264428::t_054ae313a8ea87 1-224
+packages/skillpack-skill/skill/reference/api.md
+  s_3181443b264428::t_fb222af7d5e835 1-942
+packages/skillpack-skill/skill/scripts/bootstrap.py
+  s_3181443b264428::t_881d697eefd7ca 1-327
+packages/skillpack-skill/skill/scripts/bootstrap_integrity.py
+  s_3181443b264428::t_320e4b8b524dea 1-169
+packages/skillpack-skill/skill/scripts/bootstrap_update.py
+  s_3181443b264428::t_8c3bb33a4a2446 1-373
+packages/skillpack-skill/skill/scripts/check_updates.py
+  s_3181443b264428::t_f74a65e12b508a 1-15
+packages/skillpack-skill/skill/scripts/companion-agent-client.mjs
+  s_3181443b264428::t_6db3f29d1789ab 1-144
+packages/skillpack-skill/skill/scripts/companion_lib.py
+  s_3181443b264428::t_8f2e0254b1bdfa 1-1148
+packages/skillpack-skill/skill/scripts/create_secret.py
+  s_3181443b264428::t_e4b6aaf087d878 1-94
+packages/skillpack-skill/skill/scripts/install_skill.py
+  s_3181443b264428::t_fff8333858b308 1-927
+packages/skillpack-skill/skill/scripts/onboarding_scan.py
+  s_3181443b264428::t_5b5fc967d923ef 1-407
+packages/skillpack-skill/skill/scripts/secrets_runtime.py
+  s_3181443b264428::t_16b320ac62de80 1-426
+packages/skillpack-skill/skill/scripts/skill_guard.py
+  s_3181443b264428::t_4664ac5747985f 1-813
+packages/skillpack-skill/skill/scripts/sync_companion.py
+  s_3181443b264428::t_b3e4772472d6d4 1-86
+packages/skillpack-skill/skill/scripts/sync_secrets.py
+  s_3181443b264428::t_6b1af9712c9578 1-126
+packages/skillpack-skill/skill/scripts/test_bootstrap.py
+  s_3181443b264428::t_2de9f6712c12c4 1-956
+packages/skillpack-skill/skill/scripts/test_multitool.py
+  s_3181443b264428::t_7834831b2e74a7 1-1362
+packages/skillpack-skill/skill/scripts/test_onboarding_scan.py
+  s_3181443b264428::t_7a4f3afdf0c50f 1-296
+packages/skillpack-skill/skill/scripts/test_secrets_runtime.py
+  s_3181443b264428::t_74eacedb7706d5 1-296
+packages/skillpack-skill/skill/scripts/test_skill_guard.py
+  s_3181443b264428::t_c8e4c9f5e85022 1-406
+packages/skillpack-skill/skill/scripts/test_sync_companion.py
+  s_3181443b264428::t_ecd0c104017632 1-94
+packages/skillpack-skill/skill/scripts/tools.json
+  s_3181443b264428::t_8a249ff0282ae2 1-43
+packages/skillpack-skill/skill/scripts/tools.schema.json
+  s_3181443b264428::t_f5a52b49994ef5 1-75
+packages/skillpack-skill/src/index.ts
+  s_3181443b264428::t_21f66d68e671f8 1-86
+packages/skillpack-skill/src/package.ts
+  s_3181443b264428::t_6acce5e30320d5 1-209
+packages/skillpack-skill/tsconfig.json
+  s_3181443b264428::t_afe19bbec77ebd 1-8
+packages/skillpack-skill/tsup.config.ts
+  s_3181443b264428::t_286a38b8f00d93 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "65e5a11ef3c47929d75c3188f8b7409f3284ce7a",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
