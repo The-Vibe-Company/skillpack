@@ -16,6 +16,7 @@ const config: NextConfig = {
       // Agent Auth discovery must live at the public instance root. In local development Web and
       // API use separate origins, so expose the API document through the same URL users copy.
       { source: "/.well-known/agent-configuration", destination: `${api}/.well-known/agent-configuration` },
+      { source: "/schemas/:path*", destination: `${api}/v1/schemas/:path*` },
       { source: "/auth/:path*", destination: `${api}/auth/:path*` },
       { source: "/v1/:path*", destination: `${api}/v1/:path*` },
       { source: "/trpc/:path*", destination: `${api}/trpc/:path*` },
