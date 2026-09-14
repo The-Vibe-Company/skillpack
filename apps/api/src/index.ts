@@ -264,7 +264,7 @@ import { buildInlineSkillpackManifest, uploadDependencyValues, withResolvedManif
 import { buildSkillpackSkillRow, getSkillpackSkillPackage } from "@skillpack/skillpack-skill/package";
 import { parseSkillListQuery } from "./skillListQuery";
 import { registerAgentAuthRoutes } from "./agentAuthRoutes";
-import { COMPANION_SKILL_KEY } from "@skillpack/skillpack-skill";
+import { SKILLPACK_INSTALL_KEY, isSkillpackSkillKey } from "@skillpack/skillpack-skill";
 import { StripeBillingGateway } from "@skillpack/billing";
 import {
   billingRuntimeConfig,
@@ -393,7 +393,7 @@ registerAgentCapabilityExecutor(
       name: session.user.name || session.user.email,
     };
     if (transfer.action === "download-local") {
-      if (transfer.slug !== COMPANION_SKILL_KEY) throw new Error(`unknown local skill: ${transfer.slug}`);
+      if (!isSkillpackSkillKey(transfer.slug)) throw new Error(`unknown local skill: ${transfer.slug}`);
       const pkg = await getSkillpackSkillPackage();
       if (pkg.version !== transfer.version) {
         throw new Error(`local skill version ${transfer.version} is not available`);
@@ -3384,7 +3384,7 @@ app.get("/v1/local-skills", async (c) => {
     const row = await withTenant(
       c,
       async ({ actor, orgId, database }) => {
-        const install = await getLocalSkillInstall({ actor, orgId, skillKey: COMPANION_SKILL_KEY, database });
+        const install = await getLocalSkillInstall({ actor, orgId, skillKey: SKILLPACK_INSTALL_KEY, database });
         return buildSkillpackSkillRow(install, orgId);
       },
       true,
@@ -3400,11 +3400,11 @@ app.get("/v1/local-skills/:key", async (c) => {
     actorFromContext(c, true);
     await requireScope(c, "skills:read");
     const key = c.req.param("key");
-    if (key !== COMPANION_SKILL_KEY) return c.json({ error: `unknown local skill: ${key}` }, 404);
+    if (!isSkillpackSkillKey(key)) return c.json({ error: `unknown local skill: ${key}` }, 404);
     const row = await withTenant(
       c,
       async ({ actor, orgId, database }) => {
-        const install = await getLocalSkillInstall({ actor, orgId, skillKey: key, database });
+        const install = await getLocalSkillInstall({ actor, orgId, skillKey: SKILLPACK_INSTALL_KEY, database });
         return buildSkillpackSkillRow(install, orgId);
       },
       true,
@@ -3419,7 +3419,7 @@ app.get("/v1/local-skills/:key", async (c) => {
 app.get("/v1/local-skills/:key/package", async (c) => {
   try {
     const key = c.req.param("key");
-    if (key !== COMPANION_SKILL_KEY) return c.json({ error: `unknown local skill: ${key}` }, 404);
+    if (!isSkillpackSkillKey(key)) return c.json({ error: `unknown local skill: ${key}` }, 404);
     const transferTicket = c.req.header("x-companion-transfer-ticket")?.trim() || null;
     if (!transferTicket) {
       actorFromContext(c, true);
@@ -3473,7 +3473,7 @@ app.post("/v1/local-skills/:key/installed", async (c) => {
     actorFromContext(c, true);
     await requireScope(c, "skills:write");
     const key = c.req.param("key");
-    if (key !== COMPANION_SKILL_KEY) return c.json({ error: `unknown local skill: ${key}` }, 404);
+    if (!isSkillpackSkillKey(key)) return c.json({ error: `unknown local skill: ${key}` }, 404);
     let input;
     try {
       input = reportLocalSkillInstallInputSchema.parse(await c.req.json());
@@ -3495,7 +3495,7 @@ app.post("/v1/local-skills/:key/installed", async (c) => {
         reportLocalSkillInstall({
           actor,
           orgId,
-          skillKey: key,
+          skillKey: SKILLPACK_INSTALL_KEY,
           version: input.version,
           agentLabel: input.agent ?? null,
           database,

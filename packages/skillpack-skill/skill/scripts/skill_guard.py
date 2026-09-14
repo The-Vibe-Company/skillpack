@@ -776,7 +776,7 @@ def main(argv: list[str] | None = None) -> int:
     options = parse_args(list(sys.argv[1:] if argv is None else argv))
     api_url, token, workspace_id = resolve_credentials()
     if not workspace_id:
-        local_skill = api_get(api_url, token, "/local-skills/companion")
+        local_skill = api_get(api_url, token, "/local-skills/skillpack")
         workspace_id = local_skill.get("workspaceId") if isinstance(local_skill, dict) else None
 
     migration = migrate_legacy_log(workspace_id, api_url)

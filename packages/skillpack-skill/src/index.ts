@@ -9,7 +9,12 @@ import { fileURLToPath } from "node:url";
  * version, user-facing copy, commands, changelog, and setup declarations.
  */
 
-export const COMPANION_SKILL_KEY = "companion";
+export const SKILLPACK_SKILL_KEY = "skillpack";
+// Keep existing per-member installation records under their original database key.
+export const SKILLPACK_INSTALL_KEY = "companion";
+export function isSkillpackSkillKey(key: string): boolean {
+  return key === SKILLPACK_SKILL_KEY || key === SKILLPACK_INSTALL_KEY;
+}
 
 export interface SkillpackSkillCommand {
   name: string;
@@ -45,8 +50,9 @@ interface RawSkillpackJson {
 }
 
 function loadSkillpackSkillManifest(): SkillpackSkillManifest {
+  // SAFETY: the bundled manifest is a repository-owned package with the declared metadata shape.
   const raw = JSON.parse(readFileSync(join(skillpackSkillDir(), "companion.json"), "utf8")) as RawSkillpackJson;
-  const key = raw.name ?? COMPANION_SKILL_KEY;
+  const key = raw.name ?? SKILLPACK_SKILL_KEY;
   const version = raw.version;
   if (!version) throw new Error("bundled companion skill is missing companion.json version");
   return {

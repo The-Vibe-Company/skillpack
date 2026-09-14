@@ -1,5 +1,5 @@
 ---
-name: companion
+name: skillpack
 description: "Use when managing local SKILL.md packages with Skillpack: validate, publish, update, resolve dependencies, declare secrets, environment variables, or hosted SQLite state tables, query skill state, install updates, audit skills, check workspace versions, or self-update this Skillpack skill through the Skillpack workspace API."
 license: MIT
 compatibility: claude-code codex opencode grok-bot openclaw hermes
@@ -7,6 +7,13 @@ allowed-tools: read_file write_file run_shell
 ---
 
 # Skillpack
+
+Install this skill in a folder named `skillpack` and invoke it as `$skillpack`.
+The legacy `companion.json` manifest format, `~/.companion` credentials, and API aliases remain
+supported so existing workspaces keep their identity and installation history. When replacing
+an older `companion` installation, install the verified package under `skillpack`, reuse the
+existing connection, and remove the old skill folder only after checking for local customizations.
+Older bootstrap versions may reject the new skill name; use the workspace install flow in that case.
 
 This skill lets you manage the skills on this machine and keep them in sync with a Skillpack
 workspace: validate a skill, publish it, push an update, manage its pinned public release, and check
@@ -21,7 +28,7 @@ packages, secrets, and declared Skill Databases. The control plane never execute
 
 You need two non-secret values, supplied by the web app's **Use with an agent** prompt:
 
-- `COMPANION_API_URL` — the workspace API base, e.g. `https://companion.acme.dev/v1`.
+- `COMPANION_API_URL` — the workspace API base, e.g. `https://skillpack.app/v1`.
 - `COMPANION_WORKSPACE_ID` — the Skillpack workspace id (`organizations.id`), used to key local
   credentials and install inventory.
 - `COMPANION_DELEGATION_TOKEN` — optional short-lived child PAT for a non-interactive workspace. If
@@ -82,9 +89,9 @@ The current schema v3 file is keyed by workspace id and contains no agent privat
   "activeWorkspaceId": "6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4",
   "workspaces": {
     "6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4": {
-      "apiUrl": "https://companion.acme.dev/v1",
+      "apiUrl": "https://skillpack.app/v1",
       "agentAuth": {
-        "issuer": "https://companion.acme.dev/auth",
+        "issuer": "https://skillpack.app/auth",
         "agentId": "agent_01J..."
       },
       "updatedAt": "2026-06-15T12:00:00.000Z"
@@ -98,7 +105,7 @@ key as `COMPANION_WORKSPACE_ID`. The Ed25519 host and agent keypairs live separa
 `~/.companion/agent-auth/` in `0600` files; directories are `0700`. Never copy a private key into
 `credentials.json`, a package, argv, output, an event, or a log.
 
-The compiled `scripts/companion-agent-client.mjs` is the only programmatic transport. It reads one
+The compiled `scripts/skillpack-agent-client.mjs` is the only programmatic transport. It reads one
 JSON request from stdin, writes one value-free JSON result to stdout, signs a fresh request-bound
 JWT, and accepts only the closed operation registry documented in `reference/api.md`. Upload and
 download paths also travel in that JSON input, never as secret-bearing command arguments. Secret
@@ -123,8 +130,8 @@ this skill package root. `apiUrl` and `workspaceId` are the non-secret values fr
 **Use with an agent** prompt or existing credentials entry:
 
 ```sh
-printf '%s' '{"action":"connect","apiUrl":"https://companion.acme.dev/v1","workspaceId":"6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4","name":"Codex"}' \
-  | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"connect","apiUrl":"https://skillpack.app/v1","workspaceId":"6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4","name":"Codex"}' \
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 The client emits value-free approval status events on stderr, opens the device-approval page when the
@@ -175,18 +182,18 @@ workspace URL looks wrong or unexpected, stop and ask the user to reconnect befo
 Run it from this skill package root:
 
 ```sh
-python3 scripts/bootstrap.py --json --auto-update-companion
+python3 scripts/bootstrap.py --json --auto-update-skillpack
 ```
 
 The bootstrap resolves the Agent Auth connection, obtains `skills:read` on demand, then calls
-`GET /local-skills/companion`, `GET /skills?lib=org`,
+`GET /local-skills/skillpack`, `GET /skills?lib=org`,
 `GET /skills?lib=mine`, and `GET /skills?installed=true`, reads the active workspace entry in
 `~/.companion/skills.lock.json` or the legacy `skills.log.json` fallback, and returns a JSON context
 with `workspace`, `companion`, `integrity`, `skills`, `actions`, and `errors`.
 
 Self-update covers every existing user-global Skillpack copy in the registered tool locations
-(`~/.claude/skills/companion`, `~/.codex/skills/companion`, `~/.agents/skills/companion`,
-`~/.cursor/skills/companion`, `~/.openclaw/skills/companion`, `~/.hermes/skills/companion`, and future entries in
+(`~/.claude/skills/skillpack`, `~/.codex/skills/skillpack`, `~/.agents/skills/skillpack`,
+`~/.cursor/skills/skillpack`, `~/.openclaw/skills/skillpack`, `~/.hermes/skills/skillpack`, and future entries in
 `scripts/tools.json`). It does not silently add
 Skillpack to a tool where the folder is absent. The bootstrap verifies every existing copy against
 its own installed integrity baseline, downloads and verifies the official package once, stages every
@@ -199,9 +206,9 @@ When explicit legacy mode is active, the bootstrap instead checks the preserved 
 Agent Auth request.
 
 If a newer Skillpack skill is available and all tracked local files still match the installed
-version's official baseline from `companion.integrity.json`, `--auto-update-companion` downloads,
+version's official baseline from `companion.integrity.json`, `--auto-update-skillpack` downloads,
 stages, verifies, backs up, replaces, and reports the installed version through
-`POST /local-skills/companion/installed`. If any tracked local file is `modified` or `missing`
+`POST /local-skills/skillpack/installed`. If any tracked local file is `modified` or `missing`
 against that installed baseline, the bootstrap blocks replacement with
 `reason: "local_customizations"` and preserves the local folder. It never installs updates for other
 skills; it only reports those as recommended actions.
@@ -382,9 +389,9 @@ normally.
 Bootstrap once, then read the server-owned progress before doing any work:
 
 ```sh
-python3 scripts/bootstrap.py --json --auto-update-companion
+python3 scripts/bootstrap.py --json --auto-update-skillpack
 printf '%s' '{"action":"api","method":"GET","path":"/getting-started"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 Resume from `first_incomplete_step`; never infer progress from the conversation. If either
@@ -395,7 +402,7 @@ not recorded and offer to retry.
 
 For `companion_install`, confirm that this Skillpack skill is installed and configured through the
 normal install/report flow. If it is missing locally, direct the user back to the Install Skillpack
-step. `POST /local-skills/companion/installed` records this step automatically; do not claim success
+step. `POST /local-skills/skillpack/installed` records this step automatically; do not claim success
 before that request succeeds.
 
 For `local_review`:
@@ -428,7 +435,7 @@ For `local_review`:
 
    ```sh
    printf '%s' '{"action":"api","method":"POST","path":"/getting-started/steps","body":{"step":"local_review","agent":"<your assistant name>"}}' \
-     | node scripts/companion-agent-client.mjs
+     | node scripts/skillpack-agent-client.mjs
    ```
 
 For `org_review`:
@@ -443,7 +450,7 @@ For `org_review`:
 
    ```sh
    printf '%s' '{"action":"api","method":"POST","path":"/getting-started/steps","body":{"step":"org_review","agent":"<your assistant name>"}}' \
-     | node scripts/companion-agent-client.mjs
+     | node scripts/skillpack-agent-client.mjs
    ```
 
 After either recorded step, read `GET /getting-started` again and continue from the returned
@@ -508,9 +515,9 @@ Use the Agent Auth client to inspect the workspace catalog. It requests `skills:
 workspace and signs a separate 60-second JWT for each call:
 
 ```sh
-printf '%s' '{"action":"api","method":"GET","path":"/skills?lib=org"}' | node scripts/companion-agent-client.mjs
-printf '%s' '{"action":"api","method":"GET","path":"/skills?lib=mine"}' | node scripts/companion-agent-client.mjs
-printf '%s' '{"action":"api","method":"GET","path":"/skills?installed=true"}' | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/skills?lib=org"}' | node scripts/skillpack-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/skills?lib=mine"}' | node scripts/skillpack-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/skills?installed=true"}' | node scripts/skillpack-agent-client.mjs
 ```
 
 `lib=org` lists the org library. `lib=mine` lists the caller's My Skills: authored personal skills
@@ -582,7 +589,7 @@ already be org-scoped, and only its current immutable version can be promoted:
 {"action":"api","method":"PUT","path":"/skills/<slug>/public-version","body":{"version":"1.4.0"}}
 ```
 
-Send that JSON to `scripts/companion-agent-client.mjs` over stdin. Removal uses the same client with
+Send that JSON to `scripts/skillpack-agent-client.mjs` over stdin. Removal uses the same client with
 `DELETE` and no body. A promotion races safely with publishing: `409` means the chosen version is no
 longer current. Re-read the skill and ask again; never republish a package to repair promotion.
 Removing public access clears the pointer but preserves the share token. Archiving makes the preview
@@ -724,7 +731,7 @@ returns the dependency preflight:
 ```sh
 cd <skill-folder> && zip -r -q ../skill.zip . \
   && printf '%s' '{"action":"upload","method":"POST","path":"/skills?action=validate&expect_slug=<encoded-slug>&version=<version>","inputPath":"<absolute-zip-path>","contentType":"application/zip"}' \
-       | node scripts/companion-agent-client.mjs
+       | node scripts/skillpack-agent-client.mjs
 ```
 
 The response is `{ "result": <validation>, "dependency_plan": <plan> }`. Report the local dependency
@@ -976,7 +983,7 @@ For an org skill filed under folders at publish time, pass `scope=org` and repea
 
 ```sh
 printf '%s' '{"action":"upload","method":"POST","path":"/skills?action=publish&expect_slug=<encoded-slug>&version=<version>&scope=org&label=marketing&label=marketing%2Fseo","inputPath":"<absolute-zip-path>","contentType":"application/zip"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 For a personal skill, pass `scope=personal`. If the API supports personal folder assignment at
@@ -985,14 +992,14 @@ file the returned slug with `POST /skills/{slug}/personal-labels` using the alre
 
 ```sh
 printf '%s' '{"action":"upload","method":"POST","path":"/skills?action=publish&expect_slug=<encoded-slug>&version=<version>&scope=personal","inputPath":"<absolute-zip-path>","contentType":"application/zip"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 To publish without filing it under any folder, still send the explicit scope and no `label`:
 
 ```sh
 printf '%s' '{"action":"upload","method":"POST","path":"/skills?action=publish&expect_slug=<encoded-slug>&version=<version>&scope=personal","inputPath":"<absolute-zip-path>","contentType":"application/zip"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 The response contains the assigned `id`, `version`, and `checksum`. Write the returned id into
@@ -1063,7 +1070,7 @@ skill is org-scoped.
 
 ```sh
 printf '%s' '{"action":"upload","method":"POST","path":"/skills?action=publish&expect_slug=<encoded-slug>&expect_skill_id=<skill-id>&version=<version>","inputPath":"<absolute-zip-path>","contentType":"application/zip"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 Run the full dependency analysis on updates too. Write the confirmed final list to
@@ -1094,13 +1101,13 @@ cascade across descendant folders for the relevant library.
 List the org folder tree (roll-up counts plus each path's display name, color, and icon):
 
 ```sh
-printf '%s' '{"action":"api","method":"GET","path":"/labels"}' | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/labels"}' | node scripts/skillpack-agent-client.mjs
 ```
 
 List the caller's personal folder tree:
 
 ```sh
-printf '%s' '{"action":"api","method":"GET","path":"/personal-labels"}' | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/personal-labels"}' | node scripts/skillpack-agent-client.mjs
 ```
 
 The response is `{ "tree": [...], "flat": [...] }`: `tree` is the nested folder hierarchy with a
@@ -1112,33 +1119,33 @@ Create a folder (it may stay empty), optionally with a display name, color, and 
 
 ```sh
 printf '%s' '{"action":"api","method":"POST","path":"/labels","body":{"path":"marketing/seo","displayName":"SEO","color":null,"icon":null}}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 File a skill into a folder (or remove it) without uploading a new version:
 
 ```sh
 printf '%s' '{"action":"api","method":"POST","path":"/skills/<slug>/labels","body":{"path":"marketing/seo"}}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 
 printf '%s' '{"action":"api","method":"DELETE","path":"/skills/<slug>/labels","body":{"path":"marketing/seo"}}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 Rename, recolor, or set the icon of a folder (rename and delete cascade to every descendant; a rename
 is rejected if it collides with an existing path):
 
 ```sh
-printf '%s' '{"action":"api","method":"PUT","path":"/labels/rename","body":{"from":"marketing","to":"growth","displayName":"Growth"}}' | node scripts/companion-agent-client.mjs
-printf '%s' '{"action":"api","method":"PUT","path":"/labels/color","body":{"path":"growth/seo","color":"oklch(0.72 0.18 145)"}}' | node scripts/companion-agent-client.mjs
-printf '%s' '{"action":"api","method":"PUT","path":"/labels/icon","body":{"path":"growth/seo","icon":"rocket"}}' | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"PUT","path":"/labels/rename","body":{"from":"marketing","to":"growth","displayName":"Growth"}}' | node scripts/skillpack-agent-client.mjs
+printf '%s' '{"action":"api","method":"PUT","path":"/labels/color","body":{"path":"growth/seo","color":"oklch(0.72 0.18 145)"}}' | node scripts/skillpack-agent-client.mjs
+printf '%s' '{"action":"api","method":"PUT","path":"/labels/icon","body":{"path":"growth/seo","icon":"rocket"}}' | node scripts/skillpack-agent-client.mjs
 ```
 
 Delete a folder (and every descendant) for the whole org:
 
 ```sh
 printf '%s' '{"action":"api","method":"DELETE","path":"/labels","body":{"path":"growth/seo"}}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 ### Rename a skill
@@ -1262,7 +1269,7 @@ For a targeted manual check of one installed skill, read its local `companion.js
 the workspace for the current published version of that slug:
 
 ```sh
-printf '%s' '{"action":"api","method":"GET","path":"/skills/<slug>/download"}' | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"GET","path":"/skills/<slug>/download"}' | node scripts/skillpack-agent-client.mjs
 ```
 
 The response includes the current `version` and `checksum`. If that `version` is greater than the
@@ -1292,26 +1299,26 @@ to **the Skillpack skill itself**. This is the built-in local skill shown in the
 Prefer the bootstrap command; it performs the integrity check and replacement flow:
 
 ```sh
-python3 scripts/bootstrap.py --json --auto-update-companion
+python3 scripts/bootstrap.py --json --auto-update-skillpack
 ```
 
 When repairing a machine where different tools already have different Skillpack versions, use the
 dedicated synchronization command from the newest installed Skillpack folder:
 
 ```sh
-python3 scripts/sync_companion.py --json
+python3 scripts/sync_skillpack.py --json
 ```
 
 It is an idempotent wrapper around the same bootstrap transaction. Success means every existing
 registered user-global copy is official and at the workspace's available version.
 
 The bootstrap reads the local `companion.json.version`, compares it with `availableVersion` from
-`GET /local-skills/companion`, compares tracked files against the installed
-`companion.integrity.json` baseline, downloads `GET /local-skills/companion/package`, verifies
+`GET /local-skills/skillpack`, compares tracked files against the installed
+`companion.integrity.json` baseline, downloads `GET /local-skills/skillpack/package`, verifies
 `SKILL.md`, the staged `companion.json.version`, and the staged integrity baseline, stages all
 outdated existing tool targets, revalidates each target again at its swap boundary, replaces them
 transactionally, and reports the install with
-`POST /local-skills/companion/installed`. Treat a JSON result with
+`POST /local-skills/skillpack/installed`. Treat a JSON result with
 `companion.autoUpdate.applied: true` as success. If the result has
 `companion.autoUpdate.blocked: true`, do not overwrite any local folder. For
 `reason: "local_customizations"` or `"integrity_unavailable"`, report the target paths plus modified
@@ -1334,8 +1341,8 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/companion/installed","body":{"version":"1.114.0","agent":"<your assistant name>"}}' \
-  | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.115.0","agent":"<your assistant name>"}}' \
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 A `{ "ok": true, "status": "installed" }` response confirms the workspace now knows this machine has

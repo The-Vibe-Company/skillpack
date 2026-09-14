@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
-  COMPANION_SKILL_KEY,
+  SKILLPACK_SKILL_KEY,
   COMPANION_SKILL_MANIFEST,
   skillpackSkillChanges,
   skillpackSkillDir,
@@ -14,7 +14,7 @@ import { z } from "zod";
 
 export interface SkillpackSkillPackage {
   key: string;
-  /** Exact `.zip` bytes served by `/local-skills/companion/package`. */
+  /** Exact `.zip` bytes served by `/local-skills/skillpack/package`. */
   zip: Buffer;
   /** Canonical package checksum computed from the deterministic package archive. */
   checksum: string;
@@ -51,12 +51,13 @@ async function buildPackage(): Promise<SkillpackSkillPackage> {
   const packed = await packDir(dir);
   const zip = await tarGzToZip(packed.archive);
   const packageChecksum = packed.checksum;
+  // SAFETY: the repository-owned bundled manifest declares its semver version.
   const manifest = JSON.parse(await readFile(join(dir, "companion.json"), "utf8")) as { version?: string };
   const version = manifest.version;
   if (!version) throw new Error("bundled companion skill is missing companion.json version");
   const baseline = skillpackIntegrityBaselineSchema.parse(JSON.parse(await readFile(join(dir, "companion.integrity.json"), "utf8")));
   if (baseline.version !== version) throw new Error("bundled companion integrity baseline version does not match companion.json");
-  const files: Record<string, string> = { ...baseline.files };
+  const files = { ...baseline.files };
   for (const relPath of [...Object.keys(baseline.files), "companion.integrity.json"]) {
     const bytes = await readFile(join(dir, relPath));
     const digest = `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
@@ -66,7 +67,7 @@ async function buildPackage(): Promise<SkillpackSkillPackage> {
     files[relPath] = digest;
   }
   return {
-    key: COMPANION_SKILL_KEY,
+    key: SKILLPACK_SKILL_KEY,
     zip,
     checksum: packageChecksum,
     sizeBytes: zip.length,
@@ -113,9 +114,9 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     "5. Persist only { issuer, agentId } plus apiUrl={base} under this workspace in credentials.json.",
     "   Migrate a schema-v2 token to schema v3 under legacyPat without using it. Write atomically with",
     "   mode 0600; private host/agent keys stay only under ~/.companion/agent-auth.",
-    `6. Execute skills:read with {workspaceId, transfer:{action:"download-local",slug:"companion",version:"${version}"}}.`,
+    `6. Execute skills:read with {workspaceId, transfer:{action:"download-local",slug:"skillpack",version:"${version}"}}.`,
     "   Keep the 60-second ticket in memory. Pipe the execution JSON over stdin to a local program",
-    "   that sends it only in X-Companion-Transfer-Ticket to {base}/local-skills/companion/package.",
+    "   that sends it only in X-Companion-Transfer-Ticket to {base}/local-skills/skillpack/package.",
     "   Never put the ticket in a URL, argv, file, log, or chat.",
     "7. Verify the exact checksum and size. Inspect the ZIP without executing scripts; reject",
     "   traversal, absolute paths, duplicate/case-colliding paths, links, and special files, and",
@@ -127,10 +128,10 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     "   at ~/.hermes/skills/<slug>; do not offer project scope for Hermes. Confirm before",
     "   replacement, stage beside the destination, and atomically swap with rollback. Install only",
     "   the root package and report declared prerequisites.",
-    "9. Run the bootstrap once from the installed companion folder:",
+    "9. Run the bootstrap once from the installed skillpack folder:",
     "   python3 scripts/bootstrap.py --summary",
-    "10. Report installation through scripts/companion-agent-client.mjs over JSON stdin:",
-    `   {"action":"api","method":"POST","path":"/local-skills/companion/installed","body":{"version":"${version}","agent":"<your assistant>"}}`,
+    "10. Report installation through scripts/skillpack-agent-client.mjs over JSON stdin:",
+    `   {"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"${version}","agent":"<your assistant>"}}`,
     "   This first write may request one additional skills:write approval. Tell me when it is ready.",
   ].join("\n");
 
@@ -138,8 +139,8 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     `Please update the Skillpack skill to version ${version}.`,
     "Use its existing Agent Auth connection. If only a legacy PAT exists, do not use it silently;",
     "complete the delegated device connection from the install flow first.",
-    "1. From the installed companion folder, run the safe bootstrap update:",
-    "   python3 scripts/bootstrap.py --json --auto-update-companion",
+    "1. From the installed skillpack folder, run the safe bootstrap update:",
+    "   python3 scripts/bootstrap.py --json --auto-update-skillpack",
     "   It preserves local customizations: if tracked files are modified or missing, it blocks with",
     '   reason "local_customizations" instead of overwriting them.',
     "2. The bundled client obtains a one-use skills:read transfer ticket for the exact local package;",
@@ -154,7 +155,7 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     "Use the schema-v3 Agent Auth connection for workspace {workspaceId}; request capabilities only",
     "when first needed. Never fall back to a PAT unless I explicitly select legacy-pat mode.",
     "On the first Skillpack use in a conversation, run:",
-    "python3 scripts/bootstrap.py --json --auto-update-companion",
+    "python3 scripts/bootstrap.py --json --auto-update-skillpack",
   ].join("\n");
 
   const onboarding = [
@@ -167,17 +168,17 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     "    complete only after its POST /getting-started/steps call returns 2xx.",
     "    If the newly installed Skillpack skill can be loaded now, continue in this conversation.",
     "    If the Skillpack skill cannot be loaded in this conversation, start a new conversation in {tool} and say:",
-    "    'Use the companion skill and resume my Skillpack getting started onboarding.'",
+    "    'Use the skillpack skill and resume my Skillpack getting started onboarding.'",
   ].join("\n");
 
   const resume = [
     "Use the Skillpack skill to resume my Skillpack getting started onboarding for workspace",
-    "{workspaceId} at {base}. Run python3 scripts/bootstrap.py --json --auto-update-companion once,",
+    "{workspaceId} at {base}. Run python3 scripts/bootstrap.py --json --auto-update-skillpack once,",
     "then GET /getting-started and resume from first_incomplete_step in my conversation language",
     "(English or French). If the skill is not installed locally, direct me back to the Install step.",
     "Treat a step as complete only after its POST /getting-started/steps call returns 2xx.",
     "If the Skillpack skill cannot be loaded in this conversation, start a new conversation in {tool} and say:",
-    "'Use the companion skill and resume my Skillpack getting started onboarding.'",
+    "'Use the skillpack skill and resume my Skillpack getting started onboarding.'",
   ].join("\n");
 
   return { install, update, use, onboarding, resume };
