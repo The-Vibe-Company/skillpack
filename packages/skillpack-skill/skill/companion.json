@@ -1,0 +1,1308 @@
+{
+  "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
+  "name": "companion",
+  "version": "1.114.0",
+  "icon": "boxes",
+  "title": "Skillpack",
+  "description": "Manage and safely install SKILL.md packages through delegated Agent Auth, including pinned public releases, publishing, updates, dependencies, secrets, hosted Skill Databases, local install tracking, and Skillpack self-update.",
+  "notes": "## What it does\n\nThe Skillpack skill gives your assistant one reliable workflow for local SKILL.md packages: connect through delegated Agent Auth, validate, publish, update, organize, install, audit, use declared hosted SQLite state, and self-update. It can also publish one explicitly selected version of an organization skill as a stable public release.\n\n## Safety model\n\n- Reads only skill folders you point it at and Skillpack's own local state under ~/.companion.\n- Stores only the non-secret Agent Auth reference in ~/.companion/credentials.json; private keys live in 0600 files under ~/.companion/agent-auth.\n- Requests workspace-scoped capabilities progressively and never silently falls back to a preserved PAT. Legacy PAT use requires COMPANION_AUTH_MODE=legacy-pat.\n- Can issue a short-lived, revocable child PAT from an existing Agent Auth grant snapshot and pass it only through an owner-only FIFO; env mode never reads credentials.json or starts device approval.\n- Confirms publishing or archival changes before mutating workspace skills, and defaults public-release promotion to no after every publication.\n- Verifies the exact public ZIP checksum, rejects unsafe archive entries, and never executes packaged scripts during a public install.\n- Uses companion.json as the source of truth for package identity, version, env/secrets, hosted database declarations, dependencies, notes, commands, and changelog.\n\n## Local tracking\n\nSkillpack records installed workspace skills in ~/.companion/skills.lock.json under workspace-id keys so audits can compare local versions, checksums, and dependency snapshots against the workspace registry without storing credentials. Installs fan out into every tool the user works with (Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, Hermes, …); each record's targets[] array tracks the per-tool and per-project install locations, with project-scope installs kept in a per-project <repo>/.companion/skills.lock.json. Grok Bot is Cursor's desktop assistant, so Grok Bot installs use Cursor's supported ~/.cursor/skills global root or .cursor/skills project root. Hermes installs use its global ~/.hermes/skills source of truth. Skillpack self-update also repairs every existing user-global Skillpack copy as one verified multi-tool transaction, with rollback on partial failure. Public-link installs only install the selected root ZIP and do not create a Skillpack skill_installs row.",
+  "metadata": {
+    "companionSkillId": "b0780a97-6972-4a2b-8e88-f41a528900c7",
+    "integrityFiles": [
+      "SKILL.md",
+      "companion.json",
+      "scripts/bootstrap.py",
+      "scripts/bootstrap_integrity.py",
+      "scripts/bootstrap_update.py",
+      "scripts/check_updates.py",
+      "scripts/companion-agent-client.mjs",
+      "scripts/companion_lib.py",
+      "scripts/create_secret.py",
+      "scripts/install_skill.py",
+      "scripts/onboarding_scan.py",
+      "scripts/secrets_runtime.py",
+      "scripts/sync_companion.py",
+      "scripts/sync_secrets.py",
+      "scripts/skill_guard.py",
+      "scripts/tools.json",
+      "evals/evals.json"
+    ],
+    "changelog": [
+      {
+        "version": "1.114.0",
+        "date": "2026-09-14",
+        "changes": [
+          "Rebrands the Skills Hub as Skillpack at skillpack.app while preserving existing package, credential, and installed-skill compatibility."
+        ]
+      },
+      {
+        "version": "1.113.0",
+        "date": "2026-09-07",
+        "changes": [
+          "Retires hosted Skillpacks instructions and keeps Skills Hub workflows, Agent Auth, and external agent delegation."
+        ]
+      },
+      {
+        "version": "1.112.0",
+        "date": "2026-09-04",
+        "changes": [
+          "Clarifies that attached lazy MCP plugins remain available while idle and connect automatically on first use.",
+          "Treats only failed or authentication-required MCP states as unavailable, without asking members to reconnect idle attachments."
+        ]
+      },
+      {
+        "version": "1.111.1",
+        "date": "2026-09-04",
+        "changes": [
+          "Refreshes the bundled Agent Auth client so the published integrity manifest matches the current build output.",
+          "Documents preparation lease renewal and parallel Skillpack wake without weakening per-lane FIFO guarantees."
+        ]
+      },
+      {
+        "version": "1.111.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Documents the v3-only hosted runtime, Turn-owned admission and outcome facts, and no-replay recovery without an attempt or legacy executor.",
+          "Clarifies that Pi-only Restart is a temporary launch control and never restarts the persistent Box."
+        ]
+      },
+      {
+        "version": "1.110.1",
+        "date": "2026-09-03",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added the Runtime v3 recovery projection and Pi-only Restart target.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.110.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Documents durable privacy-safe external incident aggregation, bounded retries, and automatic source resumption."
+        ]
+      },
+      {
+        "version": "1.109.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Binds scheduled routine preparation and capabilities to the immutable Skillpack Owner before Box contact.",
+          "Uses live persistent Skillpack memory plus current companion-control and directed delegation in direct-workspace routines.",
+          "Retries only proven pre-acceptance prompt rejection and never replays ambiguous or accepted routine work."
+        ]
+      },
+      {
+        "version": "1.108.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Documents the single Runtime v3 background lane for durable scheduled routine occurrences while main chat remains independent.",
+          "Clarifies current capability revalidation and direct persistent Box workspace access without a product snapshot or merge layer.",
+          "Documents supersession of obsolete pending work plus automatic backoff recovery without routine auto-disable."
+        ]
+      },
+      {
+        "version": "1.107.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Documents message-scoped hosted chat attachment bytes expiring exactly 30 days after upload.",
+          "Clarifies that reads, retries, wake, and restaging never extend the fixed deadline.",
+          "Keeps explicit expired metadata in the durable thread and requires a new upload for new bytes."
+        ]
+      },
+      {
+        "version": "1.106.0",
+        "date": "2026-09-03",
+        "changes": [
+          "Documents immediate terminal handling for outcome-unknown Runtime v3 Pi admission without replay or a recovery operation.",
+          "Clarifies exact Pi-only recycle on the same persistent Box with freshly resolved authority and bounded durable context reconstruction.",
+          "Explains the one-time context-loss sentence shown only when complete continuity cannot be proved."
+        ]
+      },
+      {
+        "version": "1.105.0",
+        "date": "2026-09-02",
+        "changes": [
+          "Documents the one-hour accepted-work window for archiving the persistent hosted Skillpack Box.",
+          "Clarifies that reads and composer activity never wake the Box, while accepted member or background work resumes the same identity through current staging.",
+          "Keeps Stop as archive, permanent deletion Owner-only, and automatic healing Pi-only."
+        ]
+      },
+      {
+        "version": "1.104.3",
+        "date": "2026-09-02",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared runtime budget metadata removed the obsolete image-baker overrun exception.",
+          "No change to Skillpack skill commands, permissions, installation behavior, or hosted Skillpack capabilities."
+        ]
+      },
+      {
+        "version": "1.104.2",
+        "date": "2026-09-02",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added Runtime v3 warm-turn admission facts and the admitted status.",
+          "Keeps replying strictly gated by durable positive Pi admission and false again after every terminal outcome.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.104.1",
+        "date": "2026-09-01",
+        "changes": [
+          "Documents protocol-7 durable cleanup that terminates only the exact ambiguous Pi invocation before releasing its lane.",
+          "Clarifies that automatic recovery never reloads message resources, stages Pi, restarts the Box, or replays the ambiguous prompt.",
+          "Keeps hosted Skillpack interruptions free of manual Retry/Cancel controls while later FIFO messages resume automatically."
+        ]
+      },
+      {
+        "version": "1.104.0",
+        "date": "2026-09-01",
+        "changes": [
+          "Documents protocol-6 terminal interruptions that release their lane immediately without durable recovery or human actions.",
+          "Clarifies that ambiguous prompts are never replayed and that exact bounded Pi cleanup cannot block later messages, routines, or triggers.",
+          "Removes Retry/Cancel guidance for interrupted hosted Skillpack occurrences while retaining historical retry_id evidence."
+        ]
+      },
+      {
+        "version": "1.103.1",
+        "date": "2026-09-01",
+        "changes": [
+          "Keeps the product-owned companion-control MCP compatible with strict clients by declaring object roots for every tool input schema.",
+          "Rebuilds the bundled agent client while preserving automatic OAuth attachment and the existing approval continuations.",
+          "Retains bounded grant-gated peer messaging and the complete control catalog after the compatibility fix."
+        ]
+      },
+      {
+        "version": "1.103.0",
+        "date": "2026-09-01",
+        "changes": [
+          "Introduces the product-owned companion-control MCP as the unified hosted Pi interface for identity, Skills, models, plugins, routines, triggers, Pi recycle, and directed delegation.",
+          "Replaces newly staged propose_config, request_plugin_connection, propose_routine, and propose_trigger bridges with direct or durable asynchronous MCP actions while retaining ask_user.",
+          "Documents automatic OAuth attachment, provider webhook reconciliation, attempt-fenced tokens, approval continuations, and bounded grant-gated peer messaging without a Group or Room model."
+        ]
+      },
+      {
+        "version": "1.102.0",
+        "date": "2026-08-31",
+        "changes": [
+          "Documents protocol-5 automatic Pi recovery for ambiguous hosted Skillpack occurrences without prompt replay or a human queue gate.",
+          "Documents bounded thread-window bootstrap, monotonic deltas, and paged durable history for first-party clients.",
+          "Clarifies that routine recovery remains lane-local while the main chat stays available."
+        ]
+      },
+      {
+        "version": "1.101.0",
+        "date": "2026-08-31",
+        "changes": [
+          "Prevents hosted Pi from inventing provider-account UUIDs in trigger proposals and resolves the approving member's sole eligible connection server-side.",
+          "Keeps legacy pending proposals compatible while preserving fail-closed selection when several provider accounts are eligible."
+        ]
+      },
+      {
+        "version": "1.100.0",
+        "date": "2026-08-30",
+        "changes": [
+          "Makes trigger-provider connections member-scoped and immediately available to every Skillpack without an MCP attachment step.",
+          "Reuses the same encrypted GitHub or Sentry MCP OAuth credential while preserving explicit MCP tool attachment semantics.",
+          "Documents disconnected provider degradation as durable unregistered triggers with explicit registration retry."
+        ]
+      },
+      {
+        "version": "1.99.0",
+        "date": "2026-08-30",
+        "changes": [
+          "Adds zero-friction Trigger v2 creation with notify or relay mode, shared MCP credentials, provider-side registration status and retry, and isolated payload validation before anything reaches the main Skillpack."
+        ]
+      },
+      {
+        "version": "1.98.0",
+        "date": "2026-08-30",
+        "changes": [
+          "Adds Sentry to the hosted Skillpack's approved product-owned MCP plugin connection catalog.",
+          "Documents that Sentry issue, event, trace, release, and debugging access stays behind the selected member account.",
+          "Keeps Sentry OAuth and hosted plugin selection outside delegated Skills Hub Agent Auth."
+        ]
+      },
+      {
+        "version": "1.97.0",
+        "date": "2026-08-29",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added roster and transcript delta projections.",
+          "Keeps native on-device projection caching and APNs invalidation outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.96.0",
+        "date": "2026-08-29",
+        "changes": [
+          "Documents terse hosted Skillpack delivery semantics while preserving owner-authored voice.",
+          "Documents projection-only collapsing for consecutive attachment-free notify returns from one routine.",
+          "Keeps every routine return durable and available in routine history."
+        ]
+      },
+      {
+        "version": "1.95.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added owner-scoped roster sections and member-private notification mute state.",
+          "Keeps roster organization, section membership, and notification preferences outside delegated Skills Hub Agent Auth.",
+          "Clarifies that roster sections are control-plane metadata and never change Box or Pi state."
+        ]
+      },
+      {
+        "version": "1.94.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts replaced live transcription sessions with bounded contextual transcription responses.",
+          "Keeps microphone audio, recent conversation context, the deployment API key, and hosted transcription outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.93.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after hosted Skillpack contracts added read-only routine run history and terminal relay/notify metadata.",
+          "Keeps hosted routine transcripts, main-thread bridges, Box, and Pi outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.92.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Adds Slack to the hosted Skillpack's approved product-owned plugin connection catalog.",
+          "Documents that Slack accounts send through the selected Bot User connection while Events API receive remains a separate trigger increment.",
+          "Keeps Slack OAuth, message sends, and hosted plugin selection outside delegated Skills Hub Agent Auth."
+        ]
+      },
+      {
+        "version": "1.91.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added deployment-wide voice-transcription availability metadata.",
+          "Keeps the global API transcription key, iOS microphone capture, Google audio, and hosted Skillpack runtime behavior outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.90.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after shared Skillpack contracts added short-lived voice-transcription sessions and deployment availability metadata.",
+          "Keeps the global API transcription key, iOS microphone capture, Google audio, and hosted Skillpack runtime behavior outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.89.0",
+        "date": "2026-08-27",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after hosted Skillpack plugin proposals added Gmail to the approved provider catalog.",
+          "Keeps Gmail OAuth, email reading, and draft creation outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.88.0",
+        "date": "2026-08-26",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after hosted Skillpack turns gained fixed-format current-time and member-timezone metadata.",
+          "Keeps member profile settings and hosted turn prompt assembly outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.87.0",
+        "date": "2026-08-26",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after pending decisions became ten-minute, fail-closed waits that a newer member message can supersede.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.86.0",
+        "date": "2026-08-25",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after the Skillpack contracts unified the runtime budget constants (skillpackBudgets) behind the existing tool-timeout exports.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.85.0",
+        "date": "2026-08-22",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after the Skillpack contracts exposed the ACK-gated runtime.replying fact on the companion read model.",
+          "Keeps hosted Skillpack runtime status outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.84.0",
+        "date": "2026-08-21",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client after the Skillpack contracts added cosmetic icon settings.",
+          "Keeps hosted Skillpack icon settings outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.83.0",
+        "date": "2026-08-21",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after hosted Skillpack plugin proposals added Conductor to the approved provider catalog.",
+          "Keeps Conductor OAuth connection and hosted plugin use outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.82.0",
+        "date": "2026-08-21",
+        "changes": [
+          "Documents that propose_trigger may carry a github repo-and-events target, that the matching plugin must be attached, and that webhook registration is a separate on-demand capability rather than part of approval.",
+          "Keeps the propose_trigger webhook-URL handoff documented alongside the new on-demand registration, and stages per-plugin skills (plugin-github, plugin-linear) onto a Skillpack box while the matching plugin is attached.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.81.0",
+        "date": "2026-08-21",
+        "changes": [
+          "Documents that linear and github webhook triggers require the matching plugin attached to the Skillpack before propose_trigger can use that provider.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.80.0",
+        "date": "2026-08-20",
+        "changes": [
+          "Documents hosted Pi propose_trigger for Owner/Editor-approved webhook-fired Skillpack prompts, including the webhook-URL handoff after approval.",
+          "Keeps trigger creation, webhook firing, and decision cards outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.79.0",
+        "date": "2026-08-19",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client against Skillpack contracts that expose queued transcript turns and stop/cancel of active work.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.78.0",
+        "date": "2026-08-19",
+        "changes": [
+          "Documents hosted Pi propose_routine for Owner/Editor-approved scheduled Skillpack prompts.",
+          "Refreshes the bundled Agent Auth client after Skillpack routines were added to the shared contracts.",
+          "Keeps routine creation, firing, and decision cards outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.77.0",
+        "date": "2026-08-19",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client against the Skillpack contracts behind subagent tool runs.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.76.0",
+        "date": "2026-08-18",
+        "changes": [
+          "Documents that hosted-Box Skills Hub access is unconditional: the runtime-minted COMPANION_DELEGATION_TOKEN always carries skills read/write, secret reads, and Skill Database read/write.",
+          "States that a refusal means the Skillpack or its member is gone, not that a scope must be requested.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.75.0",
+        "date": "2026-08-18",
+        "changes": [
+          "Rebuilds the bundled Agent Auth client against the Skillpack contracts behind unconditional Skills Hub access.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.74.0",
+        "date": "2026-08-18",
+        "changes": [
+          "Documents hosted Pi propose_config and request_plugin_connection tools that emit config decision cards.",
+          "Keeps those config proposals and permission decisions outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.73.0",
+        "date": "2026-08-18",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added bounded config-proposal decision cards.",
+          "Keeps Skillpack config proposals and permission decisions outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.72.0",
+        "date": "2026-08-18",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack chat attachments were added to the shared contracts.",
+          "Chat attachments belong to hosted Skillpack threads and remain outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.71.0",
+        "date": "2026-08-17",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the final Runtime v2 API cutover and route registry consolidation.",
+          "Keeps hosted Skillpack turns, lifecycle operations, desktop access, Box, and Pi outside delegated Skills Hub capabilities.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.70.0",
+        "date": "2026-08-17",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after ownership of Skillpack package assembly moved out of the retired Box lifecycle code.",
+          "Keeps package serving and runtime staging on one integrity-checked implementation without granting delegated clients any Box or Pi access.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.69.0",
+        "date": "2026-08-16",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after hosted Skillpack chat and lifecycle APIs moved to durable asynchronous turns and operations.",
+          "Documents explicit Retry and Cancel recovery for interrupted hosted turns while keeping those actions outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.68.0",
+        "date": "2026-08-16",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the hosted Skillpack model catalog began preserving Pi text and image input capabilities.",
+          "Keeps Box/Pi model capability checks inside the dedicated runtime; delegated Skills Hub clients gain no hosted runtime access."
+        ]
+      },
+      {
+        "version": "1.67.0",
+        "date": "2026-08-17",
+        "changes": [
+          "Defines Skillpack as a Skills Hub with an optional hosted Box/Pi teammate runtime while keeping this delegated skill limited to Skills Hub APIs.",
+          "Clarifies that Agent Auth never grants hosted Skillpack chat, turn, desktop, provider, or lifecycle access.",
+          "Documents that only the dedicated runtime may stage selected Skills for Pi and that the control plane never executes package scripts."
+        ]
+      },
+      {
+        "version": "1.66.1",
+        "date": "2026-08-17",
+        "changes": [
+          "Fixes secret redemption on macOS, where every anonymous pipe is reported as mode 0660 and the owner-only descriptor guard rejected it, so no secret could be projected on a Mac host.",
+          "Routes the redemption transport through a named FIFO created at 0600 and unlinked once both ends are open; no skill command, permission, or installation behavior changes."
+        ]
+      },
+      {
+        "version": "1.66.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Refreshes the bundled client for the correlated Skillpack delivery-acceptance marker used by honest post-timeout replying state.",
+          "Keeps Pi recovery and delivery entirely in the Skillpack runtime; no skill command, permission, or installation behavior changes."
+        ]
+      },
+      {
+        "version": "1.65.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after timed-out Skillpack turns gained stranded-message re-delivery.",
+          "Keeps timeout settlement and transcript recovery in the Skillpack control plane; no skill command, permission, or installation behavior changes."
+        ]
+      },
+      {
+        "version": "1.64.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Documents the accessible library listing (GET /skills?lib=accessible): every org skill plus the caller's own personal skills in one list.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.63.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Refreshes the bundled Agent Auth client for Skillpack tool runs that can settle with a timeout.",
+          "Keeps tool-run timeout handling in the Skillpack runtime; no skill command, permission, or installation behavior changes."
+        ]
+      },
+      {
+        "version": "1.62.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack replies gained the reasoning that produced them.",
+          "Keeps Skillpack transcripts and reply reasoning outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.61.0",
+        "date": "2026-08-15",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack reads gained a projected last chat line for the conversation list.",
+          "Keeps the projection to member messages and Pi replies, so no tool run or pending permission question reaches a list preview.",
+          "Carries the reader's own unread watermark on the thread read, so a transcript can mark where they left off.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.60.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack Plugins replaced the external MCP registry contract with the product-owned Linear, GitHub, and Notion catalog.",
+          "Keeps plugin discovery, OAuth credentials, custom MCP setup, and runtime injection outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.59.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpacks gained per-member pin, unread, hide, and Owner-only duplicate list actions.",
+          "Keeps Skillpack roster preferences and duplicate Box creation outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.58.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpacks gained Allow/Deny permission cards for shell, file edits, and questions.",
+          "Keeps Skillpack thread permission decisions and Pi extension UI responses outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.57.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpacks gained a per-Skillpack MCP plugin allow-list.",
+          "Keeps Skillpack plugin attach, MCP injection, and Pi recycling outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.56.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack transcript entries gained tool runs and Box desktop frames.",
+          "Keeps Skillpack transcripts, tool runs, and desktop frames outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.55.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after Skillpack model selection moved from contract-time pins to server-validated live pi.dev catalogs.",
+          "Keeps provider models, credentials, Skillpack settings, and Pi recycling outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.54.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpack provider catalog added pinned Pi models and persisted model selection.",
+          "Keeps Skillpack provider/model settings and Pi recycling outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.53.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract named the stream a freshly minted Box desktop arrives over.",
+          "Keeps Box status, the in-thread Box desktop, and Lux computer use outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.52.1",
+        "date": "2026-08-14",
+        "changes": [
+          "Corrects the Pi Moonshot provider key to moonshotai and keeps Codex device authorization retryable while approval is pending.",
+          "Preserves write-only model-provider credentials and the separation from Skillpack Plugins OAuth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.52.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpack provider contract added Pi-pinned API-key providers and server-brokered Claude and Codex subscription login.",
+          "Keeps model-provider authorization, encrypted credentials, and Box injection outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.51.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the curated Skillpack Plugins OAuth contract added Linear, GitHub, and Notion connect metadata.",
+          "Keeps MCP OAuth redirects, credentials, refresh, and runtime injection outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.50.0",
+        "date": "2026-08-14",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the browser-only Skillpack settings contract added editable name, instructions, and provider fields.",
+          "Keeps Skillpack settings, deletion, and Box lifecycle outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.49.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks chat contract added its client surface for wake-on-message.",
+          "Keeps Skillpack chat sending and Box lifecycle outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.48.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract gave a chat send a client message id, so one send is one turn however many times the request arrives.",
+          "Keeps Skillpack chat sending outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.47.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added the MCP registry browse schema.",
+          "Keeps MCP registry browse and labeled MCP accounts outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.46.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract cut per-member Skillpack share grants to workspace-only access.",
+          "Keeps Skillpack sharing outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.45.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added the Box desktop handoff schema.",
+          "Keeps Box status, the Box desktop, and Lux computer use outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.44.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the gated Skillpacks contract added member-private labeled MCP account metadata.",
+          "Keeps Plugins, connector authentication, MCP injection, and Skillpack chat outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.43.0",
+        "date": "2026-08-13",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added the runtime last_error field.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.42.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added the 1:1 chat thread, message, and message-author schemas.",
+          "Keeps Skillpack chat threads, message sending, and thread sync outside delegated Skills Hub Agent Auth.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.41.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Refreshes the bundled Agent Auth client after the Skillpacks contract added the optional persona field.",
+          "No change to Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.40.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Documents that Skillpack Owner, Editor, and Viewer sharing is browser-session workspace administration.",
+          "Keeps runtime ACL, transcript, Box lifecycle, plugins, and desktop routes outside delegated Skills Hub Agent Auth.",
+          "Refreshes the bundled Agent Auth client with the locked workspace build toolchain."
+        ]
+      },
+      {
+        "version": "1.39.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Documents that Skillpack runtime provider credentials are browser-session workspace administration and are never handled by delegated Agent Auth.",
+          "Keeps the bundled skill limited to Skills Hub capabilities while the gated Skillpacks surface adds its provider picker."
+        ]
+      },
+      {
+        "version": "1.38.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Refreshes the bundled Agent Auth client with the locked workspace toolchain so build output and the published integrity baseline remain identical.",
+          "Does not change Skillpack skill commands, permissions, or installation behavior."
+        ]
+      },
+      {
+        "version": "1.37.0",
+        "date": "2026-08-12",
+        "changes": [
+          "Clarifies that the grok-bot install target is Grok Bot (Cursor), Cursor's desktop assistant, across tool display names and docs.",
+          "Keeps the stable grok-bot machine key and ~/.cursor/skills and .cursor/skills discovery roots unchanged.",
+          "Keeps delegated Agent Auth as the default programmatic identity."
+        ]
+      },
+      {
+        "version": "1.36.0",
+        "date": "2026-08-11",
+        "changes": [
+          "Adds Grok Bot (Cursor's desktop assistant) as a detected Skillpack install target through Cursor's supported ~/.cursor/skills and .cursor/skills discovery roots.",
+          "Tracks Grok Bot user and project installs in lockfile targets and includes them in onboarding scans and Skillpack self-update fan-out.",
+          "Documents Grok Bot install choices while keeping delegated Agent Auth as the default identity."
+        ]
+      },
+      {
+        "version": "1.35.0",
+        "date": "2026-08-09",
+        "changes": [
+          "Removes the retired Skill Run lifecycle documentation now that Skillpack is a Skills Hub only.",
+          "Keeps delegated Agent Auth focused on skills, hosted Skill Databases, public releases, and skill secrets."
+        ]
+      },
+      {
+        "version": "1.34.0",
+        "date": "2026-08-09",
+        "changes": [
+          "Adds short-lived child PAT issuance from the exact active Agent Auth grant snapshot without a new device approval.",
+          "Adds first-class COMPANION_DELEGATION_TOKEN env mode with optional explicit runtime target binding and no credentials.json dependency.",
+          "Hands the new PAT only through a caller-provided owner-only FIFO and supports checksum-pinned public installs with inherited public-skills:install."
+        ]
+      },
+      {
+        "version": "1.33.0",
+        "date": "2026-08-04",
+        "changes": [
+          "Clarifies that Hermes uses only ~/.hermes/skills and must never be offered as a project-only install target.",
+          "Documents global, both, and explicit split-scope choices so every configured tool receives the install the user approved."
+        ]
+      },
+      {
+        "version": "1.32.0",
+        "date": "2026-08-04",
+        "changes": [
+          "Adds Hermes as a detected Skillpack install target, using the official ~/.hermes/skills global source of truth.",
+          "Tracks Hermes installs and updates in lockfile targets alongside Claude Code, Codex, OpenCode, and OpenClaw.",
+          "Discovers nested Hermes category skills during bounded onboarding scans while excluding internal .hub state."
+        ]
+      },
+      {
+        "version": "1.31.0",
+        "date": "2026-07-31",
+        "changes": [
+          "Adds explicit read-write sharing of a complete personal Skill Database realm with current organization members.",
+          "Documents opaque realm selectors, visible realm ownership, revocation, and sensitive share-management routes.",
+          "Extends the reusable Python helpers for shared-realm statements and idempotent member grant management.",
+          "Supports up to 64 statement parameters so optimistic edits remain bounded for every valid 32-column table."
+        ]
+      },
+      {
+        "version": "1.30.0",
+        "date": "2026-07-30",
+        "changes": [
+          "Declares Skillpack-hosted SQLite state tables in companion.json with organization-shared or member-private audiences and additive schema evolution.",
+          "Queries hosted state through parameterized read and write routes with dedicated database:read and database:write capabilities.",
+          "Documents SQL restrictions, realm privacy, limits, error codes, timestamp and JSON conventions, and adds reusable Python helpers."
+        ]
+      },
+      {
+        "version": "1.29.0",
+        "date": "2026-07-28",
+        "changes": [
+          "Adds English and French guided onboarding that resumes from server-owned progress through local-skill review and organization-skill discovery.",
+          "Discovers untracked Claude Code, Codex, and OpenCode skills only inside registered user and current-project roots, grouping identical copies and blocking ambiguous slug conflicts.",
+          "Records checklist reviews only after every candidate is published or declined and every organization skill is installed or declined, including empty libraries."
+        ]
+      },
+      {
+        "version": "1.28.1",
+        "date": "2026-07-28",
+        "changes": [
+          "Rebuilds the standalone Agent Auth client against the current shared contracts without changing the supported Skills API operations."
+        ]
+      },
+      {
+        "version": "1.28.0",
+        "date": "2026-07-27",
+        "changes": [
+          "Adds OpenClaw as a multi-tool install target, detected via ~/.openclaw and installed into ~/.openclaw/skills globally or <workspace>/skills per workspace.",
+          "Extends public skill installs and Skillpack install prompts to select and report OpenClaw alongside Claude Code, Codex, and OpenCode."
+        ]
+      },
+      {
+        "version": "1.26.4",
+        "date": "2026-07-23",
+        "changes": [
+          "Retries delegated credential-lock acquisition when another process releases the shared lock during inspection."
+        ]
+      },
+      {
+        "version": "1.26.3",
+        "date": "2026-07-23",
+        "changes": [
+          "Synchronizes every existing user-global Skillpack copy across registered tools instead of updating only the invoking folder.",
+          "Verifies each installed copy against its own integrity baseline and rolls every target back when any multi-tool swap fails.",
+          "Adds sync_companion.py as an idempotent repair command for machines with divergent Claude Code, Codex, and OpenCode installations."
+        ]
+      },
+      {
+        "version": "1.26.2",
+        "date": "2026-07-22",
+        "changes": [
+          "Rebuilds the standalone Agent Auth client against the current shared contracts without changing the supported Skills API operations."
+        ]
+      },
+      {
+        "version": "1.26.1",
+        "date": "2026-07-22",
+        "changes": [
+          "Bundles every runtime dependency into the standalone Agent Auth client distributed with Skillpack.",
+          "Documents the explicit Agent Auth connect action and its device-approval behavior.",
+          "Preserves the fixed public Agent Auth origin across production reverse proxies without widening JWT audiences."
+        ]
+      },
+      {
+        "version": "1.26.0",
+        "date": "2026-07-21",
+        "changes": [
+          "Makes delegated Agent Auth the default identity, with progressive workspace-scoped capabilities, schema-v3 credential references, and private 0600 key storage.",
+          "Adds explicit management of a pinned public release and requires a default-no promotion choice after every new organization-skill version.",
+          "Installs an authenticated public release from its exact verified ZIP without scripts, dependency closure, secret resolution, or a workspace install record.",
+          "Rejects symbolic links throughout the selected install destination, proves physical root containment before replacement, and reports current, legacy, and frontmatter-fallback prerequisites without resolving them.",
+          "Preserves older PAT credentials only behind the explicit COMPANION_AUTH_MODE=legacy-pat compatibility mode and never falls back silently.",
+          "Keeps delegated secret redemption off argv and stdout by passing plaintext only through an inherited private pipe into the mode-0600 projection workflow."
+        ]
+      },
+      {
+        "version": "1.25.0",
+        "date": "2026-07-21",
+        "changes": [
+          "Documents per-user, per-workspace sidebar ordering for personal and organization folders.",
+          "Clarifies that category ordering is private UI state and never mutates the shared label hierarchy.",
+          "Documents the browser-session-only skill preference snapshot and keeps PAT workflows out of it."
+        ]
+      },
+      {
+        "version": "1.24.0",
+        "date": "2026-07-21",
+        "changes": [
+          "Documents the optional portable skill icon in companion.json manifest v2.",
+          "Defines the curated icon catalog and requires icon preservation across normalization and republication.",
+          "Documents nullable icon metadata on skill list and detail responses while keeping older packages compatible."
+        ]
+      },
+      {
+        "version": "1.23.0",
+        "date": "2026-07-21",
+        "changes": [
+          "Refreshes a file-backed Skillpack token automatically when it expired within the last 30 days.",
+          "Preserves the token's exact name and scopes, revokes the expired token atomically, and stores the one-time replacement through a private atomic credentials-file swap.",
+          "Requires a fresh Use prompt for environment-provided, revoked, departed-user, or more-than-30-days-expired credentials without printing any token."
+        ]
+      },
+      {
+        "version": "1.22.0",
+        "date": "2026-07-20",
+        "changes": [
+          "Removes the retired skill star endpoint and response fields from the documented Skillpack API.",
+          "Updates public-preview metadata guidance to match the star-free response contract.",
+          "Keeps skill discovery centered on libraries, labels, search, dependencies, and install state."
+        ]
+      },
+      {
+        "version": "1.21.1",
+        "date": "2026-07-15",
+        "changes": [
+          "Documents token-readable GET /skills/{slug} metadata for the official installer.",
+          "Requires skills:read for canonical skill detail while preserving personal-skill privacy and workspace isolation.",
+          "Restores automatic installs for already-distributed Skillpack 1.21.0 clients without changing install_skill.py."
+        ]
+      },
+      {
+        "version": "1.21.0",
+        "date": "2026-07-13",
+        "changes": [
+          "Gives Skillpack PATs parity with signed-in users for secret vault, binding, and suggestion mutations inside their workspace.",
+          "Adds create_secret.py --skill so agents resolve the declared slot, create a write-only secret, and bind it without a browser.",
+          "Keeps plaintext out of arguments and output while preserving workspace, ownership, audience, skill-access, and stable-slot checks."
+        ]
+      },
+      {
+        "version": "1.20.0",
+        "date": "2026-07-13",
+        "changes": [
+          "Retrieves personal and shared secret bindings through five-minute preflights and non-replayable sixty-second grants.",
+          "Commits skill packages with private atomic .env projections, restores interrupted swaps on the next secrets operation, and removes transient plaintext backups.",
+          "Requires the explicit --confirm-secrets consent flag before retrieval and rejects the legacy metadata-only confirmation flag.",
+          "Keeps package-only installs compatible with legacy credentials and requires a workspace-id credential refresh before any secret retrieval.",
+          "Creates personal or shared write-only secrets through a dedicated secrets:write helper without putting values in command arguments or output.",
+          "Adds rotation/binding/tombstone sync, explicit manual profiles, offline stale-copy reporting, and value-free local projection state."
+        ]
+      },
+      {
+        "version": "1.19.0",
+        "date": "2026-07-13",
+        "changes": [
+          "Documents the managed SaaS Free and Pro skill entitlements and the 20-skill organization quota.",
+          "Explains structured entitlement 403 responses and directs signed-in Owners/Admins to Billing without using PATs.",
+          "Prevents agents from retrying or bypassing personal-skill, version-history, Share, restore, rename, and frozen-catalog gates."
+        ]
+      },
+      {
+        "version": "1.18.1",
+        "date": "2026-07-07",
+        "changes": [
+          "Deletes transient install and self-update backup folders in all normal success and failure paths.",
+          "Restores the previous skill folder during a failed swap without retaining a backup copy afterward.",
+          "Blocks stale backup folders containing SKILL.md in the local skill guard so agents delete them instead of treating them as real skills."
+        ]
+      },
+      {
+        "version": "1.18.0",
+        "date": "2026-07-02",
+        "changes": [
+          "Reads the workspace skill naming policy before naming or filing a brand-new skill.",
+          "Applies the policy to skill slugs, package names, and folder choices when the org defines one.",
+          "Documents the token-readable GET /orgs/current/skill-naming-policy endpoint and its { policy } response."
+        ]
+      },
+      {
+        "version": "1.17.1",
+        "date": "2026-06-30",
+        "changes": [
+          "Warns when the same local SKILL.md name is visible from multiple scanned paths with identical or missing Skillpack ids.",
+          "Includes duplicate local path evidence so users can manually remove stale skill copies without automatic deletion.",
+          "Keeps true retarget conflicts blocking when one slug maps to multiple Skillpack ids."
+        ]
+      },
+      {
+        "version": "1.17.0",
+        "date": "2026-06-29",
+        "changes": [
+          "Adds OpenCode as a multi-tool install target, detected via ~/.config/opencode and installed through the shared Agent Skills paths ~/.agents/skills and .agents/skills.",
+          "Updates Skillpack install prompts and the Skillpack skills UI so users can choose OpenCode and report OpenCode as the installing assistant.",
+          "Documents multi-tool install fan-out across Claude Code, Codex, and OpenCode."
+        ]
+      },
+      {
+        "version": "1.16.0",
+        "date": "2026-06-27",
+        "changes": [
+          "Documents dependency graph responses with deduplicated transitive dependencies, via provenance, and depth.",
+          "Documents per-dependency current version, installed version, and install_status update metadata.",
+          "Notes that dependency update status matches the Skills list signal for recorded installs behind the current published dependency closure."
+        ]
+      },
+      {
+        "version": "1.15.1",
+        "date": "2026-06-27",
+        "changes": [
+          "Documents the modifiers array returned by GET /skills rows so agents can distinguish the creator from members who published later versions."
+        ]
+      },
+      {
+        "version": "1.15.0",
+        "date": "2026-06-26",
+        "changes": [
+          "Installs a requested skill's transitive dependencies automatically before installing the requested root skill.",
+          "Blocks the root install when any dependency is missing, archived, cycle-blocked, not openable, locally customized, untracked, or blocked on required secrets.",
+          "Adds --confirm-required-secrets so agents can record that required secrets for the root and dependency closure were confirmed before package downloads or lockfile writes."
+        ]
+      },
+      {
+        "version": "1.14.0",
+        "date": "2026-06-26",
+        "changes": [
+          "Installs a skill into every tool the user works with (Claude Code, Codex, …) in one fan-out, not just the tool in use at the moment.",
+          "Adds an extensible tool registry (scripts/tools.json) and records the machine's tool set in ~/.companion/config.json after auto-detecting present tools and confirming with the user.",
+          "Tracks each install location per tool and scope through a lockfile targets[] array: user-scope in ~/.companion/skills.lock.json and project-scope in a per-project <repo>/.companion/skills.lock.json.",
+          "Keeps the workspace install report aggregate (a single POST /skills/{slug}/install across all tools and projects) and leaves locally customized targets untouched unless forced."
+        ]
+      },
+      {
+        "version": "1.13.2",
+        "date": "2026-06-26",
+        "changes": [
+          "Documents the browser-native file preview endpoint for package files returned by GET /skills/{slug}/versions/{version}/files."
+        ]
+      },
+      {
+        "version": "1.13.1",
+        "date": "2026-06-25",
+        "changes": [
+          "Documents the explicit POST /skills/{slug}/rename workflow for renaming a skill while preserving its stable Skillpack skill id.",
+          "Instructs agents to update local SKILL.md frontmatter and companion.json.name after rename while keeping metadata.companionSkillId unchanged."
+        ]
+      },
+      {
+        "version": "1.13.0",
+        "date": "2026-06-25",
+        "changes": [
+          "Adds a fast local bootstrap health check that returns workspace, Skillpack, integrity, and skill update context in one pass.",
+          "Allows Skillpack self-update from the bootstrap only when tracked local files still match an official installed-version baseline.",
+          "Ships a local integrity baseline so future Skillpack updates can detect customized tracked files across versions.",
+          "Detects and preserves local customizations to bootstrap and Skillpack scripts instead of overwriting them automatically."
+        ]
+      },
+      {
+        "version": "1.12.5",
+        "date": "2026-06-25",
+        "changes": [
+          "Documents the share-plan preview endpoint for personal skills.",
+          "Documents that sharing a personal skill to the org also migrates required owner-private dependencies and returns shared_dependencies."
+        ]
+      },
+      {
+        "version": "1.12.4",
+        "date": "2026-06-25",
+        "changes": [
+          "Requires agents to share a Skill link in chat after successful skill uploads or updates, using public org preview links when available."
+        ]
+      },
+      {
+        "version": "1.12.3",
+        "date": "2026-06-25",
+        "changes": [
+          "Deletes only the backup created by a successful Skillpack self-update after the install report succeeds, while preserving older backups and keeping the new backup if reporting fails."
+        ]
+      },
+      {
+        "version": "1.12.2",
+        "date": "2026-06-25",
+        "changes": [
+          "Requires confirmation that declared required secrets are ready, or explicit user authorization to install without them, before installing or updating workspace-published skills."
+        ]
+      },
+      {
+        "version": "1.12.1",
+        "date": "2026-06-25",
+        "changes": [
+          "Documents org-skill public preview links and the metadata-only GET /public/skills/{share_token} endpoint.",
+          "Notes the session-only share-target resolver used by the web app to open links in the right workspace.",
+          "Notes that skill list rows include share_token for building clean /s/{token} share URLs.",
+          "Adds a mandatory local preflight guard (scripts/skill_guard.py) to run before create, update, install, or lockfile writes, blocking duplicate slugs and skill-id retargets.",
+          "Refuses to create a skill whose slug already exists online or locally, and always sends expect_slug + expect_skill_id on updates now that the server requires them.",
+          "Automatically migrates and removes the legacy skills.log.json after copying entries into skills.lock.json, and flags archived or missing skills as missing_or_archived instead of current."
+        ]
+      },
+      {
+        "version": "1.11.1",
+        "date": "2026-06-25",
+        "changes": [
+          "Adds a CI guard requiring companion.json.version to increase when bundled Skillpack skill files change.",
+          "Updates install confirmation examples so they report the current bundled Skillpack version."
+        ]
+      },
+      {
+        "version": "1.11.0",
+        "date": "2026-06-24",
+        "changes": [
+          "Documents token-supported workspace skill listing, including My Skills and installed-only filters.",
+          "Adds a local Python update check that compares workspace listings, reported installs, and ~/.companion/skills.lock.json.",
+          "Declares local-only manifest checks so agents can run update audits without the Skillpack API executing skill scripts."
+        ]
+      },
+      {
+        "version": "1.10.2",
+        "date": "2026-06-24",
+        "changes": [
+          "Updates Skillpack manifest examples to use the thecompanion.sh schema URL."
+        ]
+      },
+      {
+        "version": "1.10.1",
+        "date": "2026-06-24",
+        "changes": [
+          "Keys ~/.companion/credentials.json and ~/.companion/skills.lock.json by Skillpack workspace id.",
+          "Keeps tokens only in credentials.json; the skills lockfile stores apiUrl metadata but never secrets.",
+          "Documents migration from URL-keyed lockfiles and the legacy skills.log.json alias."
+        ]
+      },
+      {
+        "version": "1.10.0",
+        "date": "2026-06-24",
+        "changes": [
+          "Moves Skillpack registry identity and version out of SKILL.md metadata and into companion.json.",
+          "Adds manifest v2 with markdown notes, env/secrets declarations, dependency name-to-id mapping, commands, and changelog metadata.",
+          "Adds local install tracking guidance for ~/.companion/skills.lock.json.",
+          "Runs the mandatory Skillpack self-update check once per conversation instead of before every Skillpack turn.",
+          "Reports org skills published through Skillpack as installed for the current user."
+        ]
+      },
+      {
+        "version": "1.9.1",
+        "changes": [
+          "Runs a mandatory Skillpack self-update check at the start of every Skillpack invocation before validating, publishing, updating, labeling, or installing any other skill.",
+          "Installs newer bundled Skillpack versions through /local-skills/companion/package, verifies the staged package, backs up the old folder, reports the installed version, and then asks the user to rerun when runtime reload is not guaranteed.",
+          "Requires explicit publish placement for brand-new skills: Personal/My Skills vs Org/everyone, then existing folder, new folder, or no folder before POST /skills.",
+          "Documents scope as valid on first publish only, with updates preserving existing scope and labels unless the user explicitly adds folders."
+        ]
+      }
+    ]
+  },
+  "environment": {
+    "env": {
+      "COMPANION_API_URL": {
+        "required": true,
+        "description": "Workspace API base URL. The install/use prompt stores this in ~/.companion/credentials.json when the environment variable is not set."
+      },
+      "COMPANION_WORKSPACE_ID": {
+        "required": false,
+        "description": "Skillpack workspace id (organizations.id). The install/use prompt stores credentials and local install inventory under this workspace key."
+      },
+      "COMPANION_DELEGATION_TARGET_ID": {
+        "required": false,
+        "description": "Optional explicit runtime target id for a target-bound delegation PAT. This is bearer binding, not native workspace attestation."
+      }
+    },
+    "secrets": {
+      "COMPANION_TOKEN": {
+        "slotId": "184fb29c-9eb1-555f-b3b0-17d9d5f8d21e",
+        "required": false,
+        "description": "Optional compatibility-only personal access token. It is ignored unless the user explicitly selects COMPANION_AUTH_MODE=legacy-pat; Agent Auth failures never fall back to it."
+      },
+      "COMPANION_DELEGATION_TOKEN": {
+        "slotId": "4b33c31e-0c3c-54e7-a0f2-4f6df991e5be",
+        "required": false,
+        "description": "Optional short-lived child PAT inherited from an existing Agent Auth identity. It is supplied only through an owner-only FIFO and never stored in credentials.json."
+      }
+    }
+  },
+  "dependencies": {},
+  "commands": [
+    {
+      "name": "Guided onboarding",
+      "desc": "Resume the getting-started checklist, review untracked local skills, and explore the complete organization library in English or French."
+    },
+    {
+      "name": "Connect an agent",
+      "desc": "Discover the instance and approve delegated, progressively requested Agent Auth capabilities for one workspace."
+    },
+    {
+      "name": "Delegate to a Cloud workspace",
+      "desc": "Snapshot existing Agent Auth grants into a short-lived child PAT delivered only through an owner-only FIFO, without new approval."
+    },
+    {
+      "name": "Use explicit legacy credentials",
+      "desc": "Use or refresh a preserved PAT only after the user explicitly selects legacy-pat mode."
+    },
+    {
+      "name": "Bootstrap health check",
+      "desc": "Gather workspace, self-update, local integrity, and installed-skill context in one fast pass."
+    },
+    {
+      "name": "List skills",
+      "desc": "List org, My Skills, reported installed skills, and local lockfile inventory."
+    },
+    {
+      "name": "Publish a skill",
+      "desc": "Validate a skill, ask Personal vs Org and folder placement, then publish it safely."
+    },
+    {
+      "name": "Update a skill",
+      "desc": "Push a new version with targeted identity checks."
+    },
+    {
+      "name": "Manage a public release",
+      "desc": "Make the current version of an organization skill public, promote it explicitly, or remove package access while preserving the share link."
+    },
+    {
+      "name": "Install a public release",
+      "desc": "Authenticate once, verify the exact pinned ZIP, inspect prerequisites, and atomically install only the safe root package."
+    },
+    {
+      "name": "Rename a skill",
+      "desc": "Change a skill slug through the explicit rename API while preserving its stable id."
+    },
+    {
+      "name": "Organize with labels",
+      "desc": "Create, assign, rename, recolor, or delete org and personal folder labels."
+    },
+    {
+      "name": "Resolve dependencies",
+      "desc": "Analyze packages and sync companion.json before upload."
+    },
+    {
+      "name": "Sync companion.json",
+      "desc": "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog."
+    },
+    {
+      "name": "Manage skill API calls",
+      "desc": "Use the supported skills API surface without crossing into workspace admin."
+    },
+    {
+      "name": "Manage and retrieve secrets",
+      "desc": "Create and bind write-only personal or shared secrets without a browser, manage their lifecycle, then retrieve authorized values through one-time grants."
+    },
+    {
+      "name": "Use hosted Skill Databases",
+      "desc": "Declare hosted SQLite tables, query an organization or personal realm, and explicitly share a personal realm with current members."
+    },
+    {
+      "name": "Update Skillpack skill",
+      "desc": "Check and synchronize the latest bundled Skillpack skill across every existing registered tool installation."
+    },
+    {
+      "name": "Guard against duplicates",
+      "desc": "Preflight the local inventory and workspace catalog before create/update/install to block duplicate slugs and skill-id retargets."
+    },
+    {
+      "name": "Check for updates",
+      "desc": "Compare installed skills and dependencies against the workspace registry."
+    },
+    {
+      "name": "Install into your tools",
+      "desc": "Fan out a skill install into every configured tool (Claude Code, Codex, OpenCode, Grok Bot (Cursor), OpenClaw, Hermes) at each supported scope."
+    },
+    {
+      "name": "Install updates",
+      "desc": "Bring outdated skills up to the latest published version."
+    },
+    {
+      "name": "Validate a skill",
+      "desc": "Check a skill is well formed before you share it."
+    },
+    {
+      "name": "Manage your skills",
+      "desc": "List and organize the skills on this machine."
+    }
+  ],
+  "checks": {
+    "updates": {
+      "runtime": "python",
+      "script": "scripts/bootstrap.py",
+      "timeoutSeconds": 30
+    }
+  }
+}

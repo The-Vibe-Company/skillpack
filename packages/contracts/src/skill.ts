@@ -1,0 +1,525 @@
+import { z } from "zod";
+import { validationStateSchema, skillScopeSchema } from "./scope";
+import { SKILL_NAME_RE, SEMVER_RE, skillRequirementSchema } from "./frontmatter";
+import { skillpackChangelogEntrySchema, skillpackDisplaySchema, skillIconSchema } from "./skillpackManifest";
+import { labelPathSchema } from "./labels";
+import { localSkillStatusSchema } from "./localSkills";
+
+/**
+ * Skills live in one of two libraries (`scope`): the flat org-wide library — visible to every member,
+ * any member may edit, organized by org-wide shared labels (see `./labels`) — or a private personal
+ * library ("My Skills"), visible only to its creator and organized by that user's personal folders
+ * (see `./personalLabels`). A personal skill can be shared into the org library (a one-way move).
+ */
+
+/**
+ * Live status of a single skill→skill dependency edge, computed from current state on every read.
+ * Dependencies are un-versioned (pure skill→skill links). Package manifests declare them as a
+ * readable skill name mapped to the stable skill id; the persisted graph keeps the slug and resolved
+ * id for current workspace reads.
+ */
+export const skillDependencyStatusSchema = z.enum([
+  "satisfied", // target published, not archived, no cycle
+  "missing", // declared slug has no published skill in the workspace
+  "archived", // target exists but is archived
+  "cycle", // edge participates in a directed dependency cycle
+]);
+export type SkillDependencyStatus = z.infer<typeof skillDependencyStatusSchema>;
+
+/** A "Requires" row: a skill the current version pulls in when it is installed. */
+export const skillDependencyRowSchema = z.object({
+  slug: z.string(),
+  status: skillDependencyStatusSchema,
+  /** Short human note (e.g. "not published to this workspace", cycle hint). */
+  note: z.string().nullable(),
+  /** True when the target exists (the slug links to its detail). */
+  can_open: z.boolean(),
+  /** Current published version of the target skill, when visible. */
+  version: z.string().nullable().default(null),
+  /** Caller install state for the target skill: none, installed, or update available. */
+  install_status: localSkillStatusSchema.default("none"),
+  /** Version the caller recorded installing, when available. */
+  installed_version: z.string().nullable().default(null),
+  /** 0 for direct Requires rows; >=1 for transitive dependency rows. */
+  depth: z.number().int().nonnegative().default(0),
+  /** Parent slug that pulled this dependency in; null for direct Requires rows. */
+  via: z.string().nullable().default(null),
+});
+export type SkillDependencyRow = z.infer<typeof skillDependencyRowSchema>;
+
+/** A "Used by" row: a skill version that declares this skill as a dependency. */
+export const skillDependentRowSchema = z.object({
+  slug: z.string(),
+  status: skillDependencyStatusSchema,
+  archived: z.boolean(),
+  note: z.string().nullable(),
+  can_open: z.boolean(),
+});
+export type SkillDependentRow = z.infer<typeof skillDependentRowSchema>;
+
+/** Response of `GET /v1/skills/:slug/dependencies` — the Requires + Used by graph for one skill. */
+export const skillDependenciesResponseSchema = z.object({
+  slug: z.string(),
+  version: z.string().nullable(),
+  requires: z.array(skillDependencyRowSchema),
+  transitive: z.array(skillDependencyRowSchema).default([]),
+  used_by: z.array(skillDependentRowSchema),
+  requires_n: z.number().int().nonnegative(),
+  transitive_n: z.number().int().nonnegative().default(0),
+  used_by_n: z.number().int().nonnegative(),
+  updates_n: z.number().int().nonnegative().default(0),
+});
+export type SkillDependenciesResponse = z.infer<typeof skillDependenciesResponseSchema>;
+
+/**
+ * Dependency preflight returned by `POST /v1/skills?action=validate` and echoed on publish.
+ * Drives the upload dialog's "Dependency preflight" step.
+ */
+export const dependencyPlanSchema = z.object({
+  declared: z.array(z.string()),
+  /** Declared dependencies already published in the workspace registry. */
+  ready: z.array(z.string()),
+  /** Declared but not in the registry — must be uploaded too, or the version stays unresolved. */
+  upload: z.array(z.object({ slug: z.string(), msg: z.string() })),
+  /** Required by the previous version and dropped from this one. */
+  removed: z.array(z.string()),
+  /** Removed dependencies that no published skill references anymore — candidates to archive. */
+  archive_candidates: z.array(z.object({ slug: z.string(), reason: z.string() })),
+  /** Blocking reasons (missing/cycle) that must be resolved before publish. */
+  blocked: z.array(z.object({ slug: z.string(), status: skillDependencyStatusSchema, msg: z.string() })),
+});
+export type DependencyPlan = z.infer<typeof dependencyPlanSchema>;
+
+/** Body of `POST /v1/skills/:slug/archive` — archive a skill (reason optional). */
+export const archiveSkillInputSchema = z.object({
+  reason: z.string().max(500).optional(),
+});
+export type ArchiveSkillInput = z.infer<typeof archiveSkillInputSchema>;
+
+/** Body of `POST /v1/skills/:slug/rename` — explicit slug/title rename without publishing a version. */
+export const renameSkillInputSchema = z.object({
+  newSlug: z.string().trim().regex(SKILL_NAME_RE, "newSlug must be kebab-case (lowercase letters, digits, hyphens)"),
+  title: z.string().trim().min(1, "title must not be empty").max(120, "title must be at most 120 characters").optional(),
+});
+export type RenameSkillInput = z.infer<typeof renameSkillInputSchema>;
+
+/** Response from `POST /v1/skills/:slug/rename`. */
+export const renameSkillResultSchema = z.object({
+  ok: z.literal(true),
+  id: z.string(),
+  old_slug: z.string(),
+  slug: z.string(),
+  title: z.string().nullable(),
+});
+export type RenameSkillResult = z.infer<typeof renameSkillResultSchema>;
+
+/**
+ * Body of `POST /v1/skills/:slug/install` — record a published skill as installed for the caller.
+ * The assistant posts this at the end of the normal install flow (`source: "agent"`); a member can
+ * also mark a skill installed by hand from the UI (`source: "manual"`, e.g. installed another way).
+ * Every field is optional so a bare manual mark with no version is valid.
+ */
+export const reportSkillInstallInputSchema = z.object({
+  /** The installed semver. Drives "update" detection; omitted = version-unknown (stays "installed"). */
+  version: z.string().regex(SEMVER_RE, "version must be a valid semver").optional(),
+  /** Optional source label, e.g. "Claude Code". */
+  agent: z.string().min(1).max(120).optional(),
+  /** Who recorded it. Defaults to "manual"; the agent prompt passes "agent". */
+  source: z.enum(["agent", "manual"]).optional(),
+});
+export type ReportSkillInstallInput = z.infer<typeof reportSkillInstallInputSchema>;
+
+/** Response from `POST /v1/skills/:slug/install`. */
+export const reportSkillInstallResultSchema = z.object({
+  ok: z.literal(true),
+  installed: z.literal(true),
+  status: localSkillStatusSchema,
+  installed_version: z.string().nullable(),
+  current_version: z.string().nullable(),
+});
+export type ReportSkillInstallResult = z.infer<typeof reportSkillInstallResultSchema>;
+
+/** Response from `DELETE /v1/skills/:slug/install` — mark a published skill not installed. */
+export const skillUninstallResultSchema = z.object({
+  ok: z.literal(true),
+  installed: z.literal(false),
+  status: z.literal("none"),
+});
+export type SkillUninstallResult = z.infer<typeof skillUninstallResultSchema>;
+
+/**
+ * One row of the `skill_list_v` view — the denormalized read shape the web table
+ * and the CLI list both consume. Machine-facing snake_case (mirrors the DB).
+ */
+export const skillModifierSchema = z.object({
+  user_id: z.string(),
+  name: z.string(),
+  initials: z.string(),
+  /** Resolved avatar URL for the version publisher (custom upload or Gravatar); null falls back to initials. */
+  avatar_url: z.string().nullable(),
+});
+export type SkillModifier = z.infer<typeof skillModifierSchema>;
+
+export const skillListRowSchema = z.object({
+  id: z.string(),
+  org_id: z.string(),
+  slug: z.string(),
+  /** Unguessable public metadata preview token for org skills. */
+  share_token: z.string(),
+  description: z.string(),
+  /** Human display fields normalized from companion.json, with SKILL.md fallbacks. */
+  display: skillpackDisplaySchema.default({}),
+  /** Portable catalog icon declared by the current companion.json version. */
+  icon: skillIconSchema.nullable().default(null),
+  /** Markdown-compatible notes from companion.json, kept distinct from the short description. */
+  notes: z.string().nullable().default(null),
+  validation: validationStateSchema,
+  validation_error: z.string().nullable(),
+  /** Which library this row belongs to: 'org' (shared) or 'personal' (private to the creator). */
+  scope: skillScopeSchema.default("org"),
+  /**
+   * Only set in the "My Skills" (`?lib=mine`) view: 'authored' = a personal skill the caller created;
+   * 'installed' = an org skill the caller installed, surfaced under My Skills. Null in the org view.
+   */
+  source: z.enum(["authored", "installed"]).nullable().default(null),
+  /**
+   * The label paths this skill is filed under. In the org view these are org-wide shared folders; in
+   * the My Skills view they are the caller's personal folders. Sorted lexicographically.
+   */
+  labels: z.array(z.string()).default([]),
+  /** Who first published the skill (provenance / Activity). For a personal skill, also the owner. */
+  creator_id: z.string(),
+  creator_name: z.string(),
+  creator_initials: z.string(),
+  /** Resolved avatar URL for the creator (custom upload or Gravatar); null falls back to initials. */
+  creator_avatar_url: z.string().nullable().default(null),
+  /**
+   * "Last updated by" — the member who uploaded the current version (derived from
+   * `skill_versions.created_by`), as opposed to `creator_id` (who first published). Falls back to the
+   * creator when no current version exists. Display fields are joined from `profiles`.
+   */
+  updater_id: z.string().nullable().default(null),
+  updater_name: z.string().nullable().default(null),
+  updater_initials: z.string().nullable().default(null),
+  /** Resolved avatar URL for the last updater (custom upload or Gravatar); null falls back to initials. */
+  updater_avatar_url: z.string().nullable().default(null),
+  /**
+   * Distinct members who published at least one version after the creator, ordered by their latest
+   * version publish time descending. The creator is excluded because the `creator_*` fields already
+   * carry that provenance.
+   */
+  modifiers: z.array(skillModifierSchema).default([]),
+  current_version: z.string().nullable(),
+  /** Immutable version pinned to the public share link; null keeps the link metadata-only. */
+  public_version: z.string().nullable().default(null),
+  /** Creator or org Owner/Admin. Always false for personal skills. */
+  can_manage_public: z.boolean().default(false),
+  license: z.string().nullable(),
+  compatibility: z.string().nullable(),
+  metadata: z.record(z.string()),
+  checksum: z.string().nullable(),
+  size_bytes: z.number().nullable(),
+  tools: z.array(z.string()),
+  /** Declared required secrets / env vars + install notes (parsed from the version frontmatter). */
+  requirements: z.array(skillRequirementSchema).default([]),
+  /** Whether the caller has this skill recorded as installed (any version). */
+  installed: z.boolean().default(false),
+  /** Version the caller recorded installing, or null (never installed, or marked without a version). */
+  installed_version: z.string().nullable().default(null),
+  /** "none" (not installed) | "installed" (current, or version-unknown) | "update" (behind current). */
+  install_status: localSkillStatusSchema.default("none"),
+  /** Number of dependencies the current version declares. */
+  requires_count: z.number().int().nonnegative().default(0),
+  /** Number of other skills (current versions) that depend on this one. */
+  used_by_count: z.number().int().nonnegative().default(0),
+  /** True when any declared dependency is not satisfied (drives the warn-tinted Deps pill). */
+  dep_warn: z.boolean().default(false),
+  /** True when the skill is archived (hidden from normal lists). */
+  archived: z.boolean().default(false),
+  /** True when ANY published version (current or older) references this skill — gates archived download. */
+  referenced: z.boolean().default(false),
+  /** Active hosted SQLite tables declared by the current version. */
+  database_table_count: z.number().int().nonnegative().default(0),
+  /** True only when the deployment flag is enabled and at least one table is declared. */
+  database_available: z.boolean().default(false),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+export type SkillListRow = z.infer<typeof skillListRowSchema>;
+
+/** Body for `PUT /v1/skills/:slug/public-version`. Only the current immutable version is accepted. */
+export const setSkillPublicVersionInputSchema = z.object({
+  version: z.string().regex(SEMVER_RE, "version must be a valid semver"),
+});
+export type SetSkillPublicVersionInput = z.infer<typeof setSkillPublicVersionInputSchema>;
+
+export const skillPublicVersionResultSchema = z.object({
+  ok: z.literal(true),
+  public_version: z.string().nullable(),
+  share_token: z.string(),
+  changed: z.boolean(),
+});
+export type SkillPublicVersionResult = z.infer<typeof skillPublicVersionResultSchema>;
+
+/** Public, unauthenticated skill-link preview shape. Metadata-only; never includes tenant ids or package content. */
+export const skillPublicPreviewSchema = z.object({
+  display_name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  current_version: z.string(),
+  creator_name: z.string(),
+  creator_initials: z.string(),
+  updated_at: z.string(),
+  public_release: z.object({
+    version: z.string(),
+    checksum: z.string(),
+    size_bytes: z.number().int().nonnegative(),
+    released_at: z.string(),
+  }).nullable(),
+});
+export type SkillPublicPreview = z.infer<typeof skillPublicPreviewSchema>;
+
+/** Authenticated share-link resolver shape. Used by the web app to switch to the token's workspace. */
+export const skillShareTargetSchema = z.object({
+  org_id: z.string(),
+  slug: z.string(),
+});
+export type SkillShareTarget = z.infer<typeof skillShareTargetSchema>;
+
+/** An image attached to a comment. `url` is the auth-checked serve path for the stored object. */
+export const skillCommentImageSchema = z.object({
+  id: z.string(),
+  content_type: z.string(),
+  byte_size: z.number(),
+  position: z.number(),
+  url: z.string(),
+});
+export type SkillCommentImage = z.infer<typeof skillCommentImageSchema>;
+
+/** A comment on a skill (with the author's display fields joined in). */
+export const skillCommentRowSchema = z.object({
+  id: z.string(),
+  skill_id: z.string(),
+  author_id: z.string(),
+  body: z.string(),
+  created_at: z.string(),
+  author_name: z.string().nullable().optional(),
+  author_initials: z.string().nullable().optional(),
+  /** Resolved avatar URL for the author (custom upload or Gravatar); null falls back to initials. */
+  author_avatar_url: z.string().nullable().optional(),
+  /** `null` = a root thread; a non-null value points at the root comment it replies to. */
+  parent_id: z.string().nullable(),
+  /** `null` = global thread; else the linked `skill_versions.id`. */
+  version_id: z.string().nullable(),
+  /** Joined `X.Y.Z` label for the version chip (null when global or unknown). */
+  version: z.string().nullable(),
+  deprecated: z.boolean(),
+  /** Image attachments, ordered by `position` (empty when the comment has none). */
+  images: z.array(skillCommentImageSchema).default([]),
+});
+export type SkillCommentRow = z.infer<typeof skillCommentRowSchema>;
+
+/** Body of `POST /v1/skills/:slug/comments` — add a comment (optionally a reply / version-linked). */
+export const addCommentInputSchema = z.object({
+  body: z.string().min(1),
+  parent_id: z.string().nullable().optional(),
+  version_id: z.string().nullable().optional(),
+});
+export type AddCommentInput = z.infer<typeof addCommentInputSchema>;
+
+/** Allowed comment image attachments (PNG, JPEG, WebP, GIF). */
+export const COMMENT_IMAGE_MIME_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"] as const;
+export type CommentImageMimeType = (typeof COMMENT_IMAGE_MIME_TYPES)[number];
+
+const COMMENT_IMAGE_EXTENSION_TO_MIME: Record<string, CommentImageMimeType> = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+};
+
+/** `accept` value for `<input type="file">` — extensions only (Finder ignores mixed MIME filters). */
+export const COMMENT_IMAGE_FILE_ACCEPT = Object.keys(COMMENT_IMAGE_EXTENSION_TO_MIME).join(",");
+
+/** Per-comment attachment limits, enforced on both the client and the API. */
+export const MAX_COMMENT_IMAGES = 6;
+export const MAX_COMMENT_IMAGE_BYTES = 10 * 1024 * 1024;
+
+/** Resolve a file's stored content type, falling back to its extension; null when not an allowed image. */
+export function resolveCommentImageContentType(file: { type: string; name: string }): CommentImageMimeType | null {
+  if ((COMMENT_IMAGE_MIME_TYPES as readonly string[]).includes(file.type)) {
+    return file.type as CommentImageMimeType;
+  }
+  const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
+  if (ext && ext in COMMENT_IMAGE_EXTENSION_TO_MIME) return COMMENT_IMAGE_EXTENSION_TO_MIME[ext]!;
+  return null;
+}
+
+export function isAllowedCommentImageFile(file: { type: string; name: string }): boolean {
+  return resolveCommentImageContentType(file) !== null;
+}
+
+/**
+ * Sniff an image's real format from its leading bytes (magic numbers), independent of the
+ * client-declared MIME/extension. Returns the matched allowed type, or null when the bytes are not a
+ * recognized PNG/JPEG/GIF/WebP — used to reject non-images disguised with a fake extension or header.
+ */
+export function sniffCommentImageMime(bytes: Uint8Array): CommentImageMimeType | null {
+  const b = bytes;
+  // PNG: 89 50 4E 47 0D 0A 1A 0A
+  if (
+    b.length >= 8 &&
+    b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 &&
+    b[4] === 0x0d && b[5] === 0x0a && b[6] === 0x1a && b[7] === 0x0a
+  ) return "image/png";
+  // JPEG: FF D8 FF
+  if (b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
+  // GIF: "GIF87a" / "GIF89a"
+  if (
+    b.length >= 6 &&
+    b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x38 &&
+    (b[4] === 0x37 || b[4] === 0x39) && b[5] === 0x61
+  ) return "image/gif";
+  // WebP: "RIFF" .... "WEBP"
+  if (
+    b.length >= 12 &&
+    b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+    b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
+  ) return "image/webp";
+  return null;
+}
+
+/** Body of `PATCH /v1/skills/:slug/comments/:id` — deprecate or restore a comment thread. */
+export const setCommentDeprecatedInputSchema = z.object({
+  deprecated: z.boolean(),
+});
+export type SetCommentDeprecatedInput = z.infer<typeof setCommentDeprecatedInputSchema>;
+
+/** One file inside a skill package version (`content` is null for binary or over-cap files). */
+export const skillFileSchema = z.object({
+  path: z.string(),
+  size: z.number().int().nonnegative(),
+  content: z.string().nullable(),
+  binary: z.boolean(),
+  truncated: z.boolean(),
+  preview_kind: z.enum(["text", "image", "pdf", "unsupported"]).default("unsupported"),
+  content_type: z.string().nullable().default(null),
+});
+export type SkillFile = z.infer<typeof skillFileSchema>;
+
+/** Response of `GET /v1/skills/:slug/versions/:version/files`. */
+export const skillFilesResponseSchema = z.object({
+  version: z.string(),
+  files: z.array(skillFileSchema),
+});
+export type SkillFilesResponse = z.infer<typeof skillFilesResponseSchema>;
+
+/** Immutable `skill_versions` row. */
+export const skillVersionRowSchema = z.object({
+  id: z.string(),
+  skill_id: z.string(),
+  version: z.string(),
+  note: z.string(),
+  changelog: skillpackChangelogEntrySchema.nullable(),
+  frontmatter: z.string(),
+  tools: z.array(z.string()),
+  license: z.string().nullable(),
+  compatibility: z.string().nullable().optional(),
+  metadata: z.record(z.string()).optional(),
+  display: skillpackDisplaySchema.default({}),
+  requirements: z.array(skillRequirementSchema).default([]),
+  size_bytes: z.number().int().nonnegative(),
+  checksum: z.string(),
+  storage_path: z.string(),
+  validation: validationStateSchema,
+  validation_error: z.string().nullable(),
+  created_by: z.string(),
+  /** Display fields for the member who published this version (joined from `profiles`). */
+  created_by_name: z.string().nullable().default(null),
+  created_by_initials: z.string().nullable().default(null),
+  created_by_avatar_url: z.string().nullable().default(null),
+  created_at: z.string(),
+});
+export type SkillVersionRow = z.infer<typeof skillVersionRowSchema>;
+
+/** Argument shape for the `publish_skill_version` RPC (web route + CLI share this). */
+export const publishSkillInputSchema = z.object({
+  skill_id: z.string().uuid().optional(),
+  slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  /**
+   * Library to publish into on first create. Omitted = 'org' (preserves CLI/bundled-skill behavior:
+   * every publish is org-wide unless asked otherwise). Ignored on re-publish — scope never changes by
+   * publishing; only the Share action moves a personal skill to 'org'.
+   */
+  scope: skillScopeSchema.optional(),
+  /** Label paths to file the skill under (org-wide shared folders). Applied on create. */
+  labels: z.array(labelPathSchema).max(64).default([]),
+  version: z.string(),
+  description: z.string(),
+  checksum: z.string().regex(/^sha256:[0-9a-f]{64}$/),
+  storage_path: z.string(),
+  size_bytes: z.number().int().nonnegative(),
+  frontmatter: z.string(),
+  /** The SKILL.md markdown body, persisted server-side to power full-text content search. */
+  body: z.string().default(""),
+  tools: z.array(z.string()),
+  license: z.string().nullable().optional(),
+  note: z.string().default(""),
+  /** Declared required dependencies (target skill slugs). Un-versioned: no ranges. */
+  dependencies: z
+    .array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/))
+    .max(64)
+    .default([]),
+});
+export type PublishSkillInput = z.infer<typeof publishSkillInputSchema>;
+
+/**
+ * Body of `POST /v1/skills/create` — author a SKILL.md inline ("Create in the browser").
+ * The server assembles the standard frontmatter (`name` + `description`) and the body, packs
+ * it, and publishes a new version. Labels are applied on the request, never in the skill.
+ */
+export const createSkillInputSchema = z.object({
+  id: z.string().regex(SKILL_NAME_RE, "id must be kebab-case (lowercase letters, digits, hyphens)"),
+  description: z.string().min(1, "description is required").max(1024),
+  body: z.string().max(1024 * 1024, "body is too large").default(""),
+  /** Library to create into. Defaults to 'personal' — browser "Create" authors into My Skills. */
+  scope: skillScopeSchema.default("personal"),
+  /** Label paths to file the new skill under (org folders for 'org' scope, personal for 'personal'). */
+  labels: z.array(labelPathSchema).max(64).default([]),
+});
+export type CreateSkillInput = z.infer<typeof createSkillInputSchema>;
+
+/** A private dependency that will be moved with `POST /v1/skills/:slug/share`. */
+export const skillSharePlanDependencySchema = z.object({
+  slug: z.string(),
+  status: skillDependencyStatusSchema,
+  note: z.string().nullable(),
+});
+export type SkillSharePlanDependency = z.infer<typeof skillSharePlanDependencySchema>;
+
+/** A dependency condition that prevents sharing until resolved. */
+export const skillSharePlanBlockerSchema = z.object({
+  slug: z.string(),
+  status: skillDependencyStatusSchema,
+  msg: z.string(),
+});
+export type SkillSharePlanBlocker = z.infer<typeof skillSharePlanBlockerSchema>;
+
+/** Response of `GET /v1/skills/:slug/share-plan` — preview the required private dependency migration. */
+export const skillSharePlanSchema = z.object({
+  slug: z.string(),
+  dependencies: z.array(skillSharePlanDependencySchema),
+  blocked: z.array(skillSharePlanBlockerSchema),
+});
+export type SkillSharePlan = z.infer<typeof skillSharePlanSchema>;
+
+/** Response of `POST /v1/skills/:slug/share` — move a personal skill into the org library. */
+export const shareSkillResultSchema = z.object({
+  ok: z.literal(true),
+  slug: z.string(),
+  scope: z.literal("org"),
+  /** Private dependency slugs that were moved into the org library with the root skill. */
+  shared_dependencies: z.array(z.string()).default([]),
+});
+export type ShareSkillResult = z.infer<typeof shareSkillResultSchema>;

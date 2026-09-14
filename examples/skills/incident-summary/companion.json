@@ -1,0 +1,26 @@
+{
+  "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
+  "name": "incident-summary",
+  "version": "0.1.9",
+  "title": "Incident summary",
+  "description": "Summarize an incident timeline from logs into a concise postmortem draft.",
+  "notes": "Reads local log excerpts and produces a terse incident summary: timeline, impact, suspected cause, and follow-ups.",
+  "metadata": {
+    "companionSkillId": "2f111883-7f11-42e0-81fa-359e5b7b9727",
+    "changelog": [
+      {
+        "version": "0.1.9",
+        "date": "2026-06-24",
+        "changes": [
+          "Publish version 0.1.9."
+        ]
+      }
+    ]
+  },
+  "environment": {
+    "env": {},
+    "secrets": {}
+  },
+  "dependencies": {},
+  "commands": []
+}

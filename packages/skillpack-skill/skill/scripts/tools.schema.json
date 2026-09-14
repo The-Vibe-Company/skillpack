@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skillpack.app/schemas/companion-tools.v1.schema.json",
+  "title": "Skillpack tool registry",
+  "description": "Registry of local agent tools a Skillpack skill can be installed into (Claude Code, Codex, OpenCode, Grok Bot (Cursor's desktop assistant), OpenClaw, Hermes, …). The single, extensible source of truth for each tool's on-disk skill directories.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "tools"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional pointer to this JSON Schema for editor validation."
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Registry schema version."
+    },
+    "tools": {
+      "type": "object",
+      "description": "Map of tool key (kebab-case, e.g. \"claude-code\") to its install spec.",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+      "additionalProperties": { "$ref": "#/$defs/tool" }
+    }
+  },
+  "$defs": {
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["displayName", "detect", "skillsDir", "format"],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable tool name, e.g. \"Claude Code\"."
+        },
+        "detect": {
+          "type": "array",
+          "description": "Paths (with ~ allowed) whose existence indicates the tool is present on this machine. Any match counts as detected.",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "skillsDir": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["user"],
+          "description": "Where this tool reads skills, by scope.",
+          "properties": {
+            "user": {
+              "type": "string",
+              "minLength": 1,
+              "description": "User-global skills directory (with ~ allowed), e.g. \"~/.claude/skills\", \"~/.agents/skills\", \"~/.cursor/skills\", or \"~/.openclaw/skills\"."
+            },
+            "project": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional project-relative skills directory, e.g. \".claude/skills\", \".agents/skills\", \".cursor/skills\", or \"skills\" (joined under a repo or workspace root). Omit it when a tool only has a global source of truth."
+            }
+          }
+        },
+        "recursive": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether onboarding discovery should find skill folders recursively below the registered roots. Use this for tools such as Hermes that organize skills in category subdirectories."
+        },
+        "format": {
+          "type": "string",
+          "description": "Package format the tool consumes. \"skill-md\" installs the package as-is; other values select a future format adapter.",
+          "enum": ["skill-md"]
+        }
+      }
+    }
+  }
+}

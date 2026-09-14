@@ -1,0 +1,67 @@
+{
+  "name": "skillpack",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Skillpack \u2014 self-hostable Skills Hub for organizations and coding agents.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Vibe-Company/skillpack.git"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@9.12.0",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "brace-expansion@<1.1.16": "1.1.16",
+      "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+      "fast-uri@>=3.0.0 <3.1.6": "3.1.6",
+      "js-yaml@>=4.0.0 <4.3.0": "4.3.0",
+      "postcss": "8.5.18",
+      "nanoid@<3.3.18": "3.3.18",
+      "sharp": "0.35.3",
+      "vite": "6.4.3",
+      "shell-quote": "1.10.0",
+      "undici@>=7.0.0 <7.29.0": "7.29.0"
+    }
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "compose:up": "docker compose up -d postgres minio mailpit minio-init",
+    "compose:down": "docker compose down",
+    "db:generate": "pnpm --filter @skillpack/db drizzle-kit generate",
+    "db:migrate": "pnpm --filter @skillpack/api exec tsx src/migrate.ts",
+    "db:seed": "pnpm --filter @skillpack/db seed",
+    "dev": "bash scripts/dev-stack.sh",
+    "dev:conductor": "bash scripts/dev-conductor.sh",
+    "dev:app": "pnpm exec concurrently -k -n api,worker,web \"bash scripts/dev-process.sh api env COMPANION_API_HOST=${COMPANION_API_HOST:-127.0.0.1} pnpm --filter @skillpack/api dev\" \"bash scripts/dev-worker.sh pnpm --filter @skillpack/worker dev\" \"bash scripts/dev-process.sh web pnpm --filter @skillpack/web dev --hostname ${COMPANION_WEB_HOST:-127.0.0.1} --port ${COMPANION_WEB_PORT:-3000}\"",
+    "dev:check": "bash scripts/dev-stack-check.sh",
+    "lint": "pnpm lint:anti-slop && turbo run lint",
+    "lint:anti-slop": "node scripts/lint-anti-slop.mjs",
+    "typecheck": "turbo run typecheck",
+    "test": "pnpm test:anti-slop && TZ=UTC turbo run test",
+    "test:anti-slop": "node --test scripts/lint-anti-slop.test.mjs scripts/lint-anti-slop.integration.test.mjs",
+    "test:coverage": "turbo run coverage",
+    "test:integration": "pnpm --filter @skillpack/api test:integration",
+    "test:e2e": "node scripts/ci-playwright-policy.mjs && playwright test",
+    "ci:quality": "turbo run lint typecheck test --continue=dependencies-successful",
+    "verify:change": "node scripts/verify-change.mjs",
+    "browser:smoke": "bash scripts/agent-browser-smoke.sh",
+    "smoke:api": "bash scripts/ci-api-smoke.sh",
+    "smoke:rsc": "bash scripts/ci-rsc-smoke.sh",
+    "cli": "pnpm --filter @skillpack/cli exec skillpack",
+    "design:lint": "npx --yes @google/design.md@0.2.0 lint DESIGN.md --format json"
+  },
+  "devDependencies": {
+    "@oxlint/plugins": "1.79.0",
+    "@playwright/test": "1.61.1",
+    "@vitest/coverage-v8": "3.2.7",
+    "concurrently": "^9.2.1",
+    "oxlint": "1.79.0",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "zod": "^4.0.0"
+  }
+}

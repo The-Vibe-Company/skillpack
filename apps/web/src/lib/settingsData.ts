@@ -1,0 +1,92 @@
+/* oxlint-disable anti-slop/no-known-value-widening, anti-slop/no-runtime-typeof -- Existing server-loader route parsing debt; the timezone field comes from the authenticated response. */
+import "server-only";
+
+import { redirect } from "next/navigation";
+import { loadOrgContext } from "@/lib/currentOrg";
+import { serverApiFetch } from "@/lib/apiServer";
+import {
+  buildSettingsAppData,
+  initialsOf,
+  parseApiTokensResponse,
+  parseOrgSettingsResponse,
+  parseBillingOverview,
+} from "@/lib/settingsViewModel";
+import { parseSettingsView } from "@/components/org/model";
+import type { SettingsAppData, SettingsDialog, SettingsRoute, SettingsView } from "@/components/org/model";
+import type { MeVM } from "@/lib/types";
+import { loadServerAuth } from "@/lib/serverAuth";
+import { gettingStartedStateSchema } from "@skillpack/contracts";
+
+export type SettingsSearchParams = Promise<Record<string, string | string[] | undefined>>;
+export { parseOrgSettingsResponse } from "@/lib/settingsViewModel";
+
+function parseSettingsState(sp: Record<string, string | string[] | undefined>): {
+  initialRoute: SettingsRoute;
+  initialDialog: SettingsDialog;
+} {
+  const viewRaw = typeof sp.view === "string" ? sp.view : undefined;
+  const view: SettingsView = parseSettingsView(viewRaw);
+  const dialogRaw = typeof sp.dialog === "string" ? sp.dialog : undefined;
+  const initialDialog: SettingsDialog = dialogRaw === "invite" ? dialogRaw : null;
+  return { initialRoute: { view }, initialDialog };
+}
+
+export async function loadSettingsPageData(searchParams: SettingsSearchParams): Promise<{
+  data: SettingsAppData;
+  initialRoute: SettingsRoute;
+  initialDialog: SettingsDialog;
+} | null> {
+  const authState = await loadServerAuth<{
+    userId: string;
+    email: string;
+    name: string;
+    avatarUrl?: string | null;
+    timezone?: string | null;
+    needsOnboarding?: boolean;
+  }>();
+  if (authState.status === "unauthenticated") redirect("/login");
+  if (authState.status === "unavailable") return null;
+  const whoami = authState.user;
+  if (whoami.needsOnboarding) redirect("/onboarding");
+
+  const orgContext = await loadOrgContext().catch(() => null);
+  if (!orgContext) return null;
+  const { current } = orgContext;
+  if (!current) redirect("/onboarding");
+  const orgHeaders = { "x-companion-org": current.id };
+
+  const me: MeVM = {
+    id: whoami.userId,
+    name: whoami.name || whoami.email || "You",
+    email: whoami.email,
+    initials: initialsOf(whoami.name || whoami.email || "You"),
+    avatarUrl: whoami.avatarUrl ?? null,
+  };
+
+  const settingsRaw = await serverApiFetch<unknown>("/v1/orgs/current/settings", {
+    headers: orgHeaders,
+  }).catch(() => null);
+  if (settingsRaw === null) return null;
+  const settings = parseOrgSettingsResponse(settingsRaw);
+  if (!settings) return null;
+
+  // Personal access tokens live on their own endpoint; a failed fetch degrades to an empty list.
+  const [tokensRaw, billingRaw, gettingStartedRaw] = await Promise.all([
+    serverApiFetch<unknown>("/v1/tokens", { headers: orgHeaders }).catch(() => null),
+    serverApiFetch<unknown>("/v1/billing", { headers: orgHeaders }).catch(() => null),
+    serverApiFetch<unknown>("/v1/getting-started", { headers: orgHeaders }).catch(() => null),
+  ]);
+  const tokens = parseApiTokensResponse(tokensRaw);
+  const billing = parseBillingOverview(billingRaw);
+  const gettingStartedResult = gettingStartedStateSchema.safeParse(gettingStartedRaw);
+  const gettingStarted = gettingStartedResult.success ? gettingStartedResult.data : null;
+
+  const state = parseSettingsState(await searchParams);
+  return {
+    ...state,
+    data: {
+      ...buildSettingsAppData({ me, current, settings, tokens, billing, gettingStarted }),
+      timezone: whoami.timezone ?? null,
+    },
+  };
+}

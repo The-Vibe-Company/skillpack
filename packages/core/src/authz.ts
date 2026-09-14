@@ -1,0 +1,132 @@
+import { type OrgRole, type SecretAudience, type SkillScope } from "@skillpack/contracts";
+
+/**
+ * The CAPABILITY gate (the "can the actor DO it?" half of authorization). The
+ * VISIBILITY gate ("can the actor SEE it?") is enforced separately by Postgres RLS.
+ * Both must pass. This module is framework-free and shared by the web routes and CLI.
+ *
+ * ORG skills are FLAT: every org skill is visible to every member, and any member may do anything to
+ * it (read / create / update / delete / publish / label-*). PERSONAL skills are private: only the
+ * creator (the owner) can see or modify them — admins included. {@link canAccessSkill} /
+ * {@link canManagePersonalSkill} express that per-resource gate; the flat capability gate
+ * ({@link canPerform}) still governs the action itself. Org governance (member/role management)
+ * mirrors the SQL guards in the SECURITY DEFINER management RPCs — the database is authoritative;
+ * these power the route layer + the table-driven tests. Every role passed in is the actor's role IN
+ * A SPECIFIC org, so a role in org A never authorizes org B.
+ *
+ * Public share-link previews are not routed through `canAccessSkill`: they are a separate,
+ * explicit metadata-only read path that resolves only live org skills by unguessable token.
+ */
+
+export type SkillAction =
+  | "skill.read"
+  | "skill.create"
+  | "skill.update"
+  | "skill.delete"
+  | "skill.publish";
+
+export interface Actor {
+  orgRole: OrgRole;
+}
+
+const ORG_ADMINS: ReadonlySet<OrgRole> = new Set<OrgRole>(["owner", "admin"]);
+
+export function isOrgAdmin(role: OrgRole): boolean {
+  return ORG_ADMINS.has(role);
+}
+
+/* ---- Management capability gates (mirror the SQL RPC guards) ---------------- */
+
+/** Owner or admin may manage org members. */
+export function canManageOrg(orgRole: OrgRole): boolean {
+  return isOrgAdmin(orgRole);
+}
+
+/** Only an owner may grant the owner role or modify/remove another owner. */
+export function canTouchOwner(orgRole: OrgRole): boolean {
+  return orgRole === "owner";
+}
+
+/** Guard: an org must always keep at least one owner. */
+export function isLastOwner(ownerCount: number, targetIsOwner: boolean): boolean {
+  return targetIsOwner && ownerCount <= 1;
+}
+
+/**
+ * The single capability decision used by routes and the CLI. Skills are flat: every action is
+ * allowed for any member of the org. The visibility gate (RLS / `assertMember`) decides whether
+ * the actor is a member at all; this gate then permits the action unconditionally.
+ */
+export function canPerform(_actor: Actor, _action: SkillAction): boolean {
+  return true;
+}
+
+/* ---- Per-skill scope gate (personal-skill privacy) -------------------------- */
+
+/** The minimal skill shape the scope gate needs: its library and its owner (creator). */
+export interface SkillScopeRef {
+  scope: SkillScope;
+  creatorId: string;
+}
+
+/**
+ * Can `actorId` SEE this specific skill? Org skills: yes (flat — every member). Personal skills: only
+ * the owner (creator). There is deliberately NO admin override — "only you see this library". Org
+ * role is irrelevant here, so this takes the bare actor id rather than an {@link Actor}.
+ */
+export function canAccessSkill(actorId: string, skill: SkillScopeRef): boolean {
+  return skill.scope === "org" || skill.creatorId === actorId;
+}
+
+/**
+ * Owner-only mutation gate for a personal skill (Share, personal-folder assign). True only when the
+ * skill is personal AND `actorId` is its creator. Org skills are not "managed" through this gate —
+ * they use the flat capability path.
+ */
+export function canManagePersonalSkill(actorId: string, skill: SkillScopeRef): boolean {
+  return skill.scope === "personal" && skill.creatorId === actorId;
+}
+
+/**
+ * Public releases are narrower than normal org-skill editing: only the original creator or an org
+ * Owner/Admin may pin, promote, or withdraw one. Membership is intentionally not inferred here and
+ * must be established by the caller before this capability gate runs.
+ */
+export function canManagePublicSkill(
+  actor: { id: string; orgRole: OrgRole },
+  skill: SkillScopeRef,
+): boolean {
+  return skill.scope === "org" && (skill.creatorId === actor.id || isOrgAdmin(actor.orgRole));
+}
+
+export interface SecretAccessRef {
+  ownerId: string;
+  audience: SecretAudience;
+  recipientIds?: readonly string[];
+  disabledAt?: Date | string | null;
+  deletedAt?: Date | string | null;
+}
+
+/** Roles are deliberately absent: secret access is owner + audience, never an admin capability. */
+export function canAccessSecret(actorId: string, secret: SecretAccessRef): boolean {
+  if (secret.disabledAt || secret.deletedAt) return false;
+  if (secret.ownerId === actorId) return true;
+  if (secret.audience === "organization") return true;
+  return secret.audience === "restricted" && (secret.recipientIds ?? []).includes(actorId);
+}
+
+export function canManageSecret(actorId: string, secret: Pick<SecretAccessRef, "ownerId">): boolean {
+  return secret.ownerId === actorId;
+}
+
+export interface SkillDatabaseRealmRef {
+  audience: "organization" | "personal";
+  ownerId: string | null;
+  /** True only after Core/RLS has resolved an explicit grant for this actor. */
+  sharedWithActor?: boolean;
+}
+
+/** Personal database realms are owner-or-explicit-grantee, deliberately without an administrator override. */
+export function canAccessSkillDatabaseRealm(actorId: string, realm: SkillDatabaseRealmRef): boolean {
+  return realm.audience === "organization" || realm.ownerId === actorId || realm.sharedWithActor === true;
+}

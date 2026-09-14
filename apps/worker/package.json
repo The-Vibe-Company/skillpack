@@ -1,0 +1,33 @@
+{
+  "name": "@skillpack/worker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@skillpack/billing": "workspace:*",
+    "@skillpack/contracts": "workspace:*",
+    "@skillpack/core": "workspace:*",
+    "@skillpack/db": "workspace:*",
+    "@skillpack/github": "workspace:*",
+    "@skillpack/skills": "workspace:*",
+    "@skillpack/storage": "workspace:*",
+    "@sentry/node": "^10.70.0",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.5",
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "3.2.7"
+  }
+}

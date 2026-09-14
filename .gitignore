@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Python (bundled skill scripts + tests)
+__pycache__/
+*.pyc
+
+# Turborepo
+.turbo/
+
+# Test coverage
+coverage/
+playwright-report/
+test-results/
+
+# Env
+.env
+.env.local
+.env*.local
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# CLI local state (when run inside the repo)
+.companion/
+companion.lock
+
+# Conductor workspace context
+.context/
+.conductor/settings.local.toml
+
+# Conductor native dev stack (Postgres/MinIO/Mailpit state)
+.conductor-pg/
+.companion-local/
+.xcodebuildmcp/
+
+# OS / editor
+.DS_Store
+*.log

@@ -1,0 +1,30 @@
+{
+  "name": "@skillpack/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./services": "./src/services.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.reporter=text-summary --coverage.reporter=json-summary"
+  },
+  "dependencies": {
+    "@skillpack/billing": "workspace:*",
+    "@skillpack/contracts": "workspace:*",
+    "@skillpack/db": "workspace:*",
+    "@skillpack/skills": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "free-email-domains": "^1.2.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/tar-stream": "^3.1.3",
+    "tar-stream": "^3.1.7",
+    "typescript": "^5.7.2",
+    "vitest": "3.2.7"
+  }
+}

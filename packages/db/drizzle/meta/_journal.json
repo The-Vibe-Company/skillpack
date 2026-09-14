@@ -1,0 +1,1315 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780843699500,
+      "tag": "0000_rapid_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780845578283,
+      "tag": "0001_sparkling_squadron_sinister",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780845605411,
+      "tag": "0002_colorful_trauma",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780855200000,
+      "tag": "0003_narrow_pending_invitations",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780855500000,
+      "tag": "0004_lightweight_tenant_rls",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780855800000,
+      "tag": "0005_api_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780939530674,
+      "tag": "0006_first_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1780939600000,
+      "tag": "0007_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780939700000,
+      "tag": "0008_verify_existing_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1780939800000,
+      "tag": "0009_settings_team_description",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1780939900000,
+      "tag": "0010_skill_comment_threads",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1781050000000,
+      "tag": "0011_everyone_skill_visibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1781050100000,
+      "tag": "0012_skill_owner_team",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1781050200000,
+      "tag": "0013_local_skill_installs",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1781050300000,
+      "tag": "0014_skill_dependencies",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1781050400000,
+      "tag": "0015_skill_dependency_org_fks",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1781050500000,
+      "tag": "0016_skill_installs",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1781050600000,
+      "tag": "0017_organization_domains",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1781050700000,
+      "tag": "0018_skill_version_body",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1781050800000,
+      "tag": "0019_skill_comment_images",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1781050900000,
+      "tag": "0020_skill_owner_only",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1781051000000,
+      "tag": "0021_labels",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1781051100000,
+      "tag": "0022_drop_skill_ownership",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1781051200000,
+      "tag": "0023_drop_teams",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1781051300000,
+      "tag": "0024_drop_owner_filter_prefs",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1781051400000,
+      "tag": "0025_label_display_names",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1781051500000,
+      "tag": "0026_personal_skills",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1781051600000,
+      "tag": "0027_personal_labels",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1781051700000,
+      "tag": "0028_skill_share_token",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1781051800000,
+      "tag": "0029_skill_display_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1781051900000,
+      "tag": "0030_user_avatar",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1781052000000,
+      "tag": "0031_org_skill_naming_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1783936000000,
+      "tag": "0032_billing",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1783937500000,
+      "tag": "0033_personal_shared_secrets",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1783937600000,
+      "tag": "0034_skill_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1783937700000,
+      "tag": "0035_runtime_credentials",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1783937800000,
+      "tag": "0036_model_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1784131200000,
+      "tag": "0037_reactivate_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1784131300000,
+      "tag": "0038_skill_run_prompt_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1784131400000,
+      "tag": "0039_run_prewarms",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1784131500000,
+      "tag": "0040_sandbox_usage",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1784217600000,
+      "tag": "0041_run_artifacts",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1784246400000,
+      "tag": "0042_run_prompt_queue_stop",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1784247300000,
+      "tag": "0043_run_prompt_dispatch_barrier",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1784568000000,
+      "tag": "0044_remove_skill_stars",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1784568900000,
+      "tag": "0045_github_skill_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1784628000000,
+      "tag": "0046_api_token_refresh",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1784638800000,
+      "tag": "0047_skill_group_preference",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1784642400000,
+      "tag": "0048_skill_sidebar_order_preference",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1784646000000,
+      "tag": "0049_authenticated_public_releases",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1784649600000,
+      "tag": "0050_agent_auth_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1784736000000,
+      "tag": "0051_run_file_previews",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1784739600000,
+      "tag": "0052_run_file_preview_function_repair",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1784790000000,
+      "tag": "0053_sandbox_lifecycle_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1784833200000,
+      "tag": "0054_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1784869200000,
+      "tag": "0055_public_skill_ticket_clock_skew",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1784907810000,
+      "tag": "0056_project_prompt_file_reconciliation",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1784912400000,
+      "tag": "0057_project_runtime_process_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1784998800000,
+      "tag": "0058_project_workspace_retry_backoff",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1785257600000,
+      "tag": "0059_getting_started_states",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1785445500000,
+      "tag": "0060_skill_databases",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1785456000000,
+      "tag": "0061_skill_database_realm_shares",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1786237200000,
+      "tag": "0062_agent_delegation_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1786240800000,
+      "tag": "0063_skills_hub_only",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1786555620000,
+      "tag": "0064_companion_box_runtime",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1786564800000,
+      "tag": "0065_companion_providers",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1786567200000,
+      "tag": "0066_companion_sharing",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1786572000000,
+      "tag": "0067_companion_persona",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1786575600000,
+      "tag": "0068_companion_threads",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1786579200000,
+      "tag": "0069_companion_transcript_author",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1786582800000,
+      "tag": "0070_companion_runtime_error",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1786584000000,
+      "tag": "0071_companion_mcp_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1786587600000,
+      "tag": "0072_drop_companion_member_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1786591200000,
+      "tag": "0073_companion_runtime_pools",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1786594800000,
+      "tag": "0074_companion_box_runtime_restore",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1786598400000,
+      "tag": "0075_companion_box_unshare",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1786726800000,
+      "tag": "0076_companion_model",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1786813200000,
+      "tag": "0077_companion_tool_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1786900000000,
+      "tag": "0078_companion_skills",
+      "breakpoints": true
+    },
+    {
+      "idx": 79,
+      "version": "7",
+      "when": 1786986400000,
+      "tag": "0079_companion_mcp_attach",
+      "breakpoints": true
+    },
+    {
+      "idx": 80,
+      "version": "7",
+      "when": 1787072800000,
+      "tag": "0080_companion_decisions",
+      "breakpoints": true
+    },
+    {
+      "idx": 81,
+      "version": "7",
+      "when": 1787159200000,
+      "tag": "0081_companion_member_state",
+      "breakpoints": true
+    },
+    {
+      "idx": 82,
+      "version": "7",
+      "when": 1787245600000,
+      "tag": "0082_companion_transcript_reasoning",
+      "breakpoints": true
+    },
+    {
+      "idx": 83,
+      "version": "7",
+      "when": 1787332000000,
+      "tag": "0083_companion_skills_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 84,
+      "version": "7",
+      "when": 1787418400000,
+      "tag": "0084_companion_timeout_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 85,
+      "version": "7",
+      "when": 1787504800000,
+      "tag": "0085_companion_timeout_restart",
+      "breakpoints": true
+    },
+    {
+      "idx": 86,
+      "version": "7",
+      "when": 1787591200000,
+      "tag": "0086_companion_tool_timeout_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 87,
+      "version": "7",
+      "when": 1787677600000,
+      "tag": "0087_companion_reconciler",
+      "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1787764000000,
+      "tag": "0088_companion_delivery_lease",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1787850400000,
+      "tag": "0089_legacy_companion_purge",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1787936800000,
+      "tag": "0090_companion_runtime_v2",
+      "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1788023200000,
+      "tag": "0091_companion_runtime_executor",
+      "breakpoints": true
+    },
+    {
+      "idx": 92,
+      "version": "7",
+      "when": 1788109600000,
+      "tag": "0092_companion_runtime_api",
+      "breakpoints": true
+    },
+    {
+      "idx": 93,
+      "version": "7",
+      "when": 1788152800000,
+      "tag": "0093_companion_runtime_desktop_replay",
+      "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1788196000000,
+      "tag": "0094_companion_runtime_cutover",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1788282400000,
+      "tag": "0095_companion_runtime_desktop_replay_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1788368800000,
+      "tag": "0096_companion_runtime_settings_claim_revisions",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1788455200000,
+      "tag": "0097_companion_runtime_warm_send_dispatch",
+      "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1788541600000,
+      "tag": "0098_companion_message_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1788628000000,
+      "tag": "0099_companion_attempt_outputs",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1788714400000,
+      "tag": "0100_companion_config_proposal",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1788800800000,
+      "tag": "0101_companion_answer_config_decision",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1788887200000,
+      "tag": "0102_companion_config_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1788973600000,
+      "tag": "0103_companion_hub_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1789060000000,
+      "tag": "0104_companion_mint_hub_token",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1789146400000,
+      "tag": "0105_companion_subagent_tool_runs",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1789232800000,
+      "tag": "0106_companion_routines",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1789319200000,
+      "tag": "0107_companion_answer_routine_decision",
+      "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1789405600000,
+      "tag": "0108_companion_turn_stop",
+      "breakpoints": true
+    },
+    {
+      "idx": 109,
+      "version": "7",
+      "when": 1789405600000,
+      "tag": "0109_companion_runtime_health_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1789492000000,
+      "tag": "0110_companion_material_snapshot_expiry",
+      "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1789578400000,
+      "tag": "0111_companion_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1789664800000,
+      "tag": "0112_companion_answer_trigger_decision",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1789751200000,
+      "tag": "0113_defer_skill_updates_to_pi_stop",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1789837600000,
+      "tag": "0114_companion_delete_resume",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1789924000000,
+      "tag": "0115_companion_trigger_plugin_gate",
+      "breakpoints": true
+    },
+    {
+      "idx": 116,
+      "version": "7",
+      "when": 1789924000001,
+      "tag": "0116_companion_trigger_target",
+      "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1790010400000,
+      "tag": "0117_companion_plugin_trigger_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1790096800000,
+      "tag": "0118_conductor_config_proposal",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1790096800001,
+      "tag": "0119_companion_icons",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1790183200000,
+      "tag": "0120_companion_mcp_token_broker",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1790269600000,
+      "tag": "0121_companion_mcp_selection_lock",
+      "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1790356000000,
+      "tag": "0122_companion_image_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 123,
+      "version": "7",
+      "when": 1790442400000,
+      "tag": "0123_companion_image_registry_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1790528800000,
+      "tag": "0124_companion_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1790615200000,
+      "tag": "0125_companion_box_agent_endpoint",
+      "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1790701600000,
+      "tag": "0126_companion_agent_endpoint_read",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1790788000000,
+      "tag": "0127_companion_dispatch_resolution",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1790874400000,
+      "tag": "0128_companion_retry_absent_box",
+      "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1790960800000,
+      "tag": "0129_companion_decision_waits",
+      "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1791047200000,
+      "tag": "0130_companion_expired_denial",
+      "breakpoints": true
+    },
+    {
+      "idx": 131,
+      "version": "7",
+      "when": 1791133600000,
+      "tag": "0131_companion_notification_avatar",
+      "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1791220000000,
+      "tag": "0132_member_timezone",
+      "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1791306400000,
+      "tag": "0133_companion_tool_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 134,
+      "version": "7",
+      "when": 1791392800000,
+      "tag": "0134_slack_gmail_config_proposal",
+      "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1791479200000,
+      "tag": "0135_companion_routine_run_history",
+      "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1791565600000,
+      "tag": "0136_companion_sections",
+      "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1791652000000,
+      "tag": "0137_companion_routine_isolation",
+      "breakpoints": true
+    },
+    {
+      "idx": 138,
+      "version": "7",
+      "when": 1791738400000,
+      "tag": "0138_companion_routine_cancel_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 139,
+      "version": "7",
+      "when": 1791824800000,
+      "tag": "0139_companion_routine_parallel_scheduling",
+      "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1791911200000,
+      "tag": "0140_companion_routine_notify_projection",
+      "breakpoints": true
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1791997600000,
+      "tag": "0141_companion_routine_proposal_upsert",
+      "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1792084000000,
+      "tag": "0142_companion_thread_sync_projection",
+      "breakpoints": true
+    },
+    {
+      "idx": 143,
+      "version": "7",
+      "when": 1792170400000,
+      "tag": "0143_companion_delete_routine_preemption",
+      "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1792256800000,
+      "tag": "0144_companion_routine_lane_failure_accounting",
+      "breakpoints": true
+    },
+    {
+      "idx": 145,
+      "version": "7",
+      "when": 1792343200000,
+      "tag": "0145_companion_routine_queue_cleanup",
+      "breakpoints": true
+    },
+    {
+      "idx": 146,
+      "version": "7",
+      "when": 1792429600000,
+      "tag": "0146_companion_restart_box_checkpoint",
+      "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1792516000000,
+      "tag": "0147_companion_trigger_v2_engine",
+      "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1792602400000,
+      "tag": "0148_companion_trigger_prepare_result",
+      "breakpoints": true
+    },
+    {
+      "idx": 149,
+      "version": "7",
+      "when": 1792688800000,
+      "tag": "0149_companion_trigger_proposal_account_fallback",
+      "breakpoints": true
+    },
+    {
+      "idx": 150,
+      "version": "7",
+      "when": 1792775200000,
+      "tag": "0150_companion_needs_input_claim_damper",
+      "breakpoints": true
+    },
+    {
+      "idx": 151,
+      "version": "7",
+      "when": 1792861600000,
+      "tag": "0151_companion_runtime_self_heal_protocol_5",
+      "breakpoints": true
+    },
+    {
+      "idx": 152,
+      "version": "7",
+      "when": 1792948000000,
+      "tag": "0152_companion_thread_incremental_projection",
+      "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1793034400000,
+      "tag": "0153_companion_control_mcp",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1793120800000,
+      "tag": "0154_companion_archived_box_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 155,
+      "version": "7",
+      "when": 1793207200000,
+      "tag": "0155_companion_interruption_terminal_protocol_6",
+      "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1793293600000,
+      "tag": "0156_companion_main_start_budget_and_interruption_projection",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1793297200000,
+      "tag": "0157_companion_recovery_cleanup_protocol_7",
+      "breakpoints": true
+    },
+    {
+      "idx": 158,
+      "version": "7",
+      "when": 1793300800000,
+      "tag": "0158_companion_recovery_lane_interlock",
+      "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1793304400000,
+      "tag": "0159_companion_runtime_v3_progression",
+      "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1793308000000,
+      "tag": "0160_companion_runtime_v2_purge",
+      "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1793311600000,
+      "tag": "0161_companion_runtime_v3_warm_turn",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1793315200000,
+      "tag": "0162_companion_runtime_v3_acceptance_measurement",
+      "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1793318800000,
+      "tag": "0163_companion_runtime_v3_async_prepare",
+      "breakpoints": true
+    },
+    {
+      "idx": 164,
+      "version": "7",
+      "when": 1793322400000,
+      "tag": "0164_runtime_images_optional_accelerators",
+      "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1793326000000,
+      "tag": "0165_companion_runtime_v3_complete_preparation",
+      "breakpoints": true
+    },
+    {
+      "idx": 166,
+      "version": "7",
+      "when": 1793329600000,
+      "tag": "0166_companion_runtime_v3_persistent_box_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 167,
+      "version": "7",
+      "when": 1793333200000,
+      "tag": "0167_companion_runtime_v3_pi_native_admission",
+      "breakpoints": true
+    },
+    {
+      "idx": 168,
+      "version": "7",
+      "when": 1793336800000,
+      "tag": "0168_companion_runtime_v3_turn_bounds",
+      "breakpoints": true
+    },
+    {
+      "idx": 169,
+      "version": "7",
+      "when": 1793340400000,
+      "tag": "0169_companion_runtime_v3_ambiguous_self_heal",
+      "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1793344000000,
+      "tag": "0170_companion_runtime_v3_human_decisions",
+      "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1793347600000,
+      "tag": "0171_companion_attachment_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1793351200000,
+      "tag": "0172_companion_runtime_v3_background_routines",
+      "breakpoints": true
+    },
+    {
+      "idx": 173,
+      "version": "7",
+      "when": 1793354800000,
+      "tag": "0173_companion_runtime_v3_background_triggers",
+      "breakpoints": true
+    },
+    {
+      "idx": 174,
+      "version": "7",
+      "when": 1793358400000,
+      "tag": "0174_companion_runtime_v3_delegations",
+      "breakpoints": true
+    },
+    {
+      "idx": 175,
+      "version": "7",
+      "when": 1793362000000,
+      "tag": "0175_companion_runtime_v3_deferred_pi_restart",
+      "breakpoints": true
+    },
+    {
+      "idx": 176,
+      "version": "7",
+      "when": 1793365600000,
+      "tag": "0176_companion_runtime_v3_control_followups",
+      "breakpoints": true
+    },
+    {
+      "idx": 177,
+      "version": "7",
+      "when": 1793369200000,
+      "tag": "0177_companion_runtime_v3_external_incidents",
+      "breakpoints": true
+    },
+    {
+      "idx": 178,
+      "version": "7",
+      "when": 1793372800000,
+      "tag": "0178_companion_runtime_v3_client_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 179,
+      "version": "7",
+      "when": 1793376400000,
+      "tag": "0179_companion_runtime_v3_contraction",
+      "breakpoints": true
+    },
+    {
+      "idx": 180,
+      "version": "7",
+      "when": 1793380000000,
+      "tag": "0180_companion_runtime_v3_terminal_assistant_fallback",
+      "breakpoints": true
+    },
+    {
+      "idx": 181,
+      "version": "7",
+      "when": 1793383600000,
+      "tag": "0181_companion_runtime_v3_desktop_authorization",
+      "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1793387200000,
+      "tag": "0182_companion_runtime_v3_thread_projection",
+      "breakpoints": true
+    },
+    {
+      "idx": 183,
+      "version": "7",
+      "when": 1793390800000,
+      "tag": "0183_companion_runtime_v3_mcp_broker_resolver",
+      "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1793394400000,
+      "tag": "0184_companion_runtime_v3_background_retry_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 185,
+      "version": "7",
+      "when": 1793398000000,
+      "tag": "0185_companion_runtime_v3_reload_staged_credentials",
+      "breakpoints": true
+    },
+    {
+      "idx": 186,
+      "version": "7",
+      "when": 1793401600000,
+      "tag": "0186_retire_hosted_companions",
+      "breakpoints": true
+    }
+  ]
+}

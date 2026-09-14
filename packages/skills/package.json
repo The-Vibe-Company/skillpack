@@ -1,0 +1,26 @@
+{
+  "name": "@skillpack/skills",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage --coverage.reporter=text-summary --coverage.reporter=json-summary"
+  },
+  "dependencies": {
+    "@skillpack/contracts": "workspace:*",
+    "fflate": "^0.8.2",
+    "tar-stream": "^3.1.7",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/tar-stream": "^3.1.3",
+    "typescript": "^5.7.2",
+    "vitest": "3.2.7"
+  }
+}

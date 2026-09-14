@@ -1,0 +1,43 @@
+{
+  "$schema": "./tools.schema.json",
+  "schemaVersion": 1,
+  "tools": {
+    "claude-code": {
+      "displayName": "Claude Code",
+      "detect": ["~/.claude"],
+      "skillsDir": { "user": "~/.claude/skills", "project": ".claude/skills" },
+      "format": "skill-md"
+    },
+    "codex": {
+      "displayName": "Codex",
+      "detect": ["~/.codex"],
+      "skillsDir": { "user": "~/.codex/skills", "project": ".codex/skills" },
+      "format": "skill-md"
+    },
+    "opencode": {
+      "displayName": "OpenCode",
+      "detect": ["~/.config/opencode"],
+      "skillsDir": { "user": "~/.agents/skills", "project": ".agents/skills" },
+      "format": "skill-md"
+    },
+    "grok-bot": {
+      "displayName": "Grok Bot (Cursor)",
+      "detect": ["~/.cursor"],
+      "skillsDir": { "user": "~/.cursor/skills", "project": ".cursor/skills" },
+      "format": "skill-md"
+    },
+    "openclaw": {
+      "displayName": "OpenClaw",
+      "detect": ["~/.openclaw"],
+      "skillsDir": { "user": "~/.openclaw/skills", "project": "skills" },
+      "format": "skill-md"
+    },
+    "hermes": {
+      "displayName": "Hermes",
+      "detect": ["~/.hermes"],
+      "skillsDir": { "user": "~/.hermes/skills" },
+      "recursive": true,
+      "format": "skill-md"
+    }
+  }
+}

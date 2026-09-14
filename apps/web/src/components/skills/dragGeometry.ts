@@ -1,0 +1,127 @@
+// Pure, framework-free geometry + hit-testing for the Skills drag-and-drop.
+//
+// Why this file exists: the drag-and-drop used to be native HTML5 DnD, whose only
+// "testable" seam was dispatching synthetic DragEvents straight at the handlers —
+// which always pass regardless of whether a real mouse would ever reach them. The
+// pointer-based implementation resolves the drop target itself, on every move, via
+// `document.elementFromPoint`. That decision logic lives here as pure functions so it
+// is exercised by the SAME code in production and in tests (tests stub only layout,
+// i.e. `elementFromPoint`, never this logic). See SkillsDrag.pointer.test.ts.
+
+import type { SkillsLibrary } from "./route";
+import type { DragItem } from "./SkillsApp";
+
+/** A validated drop target resolved from the element under the pointer. */
+export type ResolvedTarget =
+  | { lib: SkillsLibrary; kind: "label"; path: string }
+  | { lib: SkillsLibrary; kind: "reorder"; path: string; position: "before" | "after" }
+  | { lib: SkillsLibrary; kind: "root" };
+
+/** Pixels the pointer must travel before a press becomes a drag (so a click still opens). */
+export const DRAG_THRESHOLD_PX = 4;
+
+function labelParent(path: string): string | null {
+  const i = path.lastIndexOf("/");
+  return i === -1 ? null : path.slice(0, i);
+}
+
+function isSkillsLibrary(value: string | null | undefined): value is SkillsLibrary {
+  return value === "mine" || value === "org";
+}
+
+/** A skill always drops into a label of its own library; a label cannot drop into itself,
+ *  a descendant of itself, or back onto its own current parent. */
+export function isLabelDropValid(drag: DragItem | null, lib: SkillsLibrary, targetPath: string): drag is DragItem {
+  if (!drag || drag.lib !== lib) return false;
+  if (drag.kind === "skill") return true;
+  if (targetPath === drag.path || targetPath.startsWith(drag.path + "/")) return false;
+  return `${targetPath}/${drag.leaf}` !== drag.path;
+}
+
+/** Personal ordering is intentionally limited to labels that already share a parent. */
+export function isLabelReorderValid(drag: DragItem | null, lib: SkillsLibrary, targetPath: string): drag is DragItem {
+  return !!drag
+    && drag.kind === "label"
+    && drag.lib === lib
+    && drag.path !== targetPath
+    && labelParent(drag.path) === labelParent(targetPath);
+}
+
+/** Dropping on a library header (root): a skill must currently be filed somewhere;
+ *  a label must currently be nested (un-nesting it to the root). */
+export function isRootDropValid(drag: DragItem | null, lib: SkillsLibrary): drag is DragItem {
+  if (!drag || drag.lib !== lib) return false;
+  if (drag.kind === "skill") return drag.sourceLabel !== null;
+  return labelParent(drag.path) !== null;
+}
+
+/** Has the pointer moved far enough from the press origin to commit to a drag? */
+export function exceedsThreshold(
+  start: { x: number; y: number },
+  now: { x: number; y: number },
+  px: number = DRAG_THRESHOLD_PX,
+): boolean {
+  return Math.abs(now.x - start.x) >= px || Math.abs(now.y - start.y) >= px;
+}
+
+/**
+ * Resolve the element under the pointer to a validated drop target. This is the real
+ * production decision path: walk up to the nearest `[data-skill-drop-kind]` surface,
+ * read its `data-skill-drop-*` attributes, and validate against the active drag.
+ * Label drags use the outer vertical quarters for sibling ordering and the center for
+ * the existing reparent operation. Skill drags keep the whole row as their drop target.
+ */
+export function resolveDropTarget(el: Element | null, drag: DragItem | null, pointerY?: number): ResolvedTarget | null {
+  if (!drag) return null;
+  const surface = el instanceof Element ? el.closest<HTMLElement>("[data-skill-drop-kind]") : null;
+  if (!surface) return null;
+  const lib = surface.dataset.skillDropLib;
+  if (!isSkillsLibrary(lib)) return null;
+  const kind = surface.dataset.skillDropKind;
+  if (kind === "root") return isRootDropValid(drag, lib) ? { lib, kind: "root" } : null;
+  if (kind === "label") {
+    const path = surface.dataset.skillDropPath;
+    if (path && drag.kind === "label" && pointerY !== undefined) {
+      const rect = surface.getBoundingClientRect();
+      if (rect.height > 0) {
+        const ratio = (pointerY - rect.top) / rect.height;
+        const position = ratio <= 0.25 ? "before" : ratio >= 0.75 ? "after" : null;
+        if (position) {
+          return isLabelReorderValid(drag, lib, path) ? { lib, kind: "reorder", path, position } : null;
+        }
+      }
+    }
+    return path && isLabelDropValid(drag, lib, path) ? { lib, kind: "label", path } : null;
+  }
+  return null;
+}
+
+/** Stable key for the per-(library,path) tree-row lookup used by the dwell check. */
+export function treeRowKey(lib: SkillsLibrary, path: string): string {
+  return `${lib}\u0000${path}`;
+}
+
+/** Should hovering this target arm the 650ms folder auto-open? Only when dragging a
+ *  skill over a collapsed folder that actually has children. */
+export function isDwellCandidate(
+  target: ResolvedTarget | null,
+  drag: DragItem | null,
+  treeRowsByPath: Map<string, { hasChildren: boolean }>,
+  expanded: Set<string>,
+): boolean {
+  if (!target || target.kind !== "label") return false;
+  if (!drag || drag.kind !== "skill") return false;
+  const row = treeRowsByPath.get(treeRowKey(target.lib, target.path));
+  if (!row || !row.hasChildren) return false;
+  return !expanded.has(target.path);
+}
+
+/** Value-equality for resolved targets, to avoid re-rendering on every identical move. */
+export function sameDropTarget(a: ResolvedTarget | null, b: ResolvedTarget | null): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  if (a.kind !== b.kind || a.lib !== b.lib) return false;
+  if (a.kind === "label" && b.kind === "label") return a.path === b.path;
+  if (a.kind === "reorder" && b.kind === "reorder") return a.path === b.path && a.position === b.position;
+  return true;
+}

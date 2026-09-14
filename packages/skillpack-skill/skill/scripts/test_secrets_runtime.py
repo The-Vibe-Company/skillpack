@@ -1,0 +1,296 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+import json
+import contextlib
+import io
+import os
+import stat
+import sys
+import tempfile
+import threading
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+import secrets_runtime  # noqa: E402
+import companion_lib  # noqa: E402
+
+
+WORKSPACE = "7ab5fcf5-c49c-4a67-bad8-d6b36e28a1dc"
+SENTINEL = "SENTINEL_secret_value_297"
+
+
+class SecretRuntimeTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name)
+        self.old_home = os.environ.get("COMPANION_HOME")
+        os.environ["COMPANION_HOME"] = str(self.root / ".companion")
+
+    def tearDown(self) -> None:
+        if self.old_home is None:
+            os.environ.pop("COMPANION_HOME", None)
+        else:
+            os.environ["COMPANION_HOME"] = self.old_home
+        self.tmp.cleanup()
+
+    def item(self, value: str = SENTINEL) -> dict[str, object]:
+        return {
+            "projection_id": "5f81d77a-f99c-4d54-b217-d6a3479ec9ab",
+            "skill": "demo-skill",
+            "skill_version": "1.2.3",
+            "slot_id": "3dc0c51a-710b-4c9d-bac0-2269aa76f56e",
+            "env_key": "DEMO_TOKEN",
+            "secret_id": "00000000-0000-4000-8000-000000000101",
+            "secret_version": 4,
+            "value": value,
+        }
+
+    def test_projection_permissions_and_value_free_state(self) -> None:
+        path = secrets_runtime.write_projection(WORKSPACE, "demo-skill", [self.item()])
+        self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+        self.assertEqual(path.parent.stat().st_mode & 0o777, 0o700)
+        self.assertIn(SENTINEL, path.read_text(encoding="utf-8"))
+        secrets_runtime.update_projection_state(
+            WORKSPACE,
+            {"items": [self.item()], "tombstones": []},
+            {"demo-skill": path},
+        )
+        state = secrets_runtime.state_path().read_text(encoding="utf-8")
+        self.assertNotIn(SENTINEL, state)
+        parsed = json.loads(state)
+        projection = next(iter(parsed["workspaces"][WORKSPACE]["projections"].values()))
+        self.assertEqual(projection["secretVersion"], 4)
+        self.assertEqual(projection["envKey"], "DEMO_TOKEN")
+
+    def test_manual_projection_uses_the_fixed_internal_namespace(self) -> None:
+        item = self.item()
+        item["skill"] = "_manual/local-profile"
+        path = secrets_runtime.write_projection(WORKSPACE, "_manual/local-profile", [item])
+
+        self.assertEqual(
+            path,
+            Path(os.environ["COMPANION_HOME"]) / "secrets" / WORKSPACE / "_manual" / "local-profile" / ".env",
+        )
+        with self.assertRaises(ValueError):
+            secrets_runtime.projection_dir(WORKSPACE, "_manual/../escape")
+
+    def test_dotenv_escaping_is_one_physical_line(self) -> None:
+        rendered = secrets_runtime.render_projection([self.item('a"b\\c\nnext')]).decode("utf-8")
+        self.assertEqual(rendered, 'DEMO_TOKEN="a\\"b\\\\c\\nnext"\n')
+
+    def test_rejects_path_traversal_and_symlinked_projection_path(self) -> None:
+        with self.assertRaises(ValueError):
+            secrets_runtime.projection_dir(WORKSPACE, "../escape")
+        root = Path(os.environ["COMPANION_HOME"])
+        root.mkdir(parents=True)
+        outside = self.root / "outside"
+        outside.mkdir()
+        (root / "secrets").symlink_to(outside, target_is_directory=True)
+        with self.assertRaises(ValueError):
+            secrets_runtime.projection_dir(WORKSPACE, "demo-skill")
+
+    def test_concurrent_writers_leave_one_coherent_projection(self) -> None:
+        values = [f"value-{index}-" + ("x" * 1000) for index in range(8)]
+        threads = [threading.Thread(target=secrets_runtime.write_projection, args=(WORKSPACE, "demo-skill", [self.item(value)])) for value in values]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        final = (secrets_runtime.projection_dir(WORKSPACE, "demo-skill") / ".env").read_text(encoding="utf-8")
+        self.assertIn(final.removeprefix('DEMO_TOKEN="').removesuffix('"\n'), values)
+
+    def test_concurrent_state_merges_do_not_lose_other_skills(self) -> None:
+        rows = []
+        for index in range(8):
+            item = self.item(f"value-{index}")
+            item["projection_id"] = f"5f81d77a-f99c-4d54-b217-d6a3479eca{index:02d}"
+            item["skill"] = f"demo-skill-{index}"
+            path = secrets_runtime.write_projection(WORKSPACE, str(item["skill"]), [item])
+            rows.append((item, path))
+        threads = [
+            threading.Thread(
+                target=secrets_runtime.update_projection_state,
+                args=(WORKSPACE, {"items": [item], "tombstones": []}, {str(item["skill"]): path}),
+            )
+            for item, path in rows
+        ]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        state = json.loads(secrets_runtime.state_path().read_text(encoding="utf-8"))
+        self.assertEqual(len(state["workspaces"][WORKSPACE]["projections"]), len(rows))
+
+    def test_package_and_projection_rollback_together(self) -> None:
+        package = self.root / "package"
+        package.mkdir()
+        (package / "SKILL.md").write_text("new", encoding="utf-8")
+        target = self.root / "tools" / "demo-skill"
+        target.mkdir(parents=True)
+        (target / "SKILL.md").write_text("old", encoding="utf-8")
+        old_env = secrets_runtime.write_projection(WORKSPACE, "demo-skill", [self.item("old-secret")])
+        original_rename = Path.rename
+
+        def fail_env_swap(path: Path, destination: Path) -> Path:
+            if path.name.startswith("..env.staging."):
+                raise OSError("simulated env swap failure")
+            return original_rename(path, destination)
+
+        Path.rename = fail_env_swap
+        try:
+            with self.assertRaises(OSError):
+                secrets_runtime.deploy_packages_with_projection(package, [target], WORKSPACE, "demo-skill", [self.item("new-secret")])
+        finally:
+            Path.rename = original_rename
+        self.assertEqual((target / "SKILL.md").read_text(encoding="utf-8"), "old")
+        self.assertIn("old-secret", old_env.read_text(encoding="utf-8"))
+        self.assertNotIn("new-secret", old_env.read_text(encoding="utf-8"))
+
+    def test_next_operation_recovers_and_removes_plaintext_crash_backup(self) -> None:
+        directory = secrets_runtime.projection_dir(WORKSPACE, "demo-skill")
+        env_path = directory / ".env"
+        env_path.write_text('DEMO_TOKEN="new-secret"\n', encoding="utf-8")
+        env_backup = directory / "..env.backup.crash"
+        env_backup.write_text('DEMO_TOKEN="old-secret"\n', encoding="utf-8")
+        os.chmod(env_path, 0o600)
+        os.chmod(env_backup, 0o600)
+        marker = directory / ".transaction.json"
+        marker.write_text(
+            json.dumps({
+                "targets": [],
+                "envPath": str(env_path),
+                "envBackup": str(env_backup),
+                "envStaging": str(directory / "..env.staging.crash"),
+                "envExisted": True,
+            }),
+            encoding="utf-8",
+        )
+
+        secrets_runtime.recover_pending_transactions(WORKSPACE)
+
+        self.assertEqual(env_path.read_text(encoding="utf-8"), 'DEMO_TOKEN="old-secret"\n')
+        self.assertFalse(marker.exists())
+        self.assertFalse(env_backup.exists())
+        self.assertEqual(list(directory.glob("..env.backup.*")), [])
+
+    def test_tombstone_recovers_interrupted_swap_before_removing_projection(self) -> None:
+        directory = secrets_runtime.projection_dir(WORKSPACE, "demo-skill")
+        env_path = directory / ".env"
+        env_path.write_text('DEMO_TOKEN="new-secret"\n', encoding="utf-8")
+        env_backup = directory / "..env.backup.crash"
+        env_backup.write_text('DEMO_TOKEN="old-secret"\n', encoding="utf-8")
+        marker = directory / ".transaction.json"
+        marker.write_text(
+            json.dumps({
+                "targets": [],
+                "envPath": str(env_path),
+                "envBackup": str(env_backup),
+                "envStaging": str(directory / "..env.staging.crash"),
+                "envExisted": True,
+            }),
+            encoding="utf-8",
+        )
+
+        secrets_runtime.remove_projection(WORKSPACE, "demo-skill")
+
+        self.assertFalse(env_path.exists())
+        self.assertFalse(marker.exists())
+        self.assertFalse(env_backup.exists())
+
+    @unittest.skipUnless(os.name == "posix", "private inherited descriptors require POSIX")
+    def test_agent_secret_redemption_uses_private_pipe_not_argv_or_stdout(self) -> None:
+        fake_node = self.root / "fake-node"
+        fake_client = self.root / "companion-agent-client.mjs"
+        trace = self.root / "trace.json"
+        fake_client.write_text("// marker", encoding="utf-8")
+        fake_node.write_text(
+            """#!/usr/bin/env python3
+import json
+import os
+import sys
+
+request = json.load(sys.stdin)
+with open(os.environ["COMPANION_TEST_TRACE"], "w", encoding="utf-8") as handle:
+    json.dump({"argv": sys.argv, "request": request}, handle)
+payload = {"items": [{"env_key": "DEMO_TOKEN", "value": os.environ["COMPANION_TEST_SECRET"]}], "tombstones": []}
+os.write(int(request["outputFd"]), json.dumps(payload).encode("utf-8"))
+os.close(int(request["outputFd"]))
+print(json.dumps({"ok": True, "data": {"items": 1, "tombstones": 0}}))
+""",
+            encoding="utf-8",
+        )
+        fake_node.chmod(0o700)
+        previous = {
+            key: os.environ.get(key)
+            for key in ("COMPANION_NODE", "COMPANION_AGENT_CLIENT", "COMPANION_TEST_TRACE", "COMPANION_TEST_SECRET")
+        }
+        os.environ.update(
+            {
+                "COMPANION_NODE": str(fake_node),
+                "COMPANION_AGENT_CLIENT": str(fake_client),
+                "COMPANION_TEST_TRACE": str(trace),
+                "COMPANION_TEST_SECRET": SENTINEL,
+            }
+        )
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                redeemed = companion_lib._agent_secret_redeem(
+                    f"{companion_lib.AGENT_CREDENTIAL_PREFIX}{WORKSPACE}",
+                    "plan-123",
+                )
+        finally:
+            for key, value in previous.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
+
+        self.assertEqual(redeemed["items"][0]["value"], SENTINEL)
+        self.assertNotIn(SENTINEL, stdout.getvalue())
+        self.assertNotIn(SENTINEL, stderr.getvalue())
+        recorded = trace.read_text(encoding="utf-8")
+        self.assertNotIn(SENTINEL, recorded)
+        self.assertNotIn("value", recorded)
+
+
+class PrivateSecretPipeTests(unittest.TestCase):
+    """Pin the descriptor contract that assertPrivateOutputDescriptor enforces client-side.
+
+    Only a macOS runner reproduces the original failure: Darwin reports every anonymous
+    pipe as 0660, so os.pipe() could never satisfy the owner-only check and no secret
+    could be projected on a Mac. On Linux anonymous pipes are already 0600, which is why
+    the Ubuntu-only CI matrix never caught it.
+    """
+
+    def test_descriptor_satisfies_the_client_guard(self) -> None:
+        read_fd, write_fd = companion_lib._private_secret_pipe()
+        try:
+            info = os.fstat(write_fd)
+            self.assertTrue(stat.S_ISFIFO(info.st_mode))
+            self.assertEqual(info.st_mode & 0o077, 0)
+            self.assertEqual(info.st_uid, os.getuid())
+        finally:
+            os.close(read_fd)
+            os.close(write_fd)
+
+    def test_transports_bytes_and_signals_eof(self) -> None:
+        read_fd, write_fd = companion_lib._private_secret_pipe()
+        try:
+            os.write(write_fd, SENTINEL.encode("utf-8"))
+        finally:
+            os.close(write_fd)
+        try:
+            self.assertEqual(os.read(read_fd, 64).decode("utf-8"), SENTINEL)
+            self.assertEqual(os.read(read_fd, 64), b"")
+        finally:
+            os.close(read_fd)
+
+
+if __name__ == "__main__":
+    unittest.main()

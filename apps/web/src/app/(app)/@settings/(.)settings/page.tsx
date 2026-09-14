@@ -1,0 +1,45 @@
+import { SettingsDrawer, SettingsDrawerBackgroundGuard } from "@/components/org/SettingsDrawer";
+import { RetryButton } from "@/components/org/WorkspaceLoadError";
+import { loadSettingsPageData, type SettingsSearchParams } from "@/lib/settingsData";
+
+export const dynamic = "force-dynamic";
+
+export default async function InterceptedSettingsPage({
+  searchParams,
+}: {
+  searchParams: SettingsSearchParams;
+}) {
+  const props = await loadSettingsPageData(searchParams);
+  if (!props) {
+    return (
+      <div className="settings-drawer">
+        <SettingsDrawerBackgroundGuard />
+        <div className="settings-drawer__panel" role="dialog" aria-modal="true" aria-label="Settings" tabIndex={-1}>
+          <div className="og-set">
+            <div className="og-set__top">
+              <a className="og-set__back" href="/skills">
+                Back to skills
+              </a>
+              <div className="og-set__crumb">
+                <b>Skillpack</b>
+              </div>
+            </div>
+            <div className="og-pane">
+              <div className="og-pane__inner">
+                <div className="empty">
+                  <div className="empty__title">Couldn't load workspace</div>
+                  <div className="empty__desc">
+                    Refresh the page to try again. If the problem continues, check that the API and
+                    database are reachable.
+                  </div>
+                  <RetryButton />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return <SettingsDrawer {...props} />;
+}
