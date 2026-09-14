@@ -11,7 +11,7 @@ follows root `DESIGN.md`.
   Every member can manage organization skills. Share is the sole owner-only personal → org transition.
 - Organization and personal label trees organize skills without changing access.
 - External coding agents are delegated Skills Hub clients. Skillpack never launches them.
-- Hosted Skillpacks, Box/Pi, chat, routines, triggers, plugin accounts, and native chat clients are retired.
+- Legacy hosted Companions, Box/Pi, chat, routines, triggers, plugin accounts, and native chat clients are retired.
 - Complete authorized workflows end to end. Do not ask users to configure integrations manually
   when Skillpack can do that with credentials it already holds.
 - TypeScript with pnpm workspaces and Turborepo. Data access uses Drizzle and tRPC/REST.
@@ -41,7 +41,7 @@ PR titles use Commitizen style, for example `feat(skills): add package validatio
 
 ## Agent references
 
-Issues live in Linear, project Skillpacks; confirm the team with the user on first write.
+Issues live in Linear, project Companions; confirm the team with the user on first write.
 Use LINEAR_TVC_API_KEY, falling back to LINEAR_API_KEY. See `docs/agents/issue-tracker.md`.
 Triage labels: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix;
 see `docs/agents/triage-labels.md`. Domain context lives in root CONTEXT.md and docs/adr/;

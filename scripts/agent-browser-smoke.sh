@@ -261,10 +261,10 @@ skill_detail_mobile_tabs_smoke() {
 
 # Center point (x y) of an element's bounding box, from real layout.
 box_center() {
-  # A skill can legitimately appear in more than one label group. `agent-browser get box` resolves
-  # a CSS selector to its first laid-out match; its Playwright-only `:nth-match()` syntax is not
-  # accepted consistently across CLI releases.
-  agent-browser get box "$1" --json | node scripts/agent-browser-box-center.mjs
+  # A skill can occur in multiple groups. Select one DOM element before reading layout.
+  local expression
+  expression="$(node -e 'process.stdout.write("document.querySelector(" + JSON.stringify(process.argv[1]) + ")?.getBoundingClientRect().toJSON()")' "$1")"
+  agent-browser eval "$expression" --json | node scripts/agent-browser-box-center.mjs
 }
 
 # Ground truth (independent of the browser): does the skill now carry `label` directly?
@@ -297,6 +297,9 @@ drag_and_drop_smoke() {
   assert_eval_true "!!document.querySelector('$dst_sel')" "engineering folder row not found"
   assert_eval_true "!document.querySelector('$child_sel')" "engineering should start collapsed"
 
+  # Library selection hydrates after the shell: wait for the actual drag source.
+  agent-browser wait "$src_sel"
+  agent-browser wait "$dst_sel"
   src_center="$(box_center "$src_sel")"
   dst_center="$(box_center "$dst_sel")"
   sx="${src_center%% *}"

@@ -3,7 +3,7 @@
 import { pathToFileURL } from "node:url";
 
 export function boxCenterFromAgentBrowserPayload(payload) {
-  const box = payload?.data?.box ?? payload?.data ?? payload;
+  const box = payload?.data?.result ?? payload?.data?.box ?? payload?.data ?? payload;
   const x = Number(box?.x);
   const y = Number(box?.y);
   const width = Number(box?.width);
