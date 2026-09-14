@@ -137,7 +137,11 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
 
   const update = [
     `Please update the Skillpack skill to version ${version}.`,
-    "Use its existing Agent Auth connection. If only a legacy PAT exists, do not use it silently;",
+    "If the installed skill is still named companion, skip the bootstrap update steps below.",
+    "Use the legacy rename installation flow at the end, reuse the existing connection, and install",
+    "into a skillpack folder. Check the old folder for customizations before removing it; preserve",
+    "customized files and confirm their migration. Stop after that installation succeeds.",
+    "For an existing skillpack installation, use its existing Agent Auth connection. If only a legacy PAT exists, do not use it silently;",
     "complete the delegated device connection from the install flow first.",
     "1. From the installed skillpack folder, run the safe bootstrap update:",
     "   python3 scripts/bootstrap.py --json --auto-update-skillpack",
@@ -148,6 +152,9 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
     "   swap with rollback, and remove transient archives/backups.",
     "3. Report the installed version through the bundled client. Request skills:write progressively",
     "   if absent, then tell me what changed.",
+    "",
+    "Legacy rename installation flow (only for a skill still named companion):",
+    install,
   ].join("\n");
 
   const use = [
