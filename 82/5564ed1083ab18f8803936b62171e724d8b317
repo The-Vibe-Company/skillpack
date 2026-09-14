@@ -1,0 +1,19 @@
+packages/skillpack-skill/src/package.ts
+  s_3181443b264428::t_522cf748ecd7c3 140-144,155-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "825564ed1083ab18f8803936b62171e724d8b317",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
