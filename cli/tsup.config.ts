@@ -8,5 +8,5 @@ export default defineConfig({
   banner: { js: "#!/usr/bin/env node" },
   clean: true,
   // Bundle the internal workspace packages; leave npm deps external (declared in package.json).
-  noExternal: [/^@companion\//],
+  noExternal: [/^@skillpack\//],
 });

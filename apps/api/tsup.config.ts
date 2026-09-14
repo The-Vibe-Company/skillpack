@@ -12,7 +12,7 @@ export default defineConfig({
   format: ["esm"],
   // Agent Auth depends on Zod 4 (`.meta()`), while the API still uses Zod 3. Bundle each
   // dependency-local copy so the flattened API artifact cannot resolve Agent Auth against Zod 3.
-  noExternal: [/^@companion\//, /^zod(?:\/.*)?$/],
+  noExternal: [/^@skillpack\//, /^zod(?:\/.*)?$/],
   external: [
     "@aws-sdk/client-s3",
     "@aws-sdk/s3-request-presigner",

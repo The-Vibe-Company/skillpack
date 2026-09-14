@@ -45,3 +45,4 @@ companion.lock
 # OS / editor
 .DS_Store
 *.log
+.vercel/

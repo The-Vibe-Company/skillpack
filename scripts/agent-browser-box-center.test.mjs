@@ -21,3 +21,10 @@ test("rejects malformed bounding boxes before issuing mouse commands", () => {
     /invalid bounding box/,
   );
 });
+
+test("reads layout from one DOM element when a skill occurs in multiple groups", () => {
+  assert.deepEqual(boxCenterFromAgentBrowserPayload({
+    success: true,
+    data: { result: { x: 244, y: 296, width: 1036, height: 39 } },
+  }), [762, 316]);
+});

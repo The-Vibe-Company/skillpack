@@ -6,7 +6,7 @@ export default defineConfig({
     js: 'import { createRequire as __companionCreateRequire } from "node:module"; const require = __companionCreateRequire(import.meta.url);',
   },
   format: ["esm"],
-  noExternal: [/^@companion\//],
+  noExternal: [/^@skillpack\//],
   external: ["@sentry/node", "drizzle-orm", "postgres", "stripe"],
   sourcemap: true,
   clean: true,

@@ -33,8 +33,8 @@ test("the Railway release unit is a one-shot migration job", () => {
 test("the shared backend image maps the release service to the API migration package", () => {
   const dockerfile = readFileSync(join(root, "deploy", "railway", "Dockerfile.backend"), "utf8");
   assert.match(dockerfile, /release\) package="api"/);
-  assert.match(dockerfile, /turbo prune "@companion\/\$\{package\}" --docker/);
-  assert.match(dockerfile, /pnpm --filter "@companion\/\$\{package\}" build/);
+  assert.match(dockerfile, /turbo prune "@skillpack\/\$\{package\}" --docker/);
+  assert.match(dockerfile, /pnpm --filter "@skillpack\/\$\{package\}" build/);
 });
 
 test("the web image inlines public PostHog and Sentry values at build time", () => {
