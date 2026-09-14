@@ -29,7 +29,7 @@ from companion_lib import (
 
 
 def download_package(base: str, token: str, destination: Path) -> None:
-    destination.write_bytes(api_download_bytes(base, token, "/local-skills/companion/package"))
+    destination.write_bytes(api_download_bytes(base, token, "/local-skills/skillpack/package"))
 
 
 def frontmatter_name(skill_md: Path) -> str | None:
@@ -53,10 +53,10 @@ def validate_companion_dir(
     require_folder_name: bool = True,
     require_integrity: bool = False,
 ) -> None:
-    if require_folder_name and path.name != "companion":
-        fail(f"Skillpack skill folder must be named companion: {path}")
-    if frontmatter_name(path / "SKILL.md") != "companion":
-        fail(f"{path / 'SKILL.md'} does not declare name: companion")
+    if require_folder_name and path.name not in ("skillpack", "companion"):
+        fail(f"Skillpack skill folder must be named skillpack: {path}")
+    if frontmatter_name(path / "SKILL.md") not in ("skillpack", "companion"):
+        fail(f"{path / 'SKILL.md'} does not declare name: skillpack")
     version = local_companion_version(path)
     if expected_version and version != expected_version:
         fail(f"{path / 'companion.json'} version {version or 'missing'} does not match {expected_version}")
@@ -124,9 +124,10 @@ def companion_install_targets(skill_dir: Path) -> list[dict[str, Any]]:
     registry = load_tool_registry()
     candidates: list[tuple[str, Path]] = [("current", skill_dir)]
     for tool in sorted(registry):
-        target = resolve_target_dir(tool, "user", "companion", registry=registry)
-        if os.path.lexists(target):
-            candidates.append((tool, target))
+        for slug in ("skillpack", "companion"):
+            target = resolve_target_dir(tool, "user", slug, registry=registry)
+            if os.path.lexists(target):
+                candidates.append((tool, target))
 
     targets: dict[str, dict[str, Any]] = {}
     for tool, candidate in candidates:
@@ -277,7 +278,7 @@ def install_companion_update(
                 fail("Skillpack multi-tool rollback failed: " + details)
             raise
 
-        report = api_post_json(api_url, token, "/local-skills/companion/installed", {"version": available_version, "agent": agent})
+        report = api_post_json(api_url, token, "/local-skills/skillpack/installed", {"version": available_version, "agent": agent})
         return {
             "applied": True,
             "version": available_version,

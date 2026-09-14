@@ -50,3 +50,8 @@ An Agent Auth child PAT snapshots only active exact-workspace grants, caps expir
 the earliest source expiry, and stores value-free provenance. Callers cannot choose scopes or
 organizations, PATs cannot mint child PATs, and a target-bound token requires the matching declared
 target. Possession remains bearer authority until expiry or revocation.
+
+The bundled management skill is named `skillpack` and served at `/v1/local-skills/skillpack`.
+The former `companion` route remains an alias; both names use the existing per-member installation
+key `companion` so rebranding does not reset installation history. Package manifests, credential
+paths, and transport headers retain their compatibility names. New installs use a `skillpack` folder.

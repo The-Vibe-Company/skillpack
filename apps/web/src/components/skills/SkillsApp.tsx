@@ -235,7 +235,8 @@ export function SkillsApp({
   const [orgLabels, setOrgLabels] = useState<LabelVM[]>(initialLabels.flat);
   const [localSkills, setLocalSkills] = useState<LocalSkillRow[]>(initialLocalSkills);
   const skillpackLocalSkill = useMemo(
-    () => localSkills.find((row) => row.key === "companion") ?? null,
+    () => localSkills.find((row) => row.key === "skillpack")
+      ?? localSkills.find((row) => row.key === "companion") ?? null,
     [localSkills],
   );
   const [currentView, setCurrentView] = useState<SkillsView>(() => skillsViewForRoute(initialRoute));

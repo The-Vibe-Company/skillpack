@@ -46,9 +46,9 @@ describe("reportLocalSkillInstallInputSchema", () => {
 describe("companion skill package + row", () => {
   it("packs the bundled skill deterministically and reads its version", async () => {
     const pkg = await getSkillpackSkillPackage();
-    expect(pkg.key).toBe("companion");
+    expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.114.0");
+    expect(pkg.version).toBe("1.115.0");
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -80,8 +80,10 @@ describe("companion skill package + row", () => {
       "scripts/onboarding_scan.py",
       "scripts/secrets_runtime.py",
       "scripts/skill_guard.py",
+      "scripts/skillpack-agent-client.mjs",
       "scripts/sync_companion.py",
       "scripts/sync_secrets.py",
+      "scripts/sync_skillpack.py",
       "scripts/tools.json",
     ]);
     for (const [relPath, digest] of Object.entries(baseline.files ?? {})) {
@@ -127,8 +129,8 @@ describe("companion skill package + row", () => {
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
     const changelog = row.changes.join("\n");
-    expect(changelog).toContain("Rebrands the Skills Hub as Skillpack");
-    expect(changelog).toContain("preserving existing package, credential, and installed-skill compatibility");
+    expect(changelog).toContain("Renames the distributed skill identity");
+    expect(changelog).toContain("Preserves existing credentials, installation history");
     // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
     const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
       metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };
@@ -306,8 +308,8 @@ describe("companion skill package + row", () => {
     expect(billingChanges).toContain("Documents the managed SaaS Free and Pro skill entitlements");
     expect(billingChanges).toContain("structured entitlement 403 responses");
     // The install prompt drives the report-back call and leaves placeholders for the client.
-    expect(row.prompts.install).toContain("/local-skills/companion/package");
-    expect(row.prompts.install).toContain("/local-skills/companion/installed");
+    expect(row.prompts.install).toContain("/local-skills/skillpack/package");
+    expect(row.prompts.install).toContain("/local-skills/skillpack/installed");
     expect(row.prompts.install).toContain("python3 scripts/bootstrap.py --summary");
     expect(row.prompts.install).toContain("{base}");
     expect(row.prompts.install).toContain("{workspaceId}");
@@ -349,11 +351,11 @@ describe("companion skill package + row", () => {
     expect(prompt).not.toContain("{token}");
     expect(prompt).toContain("schema-v3 ~/.companion/credentials.json");
     expect(prompt).toContain("Migrate a schema-v2 token to schema v3 under legacyPat without using it");
-    expect(prompts.update).toContain("python3 scripts/bootstrap.py --json --auto-update-companion");
+    expect(prompts.update).toContain("python3 scripts/bootstrap.py --json --auto-update-skillpack");
     expect(prompts.update).toContain("local_customizations");
     expect(prompts.update).toContain("do not use it silently");
     expect(prompts.use).toContain("Never fall back to a PAT unless I explicitly select legacy-pat mode");
-    expect(prompts.install).toContain("/local-skills/companion/installed");
+    expect(prompts.install).toContain("/local-skills/skillpack/installed");
     expect(prompts.onboarding).toContain("Guided onboarding");
     expect(prompts.onboarding).toContain("GET /getting-started");
     expect(prompts.onboarding).toContain("new conversation in {tool}");
@@ -381,7 +383,7 @@ describe("companion skill package + row", () => {
     expect(skillMd).toContain("GET /skills?installed=true");
     expect(skillMd).toContain("GET /public/skills/{share_token}");
     expect(skillMd).toContain("/s/{share_token}");
-    expect(skillMd).toContain("python3 scripts/bootstrap.py --json --auto-update-companion");
+    expect(skillMd).toContain("python3 scripts/bootstrap.py --json --auto-update-skillpack");
     expect(skillMd).toContain("reason: \"local_customizations\"");
     expect(skillMd).toContain("executes only on the user's machine");
     expect(skillMd).toContain("skills.log.json");
@@ -391,11 +393,11 @@ describe("companion skill package + row", () => {
     expect(skillMd).toContain("only once per conversation");
     expect(skillMd).toContain("do not repeat it on later Skillpack turns");
     expect(skillMd).toContain("Do not validate, publish, update, archive, label, install");
-    expect(skillMd).toContain("GET /local-skills/companion");
+    expect(skillMd).toContain("GET /local-skills/skillpack");
     expect(skillMd).toContain("POST /tokens/refresh");
     expect(skillMd).toContain("no more than 30 days");
     expect(skillMd).toContain("integrity");
-    expect(skillMd).toContain("POST /local-skills/companion/installed");
+    expect(skillMd).toContain("POST /local-skills/skillpack/installed");
     expect(skillMd).toContain(`"version":"${skillpackManifest.version}"`);
     expect(skillMd).toContain("original preserved at <path>");
     expect(skillMd).toContain("GET /v1/schemas/companion-manifest.v2.schema.json");
@@ -465,7 +467,7 @@ describe("companion skill package + row", () => {
     expect(skillpackLib).toContain("def resolve_credentials");
     expect(checkScript).toContain("bootstrap.main()");
     expect(bootstrapScript).toContain("/skills?installed=true");
-    expect(bootstrapScript).toContain("/local-skills/companion");
+    expect(bootstrapScript).toContain("/local-skills/skillpack");
     expect(bootstrapUpdateScript).toContain("local_customizations");
     expect(bootstrapScript).toContain("from companion_lib import");
     // The anti-duplication / anti-retargeting guard ships alongside the update check.

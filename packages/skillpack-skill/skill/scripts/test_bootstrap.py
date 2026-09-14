@@ -168,7 +168,7 @@ class BootstrapTests(unittest.TestCase):
 
     def run_with_api(self, local_skill, **kwargs):
         def fake_get(_api_url, _token, path):
-            if path == "/local-skills/companion":
+            if path == "/local-skills/skillpack":
                 return local_skill
             return api_rows(path)
 
@@ -349,7 +349,7 @@ class BootstrapTests(unittest.TestCase):
 
     def test_unexpected_skill_list_shape_reports_error(self):
         def fake_get(_api_url, _token, path):
-            if path == "/local-skills/companion":
+            if path == "/local-skills/skillpack":
                 return skill_row(integrity=self.integrity_for_local_files())
             if path == "/skills?lib=org":
                 return {"unexpected": True}
@@ -366,7 +366,7 @@ class BootstrapTests(unittest.TestCase):
         result = {"applied": True, "version": "1.1.0", "backupPath": "/tmp/backup", "report": {"status": "installed"}}
 
         def fake_get(_api_url, _token, path):
-            if path == "/local-skills/companion":
+            if path == "/local-skills/skillpack":
                 return row
             if path == "/skills?lib=org":
                 return {"unexpected": True}
@@ -513,6 +513,20 @@ class BootstrapTests(unittest.TestCase):
         by_path = {str(row["path"]): row for row in targets}
         self.assertEqual(["current", "claude-code"], by_path[str(self.skill_dir.resolve())]["tools"])
         self.assertEqual(["codex", "opencode"], by_path[str(peer.resolve())]["tools"])
+
+    def test_target_discovery_includes_new_and_legacy_install_names(self):
+        renamed = self.root / "codex" / "skillpack"
+        renamed.mkdir(parents=True)
+        (renamed / "SKILL.md").write_text("---\nname: skillpack\n---\n")
+        bootstrap_update.validate_companion_dir(renamed)
+        def resolve(_tool, _scope, slug, **_kwargs):
+            return renamed if slug == "skillpack" else self.skill_dir
+        with (
+            mock.patch.object(bootstrap_update, "load_tool_registry", return_value={"codex": {}}),
+            mock.patch.object(bootstrap_update, "resolve_target_dir", side_effect=resolve),
+        ):
+            targets = self.real_companion_install_targets(self.skill_dir)
+        self.assertEqual({renamed.resolve(), self.skill_dir.resolve()}, {row["path"] for row in targets})
 
     def test_install_update_accepts_package_files_at_zip_root(self):
         official_files = {}

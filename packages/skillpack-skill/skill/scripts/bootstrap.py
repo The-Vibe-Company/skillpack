@@ -150,7 +150,7 @@ def collect_context(auto_update: bool = False, agent: str = "companion-bootstrap
         "workspace": {"id": None, "apiUrl": None},
         "credentials": {"source": None, "status": "unknown", "expiresAt": None},
         "companion": {
-            "key": "companion",
+            "key": "skillpack",
             "skillDir": str(skill_dir),
             "localVersion": local_companion_version(skill_dir),
             "availableVersion": None,
@@ -206,7 +206,7 @@ def collect_context(auto_update: bool = False, agent: str = "companion-bootstrap
         else:
             context["credentials"]["status"] = "environment_unmanaged"
 
-        local_skill = api_get(api_url, token, "/local-skills/companion")
+        local_skill = api_get(api_url, token, "/local-skills/skillpack")
         if not workspace_id:
             workspace_id = local_skill.get("workspaceId")
             context["workspace"]["id"] = workspace_id
@@ -310,7 +310,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Fast Skillpack bootstrap health check")
     parser.add_argument("--json", action="store_true", help="print machine-readable context only")
     parser.add_argument("--summary", action="store_true", help="print a human summary")
-    parser.add_argument("--auto-update-companion", action="store_true", help="install a newer Skillpack skill when local tracked files are official")
+    parser.add_argument("--auto-update-skillpack", "--auto-update-companion", dest="auto_update_companion", action="store_true", help="install a newer Skillpack skill when local tracked files are official")
     parser.add_argument("--agent", default=os.environ.get("COMPANION_AGENT", "companion-bootstrap"), help="agent label for install reporting")
     args = parser.parse_args()
 

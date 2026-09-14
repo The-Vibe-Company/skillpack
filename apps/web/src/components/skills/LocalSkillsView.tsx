@@ -9,11 +9,11 @@ import { Icon } from "../Icon";
 import { CodeBlock, useModalA11y } from "./UploadDialog";
 import { fillPrompt, promptFor } from "./prompts";
 
-const STATUS_META: Record<LocalSkillStatus, { label: string; badge: string; action: string }> = {
+const STATUS_META = {
   none: { label: "Not installed", badge: "ls-badge--neutral", action: "Install" },
   installed: { label: "Installed", badge: "ls-badge--ok", action: "Use" },
   update: { label: "Update available", badge: "ls-badge--warn", action: "Update" },
-};
+} satisfies Record<LocalSkillStatus, { label: string; badge: string; action: string }>;
 
 function relativeTime(iso: string | null): string {
   if (!iso) return "—";
@@ -42,14 +42,16 @@ type CopiedKind = "prompt" | "reinstall";
 
 /** The assistants the install dialog can target. Their display name is reported as the install agent. */
 type AssistantId = "claude-code" | "codex" | "opencode" | "grok-bot" | "openclaw" | "hermes";
-const ASSISTANTS: Record<AssistantId, { name: string; vendor: string; hint: string }> = {
+const ASSISTANTS = {
   "claude-code": { name: "Claude Code", vendor: "anthropic", hint: "paste into Claude Code" },
   codex: { name: "Codex", vendor: "openai", hint: "paste into Codex" },
   opencode: { name: "OpenCode", vendor: "opencode", hint: "paste into OpenCode" },
   "grok-bot": { name: "Grok Bot (Cursor)", vendor: "cursor", hint: "paste into Cursor's Grok Bot" },
   openclaw: { name: "OpenClaw", vendor: "openclaw", hint: "paste into OpenClaw" },
   hermes: { name: "Hermes", vendor: "nous-research", hint: "paste into Hermes" },
-};
+} satisfies Record<AssistantId, { name: string; vendor: string; hint: string }>;
+// SAFETY: ASSISTANTS is the exact closed literal keyed by AssistantId above.
+const ASSISTANT_IDS = Object.keys(ASSISTANTS) as AssistantId[];
 
 /** Anthropic mark, shown on the Claude Code chooser tile (copied from the design). */
 function ClaudeLogo() {
@@ -190,7 +192,9 @@ export function LocalSkillsView({
   const [dismissed, setDismissed] = useState(false);
 
   const featured =
-    localSkills.find((skill) => skill.key === REQUIRED_LOCAL_SKILL_KEY) ?? localSkills[0] ?? null;
+    localSkills.find((skill) => skill.key === REQUIRED_LOCAL_SKILL_KEY)
+    ?? localSkills.find((skill) => skill.key === "companion")
+    ?? localSkills[0] ?? null;
   const open = useMemo(() => localSkills.find((s) => s.key === openKey) ?? null, [localSkills, openKey]);
 
   const storageKey = featured ? gateStorageKey(workspaceName, featured.key) : null;
@@ -262,7 +266,7 @@ export function LocalSkillsView({
   return (
     <div className="ls">
       <header className="ls-top">
-        <span className="ls-top__crumb mono">companion</span>
+        <span className="ls-top__crumb mono">skillpack</span>
         <span className="ls-top__sep">·</span>
         <span className="ls-top__crumb">{workspaceName}</span>
         <span className="ls-top__sep">·</span>
@@ -534,7 +538,7 @@ function InstallGate({
 
           <div className="ls-gate__chotitle">Which assistant do you use?</div>
           <div className="ls-choose" role="group" aria-label="Choose your assistant">
-            {(Object.keys(ASSISTANTS) as AssistantId[]).map((id) => {
+            {ASSISTANT_IDS.map((id) => {
               const info = ASSISTANTS[id];
               const on = assistant === id;
               return (

@@ -2,7 +2,7 @@
 
 Base URL is `COMPANION_API_URL` (ends in `/v1`). The active workspace id is
 `COMPANION_WORKSPACE_ID` (`organizations.id`). Agent Auth is the default management identity. The
-bundled `scripts/companion-agent-client.mjs` discovers the instance, uses delegated device approval,
+bundled `scripts/skillpack-agent-client.mjs` discovers the instance, uses delegated device approval,
 and signs one 60-second request-bound JWT at a time. Its closed operation registry maps only the
 documented REST operations to `skills:read`, `skills:write`, `secrets:read`, `secrets:write`,
 `database:read`, or `database:write`, each
@@ -31,9 +31,9 @@ reference:
   "activeWorkspaceId": "6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4",
   "workspaces": {
     "6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4": {
-      "apiUrl": "https://companion.acme.dev/v1",
+      "apiUrl": "https://skillpack.app/v1",
       "agentAuth": {
-        "issuer": "https://companion.acme.dev/auth",
+        "issuer": "https://skillpack.app/auth",
         "agentId": "agent_01J..."
       },
       "updatedAt": "2026-06-15T12:00:00.000Z"
@@ -54,11 +54,11 @@ The official client takes one JSON request on stdin and returns one value-free J
 stdout:
 
 ```sh
-printf '%s' '{"action":"connect","apiUrl":"https://companion.acme.dev/v1","workspaceId":"6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4","name":"Codex"}' \
-  | node scripts/companion-agent-client.mjs
+printf '%s' '{"action":"connect","apiUrl":"https://skillpack.app/v1","workspaceId":"6a9c3cfd-6a1e-4a7b-8f77-1f7f0e62e3d4","name":"Codex"}' \
+  | node scripts/skillpack-agent-client.mjs
 
 printf '%s' '{"action":"api","method":"GET","path":"/skills?lib=org"}' \
-  | node scripts/companion-agent-client.mjs
+  | node scripts/skillpack-agent-client.mjs
 ```
 
 Use `action: "connect"` once when the workspace has no Agent Auth reference. It performs discovery,
@@ -139,9 +139,9 @@ legacy PAT:
 | Run parameterized Skill Database DML | `POST /skills/{slug}/database/execute` | `database:write` |
 | Hide guided onboarding | `POST /getting-started/dismiss` | Browser session only |
 | Resume guided onboarding | `POST /getting-started/reopen` | Browser session only |
-| Current bundled Skillpack skill status + workspace id | `GET /local-skills/companion` | `skills:read` |
-| Download bundled Skillpack skill package | `GET /local-skills/companion/package` | `skills:read` |
-| Confirm this skill installed | `POST /local-skills/companion/installed` | `skills:write` |
+| Current bundled Skillpack skill status + workspace id | `GET /local-skills/skillpack` | `skills:read` |
+| Download bundled Skillpack skill package | `GET /local-skills/skillpack/package` | `skills:read` |
+| Confirm this skill installed | `POST /local-skills/skillpack/installed` | `skills:write` |
 | Create a write-only secret | `POST /secrets` | `secrets:write` |
 | Update secret metadata, audience, or recipients | `PATCH /secrets/{id}` | `secrets:write` |
 | Rotate a secret value | `POST /secrets/{id}/rotate` | `secrets:write` |
@@ -492,8 +492,8 @@ skill folders with `companion.json.metadata.companionSkillId` / `companion.json.
 then write future state to `skills.lock.json`.
 
 The built-in Skillpack skill is different from user-published skills. For the skill shown in the
-workspace's **Skillpack skills** section, use only the `/local-skills/companion` endpoints.
-The `GET /local-skills/companion` response includes `workspaceId`; use it as
+workspace's **Skillpack skills** section, use only the `/local-skills/skillpack` endpoints.
+The `GET /local-skills/skillpack` response includes `workspaceId`; use it as
 `COMPANION_WORKSPACE_ID` when migrating legacy flat credentials or URL-keyed lockfiles.
 
 ## Libraries (personal vs org)
@@ -850,7 +850,7 @@ Manifest v2 may declare a local update check:
 
 The Skillpack API validates the declaration and verifies the referenced script is packaged, but it
 never executes the script. The installed Skillpack skill runs it locally when asked to audit updates.
-The bundled `scripts/bootstrap.py` resolves credentials, calls `GET /local-skills/companion`,
+The bundled `scripts/bootstrap.py` resolves credentials, calls `GET /local-skills/skillpack`,
 `GET /skills?lib=mine`, `GET /skills?lib=org`, and `GET /skills?installed=true`, then compares those
 rows with `~/.companion/skills.lock.json` or the legacy `skills.log.json` fallback.
 `scripts/check_updates.py` remains a compatibility wrapper around the bootstrap.
@@ -858,11 +858,11 @@ rows with `~/.companion/skills.lock.json` or the legacy `skills.log.json` fallba
 Run the fast bootstrap when the agent needs startup context:
 
 ```sh
-python3 scripts/bootstrap.py --json --auto-update-companion
+python3 scripts/bootstrap.py --json --auto-update-skillpack
 ```
 
 The JSON shape is stable and contains `workspace`, `companion`, `integrity`, `skills`, `actions`, and
-`errors`. With `--auto-update-companion`, the script may update only the Skillpack skill itself. It
+`errors`. With `--auto-update-skillpack`, the script may update only the Skillpack skill itself. It
 never installs workspace-published skill updates; it only reports those as actions.
 
 ## Local preflight guard
@@ -896,7 +896,7 @@ The Skillpack skill must check whether this local Skillpack skill is current at 
 other Skillpack task or skill mutation:
 
 ```http
-GET /local-skills/companion
+GET /local-skills/skillpack
 ```
 
 The response includes `status`, `installedVersion`, `availableVersion`, `changes`, and `integrity`.
@@ -908,18 +908,18 @@ skill's `companion.json`. If they match, no update is needed.
 If `availableVersion` is newer, download the bundled package:
 
 ```http
-GET /local-skills/companion/package
+GET /local-skills/skillpack/package
 ```
 
 Before replacing anything, compare the installed tracked files with the installed package's
 `companion.integrity.json` baseline. If the installed copy predates that baseline and already matches
-`availableVersion`, use `integrity.files` from `/local-skills/companion` as the fallback baseline. If
+`availableVersion`, use `integrity.files` from `/local-skills/skillpack` as the fallback baseline. If
 any tracked file is modified or missing against the selected baseline, preserve the local folder and
 report `reason: "local_customizations"`. If all tracked files match, extract the package into a
 temporary directory, verify `SKILL.md` is at the package root, verify its `companion.json.version`
-equals the `availableVersion` from `/local-skills/companion`, and verify the staged
+equals the `availableVersion` from `/local-skills/skillpack`, and verify the staged
 `companion.integrity.json` matches the staged package files. Only then replace the installed
-Skillpack skill folder. After replacement, call `POST /local-skills/companion/installed` with the
+Skillpack skill folder. After replacement, call `POST /local-skills/skillpack/installed` with the
 installed version so the workspace status updates. Delete the transient backup folder created for
 this self-update whether or not that install report succeeds. If reporting fails after replacement,
 keep the newly installed folder in place, delete the transient backup, and report that confirmation
@@ -932,7 +932,7 @@ built-in Skillpack skill. Those endpoints are for workspace-published skills.
 ## Confirm install
 
 ```http
-POST /local-skills/companion/installed
+POST /local-skills/skillpack/installed
 Content-Type: application/json
 
 { "version": "1.13.0", "agent": "Claude Code" }
