@@ -1,0 +1,21 @@
+.gitignore
+  s_3181443b264428::t_6931892ffd943c 48
+docs/skillpack-migration.md
+  s_3181443b264428::t_5a8c4d0431a048 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7b0a6243eb337076c765d371f1b424556f7502d3",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
