@@ -1,0 +1,19 @@
+apps/web/src/components/skills/SkillsApp.tsx
+  s_3181443b264428::t_857ab5eb2f63ef 238-239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7e67fcec89cdef29947ff2cdcd3a0ddd8b9348a4",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
