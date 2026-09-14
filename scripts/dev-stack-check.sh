@@ -243,6 +243,15 @@ if [ "$worker_url_overridden" != "postgres://worker" ]; then
   exit 1
 fi
 
+# GitHub mirrors need the canonical web origin after the worker environment is filtered.
+# shellcheck disable=SC2016
+worker_web_url="$(env COMPANION_WEB_URL=https://skillpack.app \
+  bash "$ROOT/scripts/dev-worker.sh" bash -c 'printf %s "${COMPANION_WEB_URL:-unset}"')"
+if [ "$worker_web_url" != "https://skillpack.app" ]; then
+  printf '[dev-stack-check] dev-worker must retain the canonical web origin\n' >&2
+  exit 1
+fi
+
 # The repo-root .env is intentionally shared only with the launcher. Child
 # wrappers enforce the API/worker/web trust boundaries.
 # shellcheck disable=SC2016
