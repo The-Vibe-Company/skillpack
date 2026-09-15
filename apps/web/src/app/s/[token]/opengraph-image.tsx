@@ -10,7 +10,7 @@ export const contentType = "image/png";
 
 async function loadBrandMark(): Promise<string | null> {
   try {
-    const data = await readFile(join(process.cwd(), "public", "brand", "companion-mark.png"));
+    const data = await readFile(join(process.cwd(), "public", "brand", "skillpack-mark.png"));
     return `data:image/png;base64,${data.toString("base64")}`;
   } catch {
     return null;

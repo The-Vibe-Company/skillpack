@@ -28,8 +28,11 @@ export const metadata: Metadata = {
     images: [{ url: "/brand/og.png", alt: "Skillpack — Share skills with your whole team." }],
   },
   icons: {
-    icon: "/brand/favicon.png",
-    apple: "/brand/apple-icon.png",
+    icon: [
+      { url: "/brand/skillpack-favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/brand/favicon-180.png",
   },
 };
 
