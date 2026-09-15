@@ -243,7 +243,7 @@ function Nav({ c }: { c: Copy }) {
     <header className="v10-nav">
       <div className="v10-wrap v10-nav__inner">
         <a className="v5-brand" href="#top" aria-label="Skillpack">
-          <span className="v10-wordmark" role="img" aria-label="Skillpack">Skillpack</span>
+          <img className="v10-wordmark" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
         </a>
         <nav className="v10-nav__links" aria-label="Sections">
           <a className="v10-nav__link" href="#idea">
@@ -685,7 +685,7 @@ function Footer({ c }: { c: Copy }) {
     <footer className="v10-footer">
       <div className="v10-wrap v10-footer__inner">
         <span className="v5-brand">
-          <span className="v10-wordmark v10-wordmark--sm" role="img" aria-label="Skillpack">Skillpack</span>
+          <img className="v10-wordmark v10-wordmark--sm" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
         </span>
         <span className="v10-footer__by">
           {c.footerByPre}

@@ -36,7 +36,7 @@ export default function PrivacyPage() {
       <header className="v10-nav">
         <div className="v10-wrap v10-nav__inner">
           <Link className="v5-brand" href="/" aria-label="Skillpack home">
-            <span className="v10-wordmark" role="img" aria-label="Skillpack">Skillpack</span>
+            <img className="v10-wordmark" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
           </Link>
           <span className="v10-nav__spacer" />
           <div className="v10-nav__actions">
@@ -98,7 +98,7 @@ export default function PrivacyPage() {
       <footer className="v10-footer">
         <div className="v10-wrap v10-footer__inner">
           <Link className="v5-brand" href="/" aria-label="Skillpack home">
-            <span className="v10-wordmark v10-wordmark--sm" role="img" aria-label="Skillpack">Skillpack</span>
+            <img className="v10-wordmark v10-wordmark--sm" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
           </Link>
           <span className="v10-footer__by">Skillpack privacy</span>
           <span className="v10-footer__links">

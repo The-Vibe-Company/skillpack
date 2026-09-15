@@ -51,7 +51,7 @@
   width: 32px; height: 32px;
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  background-image: url("/brand/companion-mark-ui.png");
+  background-image: url("/brand/skillpack-mark.svg");
   background-size: 86%;
   background-repeat: no-repeat;
   background-position: center;

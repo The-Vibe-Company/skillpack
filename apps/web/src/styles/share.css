@@ -45,7 +45,7 @@
   height: 28px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  background: var(--color-surface) url("/brand/companion-mark-ui.png") center / 86% no-repeat;
+  background: var(--color-surface) url("/brand/skillpack-mark.svg") center / 86% no-repeat;
 }
 
 .spreview__brandtext {
