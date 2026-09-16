@@ -2,7 +2,7 @@
 name: skillpack
 description: "Use when managing local SKILL.md packages with Skillpack: validate, publish, update, resolve dependencies, declare secrets, environment variables, or hosted SQLite state tables, query skill state, install updates, audit skills, check workspace versions, or self-update this Skillpack skill through the Skillpack workspace API."
 license: MIT
-compatibility: claude-code codex opencode grok-bot openclaw hermes
+compatibility: claude-code codex opencode grok-bot openclaw hermes companion
 allowed-tools: read_file write_file run_shell
 ---
 
@@ -486,7 +486,8 @@ lockfile levels, same shape:
 
 - **User-scope** installs (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills` for OpenCode,
   `~/.cursor/skills` for Grok Bot,
-  `~/.openclaw/skills` for OpenClaw, and `~/.hermes/skills` for Hermes) live in
+  `~/.openclaw/skills` for OpenClaw, `~/.hermes/skills` for Hermes, and
+  `${AGENT_STATE_DIR:-~/.companions}/pi/skills` for a companions.build Companion (Pi)) live in
   `~/.companion/skills.lock.json`.
 - **Project-scope** installs (`.claude/skills`, `.codex/skills`, `.agents/skills` for OpenCode,
   `.cursor/skills` for Grok Bot, or
@@ -496,7 +497,7 @@ lockfile levels, same shape:
   this lockfile.
 
 The set of tools this machine uses is recorded in `~/.companion/config.json`
-(`{ "schemaVersion": 1, "tools": ["claude-code", "codex", "opencode", "grok-bot", "openclaw", "hermes"] }` — never any
+(`{ "schemaVersion": 1, "tools": ["claude-code", "codex", "opencode", "grok-bot", "openclaw", "hermes", "companion"] }` — never any
 secret). The supported tools and their on-disk skill directories are declared in this skill's
 `scripts/tools.json` registry, which is extensible: adding a tool there is enough to make it an
 install target. The OpenCode target uses the shared Agent Skills paths (`~/.agents/skills` and
@@ -696,7 +697,7 @@ use right now. Resolve the target tools, confirm with the user, then fan out:
    python3 scripts/install_skill.py <slug> --scope user            # all configured tools, user-global
    python3 scripts/install_skill.py <slug> --scope both            # user-global + the current project/workspace
    python3 scripts/install_skill.py <slug> --scope project --project /path/to/openclaw-workspace
-   python3 scripts/install_skill.py <slug> --tools claude-code,codex,opencode,grok-bot,openclaw,hermes --json
+   python3 scripts/install_skill.py <slug> --tools claude-code,codex,opencode,grok-bot,openclaw,hermes,companion --json
    python3 scripts/install_skill.py <slug> --confirm-secrets --report
    ```
 
@@ -713,9 +714,37 @@ use right now. Resolve the target tools, confirm with the user, then fan out:
 4. **Report once.** After the dependency-first fan-out, send a single aggregate
    `POST /skills/{slug}/install` for the requested root skill with the
    installed version and an `agent` label listing the tools (for example
-   `"Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, Hermes"`). The workspace tracks installs per user, not per tool,
+   `"Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, Hermes, Companion"`). The workspace tracks installs per user, not per tool,
    so this stays one call even across multiple tools and projects. (`install_skill.py --report` can
    send it for you.)
+
+### Install into a companions.build Companion (Pi)
+
+The `companion` tool target deploys a skill straight into a companions.build Companion's local Pi
+skill manager. The destination is the companion agent state directory's managed skills root,
+resolved as `${AGENT_STATE_DIR:-~/.companions}/pi/skills/<slug>`: when the installer runs inside the
+companion's own shell or on its Box, `AGENT_STATE_DIR` already points at the correct state root
+(including the per-companion layout `~/.companions/agents/<id>`); otherwise the `~/.companions`
+default applies. `AGENT_STATE_DIR` must be absolute when set — a relative value is refused rather
+than resolved against the installer's current directory.
+
+```sh
+python3 scripts/install_skill.py <slug> --tools companion --scope user
+python3 scripts/install_skill.py <slug> --tools companion,claude-code --scope user --json
+```
+
+Never bridge workspace skills into a local agent's skill manager by relaying file contents —
+base64 or text — through model context or MCP tool-call payloads. Long encoded bundles get wrapped,
+truncated, or re-hashed on the way through, and the receiving manager then rightly rejects them as
+corrupt (`INVALID_SKILL_BUNDLE`, `SKILL_INTEGRITY_FAILED`) or mismatched. Always deploy on disk with
+this installer so the exact published bytes land on the target, then let the receiving side verify:
+
+- The installer downloads the immutable published package, verifies its integrity, and swaps the
+  folder atomically, like every other tool target. The companion state directory is a managed root:
+  a locally customized folder is skipped unless `--force` is explicit.
+- Afterwards, confirm through the companion itself — its local skill listing (for example the
+  companions.build control operation that lists skills with names and hashes), or by asking the
+  companion to use the skill. Do not claim installation from the deploy alone.
 
 To **update** installed skills across tools, `python3 scripts/bootstrap.py --summary` lists every local
 skill with its per-tool `targets`; re-run `install_skill.py <slug>` to bring the behind targets up to
@@ -1341,7 +1370,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.115.0","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.116.0","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 

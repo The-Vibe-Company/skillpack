@@ -48,6 +48,7 @@ from companion_lib import (  # noqa: E402
     normalize_targets,
     project_lockfile_path,
     resolve_credentials,
+    resolve_scope_base,
     resolve_target_dir,
     upsert_skill_lock_record,
     validate_project_lockfile_path,
@@ -107,10 +108,23 @@ def _absolute_without_resolving(path: Path) -> Path:
     return Path(os.path.abspath(str(path.expanduser())))
 
 
-def install_root_for_scope(scope: str, project_root: Path | None) -> Path:
-    """Return the user-selected containment root for an install scope."""
+def install_root_for_scope(
+    tool: str,
+    scope: str,
+    project_root: Path | None,
+    registry: dict[str, Any] | None = None,
+) -> Path:
+    """Return the containment root for an install scope.
+
+    User-scope installs are contained by the tool's own resolved skills base rather than blindly by
+    $HOME, so a tool such as Companion (Pi) whose state root is `AGENT_STATE_DIR` stays valid even
+    when that root lives outside the home directory. The base is created when missing because the
+    deploy would create it anyway; the preflight never touches a skill target folder.
+    """
     if scope == "user":
-        return _absolute_without_resolving(Path.home())
+        root = _absolute_without_resolving(resolve_scope_base(tool, "user", registry=registry))
+        root.mkdir(parents=True, exist_ok=True)
+        return root
     if scope == "project" and project_root is not None:
         return _absolute_without_resolving(project_root)
     fail("project scope requires a project or workspace root")
@@ -263,7 +277,7 @@ def target_conflict(
         target_dir = resolve_target_dir(tool, scope, skill_name, project_root, registry)
         validate_install_target(
             target_dir,
-            install_root_for_scope(scope, project_root),
+            install_root_for_scope(tool, scope, project_root, registry),
             create_parents=False,
         )
     except SystemExit as exc:
@@ -352,7 +366,7 @@ def fan_out_install(
         # Isolate each target: a copy/remove/rename failure on one must not abort the fan-out, so every
         # successful target is still returned and recorded in the lockfile (no untracked partial installs).
         try:
-            deploy_to_target(package_dir, target_dir, install_root_for_scope(scope, project_root))
+            deploy_to_target(package_dir, target_dir, install_root_for_scope(tool, scope, project_root, registry))
             checksum = compute_dir_checksum(target_dir)
         except (OSError, SystemExit) as exc:
             results.append({"tool": tool, "scope": scope, "status": "error", "reason": str(exc), "path": str(target_dir), "checksum": None})
@@ -599,8 +613,8 @@ def install_prepared_node(
     if workspace_id and node["slug"] in preflight_skills_set:
         target_dirs = [resolve_target_dir(tool, scope, node["skill"]["name"], project_root, registry) for tool, scope in plan]
         target_roots = {
-            str(target): install_root_for_scope(scope, project_root)
-            for (_tool, scope), target in zip(plan, target_dirs)
+            str(target): install_root_for_scope(tool, scope, project_root, registry)
+            for (tool, scope), target in zip(plan, target_dirs)
         }
 
         def validate_projected_target(target: Path) -> Path:
@@ -724,7 +738,7 @@ def resolve_tools(args_tools: str | None, registry: dict[str, Any]) -> list[str]
         fail(
             "no tools configured. Detected on this machine: "
             f"{hint}. Confirm the set with the user, then write {config_path()} "
-            "(or pass --tools claude-code,codex,opencode,grok-bot,openclaw,hermes)."
+            "(or pass --tools claude-code,codex,opencode,grok-bot,openclaw,hermes,companion)."
         )
     unknown = [tool for tool in wanted if tool not in registry]
     if unknown:

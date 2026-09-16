@@ -1,7 +1,7 @@
 {
   "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
   "name": "skillpack",
-  "version": "1.115.0",
+  "version": "1.116.0",
   "icon": "boxes",
   "title": "Skillpack",
   "description": "Manage and safely install SKILL.md packages through delegated Agent Auth, including pinned public releases, publishing, updates, dependencies, secrets, hosted Skill Databases, local install tracking, and Skillpack self-update.",
@@ -30,6 +30,14 @@
       "scripts/sync_skillpack.py"
     ],
     "changelog": [
+      {
+        "version": "1.116.0",
+        "date": "2026-09-16",
+        "changes": [
+          "Adds the Companion (Pi) install target so workspace skills deploy directly into a companions.build agent state directory at ${AGENT_STATE_DIR:-~/.companions}/pi/skills.",
+          "Supports leading ${VAR:-fallback} environment templates in tools.json detect and user skillsDir paths, requires the resolved user path to be absolute, and documents deploying on disk instead of relaying package contents through model context or MCP payloads."
+        ]
+      },
       {
         "version": "1.115.0",
         "date": "2026-09-14",

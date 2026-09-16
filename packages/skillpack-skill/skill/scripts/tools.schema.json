@@ -37,7 +37,7 @@
         },
         "detect": {
           "type": "array",
-          "description": "Paths (with ~ allowed) whose existence indicates the tool is present on this machine. Any match counts as detected.",
+          "description": "Paths whose existence indicates the tool is present on this machine. Any match counts as detected. A path may start with `~` for the home directory and may begin with a `${VAR:-fallback}` segment (non-empty fallback) that prefers an environment variable, for example \"${AGENT_STATE_DIR:-~/.companions}/pi/skills\"; the resolved user path must be absolute.",
           "minItems": 1,
           "items": { "type": "string", "minLength": 1 }
         },
@@ -50,7 +50,7 @@
             "user": {
               "type": "string",
               "minLength": 1,
-              "description": "User-global skills directory (with ~ allowed), e.g. \"~/.claude/skills\", \"~/.agents/skills\", \"~/.cursor/skills\", or \"~/.openclaw/skills\"."
+              "description": "User-global skills directory, e.g. \"~/.claude/skills\", \"~/.agents/skills\", \"~/.cursor/skills\", \"~/.openclaw/skills\", or \"${AGENT_STATE_DIR:-~/.companions}/pi/skills\". Supports `~` and a leading `${VAR:-fallback}` segment (non-empty fallback); the resolved path must be absolute."
             },
             "project": {
               "type": "string",

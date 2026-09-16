@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -740,6 +741,24 @@ def tool_registry_path() -> Path:
     return Path(__file__).resolve().parent / "tools.json"
 
 
+_ENV_DEFAULT_TEMPLATE = re.compile(r"^\$\{([A-Za-z_][A-Za-z0-9_]*):-(.+?)}(.*)$")
+
+
+def expand_dir_template(template: str) -> str:
+    """Expand a tools.json directory template.
+
+    Supports `~` for the home directory (applied afterwards via ``expanduser``) and a leading
+    `${VAR:-fallback}` segment that prefers environment variable `VAR` and uses the fallback when it
+    is unset or empty, for example "${AGENT_STATE_DIR:-~/.companions}/pi/skills". An unset variable
+    must degrade to the fallback rather than a half-expanded path, so tools.json stays the single
+    source of truth on both companions.build state layouts and plain machines.
+    """
+    match = _ENV_DEFAULT_TEMPLATE.match(template)
+    if match is None:
+        return template
+    return (os.environ.get(match.group(1)) or match.group(2)) + match.group(3)
+
+
 def load_tool_registry(path: Path | None = None) -> dict[str, Any]:
     """Return the {tool_key: spec} registry from tools.json."""
     raw = load_json(path or tool_registry_path())
@@ -776,10 +795,47 @@ def detect_tools(registry: dict[str, Any] | None = None) -> list[str]:
     found: list[str] = []
     for key, spec in registry.items():
         for probe in spec.get("detect", []) or []:
-            if Path(probe).expanduser().exists():
+            probe_path = Path(expand_dir_template(probe)).expanduser()
+            # A relative probe would depend on the current working directory, so it can never be
+            # a stable machine-level signal; skip it rather than detecting by CWD accident.
+            if not probe_path.is_absolute():
+                continue
+            if probe_path.exists():
                 found.append(key)
                 break
     return sorted(found)
+
+
+def resolve_scope_base(
+    tool: str,
+    scope: str,
+    project_root: Path | None = None,
+    registry: dict[str, Any] | None = None,
+) -> Path:
+    """Resolve the skills base directory for a (tool, scope) target, before the skill name.
+
+    User-scope templates must resolve to an absolute path: an environment template such as
+    `${AGENT_STATE_DIR:-~/.companions}` that is set to a relative value would otherwise make
+    installs depend on the current working directory.
+    """
+    registry = registry if registry is not None else load_tool_registry()
+    spec = registry.get(tool)
+    if not spec:
+        fail(f"unknown tool {tool!r}")
+    template = (spec.get("skillsDir") or {}).get(scope)
+    if not template:
+        fail(f"tool {tool!r} has no {scope!r} skills directory in tools.json")
+    if scope == "user":
+        base = Path(expand_dir_template(template)).expanduser()
+        if not base.is_absolute():
+            fail(f"tool {tool!r} user skills directory must resolve to an absolute path, got {base}")
+    elif scope == "project":
+        if project_root is None:
+            fail("project scope requires a project root")
+        base = Path(project_root) / template
+    else:
+        fail(f"unknown scope {scope!r}")
+    return base
 
 
 def resolve_target_dir(
@@ -790,22 +846,7 @@ def resolve_target_dir(
     registry: dict[str, Any] | None = None,
 ) -> Path:
     """Resolve the on-disk skill folder for a (tool, scope) target."""
-    registry = registry if registry is not None else load_tool_registry()
-    spec = registry.get(tool)
-    if not spec:
-        fail(f"unknown tool {tool!r}")
-    template = (spec.get("skillsDir") or {}).get(scope)
-    if not template:
-        fail(f"tool {tool!r} has no {scope!r} skills directory in tools.json")
-    if scope == "user":
-        base = Path(template).expanduser()
-    elif scope == "project":
-        if project_root is None:
-            fail("project scope requires a project root")
-        base = Path(project_root) / template
-    else:
-        fail(f"unknown scope {scope!r}")
-    return base / skill_name
+    return resolve_scope_base(tool, scope, project_root, registry) / skill_name
 
 
 def find_project_root(start: Path | None = None) -> Path | None:
