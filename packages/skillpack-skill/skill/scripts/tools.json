@@ -38,6 +38,12 @@
       "skillsDir": { "user": "~/.hermes/skills" },
       "recursive": true,
       "format": "skill-md"
+    },
+    "companion": {
+      "displayName": "Companion (Pi)",
+      "detect": ["${AGENT_STATE_DIR:-~/.companions}/pi/skills"],
+      "skillsDir": { "user": "${AGENT_STATE_DIR:-~/.companions}/pi/skills" },
+      "format": "skill-md"
     }
   }
 }

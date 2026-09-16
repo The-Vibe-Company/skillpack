@@ -18,6 +18,8 @@ from typing import Any
 
 import companion_lib
 
+# Onboarding reviews local authoring machines only. Tools whose roots need environment templates
+# (companion) or category recursion beyond the scan's bounded walk stay out of this tuple.
 ONBOARDING_TOOLS = ("claude-code", "codex", "opencode", "grok-bot", "hermes")
 COMPANION_SLUG = "companion"
 COMPANION_MANIFEST = Path(__file__).resolve().parent.parent / "companion.json"

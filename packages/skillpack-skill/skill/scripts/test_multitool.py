@@ -7,6 +7,7 @@ import contextlib
 import io
 import json
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -69,7 +70,7 @@ class EnvSandbox(unittest.TestCase):
         self.home.mkdir()
         self._saved = {
             key: os.environ.get(key)
-            for key in ("HOME", "COMPANION_HOME", "COMPANION_API_URL", "COMPANION_TOKEN", "COMPANION_WORKSPACE_ID", "COMPANION_AUTH_MODE", "COMPANION_AGENT")
+            for key in ("HOME", "COMPANION_HOME", "COMPANION_API_URL", "COMPANION_TOKEN", "COMPANION_WORKSPACE_ID", "COMPANION_AUTH_MODE", "COMPANION_AGENT", "AGENT_STATE_DIR", "UNSET_VAR")
         }
         os.environ["HOME"] = str(self.home)
         os.environ["COMPANION_HOME"] = str(self.home / ".companion")
@@ -105,6 +106,60 @@ class RegistryTests(EnvSandbox):
         self.assertEqual(registry["hermes"]["detect"], ["~/.hermes"])
         self.assertEqual(registry["hermes"]["skillsDir"], {"user": "~/.hermes/skills"})
         self.assertTrue(registry["hermes"]["recursive"])
+        self.assertIn("companion", registry)
+        self.assertEqual(registry["companion"]["displayName"], "Companion (Pi)")
+        self.assertEqual(registry["companion"]["detect"], ["${AGENT_STATE_DIR:-~/.companions}/pi/skills"])
+        self.assertEqual(registry["companion"]["skillsDir"], {"user": "${AGENT_STATE_DIR:-~/.companions}/pi/skills"})
+
+    def test_expand_dir_template_passthrough_and_env_default(self) -> None:
+        self.assertEqual(companion_lib.expand_dir_template("~/.claude/skills"), "~/.claude/skills")
+        self.assertEqual(companion_lib.expand_dir_template("${UNSET_VAR:-~/fallback}"), "~/fallback")
+        os.environ["UNSET_VAR"] = str(self.root / "state")
+        self.assertEqual(companion_lib.expand_dir_template("${UNSET_VAR:-~/fallback}"), str(self.root / "state"))
+        # POSIX `:-` semantics: an empty value uses the fallback.
+        os.environ["UNSET_VAR"] = ""
+        self.assertEqual(companion_lib.expand_dir_template("${UNSET_VAR:-~/fallback}"), "~/fallback")
+        self.assertEqual(companion_lib.expand_dir_template("${BAD SYNTAX}"), "${BAD SYNTAX}")
+
+    def test_companion_target_prefers_agent_state_dir(self) -> None:
+        state = self.root / "state"
+        (state / "pi" / "skills").mkdir(parents=True)
+        os.environ["AGENT_STATE_DIR"] = str(state)
+        target = companion_lib.resolve_target_dir("companion", "user", "demo")
+        self.assertEqual(target, state / "pi" / "skills" / "demo")
+
+    def test_companion_target_falls_back_to_home_state(self) -> None:
+        os.environ.pop("AGENT_STATE_DIR", None)
+        target = companion_lib.resolve_target_dir("companion", "user", "demo")
+        self.assertEqual(target, self.home / ".companions" / "pi" / "skills" / "demo")
+        # An empty AGENT_STATE_DIR must also use the fallback, never a half-expanded path.
+        os.environ["AGENT_STATE_DIR"] = ""
+        target = companion_lib.resolve_target_dir("companion", "user", "demo")
+        self.assertEqual(target, self.home / ".companions" / "pi" / "skills" / "demo")
+
+    def test_companion_detection_follows_agent_state_dir(self) -> None:
+        os.environ.pop("AGENT_STATE_DIR", None)
+        (self.home / ".companions" / "pi" / "skills").mkdir(parents=True)
+        self.assertIn("companion", companion_lib.detect_tools())
+        # With AGENT_STATE_DIR set, the env path wins even when the fallback is absent.
+        shutil.rmtree(self.home / ".companions")
+        state = self.root / "state"
+        (state / "pi" / "skills").mkdir(parents=True)
+        os.environ["AGENT_STATE_DIR"] = str(state)
+        self.assertIn("companion", companion_lib.detect_tools())
+
+    def test_relative_agent_state_dir_is_rejected(self) -> None:
+        # A relative state root would make installs depend on the current working directory.
+        os.environ["AGENT_STATE_DIR"] = "relative/state"
+        with self.assertRaisesRegex(SystemExit, "absolute path"):
+            companion_lib.resolve_target_dir("companion", "user", "demo")
+        current = os.getcwd()
+        os.chdir(self.root)
+        try:
+            (self.root / "relative" / "state" / "pi" / "skills").mkdir(parents=True)
+            self.assertNotIn("companion", companion_lib.detect_tools())
+        finally:
+            os.chdir(current)
 
     def test_detect_tools_finds_only_present_tools(self) -> None:
         (self.home / ".claude").mkdir()
@@ -575,6 +630,22 @@ class FanOutTests(EnvSandbox):
         self.assertEqual([], self._swap_dirs(self.home / ".cursor" / "skills"))
         self.assertEqual([], self._swap_dirs(self.home / ".hermes" / "skills"))
 
+    def test_companion_install_into_state_dir_outside_home(self) -> None:
+        """A Box-style AGENT_STATE_DIR outside $HOME must still pass preflight and deploy."""
+        pkg = self._package()
+        state = self.root / "box-state"
+        os.environ["AGENT_STATE_DIR"] = str(state)
+        registry = companion_lib.load_tool_registry()
+        conflict_dir, conflict = install_skill.target_conflict(
+            "demo", "companion", "user", registry, None, {}, {}, force=False, include_checksum=True
+        )
+        self.assertIsNone(conflict)
+        self.assertEqual(conflict_dir, state / "pi" / "skills" / "demo")
+        results = install_skill.fan_out_install(pkg, "demo", [("companion", "user")], registry, None, {}, {}, force=False)
+        self.assertEqual([row["status"] for row in results], ["installed"])
+        self.assertTrue((state / "pi" / "skills" / "demo" / "SKILL.md").exists())
+        self.assertEqual([], self._swap_dirs(state / "pi" / "skills"))
+
     def test_deploy_to_target_restores_and_deletes_backup_after_rename_failure(self) -> None:
         pkg = self._package()
         target = companion_lib.resolve_target_dir("claude-code", "user", "demo", None, REGISTRY)
@@ -656,7 +727,9 @@ class FanOutTests(EnvSandbox):
         )
 
         self.assertEqual(results[0]["status"], "error")
-        self.assertIn("symbolic-link destination ancestor", results[0]["reason"])
+        # Containment is rooted at the tool's own skills base, so a symlinked base is rejected
+        # outright rather than as a destination ancestor; the install must still never land.
+        self.assertIn("symbolic-link install root", results[0]["reason"])
         self.assertFalse((outside / "demo").exists())
 
     def test_openclaw_secret_projection_rejects_symlinked_workspace_parent(self) -> None:
