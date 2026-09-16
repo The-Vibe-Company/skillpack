@@ -11,6 +11,8 @@ follows root `DESIGN.md`.
   Every member can manage organization skills. Share is the sole owner-only personal → org transition.
 - Organization and personal label trees organize skills without changing access.
 - External coding agents are delegated Skills Hub clients. Skillpack never launches them.
+  They connect through Agent Auth, PATs, or the MCP server; an MCP connection acts with the
+  consenting member's rights inside the one workspace chosen at consent time.
 - Legacy hosted Companions, Box/Pi, chat, routines, triggers, plugin accounts, and native chat clients are retired.
 - Complete authorized workflows end to end. Do not ask users to configure integrations manually
   when Skillpack can do that with credentials it already holds.

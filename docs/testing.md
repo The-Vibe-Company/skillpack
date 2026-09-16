@@ -12,6 +12,7 @@ providers and identities, not authorization, persistence, or tenant scoping.
 - Public releases pin one exact version; GitHub mirrors stay deterministic and idempotent.
 - Secret grants cannot replay or leak plaintext through ordinary metadata, errors, logs, or audit.
 - Agent Auth and child PATs remain exact-workspace and capability constrained.
+- MCP connections stay bound to their consented workspace and reject non-members and revoked tokens.
 - Skill Databases preserve additive schemas, serialization, realm privacy, and conditional storage.
 - API and worker credentials remain separate NOBYPASSRLS roles.
 - Retired hosted Skillpack routes and tokens cannot access the Skills Hub.

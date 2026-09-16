@@ -123,6 +123,7 @@ export {
 // function declaration) and the `ActorContext` type from here, so the cycle is load-order safe.
 export * from "./onboarding";
 export * from "./gettingStarted";
+export * from "./mcpConnections";
 export {
   addOrgAccessDomain,
   listJoinableOrgsByDomain,

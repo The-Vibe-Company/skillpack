@@ -17,6 +17,10 @@ import {
   assertCommentTarget,
   addOrgAccessDomain,
   archiveSkill,
+  bindMcpClientWorkspace,
+  listMcpConnections,
+  revokeMcpConnection,
+  unbindMcpClientWorkspace,
   assignLabel,
   buildDependencyPlan,
   buildSkillSharePlan,
@@ -67,8 +71,6 @@ import {
   listSkillComments,
   listSkills,
   listSkillVersions,
-  publishSkillVersion,
-  assertCanPublishSkillVersion,
   prepareSkillPublishDependencies,
   refreshApiToken,
   renameSkill,
@@ -169,7 +171,6 @@ import {
   joinOnboardingOrgInputSchema,
   orgSettingsResponseSchema,
   skillNamingPolicyResponseSchema,
-  publishSkillInputSchema,
   renameSkillInputSchema,
   renameLabelInputSchema,
   reportLocalSkillInstallInputSchema,
@@ -178,7 +179,6 @@ import {
   setCommentDeprecatedInputSchema,
   setLabelColorInputSchema,
   setLabelIconInputSchema,
-  skillFrontmatterSchema,
   skillFilterPreferencesInputSchema,
   skillpackManifestV2JsonSchema,
   updateOrgInputSchema,
@@ -191,8 +191,6 @@ import {
   MAX_COMMENT_IMAGE_BYTES,
   updateUserProfileInputSchema,
   setSkillPublicVersionInputSchema,
-  type SkillpackManifest,
-  type SkillFrontmatter,
   type SkillScope,
   createSecretInputSchema,
   updateSecretInputSchema,
@@ -222,30 +220,29 @@ import {
   putUserAvatar,
   getUserAvatar,
   deleteUserAvatar,
-  skillArchiveKey,
   skillDatabaseKey,
   putSkillArchive,
   signedSkillArchiveUrl,
 } from "@skillpack/storage";
 import { SqliteWasmSkillDatabaseRuntime } from "@skillpack/skilldb";
 import {
-  bumpSemver,
   compareSemver,
   extractArchiveFileContent,
   extractArchiveFiles,
-  isValidSemver,
   buildNormalizedSkillpackJson,
-  buildNormalizedSkillMd,
   packDir,
-  prepareSkillDirForPublish,
-  toStoredSkillVersionManifest,
   tarGzToZip,
   toTar,
-  unpackAnyTo,
   validateSkillArchive,
 } from "@skillpack/skills";
 import { withTenantContext, type Db } from "@skillpack/db";
-import { auth, registerAgentCapabilityExecutor } from "@skillpack/auth";
+import {
+  auth,
+  decideMcpConsent,
+  getMcpPendingAuthorization,
+  publicInstanceOrigin,
+  registerAgentCapabilityExecutor,
+} from "@skillpack/auth";
 import { inviteEmail, sendTransactionalEmail } from "@skillpack/email";
 import {
   actorFromContext,
@@ -260,7 +257,23 @@ import {
 } from "./context";
 import { appRouter } from "./trpc";
 import { assertNoSkillpackRetarget, assertTargetedSkillUpdate, assertUpdateIsTargeted, parseSkillPublishAction } from "./skillPublishGuards";
-import { buildInlineSkillpackManifest, uploadDependencyValues, withResolvedManifestDependencies } from "./skillSkillpackManifest";
+import {
+  buildSkillMd,
+  canonicalizeSkillArchive,
+  publishCanonical,
+  resolvePublishTarget,
+  TransferTicketAuthorizationChangedError,
+} from "./skillPublish";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
+import {
+  authenticateMcpRequest,
+  forceMcpConsentPrompt,
+  isUnpublishedAuthPath,
+  mcpAuthenticateChallenge,
+  mcpConsentInputSchema,
+} from "./mcp/auth";
+import { createSkillpackMcpServer } from "./mcp/server";
+import { buildInlineSkillpackManifest, uploadDependencyValues } from "./skillSkillpackManifest";
 import { buildSkillpackSkillRow, getSkillpackSkillPackage } from "@skillpack/skillpack-skill/package";
 import { parseSkillListQuery } from "./skillListQuery";
 import { registerAgentAuthRoutes } from "./agentAuthRoutes";
@@ -637,74 +650,6 @@ async function withTenant<T>(
   return withTenantContext({ orgId, userId: actor.id }, (database) => fn({ actor, orgId, database }));
 }
 
-async function canonicalizeSkillArchive(
-  archive: Buffer,
-  companion: { skillId: string; version: string },
-  overrides: { dependencies?: string[] | Record<string, string> } = {},
-) {
-  const dir = await mkdtemp(join(tmpdir(), "companion-skill-"));
-  try {
-    await unpackAnyTo(archive, dir);
-    const prepared = await prepareSkillDirForPublish(dir, companion);
-    const skillpackManifest = overrides.dependencies
-      ? withResolvedManifestDependencies(prepared.skillpackManifest, overrides.dependencies)
-      : prepared.skillpackManifest;
-    if (overrides.dependencies) {
-      await writeFile(prepared.skillpackManifestPath, buildNormalizedSkillpackJson(skillpackManifest), "utf8");
-    }
-    const canonical = await packDir(prepared.rootDir);
-    return { canonical, frontmatter: prepared.frontmatter, skillpackManifest };
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-  }
-}
-
-/** Assemble a standard SKILL.md from inline fields. The registry sets the version, not the author. */
-function buildSkillMd(
-  id: string,
-  description: string,
-  body: string,
-  _companion: { skillId: string; version: string },
-): string {
-  const frontmatter = skillFrontmatterSchema.parse({
-    name: id,
-    description,
-    metadata: {},
-  });
-  return buildNormalizedSkillMd(frontmatter, body);
-}
-
-function skillSummary(fm: SkillFrontmatter, manifest: SkillpackManifest): string {
-  return manifest.display.summary ?? fm.description;
-}
-
-async function resolvePublishTarget(input: {
-  actor: ReturnType<typeof actorFromContext>;
-  orgId: string;
-  slug: string;
-  explicitVersion?: string;
-  metadataVersion?: string;
-  metadataSkillId?: string;
-  legacyVersion?: string;
-}): Promise<{ skillId: string; version: string }> {
-  return withTenantContext({ orgId: input.orgId, userId: input.actor.id }, async (database) => {
-    const existing = await getSkillBySlug({ actor: input.actor, orgId: input.orgId, slug: input.slug, database });
-    const metadataIsPublishedProvenance = Boolean(existing && input.metadataSkillId);
-    const candidate =
-      input.explicitVersion ??
-      (metadataIsPublishedProvenance ? undefined : input.metadataVersion) ??
-      input.legacyVersion;
-    if (candidate) {
-      if (!isValidSemver(candidate)) throw new Error(`invalid semver: ${candidate}`);
-      return { skillId: existing?.id ?? randomUUID(), version: candidate };
-    }
-    if (!existing) return { skillId: randomUUID(), version: "1.0.0" };
-    const versions = await listSkillVersions({ actor: input.actor, orgId: input.orgId, slug: input.slug, database });
-    const latest = versions.map((v) => v.version).sort((a, b) => compareSemver(b, a))[0];
-    return { skillId: existing.id, version: latest ? bumpSemver(latest, "patch") : "1.0.0" };
-  });
-}
-
 /** Collect a repeatable form/query field into a de-duped, comma-splittable string list. */
 function parseMultiValues(values: Array<string | undefined>): string[] {
   return [
@@ -735,79 +680,6 @@ function rejectLegacySkillVisibilityInput(hasField: (name: string) => boolean): 
   }
 }
 
-/**
- * Shared publish tail: store the canonical archive (idempotently) and write a new
- * skill_versions row, authorizing first and cleaning up the blob on failure.
- */
-class TransferTicketAuthorizationChangedError extends Error {}
-
-async function publishCanonical(input: {
-  actor: ReturnType<typeof actorFromContext>;
-  orgId: string;
-  canonical: Awaited<ReturnType<typeof packDir>>;
-  fm: SkillFrontmatter;
-  skillpackManifest: SkillpackManifest;
-  skillId: string;
-  /** Library to publish into on first create: 'personal' (My Skills) or 'org' (default). */
-  scope?: SkillScope;
-  /** Label paths to file the skill under on create (personal folders for 'personal', else org). */
-  labels?: string[];
-  version: string;
-  note: string;
-  /** SKILL.md markdown body — persisted server-side to power full-text content search. */
-  body: string;
-  dependencies?: Awaited<ReturnType<typeof prepareSkillPublishDependencies>>;
-  /** Runs after external storage work and immediately before the tenant mutation. */
-  beforeCommit?: () => Promise<boolean>;
-}): Promise<{ id: string; slug: string; version: string; checksum: string; sizeBytes: number }> {
-  const { actor, orgId, canonical, fm, skillpackManifest, skillId, scope, labels, version, note, body, dependencies } =
-    input;
-  if (!isValidSemver(version)) throw new Error(`invalid semver: ${version}`);
-  const key = skillArchiveKey({ orgId, slug: fm.name, version });
-  const payload = publishSkillInputSchema.parse({
-    skill_id: skillId,
-    slug: fm.name,
-    ...(scope ? { scope } : {}),
-    labels: labels ?? [],
-    version,
-    description: skillSummary(fm, skillpackManifest),
-    checksum: canonical.checksum,
-    storage_path: key,
-    size_bytes: canonical.sizeBytes,
-    frontmatter: JSON.stringify(toStoredSkillVersionManifest(fm, skillpackManifest), null, 2),
-    body,
-    tools: fm.allowedTools,
-    license: fm.license ?? null,
-    note,
-    dependencies: dependencies?.slugs ?? [],
-  });
-  await withTenantContext({ orgId, userId: actor.id }, (database) =>
-    assertCanPublishSkillVersion({ actor, orgId, payload, database }),
-  );
-  await putSkillArchive({ key, body: canonical.archive, preventOverwrite: true });
-  try {
-    if (input.beforeCommit && !await input.beforeCommit()) {
-      throw new TransferTicketAuthorizationChangedError(
-        "transfer ticket authorization changed before publication",
-      );
-    }
-    const published = await withTenantContext({ orgId, userId: actor.id }, (database) =>
-      publishSkillVersion({ actor, orgId, payload, archiveKey: key, dependencies, database }),
-    );
-    return { ...published, slug: fm.name, checksum: canonical.checksum, sizeBytes: canonical.sizeBytes };
-  } catch (error) {
-    await deleteSkillArchive({ key }).catch((cleanupError) => {
-      captureServerError(cleanupError, {
-        operation: "skill.archive.cleanup",
-        level: "warning",
-        retryable: true,
-      });
-      console.error(`failed to delete orphaned skill archive ${key}`, cleanupError);
-    });
-    throw error;
-  }
-}
-
 app.use(
   "*",
   cors({
@@ -827,7 +699,171 @@ app.get("/health", (c) => c.json({
   release_id: deploymentReleaseId(),
 }));
 
-app.on(["GET", "POST"], "/auth/*", (c) => auth.handler(c.req.raw));
+app.on(["GET", "POST"], "/auth/*", (c) => {
+  if (isUnpublishedAuthPath(new URL(c.req.url).pathname)) {
+    return c.json({ ok: false, error: "Not Found" }, 404);
+  }
+  return auth.handler(forceMcpConsentPrompt(c.req.raw));
+});
+
+/**
+ * The Skills Hub as an OAuth-protected MCP server.
+ *
+ * Stateless: one transport and one tool server per request, both bound to the connection this
+ * bearer token resolves to. A request that does not resolve gets the RFC 9728 challenge so an MCP
+ * client can discover where to authorize. Publishing a skill sends its file contents inline, so the
+ * body cap is larger than the JSON routes but well under the archive upload limit.
+ *
+ * Only POST carries a session. A stateless server has no standalone notification stream to offer,
+ * and tearing the per-request server down would close such a stream the moment it opened, so GET
+ * and DELETE are answered 405 rather than handed to the transport.
+ */
+app.all(
+  "/mcp",
+  bodyLimit({
+    maxSize: 12 * 1024 * 1024,
+    onError: (c) => c.json({ error: "request exceeds the 12 MB MCP limit" }, 413),
+  }),
+  async (c) => {
+    const challenge = mcpAuthenticateChallenge(publicInstanceOrigin());
+    let connection: Awaited<ReturnType<typeof authenticateMcpRequest>>;
+    try {
+      connection = await authenticateMcpRequest(c.req.raw.headers);
+    } catch (error) {
+      captureServerError(error, { operation: "mcp.authenticate" });
+      connection = null;
+    }
+    if (!connection) {
+      return c.json(
+        {
+          jsonrpc: "2.0",
+          error: { code: -32_000, message: "Unauthorized: connect this workspace in Skillpack first" },
+          id: null,
+        },
+        401,
+        { "WWW-Authenticate": challenge, "Access-Control-Expose-Headers": "WWW-Authenticate" },
+      );
+    }
+    if (c.req.method !== "POST") {
+      return c.json(
+        {
+          jsonrpc: "2.0",
+          error: { code: -32_000, message: "This MCP server is stateless; use POST." },
+          id: null,
+        },
+        405,
+        { allow: "POST" },
+      );
+    }
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      // Stateless: companions.build reconnects per call and never replays a stream.
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
+    });
+    const server = createSkillpackMcpServer({
+      connection,
+      skillDatabaseRuntime: lazySkillDatabaseRuntime,
+      skillDatabaseStorage,
+    });
+    try {
+      await server.connect(transport);
+      return await transport.handleRequest(c.req.raw);
+    } finally {
+      await server.close().catch(() => undefined);
+    }
+  },
+);
+
+/**
+ * Record an MCP consent decision. The workspace is chosen here, by the signed-in member, and is the
+ * only workspace the resulting connection will ever act in. A denial writes no mapping at all.
+ */
+app.post("/v1/mcp/consent", async (c) => {
+  try {
+    if (isTokenRequest(c) || isAgentRequest(c)) {
+      return jsonError(c, "MCP consent requires a signed-in browser session", 403);
+    }
+    const actor = actorFromContext(c);
+    const body = mcpConsentInputSchema.parse(await c.req.json());
+    const pending = await getMcpPendingAuthorization(body.consent_code);
+    if (!pending) return jsonError(c, "this authorization request is unknown or has expired", 404);
+    if (pending.userId !== actor.id) {
+      return jsonError(c, "this authorization request belongs to a different account", 403);
+    }
+    if (!body.accept) {
+      const denied = await decideMcpConsent({ headers: c.req.raw.headers, accept: false, consentCode: body.consent_code });
+      return c.json({ ok: true as const, accepted: false as const, redirect_uri: denied.redirectURI });
+    }
+    // Bind before approving: a failed membership check must not leave an approved grant with no
+    // workspace, which would authorize a connection that can never be scoped. The reverse order
+    // fails the other way — an approval that never got its workspace would leave a live mapping for
+    // a grant the member never completed — so undo the binding if the approval does not land.
+    await bindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId });
+    let approved: Awaited<ReturnType<typeof decideMcpConsent>>;
+    try {
+      approved = await decideMcpConsent({
+        headers: c.req.raw.headers,
+        accept: true,
+        consentCode: body.consent_code,
+      });
+    } catch (error) {
+      await unbindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId })
+        .catch((cleanupError: unknown) => {
+          captureServerError(cleanupError, { operation: "mcp.consent.unbind", level: "warning" });
+        });
+      throw error;
+    }
+    return c.json({
+      ok: true as const,
+      accepted: true as const,
+      workspace_id: body.workspace_id,
+      redirect_uri: approved.redirectURI,
+    });
+  } catch (error) {
+    return jsonError(c, error);
+  }
+});
+
+/** The pending MCP authorization behind a consent code, for the consent screen to render. */
+app.get("/v1/mcp/consent", async (c) => {
+  try {
+    const actor = actorFromContext(c);
+    const consentCode = c.req.query("consent_code")?.trim() ?? "";
+    const pending = await getMcpPendingAuthorization(consentCode);
+    if (!pending || pending.userId !== actor.id) {
+      return jsonError(c, "this authorization request is unknown or has expired", 404);
+    }
+    return c.json({
+      client_id: pending.clientId,
+      client_name: pending.clientName,
+      redirect_origin: pending.redirectOrigin,
+      scopes: pending.scopes,
+    });
+  } catch (error) {
+    return jsonError(c, error, 401);
+  }
+});
+
+/** The caller's own MCP connections, across every workspace they consented into. */
+app.get("/v1/mcp/connections", async (c) => {
+  try {
+    const actor = actorFromContext(c);
+    return c.json({ connections: await listMcpConnections({ actor }) });
+  } catch (error) {
+    return jsonError(c, error, 401);
+  }
+});
+
+app.delete("/v1/mcp/connections/:clientId", async (c) => {
+  try {
+    const actor = actorFromContext(c);
+    const revoked = await revokeMcpConnection({ actor, clientId: c.req.param("clientId") });
+    if (!revoked) return jsonError(c, "connection not found", 404);
+    return c.json({ ok: true as const });
+  } catch (error) {
+    return jsonError(c, error);
+  }
+});
 
 app.get("/v1/skills/share-target/:token", async (c) => {
   try {

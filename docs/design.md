@@ -51,6 +51,44 @@ the earliest source expiry, and stores value-free provenance. Callers cannot cho
 organizations, PATs cannot mint child PATs, and a target-bound token requires the matching declared
 target. Possession remains bearer authority until expiry or revocation.
 
+## MCP connections
+
+Skillpack is also an OAuth 2.1 authorization server and an MCP server, so a hosted agent platform
+can reach the Skills Hub without a personal access token. Better Auth's `mcp` plugin serves
+authorization, token and dynamic client registration endpoints under `/auth/mcp/*`, with metadata at
+`/auth/.well-known/oauth-*` and the resource itself at `/mcp`. Every URL lives on the one public
+origin, so a deployment sets `BETTER_AUTH_URL` to that origin. PKCE S256 is required, there are no
+static client secrets, and registration is dynamic.
+
+An MCP connection carries session-equivalent rights, not Agent Auth capabilities: it acts as the
+member who consented, with exactly the access that member already has. What bounds it is the
+workspace. The consent screen makes the member choose one organization, and `mcp_client_workspaces`
+records that choice for the registered client. No tool accepts a workspace argument, so one
+connection can never reach a second organization; connecting another workspace means connecting the
+app again.
+
+Consent is not optional and is not the client's decision. Better Auth only routes to a consent page
+when the client asks for `prompt=consent`, so the API rewrites every `/auth/mcp/authorize` request
+to carry it — dynamic registration is open, which makes the client exactly the party that must not
+be trusted to ask. For the same reason the two plugin endpoints this product does not publish are
+closed: `/auth/mcp/get-session` would trade a one-hour access token for the thirty-day refresh
+token, and `/auth/oauth2/consent` would approve a grant without binding a workspace or checking that
+the session owns the request. `POST /v1/mcp/consent` is the only approval path.
+
+Resolution requires the mapping *and* the recorded consent, so a binding whose approval never landed
+is inert; the consent route also unwinds its own binding when approval fails. The pre-tenant
+resolver re-proves membership on every request, so a removed member's connection fails closed, and
+revocation deletes the OAuth client — cascading its tokens, consent and workspace mapping away.
+
+Better Auth stores MCP access and refresh tokens in plaintext, unlike every other bearer credential
+in this schema. That is inherent to delegating the token lifecycle to the plugin, which looks tokens
+up by equality; it is recorded here as a known deviation rather than an oversight.
+
+Tools mirror the REST surface through the same `@skillpack/core` services, so authorization, audit
+rows and tenancy behave identically on both. Skillpack has no hard delete, so `skill_archive` is
+documented as the delete and `skill_restore` undoes it. Secret plaintext stays behind the same
+three-step preflight, grant and redeem sequence.
+
 The bundled management skill is named `skillpack` and served at `/v1/local-skills/skillpack`.
 The former `companion` route remains an alias; both names use the existing per-member installation
 key `companion` so rebranding does not reset installation history. Package manifests, credential
