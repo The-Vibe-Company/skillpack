@@ -1370,7 +1370,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.115.0","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.116.0","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 

@@ -48,7 +48,7 @@ describe("companion skill package + row", () => {
     const pkg = await getSkillpackSkillPackage();
     expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.115.0");
+    expect(pkg.version).toBe("1.116.0");
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -129,8 +129,8 @@ describe("companion skill package + row", () => {
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
     const changelog = row.changes.join("\n");
-    expect(changelog).toContain("Renames the distributed skill identity");
-    expect(changelog).toContain("Preserves existing credentials, installation history");
+    expect(changelog).toContain("Adds the Companion (Pi) install target");
+    expect(changelog).toContain("${AGENT_STATE_DIR:-~/.companions}/pi/skills");
     // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
     const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
       metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };
