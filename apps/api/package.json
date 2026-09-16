@@ -31,6 +31,7 @@
     "@skillpack/skills": "workspace:*",
     "@skillpack/storage": "workspace:*",
     "@hono/node-server": "^1.18.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@sentry/node": "^10.70.0",
     "@sqlite.org/sqlite-wasm": "3.50.4-build1",
     "@trpc/server": "^10.45.2",

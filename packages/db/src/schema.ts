@@ -239,6 +239,73 @@ export const agentAuthEphemeral = pgTable(
   (t) => ({ byExpiry: index("agent_auth_ephemeral_expires_at_idx").on(t.expiresAt) }),
 );
 
+// Better Auth `mcp` plugin identity tables (built on its OIDC provider). Like `user`/`session`,
+// these are global: one OAuth client belongs to a Better Auth user, and the workspace it may act in
+// is recorded separately in `mcp_client_workspaces`. Column names follow the plugin's field names.
+export const oauthApplication = pgTable(
+  "oauth_application",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    icon: text("icon"),
+    metadata: text("metadata"),
+    clientId: text("client_id").notNull().unique(),
+    clientSecret: text("client_secret"),
+    /** Comma-joined registered redirect URIs, exactly as the plugin stores them. */
+    redirectUrls: text("redirect_urls").notNull(),
+    /** "public" for PKCE-only clients registered with `token_endpoint_auth_method: none`. */
+    type: text("type").notNull(),
+    disabled: boolean("disabled").notNull().default(false),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({ byUser: index("oauth_application_user_id_idx").on(t.userId) }),
+);
+
+export const oauthAccessToken = pgTable(
+  "oauth_access_token",
+  {
+    id: text("id").primaryKey(),
+    accessToken: text("access_token").notNull().unique(),
+    refreshToken: text("refresh_token").notNull().unique(),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }).notNull(),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }).notNull(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthApplication.clientId, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    scopes: text("scopes").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    byClient: index("oauth_access_token_client_id_idx").on(t.clientId),
+    byUser: index("oauth_access_token_user_id_idx").on(t.userId),
+  }),
+);
+
+export const oauthConsent = pgTable(
+  "oauth_consent",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthApplication.clientId, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    scopes: text("scopes").notNull(),
+    consentGiven: boolean("consent_given").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    byClient: index("oauth_consent_client_id_idx").on(t.clientId),
+    byUser: index("oauth_consent_user_id_idx").on(t.userId),
+  }),
+);
+
 export const profiles = pgTable("profiles", {
   id: text("id")
     .primaryKey()
@@ -625,6 +692,30 @@ export const agentTransferTickets = pgTable(
       name: "agent_transfer_tickets_version_org_skill_fk",
     }).onDelete("cascade"),
   }),
+);
+
+/**
+ * The workspace one MCP OAuth client was consented into. Tenant-owned business data: an MCP
+ * connection acts with the connecting member's session-equivalent rights inside exactly this
+ * organization, and the row is written only by the consent screen after `assertMember` succeeds.
+ * One companions.build connection registers one client, so one client maps to one workspace.
+ */
+export const mcpClientWorkspaces = pgTable(
+  "mcp_client_workspaces",
+  {
+    clientId: text("client_id")
+      .primaryKey()
+      .references(() => oauthApplication.clientId, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: now(),
+    updatedAt: updatedAt(),
+  },
+  (t) => ({ byMember: index("mcp_client_workspaces_member_idx").on(t.orgId, t.userId) }),
 );
 
 /**

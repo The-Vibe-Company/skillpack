@@ -190,6 +190,29 @@ BEGIN
       'public.companion_trigger_provider_accounts'::regclass
     ];
   END IF;
+  -- Better Auth's MCP OAuth tables (0187) are API-owned identity data without RLS, and its three
+  -- pre-tenant resolvers answer requests that arrive before a workspace can be selected. Appended
+  -- behind the 0187 sentinel so a migration-first deploy that has not reached it still applies the
+  -- rest of the split; once the sentinel exists the exact casts stay a fail-closed contract.
+  IF pg_catalog.to_regclass('public.mcp_client_workspaces') IS NOT NULL THEN
+    api_unprotected_tables := api_unprotected_tables || ARRAY[
+      'public.oauth_application'::regclass,
+      'public.oauth_access_token'::regclass,
+      'public.oauth_consent'::regclass
+    ];
+    -- The mapping is the sole binding that decides which organization an MCP connection may act in,
+    -- so it stays API-managed like the other credential metadata below. Billing, GitHub sync and
+    -- Skill Database cleanup never touch it; without this the generic RLS-table loop would hand the
+    -- worker DELETE on every workspace binding in an organization it happens to be processing.
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY[
+      'public.mcp_client_workspaces'::regclass
+    ];
+    api_functions := api_functions || ARRAY[
+      'public.companion_resolve_mcp_connection(text,text)'::regprocedure,
+      'public.companion_list_mcp_connections(text)'::regprocedure,
+      'public.companion_revoke_mcp_connection(text,text)'::regprocedure
+    ];
+  END IF;
   IF api_role IS NULL OR worker_role IS NULL OR companion_runtime_role IS NULL THEN
     RAISE EXCEPTION 'companion API, worker, and runtime roles are required';
   END IF;

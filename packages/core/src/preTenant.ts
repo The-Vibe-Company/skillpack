@@ -411,3 +411,67 @@ export async function listPreTenantBillingSyncCandidates(
   `);
   return resultRows<{ orgId: string }>(result).map((row) => row.orgId);
 }
+
+export interface PreTenantMcpConnectionRow {
+  orgId: string;
+  userId: string;
+  email: string;
+  name: string;
+}
+
+/**
+ * Resolve the workspace an MCP client was consented into. The request carries only a bearer token,
+ * so the mapping — and the member's still-current membership — must be read before `app.org_id`
+ * exists. A revoked membership or a disabled client resolves to null.
+ */
+export async function resolvePreTenantMcpConnection(
+  database: Db,
+  input: { clientId: string; userId: string },
+): Promise<PreTenantMcpConnectionRow | null> {
+  const result = await database.execute(sql`
+    select
+      connection."org_id"::text as "orgId",
+      connection."user_id" as "userId",
+      connection."email" as "email",
+      connection."name" as "name"
+    from companion_resolve_mcp_connection(${input.clientId}, ${input.userId}) as connection
+  `);
+  return resultRows<PreTenantMcpConnectionRow>(result)[0] ?? null;
+}
+
+export interface PreTenantMcpConnectionListRow {
+  clientId: string;
+  clientName: string;
+  orgId: string;
+  orgName: string;
+  createdAt: string;
+  lastTokenIssuedAt: string | null;
+}
+
+export async function listPreTenantMcpConnections(
+  database: Db,
+  userId: string,
+): Promise<PreTenantMcpConnectionListRow[]> {
+  const result = await database.execute(sql`
+    select
+      connection."client_id" as "clientId",
+      connection."client_name" as "clientName",
+      connection."org_id"::text as "orgId",
+      connection."org_name" as "orgName",
+      connection."created_at" as "createdAt",
+      connection."last_token_issued_at" as "lastTokenIssuedAt"
+    from companion_list_mcp_connections(${userId}) as connection
+  `);
+  return resultRows<PreTenantMcpConnectionListRow>(result);
+}
+
+/** Delete one of the caller's own MCP clients; its tokens, consent and mapping cascade away. */
+export async function revokePreTenantMcpConnection(
+  database: Db,
+  input: { clientId: string; userId: string },
+): Promise<boolean> {
+  const result = await database.execute(sql`
+    select companion_revoke_mcp_connection(${input.clientId}, ${input.userId}) as "revoked"
+  `);
+  return resultRows<{ revoked: boolean }>(result)[0]?.revoked ?? false;
+}
