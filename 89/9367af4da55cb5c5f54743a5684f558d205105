@@ -1,0 +1,28 @@
+runtime/internal/runtime/hardening_test.go
+  s_524f399a310bce::t_7002f6639d743d 227
+  s_524f399a310bce::t_3c4bced7fe052c 219-220
+runtime/internal/runtime/transcript_test.go
+  s_524f399a310bce::t_d528c09eadc635 597-598,667-668,690-691
+  s_524f399a310bce::t_cb3116651e9777 605,671
+  s_524f399a310bce::t_ebb7de7fe76ae3 31-32,149,152
+  s_524f399a310bce::t_32e03c18b654b0 12,412-416
+  s_524f399a310bce::t_ff447d0318b9f1 16-23
+runtime/internal/runtime/hook_test.go
+  s_524f399a310bce::t_10c10735fbca61 89-98,247-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "899367af4da55cb5c5f54743a5684f558d205105",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
