@@ -216,15 +216,15 @@ func TestClaudeHookAndTranscriptInvocationWithSameCallIDDedupeAcrossTurnFields(t
 		t.Fatalf("events after first hook=%d, want 1", events)
 	}
 	transcriptLines := []string{
-		`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"same-call","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}`,
-		`{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"same-call","is_error":false}]}}`,
+		testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": "same-call", "name": "Skill", "input": map[string]any{"skill": skillDir}}}}}),
+		testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": "same-call", "is_error": false}}}}),
 	}
 	file, err := os.OpenFile(transcript, os.O_APPEND|os.O_WRONLY, 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, line := range transcriptLines {
-		if _, err := file.WriteString(line + "\n"); err != nil {
+		if _, err := file.WriteString(line); err != nil {
 			_ = file.Close()
 			t.Fatal(err)
 		}

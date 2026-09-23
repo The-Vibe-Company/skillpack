@@ -86,7 +86,16 @@ func TestTelemetryOptOutIsPersistedPerSessionBeforeLaterReconciliation(t *testin
 	if _, err := store.RegisterInventory(Inventory{SchemaVersion: 1, Origins: []string{"https://skillpack.app"}, Skills: []InventorySkill{{Path: skillDir, SkillID: "11111111-1111-4111-8111-111111111111", Version: "1.0.0", Origin: "https://skillpack.app"}}}); err != nil {
 		t.Fatal(err)
 	}
-	hook := []byte(`{"hook_event_name":"PostToolUse","session_id":"opt-out-session","tool_name":"Skill","tool_input":{"skill":"` + skillDir + `"},"tool_use_id":"call-1"}`)
+	hook, err := json.Marshal(map[string]any{
+		"hook_event_name": "PostToolUse",
+		"session_id":      "opt-out-session",
+		"tool_name":       "Skill",
+		"tool_input":      map[string]any{"skill": skillDir},
+		"tool_use_id":     "call-1",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Setenv("SKILLPACK_TELEMETRY", "0")
 	results, err := store.HandleHook(context.Background(), "claude-code", bytes.NewReader(hook))
 	if err != nil {
@@ -235,7 +244,14 @@ func TestSessionStartEnrollsBeforeTranscriptAndDoctorSeparatesObservation(t *tes
 	if err := os.WriteFile(filepath.Join(stateDir, "hook-setup.json"), []byte(`{"schemaVersion":1,"agents":{"claude-code":true}}`), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	input := []byte(`{"hook_event_name":"SessionStart","session_id":"session-start","transcript_path":"` + transcript + `"}`)
+	input, err := json.Marshal(map[string]any{
+		"hook_event_name": "SessionStart",
+		"session_id":      "session-start",
+		"transcript_path": transcript,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
 	results, err := store.HandleHook(context.Background(), "claude-code", bytes.NewReader(input))
 	if err != nil || len(results) != 1 || results[0].Reason != "session_enrolled" {
 		t.Fatalf("session start result=%#v err=%v", results, err)

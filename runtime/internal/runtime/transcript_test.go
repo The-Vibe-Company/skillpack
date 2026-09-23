@@ -9,8 +9,17 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	stdruntime "runtime"
 	"testing"
 )
+
+func testJSONLine(value any) string {
+	data, err := json.Marshal(value)
+	if err != nil {
+		panic(err)
+	}
+	return string(append(data, '\n'))
+}
 
 func TestTranscriptReconciliationIsIncrementalAndDoesNotBackfill(t *testing.T) {
 	stateDir := t.TempDir()
@@ -19,7 +28,8 @@ func TestTranscriptReconciliationIsIncrementalAndDoesNotBackfill(t *testing.T) {
 		t.Fatal(err)
 	}
 	transcript := filepath.Join(t.TempDir(), "session-1.jsonl")
-	initial := []byte(`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"old-call","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}` + "\n" + `{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"old-call","is_error":false}]}}` + "\n")
+	initial := []byte(testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": "old-call", "name": "Skill", "input": map[string]any{"skill": skillDir}}}}}))
+	initial = append(initial, testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": "old-call", "is_error": false}}}})...)
 	if err := os.WriteFile(transcript, initial, 0o600); err != nil {
 		t.Fatal(err)
 	}
@@ -136,10 +146,10 @@ func TestTranscriptCallIDsAreScopedToTheirSession(t *testing.T) {
 
 	const reusedCallID = "reused-subagent-call"
 	toolUse := func() string {
-		return `{"type":"assistant","message":{"content":[{"type":"tool_use","id":"` + reusedCallID + `","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}` + "\n"
+		return testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": reusedCallID, "name": "Skill", "input": map[string]any{"skill": skillDir}}}}})
 	}
 	toolResult := func() string {
-		return `{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"` + reusedCallID + `","is_error":false}]}}` + "\n"
+		return testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": reusedCallID, "is_error": false}}}})
 	}
 	for _, transcript := range transcripts {
 		file, openErr := os.OpenFile(transcript.path, os.O_APPEND|os.O_WRONLY, 0o600)
@@ -399,7 +409,11 @@ func TestCodexTranscriptResolvesRelativeReadsAgainstStructuredCommandCWD(t *test
 
 func TestCodexStructuredPathDecodingHandlesFileURIsAndRequiresCWDForRelativePaths(t *testing.T) {
 	decoded, absolute := decodeCodexPath("file:///tmp/codex%20project/%C3%A9quipe")
-	if !absolute || decoded != filepath.Clean("/tmp/codex project/équipe") {
+	if stdruntime.GOOS == "windows" {
+		if absolute {
+			t.Fatalf("POSIX file URI unexpectedly accepted as a Windows absolute path=%q", decoded)
+		}
+	} else if !absolute || decoded != filepath.Clean("/tmp/codex project/équipe") {
 		t.Fatalf("decoded POSIX file URI=%q absolute=%v", decoded, absolute)
 	}
 	windows, absolute := decodeCodexPath("file:///C:/Users/test%20user/Skill%20Pack")
@@ -580,15 +594,15 @@ func TestTranscriptPathReuseReassignsOptedOutSessionBeforeReconciliation(t *test
 		t.Fatal(err)
 	}
 	lines := []string{
-		`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"reused-path-call","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}`,
-		`{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"reused-path-call","is_error":false}]}}`,
+		testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": "reused-path-call", "name": "Skill", "input": map[string]any{"skill": skillDir}}}}}),
+		testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": "reused-path-call", "is_error": false}}}}),
 	}
 	file, err := os.OpenFile(transcript, os.O_APPEND|os.O_WRONLY, 0o600)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, line := range lines {
-		if _, err := file.WriteString(line + "\n"); err != nil {
+		if _, err := file.WriteString(line); err != nil {
 			_ = file.Close()
 			t.Fatal(err)
 		}
@@ -650,11 +664,11 @@ func TestTranscriptAnchorDetectsEqualOrLargerReplacementButNotAppend(t *testing.
 			t.Fatal(openErr)
 		}
 		lines := []string{
-			`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"` + callID + `","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}`,
-			`{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"` + callID + `","is_error":false}]}}`,
+			testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": callID, "name": "Skill", "input": map[string]any{"skill": skillDir}}}}}),
+			testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": callID, "is_error": false}}}}),
 		}
 		for _, line := range lines {
-			if _, writeErr := file.WriteString(line + "\n"); writeErr != nil {
+			if _, writeErr := file.WriteString(line); writeErr != nil {
 				_ = file.Close()
 				t.Fatal(writeErr)
 			}
@@ -673,7 +687,8 @@ func TestTranscriptAnchorDetectsEqualOrLargerReplacementButNotAppend(t *testing.
 	}
 	// Replace the file with a different payload that is larger than the old
 	// file. A size-only check would seek into this new transcript and miss it.
-	replacement := []byte(`{"type":"assistant","message":{"content":[{"type":"tool_use","id":"replacement-call","name":"Skill","input":{"skill":"` + skillDir + `"}}]}}` + "\n" + `{"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"replacement-call","is_error":false}]}}` + "\n")
+	replacement := []byte(testJSONLine(map[string]any{"type": "assistant", "message": map[string]any{"content": []any{map[string]any{"type": "tool_use", "id": "replacement-call", "name": "Skill", "input": map[string]any{"skill": skillDir}}}}}))
+	replacement = append(replacement, testJSONLine(map[string]any{"type": "user", "message": map[string]any{"content": []any{map[string]any{"type": "tool_result", "tool_use_id": "replacement-call", "is_error": false}}}})...)
 	var previousSize int64
 	if info, statErr := os.Stat(transcript); statErr != nil {
 		t.Fatal(statErr)
