@@ -21,6 +21,7 @@ const STEPS: Array<{
   description: string;
   /** Label of the copy button, shown on the first unfinished step only. */
   action: string;
+  introduction: string;
   timestamp: keyof Pick<
     GettingStartedState,
     "companion_installed_at" | "local_reviewed_at" | "org_reviewed_at"
@@ -31,6 +32,7 @@ const STEPS: Array<{
     title: "Install Skillpack",
     description: "Connect Skillpack to your coding agent.",
     action: "Copy setup prompt",
+    introduction: "Connect your agent. Bring your skills together.",
     timestamp: "companion_installed_at",
   },
   {
@@ -38,6 +40,7 @@ const STEPS: Array<{
     title: "Review local skills",
     description: "Choose which skills from this machine belong in My Skills.",
     action: "Continue with my agent",
+    introduction: "Bring your local skills into your library.",
     timestamp: "local_reviewed_at",
   },
   {
@@ -45,6 +48,7 @@ const STEPS: Array<{
     title: "Explore organization skills",
     description: "Review the shared library and install what is useful.",
     action: "Continue with my agent",
+    introduction: "Discover what your organization shares.",
     timestamp: "org_reviewed_at",
   },
 ];
@@ -175,68 +179,84 @@ export function GettingStartedCard({
 
   if (!visible) return null;
 
+  const currentStep = STEPS.find((step) => step.id === state.first_incomplete_step);
+  const completedCount = STEPS.filter((step) => Boolean(state[step.timestamp])).length;
+
   return (
     <section className="gs-card" aria-labelledby="getting-started-title">
       <div className="gs-card__head">
-        <div>
-          <h2 className="gs-card__title" id="getting-started-title">Getting started</h2>
-          <p className="gs-card__desc">
-            Set up Skillpack, bring in your local skills, and explore what your organization shares.
-          </p>
-        </div>
+        <h2 className="gs-card__title" id="getting-started-title">Getting started</h2>
         <button type="button" className="gs-card__hide" onClick={() => void hide()} disabled={dismissing}>
           Hide
         </button>
       </div>
-
-      <label className="gs-agent">
-        <span className="gs-agent__label">My agent</span>
-        <select
-          value={agent}
-          onChange={(event) => {
-            const next = findAgentId(event.target.value);
-            if (!next) return;
-            setAgent(next);
-            savePreferredAgent(next);
-          }}
-        >
-          {AGENT_IDS.map((id) => (
-            <option value={id} key={id}>{AGENTS[id].name}</option>
-          ))}
-        </select>
-      </label>
-
-      <ol className="gs-steps">
-        {STEPS.map((step) => {
-          const done = Boolean(state[step.timestamp]);
-          const current = state.first_incomplete_step === step.id;
-          return (
-            <li className={`gs-step${done ? " gs-step--done" : ""}`} key={step.id}>
-              <span className="gs-step__mark" aria-hidden="true">
-                <Icon name={done ? "check" : "circle"} size={13} />
-              </span>
-              <span className="gs-step__copy">
-                <span className="gs-step__title">{step.title}</span>
-                <span className="gs-step__desc">{step.description}</span>
-              </span>
-              <span className={`gs-step__status${done ? " gs-step__status--done" : ""}`}>
-                {done ? "Done" : "To do"}
-              </span>
-              {current ? (
-                <button
-                  type="button"
-                  className="btn-primary gs-step__action"
-                  onClick={() => void copyForStep(step.id)}
-                  disabled={!prompt}
+      <div className="gs-card__body">
+        <div className="gs-card__welcome">
+          <p className="gs-card__intro">{currentStep?.introduction ?? "Your skills are ready."}</p>
+          <p className="gs-card__desc">
+            Your coding agent guides you through setup, so your skills are ready where you work.
+          </p>
+          <div className="gs-card__controls">
+            <label className="gs-agent">
+              <span className="gs-agent__label">My agent</span>
+              <select
+                value={agent}
+                onChange={(event) => {
+                  const next = findAgentId(event.target.value);
+                  if (!next) return;
+                  setAgent(next);
+                  savePreferredAgent(next);
+                }}
+              >
+                {AGENT_IDS.map((id) => (
+                  <option value={id} key={id}>{AGENTS[id].name}</option>
+                ))}
+              </select>
+            </label>
+            {currentStep ? (
+              <button
+                type="button"
+                className="btn-primary gs-step__action"
+                onClick={() => void copyForStep(currentStep.id)}
+                disabled={!prompt}
+              >
+                <Icon name={copiedStep === currentStep.id ? "check" : "copy"} size={15} />
+                {copiedStep === currentStep.id ? "Copied" : currentStep.action}
+              </button>
+            ) : null}
+          </div>
+          <p className="gs-card__hint">
+            Paste the prompt into {AGENTS[agent].name}{state.companion_installed_at
+              ? " to continue. Progress updates when your agent reports back."
+              : ", then approve the connection when asked."}
+          </p>
+        </div>
+        <div className="gs-card__journey">
+          <p className="gs-card__progress" role="status">{completedCount} of {STEPS.length} completed</p>
+          <ol className="gs-steps">
+            {STEPS.map((step, index) => {
+              const done = Boolean(state[step.timestamp]);
+              const current = state.first_incomplete_step === step.id;
+              return (
+                <li
+                  className={`gs-step${done ? " gs-step--done" : ""}${current ? " gs-step--current" : ""}`}
+                  key={step.id}
+                  aria-current={current ? "step" : undefined}
                 >
-                  <Icon name={copiedStep === step.id ? "check" : "copy"} size={13} />
-                  {copiedStep === step.id ? "Copied" : step.action}
-                </button>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
+                  <span className="gs-step__mark" aria-hidden="true">
+                    {done ? <Icon name="check" size={15} /> : index + 1}
+                  </span>
+                  <span className="gs-step__copy">
+                    <span className="gs-step__title">{step.title}</span>
+                    <span className="gs-step__desc">{step.description}</span>
+                    <span className="sr-only">{done ? "Done" : current ? "Current step" : "Upcoming"}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </div>
       {copyFailedStep && prompt ? (
         <div className="gs-copy-fallback">
           <label className="gs-copy-fallback__label" htmlFor="getting-started-prompt">
