@@ -14,10 +14,13 @@ Use the native `skillpack` CLI for this workflow. It runs on macOS, Linux and Wi
 
 1. Run `skillpack --version` and `skillpack auth status --json` once when first using this skill in a conversation. Reuse the selected profile when its API and organization match the request.
 2. If the binary is absent, use the shell or PowerShell installer from the official Skillpack GitHub release linked by the instance's install prompt. The release installer embeds archive checksums; never run an unverified archive or improvise a Python/Node bootstrap.
-3. If connection is missing, the human creates a named API key in Skillpack settings and enters it through `skillpack auth login --api-url <base>` with hidden terminal input. In CI, use the secret-injected `SKILLPACK_API_KEY` environment variable and `SKILLPACK_API_URL`. A trusted pipe may use `--token-stdin`. Never ask the user to paste a key into chat, place it in argv, or commit it.
+3. If connection is missing, run `skillpack auth login` (add `--api-url <base>` for a self-hosted instance). It opens a browser approval URL. The human signs in, chooses a workspace and approves; the CLI saves the key privately. If the browser cannot open, use the printed URL. In CI, inject `SKILLPACK_API_KEY` from the secret store; `SKILLPACK_API_URL` is needed only for a non-default instance. A trusted pipe may use `--token-stdin`, and `--manual` retains hidden terminal entry. Never ask the user to paste a key into chat, place it in argv, or commit it.
+   For a custom server: `skillpack auth login --api-url <base>`.
 4. Run `skillpack doctor --json` for setup, update or troubleshooting requests. It distinguishes installed packages, credentials and observed usage coverage. Do not repeatedly bootstrap during ordinary skill execution.
 
-One new API key covers skills, secrets and Skill Databases within its user's existing organization access. Old limited keys stay limited. An API key cannot bypass a secret's audience, another member's private realm, or a revoked membership. The new CLI does not initiate Agent Auth device approval. Existing Agent Auth/MCP clients remain supported separately.
+One new API key covers skills, secrets and Skill Databases within its user's existing organization access. Old limited keys stay limited. An API key cannot bypass a secret's audience, another member's private realm, or a revoked membership. Browser approval for the CLI is separate from Agent Auth device approval. Existing Agent Auth/MCP clients remain supported separately.
+
+The CLI uses Cobra for command-specific help, typo suggestions and `skillpack completion bash|zsh|fish|powershell`. Human-readable output is the default; pass `--json` for automation and agent parsing. Use `skillpack <command> --help` before guessing flags.
 
 `--profile <name>` selects a saved API connection. Credentials live in private OS configuration storage, outside repositories. An API origin override cannot silently reuse a key saved for another instance. `auth refresh` explicitly rotates a saved key; `auth logout` removes the local connection without claiming to revoke the remote key.
 

@@ -1,10 +1,10 @@
 {
   "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
   "name": "skillpack",
-  "version": "1.119.0",
+  "version": "1.120.0",
   "icon": "boxes",
   "title": "Skillpack",
-  "description": "Manage Skillpack packages, dependencies, secrets, hosted Skill Databases and usage hooks through the standalone native CLI and one API key.",
+  "description": "Manage Skillpack packages, dependencies, secrets, hosted Skill Databases and usage hooks with a browser-connected native CLI or API key.",
   "notes": "## Native Skillpack CLI\n\nUse one API key for authorized skills, secrets and Skill Databases. Install and update packages across coding agents, preserve local changes and pins, and reproduce project locks in cloud sandboxes.\n\nThe native CLI runs on macOS, Linux and Windows without Python or Node. Signed releases provide both skillpack and the compatible usage collector. Legacy helper files remain only to finish an already-running bootstrap migration.\n\nThe portable .companion/skills.lock.json records installs. companion.json remains the package manifest. Project packages live in .agents/skills with managed host discovery copies. API keys and secret projections stay outside repositories. Codex hook approval remains a host decision; doctor distinguishes setup from observed usage.",
   "metadata": {
     "companionSkillId": "b0780a97-6972-4a2b-8e88-f41a528900c7",
@@ -39,6 +39,14 @@
       "scripts/verify-runtime-release.mjs"
     ],
     "changelog": [
+      {
+        "version": "1.120.0",
+        "date": "2026-09-24",
+        "changes": [
+          "Connect the native CLI through browser approval with a one-time private verifier, or use an environment API key for automation.",
+          "Use Cobra command help, typo suggestions, shell completion and readable terminal output while preserving --json for agents."
+        ]
+      },
       {
         "version": "1.119.0",
         "date": "2026-09-23",
@@ -1271,7 +1279,7 @@
     },
     {
       "name": "Connect an agent",
-      "desc": "Connect the native CLI with an API key and verify the selected workspace."
+      "desc": "Connect the native CLI through browser approval or an API key and verify the selected workspace."
     },
     {
       "name": "Delegate to a Cloud workspace",

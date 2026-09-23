@@ -4,21 +4,23 @@ The release archive provides `skillpack` and the backwards-compatible `skillpack
 
 ## Install and connect
 
-Download `install.sh` or `install.ps1` from the official `runtime-v0.2.0` GitHub release and run it with the platform shell. Release generation injects the expected digest for every target into the installer. The checked-in template intentionally refuses to install before that generation step. Installers download only over HTTPS and validate the archive before executing its binaries.
+Download `install.sh` or `install.ps1` from the latest official `runtime-v*` GitHub release and run it with the platform shell. Release generation injects the expected digest for every target into the installer. The checked-in template intentionally refuses to install before that generation step. Installers download only over HTTPS and validate the archive before executing its binaries.
 
 The stable command is `~/.local/bin/skillpack` on POSIX or `%LOCALAPPDATA%\Skillpack\bin\skillpack.exe` on Windows. Add that directory to your shell PATH if needed. Version slots and the installation receipt live under the private OS configuration directory's `skillpack/cli` subdirectory. `SKILLPACK_HOME` overrides the management state root; `SKILLPACK_RUNTIME_HOME` independently overrides usage state. Defaults match Go's user configuration directory: Application Support on macOS, APPDATA on Windows, XDG_CONFIG_HOME on Linux.
 
-Create a named API key in settings, then enter it in the hidden prompt:
+Approve the CLI in your browser. The CLI prints the URL even if it cannot open a browser:
 
 ```sh
-skillpack auth login --api-url https://skillpack.app/v1
+skillpack auth login
 skillpack auth status --json
 skillpack setup --tools codex,claude-code,opencode
 ```
 
-For automation, inject `SKILLPACK_API_KEY` and `SKILLPACK_API_URL` through the runner's secret environment. The CLI never accepts a key argument. `--token-stdin` supports a trusted private pipe. New human keys have all current capabilities; existing keys retain their original scope set, expiry and revocation rules. All organization membership, secret audience and personal database access checks still apply.
+For a self-hosted instance, pass `--api-url <base>`. The browser approval shows the selected workspace and full key access before consent. The approval URL carries only a request ID; a separate private verifier lets the CLI redeem the key once within five minutes. No key is shown on the page or printed by the CLI. For automation, inject `SKILLPACK_API_KEY` through the runner's secret environment. `SKILLPACK_API_URL` is needed for a non-default instance. The CLI never accepts a key argument. `--token-stdin` supports a trusted private pipe, and `--manual` uses a hidden terminal prompt. New human keys have all current capabilities; existing keys retain their original scope set, expiry and revocation rules. All organization membership, secret audience and personal database access checks still apply.
 
 `--profile NAME` selects a saved connection. An API override cannot send its saved key to another instance. Environment keys remain ephemeral. Logout only removes local credentials; refresh explicitly rotates a saved key and does not widen capabilities.
+
+Cobra provides per-command help, typo suggestions and shell completion. The default output is readable in a terminal; `--json` preserves structured output for scripts and agents. Run `skillpack completion zsh` (or `bash`, `fish`, `powershell`) to generate the appropriate completion script.
 
 ## Packages and repository installs
 

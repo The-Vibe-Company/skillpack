@@ -18,39 +18,6 @@ type options struct {
 	args   []string
 }
 
-func parseOptions(args []string) (options, error) {
-	o := options{values: map[string]string{}, flags: map[string]bool{}}
-	boolean := map[string]bool{"public": true, "json": true, "token-stdin": true, "all": true, "dry-run": true, "frozen": true, "force": true, "confirm-secrets": true, "pin": true, "help": true}
-	value := map[string]bool{"api-url": true, "profile": true, "input": true, "scope": true, "tools": true, "project": true, "version": true, "output": true, "name": true, "realm": true, "sql": true, "params": true, "manifest": true}
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		if !strings.HasPrefix(a, "--") {
-			o.args = append(o.args, a)
-			continue
-		}
-		key, val, has := strings.Cut(strings.TrimPrefix(a, "--"), "=")
-		if boolean[key] {
-			if has {
-				return o, fmt.Errorf("--%s does not accept a value", key)
-			}
-			o.flags[key] = true
-			continue
-		}
-		if !value[key] {
-			return o, fmt.Errorf("unknown option --%s", key)
-		}
-		if !has {
-			i++
-			if i >= len(args) {
-				return o, fmt.Errorf("--%s needs a value", key)
-			}
-			val = args[i]
-		}
-		o.values[key] = val
-	}
-	return o, nil
-}
-
 type commandError struct {
 	code    int
 	message string
@@ -80,54 +47,7 @@ func Run(args []string, in io.Reader, out, diagnostic io.Writer) int {
 		fmt.Fprintln(out, "skillpack "+usage.RuntimeVersion)
 		return 0
 	}
-	o, err := parseOptions(args)
-	if err != nil {
-		fmt.Fprintln(diagnostic, err)
-		return 2
-	}
-	if len(o.args) == 0 || o.flags["help"] || o.args[0] == "help" {
-		fmt.Fprintln(out, "Skillpack native CLI\n\nauth login|status|refresh|logout\nsetup --tools codex,claude-code,opencode\ninstall SLUG [--scope project|user] [--version VERSION]\ninstall --public TOKEN --version VERSION\nupdate SLUG | update --all [--dry-run]\nsync --frozen [--project PATH]\nimport-lock PATH [--project PATH]\nskills list|info|versions|validate|publish\nsecrets list|info|create|update|rotate|delete|configuration|bind|unbind|sync\ndb info|query|execute|shares SKILL\napi METHOD /v1/path [--input FILE|-]\nself update [--version VERSION]\ndoctor --json\nusage hook|sync|doctor|telemetry\n\nUse --json for structured output. Login with hidden input or --token-stdin; never put a key in argv.")
-		return 0
-	}
-	home, err := clientHome()
-	if err != nil {
-		fmt.Fprintln(diagnostic, "cannot resolve private configuration directory")
-		return 1
-	}
-	a := &app{o, in, out, diagnostic, home}
-	var result any
-	switch o.args[0] {
-	case "auth":
-		result, err = a.auth()
-	case "skills":
-		result, err = a.skills()
-	case "api":
-		result, err = a.api()
-	case "db":
-		result, err = a.database()
-	case "secrets":
-		result, err = a.secrets()
-	case "self":
-		result, err = a.selfUpdate()
-	case "setup":
-		result, err = a.setup()
-	case "doctor":
-		result, err = a.doctor()
-	case "update":
-		result, err = a.update()
-	case "import-lock":
-		result, err = a.importLock()
-	case "install":
-		result, err = a.install()
-	case "sync":
-		if !o.flags["frozen"] {
-			err = fail(2, "use sync --frozen to verify locked packages, or update for new versions")
-		} else {
-			result, err = a.frozenSync()
-		}
-	default:
-		err = fail(2, "unknown command; run skillpack --help")
-	}
+	result, o, err := executeCommand(args, in, out, diagnostic)
 	if err != nil {
 		if result != nil {
 			_ = json.NewEncoder(out).Encode(result)
@@ -146,7 +66,11 @@ func Run(args []string, in io.Reader, out, diagnostic io.Writer) int {
 		return code
 	}
 	if result != nil {
-		if err := json.NewEncoder(out).Encode(result); err != nil {
+		if o.flags["json"] {
+			if err := json.NewEncoder(out).Encode(result); err != nil {
+				return 1
+			}
+		} else if err := printHuman(out, o.args, result); err != nil {
 			return 1
 		}
 	}
