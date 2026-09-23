@@ -1,0 +1,25 @@
+.agents/skillpack/usage/runtime_setup.py
+  s_524f399a310bce::t_96f2b338c6575f 12,30-44,54,80
+packages/skillpack-skill/skill/companion.integrity.json
+  s_524f399a310bce::t_a6473f9a59d51e 20
+packages/skillpack-skill/skill/scripts/runtime_setup.py
+  s_524f399a310bce::t_7ea7c283915f09 12,30-44,54,80
+packages/skillpack-skill/skill/scripts/test_runtime_setup.py
+  s_524f399a310bce::t_0091b097da8563 206-263
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2b3e6597694ac5c95f2176b8f56f3d5f76e104de",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
