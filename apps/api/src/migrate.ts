@@ -7,6 +7,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
+import { z } from "zod";
+import { rewriteHistoricalSkillUsage } from "./skillUsageRewrite";
 
 export const MIGRATION_LOCK_CLASS_ID = 72_401;
 export const MIGRATION_LOCK_OBJECT_ID = 20_260_608;
@@ -85,16 +87,10 @@ export function databaseRuntimeRoles(env: NodeJS.ProcessEnv = process.env): Data
   };
 }
 
-interface DrizzleJournalEntry {
-  tag: string;
-  when: number;
-  [key: string]: unknown;
-}
-
-interface DrizzleJournal {
-  entries: DrizzleJournalEntry[];
-  [key: string]: unknown;
-}
+const drizzleJournalSchema = z.object({
+  entries: z.array(z.object({ tag: z.string(), when: z.number().finite() }).passthrough()),
+}).passthrough();
+type DrizzleJournal = z.infer<typeof drizzleJournalSchema>;
 
 export interface MigrationPhases {
   checkpointFolder: string;
@@ -110,21 +106,9 @@ function parseMigrationJournal(source: string, journalPath: string): DrizzleJour
   } catch (error) {
     throw new Error(`migration journal is not valid JSON: ${journalPath}`, { cause: error });
   }
-  if (
-    !parsed
-    || typeof parsed !== "object"
-    || !Array.isArray((parsed as { entries?: unknown }).entries)
-    || !(parsed as { entries: unknown[] }).entries.every(
-      (entry) => entry
-        && typeof entry === "object"
-        && typeof (entry as { tag?: unknown }).tag === "string"
-        && typeof (entry as { when?: unknown }).when === "number"
-        && Number.isFinite((entry as { when: number }).when),
-    )
-  ) {
-    throw new Error(`migration journal has an invalid entries array: ${journalPath}`);
-  }
-  return parsed as DrizzleJournal;
+  const result = drizzleJournalSchema.safeParse(parsed);
+  if (!result.success) throw new Error(`migration journal has an invalid entries array: ${journalPath}`);
+  return result.data;
 }
 
 /**
@@ -316,7 +300,7 @@ async function resetRuntimeRoleGrantSession(client: ReturnType<typeof postgres>)
   await client.unsafe("reset companion.runtime_grants_verified").catch(() => undefined);
 }
 
-export async function run(input?: { env?: NodeJS.ProcessEnv }): Promise<void> {
+export async function run(input?: { env?: NodeJS.ProcessEnv; rewriteSkillUsage?: boolean }): Promise<void> {
   const env = input?.env ?? process.env;
   const migrationsFolder = await resolveMigrationsFolder({ env });
   const runtimeRoles = databaseRuntimeRoles(env);
@@ -389,6 +373,12 @@ export async function run(input?: { env?: NodeJS.ProcessEnv }): Promise<void> {
       }
     }
     console.log("Drizzle migrations applied");
+    if (input?.rewriteSkillUsage) {
+      const count = await rewriteHistoricalSkillUsage(client, {
+        instanceUrl: env.BETTER_AUTH_URL ?? env.COMPANION_API_URL,
+      });
+      console.log(`Historical skill activation reporting: ${count} versions processed`);
+    }
     await client`select pg_advisory_unlock(${MIGRATION_LOCK_CLASS_ID}, ${MIGRATION_LOCK_OBJECT_ID})`;
     lockAcquired = false;
   } finally {
@@ -422,6 +412,7 @@ function databaseErrorFields(error: Error): DatabaseErrorFields | null {
   let current: unknown = error;
   while (current instanceof Error && !seen.has(current)) {
     seen.add(current);
+    // SAFETY: Error is established above; driver fields are optional diagnostics used only for formatting.
     const candidate = current as DatabaseErrorFields;
     if (candidate.code || candidate.detail || candidate.hint) return candidate;
     current = candidate.cause;
@@ -435,6 +426,7 @@ function databaseErrorFields(error: Error): DatabaseErrorFields | null {
  * spell out the remediation for the fail-closed Skills Hub cutover guard, which no code change can
  * clear on its own.
  */
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- This error boundary formats arbitrary thrown values from migration and cutover commands.
 export function formatMigrationFailure(error: unknown): string {
   if (!(error instanceof Error)) return String(error);
   const database = databaseErrorFields(error);
@@ -504,9 +496,9 @@ function isMain(): boolean {
 }
 
 if (isMain()) {
-  run().catch((error: unknown) => {
+  run({ rewriteSkillUsage: true }).catch((error) => {
     console.error("Failed to apply Drizzle migrations");
-    console.error(formatMigrationFailure(error));
+    console.error(formatMigrationFailure(error instanceof Error ? error : String(error)));
     process.exitCode = 1;
   });
 }

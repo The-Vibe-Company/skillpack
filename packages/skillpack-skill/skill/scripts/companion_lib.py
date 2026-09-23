@@ -93,6 +93,23 @@ def _agent_request(token: str, payload: dict[str, Any]) -> Any:
     return result.get("data")
 
 
+def compute_package_checksum(directory: Path) -> str:
+    """Use the shared canonical tar implementation; folder and ZIP digests are different identities."""
+    script = Path(__file__).resolve().parent / "package-checksum.mjs"
+    node = shutil.which(os.environ.get("COMPANION_NODE", "node"))
+    if not node:
+        fail("Node.js 20 or newer is required to verify canonical Skillpack package checksums")
+    completed = subprocess.run([node, str(script)], input=json.dumps({"directory": str(directory)}),
+                               text=True, stdout=subprocess.PIPE, check=False)
+    try:
+        result = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        fail("the Skillpack checksum helper returned an invalid response")
+    if completed.returncode != 0 or not isinstance(result, dict) or not isinstance(result.get("checksum"), str):
+        fail("the Skillpack checksum helper could not verify the package")
+    return result["checksum"]
+
+
 def _private_secret_pipe() -> tuple[int, int]:
     """Return (read_fd, write_fd) over a FIFO the Agent Auth client will accept.
 
@@ -926,6 +943,7 @@ def normalize_targets(value: dict[str, Any]) -> list[dict[str, Any]]:
                         "scope": entry.get("scope") or "user",
                         "path": entry.get("path"),
                         "checksum": entry.get("checksum"),
+                        "packageChecksum": entry.get("packageChecksum", value.get("checksum")),
                         # Preserve the per-target version (falls back to the record-level version) so a
                         # partial update never rewrites an up-to-date target with a stale version.
                         "version": entry.get("version") or value.get("version"),
@@ -943,6 +961,7 @@ def normalize_targets(value: dict[str, Any]) -> list[dict[str, Any]]:
                     "scope": "user",
                     "path": legacy_path,
                     "checksum": None,
+                    "packageChecksum": value.get("checksum"),
                     "version": value.get("version"),
                 }
             )
@@ -982,6 +1001,7 @@ def existing_target_rows(record: dict[str, Any] | None) -> list[dict[str, Any]]:
                 "scope": target["scope"],
                 "path": target["path"],
                 "checksum": target.get("checksum"),
+                "packageChecksum": target.get("packageChecksum"),
                 "version": target.get("version") or record.get("version"),
             }
         )
@@ -1029,6 +1049,7 @@ def upsert_skill_lock_record(
                 "scope": target["scope"],
                 "path": stored_path,
                 "checksum": target["checksum"],
+                "packageChecksum": target.get("packageChecksum", skill.get("checksum")),
                 "version": skill["version"],
             }
         )
@@ -1157,6 +1178,17 @@ def status_for_local(row: dict[str, Any], workspace_by_slug: dict[str, dict[str,
         return "unknown", "local version is missing from the lockfile"
     if is_older(str(local_version), current):
         return "update", f"newer published version {current}"
+    # Folder checksums detect local edits; canonical package checksums detect registry repairs.
+    # Each target keeps its own baseline because an update may touch only one installed tool.
+    targets = normalize_targets(row)
+    baselines = targets or [{"version": local_version, "packageChecksum": row.get("checksum")}]
+    for target in baselines:
+        target_version = target.get("version") or local_version
+        if is_older(str(target_version), current):
+            return "update", f"newer published version {current}"
+        checksum = target.get("packageChecksum")
+        if str(target_version) == str(current) and checksum and workspace.get("checksum") and checksum != workspace["checksum"]:
+            return "update", "published content changed at the same version"
     reported = reported_by_slug.get(slug)
     if reported and reported.get("install_status") == "update":
         return "update", "reported install or dependency closure is behind"

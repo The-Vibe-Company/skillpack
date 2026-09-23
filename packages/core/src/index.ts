@@ -8,3 +8,4 @@ export * from "./skillDatabaseCleanup";
 export * from "./billing";
 export * from "./billingService";
 export * from "./deploymentRelease";
+export * from "./skillUsage";

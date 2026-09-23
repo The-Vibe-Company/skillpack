@@ -17,6 +17,7 @@ function versionRecord(version: string, frontmatter: string) {
     license: "MIT",
     sizeBytes: 1234,
     checksum: "sha256:" + "a".repeat(64),
+    usageReportingRevision: 0,
     storagePath: `archives/demo-skill/${version}.tar.gz`,
     validation: "valid" as const,
     validationError: null,

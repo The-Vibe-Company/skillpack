@@ -418,7 +418,7 @@ export function createSkillpackMcpServer(dependencies: McpServerDependencies): M
   tool(
     "skill_install",
     "Record that the caller has installed a skill, optionally at a specific version.",
-    { slug: slugArgument, version: z.string().optional(), agent: z.string().optional() },
+    { slug: slugArgument, version: z.string().optional(), checksum: z.string().regex(/^sha256:[0-9a-f]{64}$/).optional(), agent: z.string().optional() },
     async (args) => {
       const result = await tenant(({ database }) =>
         installSkill({
@@ -426,6 +426,7 @@ export function createSkillpackMcpServer(dependencies: McpServerDependencies): M
           orgId,
           slug: args.slug,
           version: args.version ?? null,
+          checksum: args.checksum ?? null,
           agentLabel: args.agent ?? null,
           source: "agent",
           database,

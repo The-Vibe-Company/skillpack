@@ -120,7 +120,9 @@ export type RenameSkillResult = z.infer<typeof renameSkillResultSchema>;
  * Every field is optional so a bare manual mark with no version is valid.
  */
 export const reportSkillInstallInputSchema = z.object({
-  /** The installed semver. Drives "update" detection; omitted = version-unknown (stays "installed"). */
+  /** Checksum of the package actually installed, including same-version repairs. */
+  checksum: z.string().regex(/^sha256:[0-9a-f]{64}$/).optional(),
+  /** The installed semver; checksum can also identify an update when this is omitted. */
   version: z.string().regex(SEMVER_RE, "version must be a valid semver").optional(),
   /** Optional source label, e.g. "Claude Code". */
   agent: z.string().min(1).max(120).optional(),
@@ -331,13 +333,13 @@ export type AddCommentInput = z.infer<typeof addCommentInputSchema>;
 export const COMMENT_IMAGE_MIME_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"] as const;
 export type CommentImageMimeType = (typeof COMMENT_IMAGE_MIME_TYPES)[number];
 
-const COMMENT_IMAGE_EXTENSION_TO_MIME: Record<string, CommentImageMimeType> = {
+const COMMENT_IMAGE_EXTENSION_TO_MIME = {
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".gif": "image/gif",
-};
+} satisfies Record<string, CommentImageMimeType>;
 
 /** `accept` value for `<input type="file">` — extensions only (Finder ignores mixed MIME filters). */
 export const COMMENT_IMAGE_FILE_ACCEPT = Object.keys(COMMENT_IMAGE_EXTENSION_TO_MIME).join(",");
@@ -348,12 +350,10 @@ export const MAX_COMMENT_IMAGE_BYTES = 10 * 1024 * 1024;
 
 /** Resolve a file's stored content type, falling back to its extension; null when not an allowed image. */
 export function resolveCommentImageContentType(file: { type: string; name: string }): CommentImageMimeType | null {
-  if ((COMMENT_IMAGE_MIME_TYPES as readonly string[]).includes(file.type)) {
-    return file.type as CommentImageMimeType;
-  }
+  const allowed = COMMENT_IMAGE_MIME_TYPES.find((type) => type === file.type);
+  if (allowed) return allowed;
   const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
-  if (ext && ext in COMMENT_IMAGE_EXTENSION_TO_MIME) return COMMENT_IMAGE_EXTENSION_TO_MIME[ext]!;
-  return null;
+  return Object.entries(COMMENT_IMAGE_EXTENSION_TO_MIME).find(([extension]) => extension === ext)?.[1] ?? null;
 }
 
 export function isAllowedCommentImageFile(file: { type: string; name: string }): boolean {

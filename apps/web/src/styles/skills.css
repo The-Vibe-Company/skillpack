@@ -1591,3 +1591,18 @@ body { background: var(--color-canvas); color: var(--color-fg); font-family: var
 .og-toast__close:hover { opacity: 1; }
 
 /* Login / auth styles live in styles/auth.css. */
+
+/* Usage is reported evidence, presented as compact, accessible data tables. */
+.skill-usage h2 { font-size: var(--text-lg); margin: 0 0 8px; }
+.usage-note { color: var(--color-muted); max-width: 75ch; }
+.usage-section { margin-top: 24px; min-width: 0; }
+.usage-section h3 { font-size: var(--text-base); margin: 0 0 8px; }
+.usage-breakdowns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.usage-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.usage-table th, .usage-table td { padding: 8px; text-align: left; border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.usage-table th { font-weight: 500; }
+.usage-table thead { color: var(--color-muted); }
+.usage-table th:last-child, .usage-table td:last-child { text-align: right; }
+.usage-scroll { overflow-x: auto; }
+.usage-scroll:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
+@media (max-width: 600px) { .usage-breakdowns { grid-template-columns: 1fr; gap: 0; } }

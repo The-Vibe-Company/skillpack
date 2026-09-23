@@ -32,7 +32,7 @@ at redemption. GitHub sync writes deterministic, digest-verifiable repository st
 
 Skills may declare bounded SQLite tables. Core validates additive schema evolution and access,
 `packages/skilldb` executes parameterized statements, and object storage persists realms with
-conditional generation checks. The worker cleans queued database objects only.
+conditional generation checks. The worker cleans queued database objects and expires reported skill activations.
 
 ## Secrets and delegated Agent Auth
 
@@ -93,3 +93,48 @@ The bundled management skill is named `skillpack` and served at `/v1/local-skill
 The former `companion` route remains an alias; both names use the existing per-member installation
 key `companion` so rebranding does not reset installation history. Package manifests, credential
 paths, and transport headers retain their compatibility names. New installs use a `skillpack` folder.
+
+## Unauthenticated skill usage reporting
+
+Publication embeds the instance URL, skill ID, version, and portable HTTP instructions before archive
+checksums are computed. Publication responses include `usage_instance_url` so CLI normalization uses
+the same public origin even when it connects through an internal API alias. The delimited instruction is replaced idempotently on republish. Publishing
+never executes the instruction. The public endpoint `POST /v1/skill-usage` validates a bounded 4 KB
+contract before calling an append-only SECURITY DEFINER function. It never resolves an incoming
+session, accepts a tenant ID, or returns skill metadata. Known, unknown, duplicate, and per-skill
+rate-limited reports receive the same empty 202 response. Process admission is capped at 600 requests
+per minute; PostgreSQL serializes a 120 accepted reports/minute/skill cap across replicas.
+
+`skill_usage_events` uses server receipt time, forced RLS, and a unique (org, skill, event) key. The
+server resolves the organization and published version; reported user IDs are strings, not authority
+or foreign keys to verified accounts. API runtime roles have SELECT plus the reporting function;
+worker roles have only the bounded expiry function. Reads recheck membership and personal ownership,
+and exclude rows older than 90 days. A worker sweep deletes up to 10,000 expired rows each minute.
+The migration owner policy supports narrow definers without requiring a BYPASSRLS application role.
+Request bodies and database failures carrying report values must not be logged.
+
+`GET /v1/skills/:slug/usage` is a session-authenticated read, scoped to the selected organization. It
+returns 90-day totals, daily UTC counts, agent/environment breakdowns, anonymous counts, and up to
+500 declared identities with an explicit truncation flag. Identity source remains visible; identities
+are not automatically linked to member profiles. Future events after Share follow the skill's new
+organization scope, as do retained statistics for that skill.
+
+### Historical reporting retrofit
+
+The release migration entrypoint runs a resumable maintenance pass after schema/grants, under the
+migration lock and table-owner credential. Migration 0189 first snapshots installed checksums; 0190
+adds a per-version revision checkpoint. The pass covers all tenants, scopes, archived skills and
+historical versions. This is an explicitly authorized exception to published-version immutability.
+
+It verifies each old archive checksum, changes only the SKILL.md reporting block, preserves version
+numbers and manifest/dependency/secret/database declarations, and writes to a new content-addressed
+object. A per-version transaction then replaces checksum, size, body and storage references, updates
+the pinned public ZIP tuple if necessary, revokes outstanding transfer tickets, writes a creator-private
+audit event for personal skills and queues organization GitHub mirrors. Storage failure rolls back
+references; completed versions are skipped on retry. Original objects are retained for rollback.
+
+Install reports accept the canonical tar checksum. Agent reports without one retain their previous
+baseline; manual confirmation uses the registry checksum. The distributed installer computes the
+checksum from actual downloaded files with the shared local packer before projecting secrets, and
+reports each package after the full install succeeds. CLI and local inventory compare same-version
+checksums while preserving local-edit protection. Runtime API/worker roles cannot invoke the retrofit.

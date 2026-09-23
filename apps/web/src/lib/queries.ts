@@ -3,6 +3,7 @@
 
 import type {
   DependencyPlan,
+  SkillUsageSummary,
   LabelColor,
   LabelIcon,
   LabelsResponse,
@@ -50,6 +51,7 @@ export interface PublishResult {
 export function apiBase(): string {
   const env = process.env.NEXT_PUBLIC_COMPANION_API_BASE;
   if (env) return env.replace(/\/$/, "");
+  // oxlint-disable-next-line anti-slop/no-runtime-typeof -- This is browser-global availability detection during SSR, not payload validation.
   if (typeof window !== "undefined") return `${window.location.origin}/v1`;
   return "/v1";
 }
@@ -440,7 +442,7 @@ function mergeBySkillId(mine: SkillListRow[], org: SkillListRow[]): SkillListRow
  */
 export async function fetchArchivedSkills(): Promise<SkillListRow[]> {
   const [mine, org] = await Promise.all([
-    apiFetch<SkillListRow[]>("/v1/skills?lib=mine&archived=true").catch(() => [] as SkillListRow[]),
+    apiFetch<SkillListRow[]>("/v1/skills?lib=mine&archived=true").catch((): SkillListRow[] => []),
     apiFetch<SkillListRow[]>("/v1/skills?lib=org&archived=true"),
   ]);
   return mergeBySkillId(mine, org);
@@ -454,7 +456,7 @@ export async function fetchArchivedSkills(): Promise<SkillListRow[]> {
 export async function fetchSkillSearch(query: string, signal?: AbortSignal): Promise<SkillListRow[]> {
   const q = encodeURIComponent(query);
   const [mine, org] = await Promise.all([
-    apiFetch<SkillListRow[]>(`/v1/skills?lib=mine&q=${q}`, { signal }).catch(() => [] as SkillListRow[]),
+    apiFetch<SkillListRow[]>(`/v1/skills?lib=mine&q=${q}`, { signal }).catch((): SkillListRow[] => []),
     apiFetch<SkillListRow[]>(`/v1/skills?lib=org&q=${q}`, { signal }),
   ]);
   return mergeBySkillId(mine, org);
@@ -485,4 +487,8 @@ export async function reportLocalSkillInstalled(
     `/v1/local-skills/${encodeURIComponent(key)}/installed`,
     { method: "POST", body: JSON.stringify({ version, agent }) },
   );
+}
+
+export async function fetchSkillUsage(slug: string): Promise<SkillUsageSummary> {
+  return apiFetch<SkillUsageSummary>(`/v1/skills/${encodeURIComponent(slug)}/usage`);
 }

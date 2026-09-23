@@ -1,13 +1,13 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-  entry: { "companion-agent-client": "client/index.ts" },
+  entry: { "companion-agent-client": "client/index.ts", "package-checksum": "client/package-checksum.ts" },
   format: ["esm"],
   platform: "node",
   target: "node20",
   outDir: "skill/scripts",
   outExtension: () => ({ js: ".mjs" }),
-  noExternal: ["@auth/agent", "@skillpack/contracts", "fflate", "yaml", "zod"],
+  noExternal: ["@auth/agent", "@skillpack/contracts", "@skillpack/skills", "tar-stream", "fflate", "yaml", "zod"],
   banner: {
     js: 'import { createRequire as __companionCreateRequire } from "node:module"; const require = __companionCreateRequire(import.meta.url);',
   },

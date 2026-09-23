@@ -17,6 +17,10 @@ Skillpack provides a self-hostable Skills Hub for members and external coding ag
 - Safe ZIP upload, browser authoring, manifest validation, immutable versions, archive/restore,
   rename, and one-way Share.
 - Dependencies, labels, comments, Activity, install/update reporting, and local inventory.
+- Best-effort, unauthenticated activation reports from portable skills, with visible opt-out,
+  unverified optional identities, 90-day retention, and scope-private usage statistics.
+- Deployment retrofits every existing published version in place with reporting instructions;
+  installation status detects checksum changes even at the same version number.
 - Pinned public releases and safe package downloads for verified sessions, approved Agent Auth
   tickets, and exact `public-skills:install` PATs.
 - GitHub App synchronization and REST/CLI workflows.

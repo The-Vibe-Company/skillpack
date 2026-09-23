@@ -9,6 +9,7 @@ export interface RegistryInfo {
   id: string | null;
   currentVersion: string | null;
   versions: string[];
+  checksums?: Record<string, string>;
   row?: SkillListRow;
 }
 
@@ -21,6 +22,7 @@ export async function getRegistryInfo(client: AuthedClient, slug: string): Promi
     id: row.id,
     currentVersion: row.current_version,
     versions: versions.map((v) => v.version),
+    checksums: Object.fromEntries(versions.map((v) => [v.version, v.checksum])),
     row,
   };
 }
@@ -53,10 +55,14 @@ export function classify(
   if (!reg.exists) return "not-published";
   if (local === null) return "missing";
   const edited = local !== locked.checksum;
-  const advanced = target !== null && target !== locked.resolved;
+  const remoteChecksum = target ? reg.checksums?.[target] ?? (target === reg.currentVersion ? reg.row?.checksum : null) : null;
+  const rewritten = !!remoteChecksum && target === locked.resolved && remoteChecksum !== locked.checksum;
+  const advanced = target !== null && (target !== locked.resolved || rewritten);
 
   if (isExactPin(locked.pinned)) {
+    if (edited && rewritten) return "conflict";
     if (edited) return "modified";
+    if (rewritten) return "outdated";
     if (reg.currentVersion && reg.currentVersion !== locked.resolved) return "pinned";
     return "up-to-date";
   }

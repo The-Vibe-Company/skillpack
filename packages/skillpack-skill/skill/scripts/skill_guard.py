@@ -257,6 +257,8 @@ def build_local_inventory(workspace_id: str | None, api_url: str, scan_roots: li
                 "slug": record.get("slug") or record["name"],
                 "skill_id": record.get("skillId"),
                 "version": record.get("version"),
+                "checksum": record.get("checksum"),
+                "targets": record.get("targets", []),
                 "path": record.get("path"),
                 "source": "lockfile",
             }
@@ -270,6 +272,8 @@ def build_local_inventory(workspace_id: str | None, api_url: str, scan_roots: li
                 "slug": record.get("slug") or record["name"],
                 "skill_id": record.get("skillId"),
                 "version": record.get("version"),
+                "checksum": record.get("checksum"),
+                "targets": record.get("targets", []),
                 "path": record.get("path"),
                 "source": "project_lockfile",
             }
@@ -283,6 +287,8 @@ def build_local_inventory(workspace_id: str | None, api_url: str, scan_roots: li
                     "slug": record.get("slug") or record["name"],
                     "skill_id": record.get("skillId"),
                     "version": record.get("version"),
+                    "checksum": record.get("checksum"),
+                    "targets": record.get("targets", []),
                     "path": record.get("path"),
                     "source": "legacy_log",
                 }
@@ -681,7 +687,8 @@ def build_report(
             status, reason = "local", "local skill folder (not from the lockfile)"
         else:
             status, reason = status_for_local_guarded(
-                {"name": entry["slug"], "version": entry.get("version")},
+                {"name": entry["slug"], "version": entry.get("version"),
+                 "checksum": entry.get("checksum"), "targets": entry.get("targets", [])},
                 by_slug,
                 reported_by_slug,
                 archived_slugs,

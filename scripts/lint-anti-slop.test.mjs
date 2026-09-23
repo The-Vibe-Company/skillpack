@@ -7,6 +7,7 @@ import { isAntiSlopCandidatePath, selectAntiSlopTargets } from "./anti-slop-targ
 import { parseArguments, runIncrementalLint } from "./lint-anti-slop.mjs";
 
 test("recognizes every supported source extension and excludes generated tooling", () => {
+  assert.equal(isAntiSlopCandidatePath("packages/skillpack-skill/client/package-checksum.ts"), true);
   for (const extension of ["js", "jsx", "mjs", "cjs", "ts", "tsx", "mts", "cts"]) {
     assert.equal(isAntiSlopCandidatePath(`apps/api/src/example.${extension}`), true, extension);
   }
@@ -17,6 +18,7 @@ test("recognizes every supported source extension and excludes generated tooling
     ".claude/hooks/check.js",
     ".context/scratch.ts",
     "tools/oxlint/anti-slop/index.ts",
+    "packages/skillpack-skill/skill/scripts/package-checksum.mjs",
   ]) {
     assert.equal(isAntiSlopCandidatePath(file), false, file);
   }

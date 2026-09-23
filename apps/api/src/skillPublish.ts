@@ -26,6 +26,7 @@ import {
 import { deleteSkillArchive, putSkillArchive, skillArchiveKey } from "@skillpack/storage";
 import {
   buildNormalizedSkillMd,
+  withSkillUsageInstructions,
   buildNormalizedSkillpackJson,
   bumpSemver,
   compareSemver,
@@ -56,7 +57,7 @@ export async function canonicalizeSkillArchive(
   const dir = await mkdtemp(join(tmpdir(), "companion-skill-"));
   try {
     await unpackAnyTo(archive, dir);
-    const prepared = await prepareSkillDirForPublish(dir, companion);
+    const prepared = await prepareSkillDirForPublish(dir, { ...companion, instanceUrl: skillUsageInstanceUrl() });
     const skillpackManifest = overrides.dependencies
       ? withResolvedManifestDependencies(prepared.skillpackManifest, overrides.dependencies)
       : prepared.skillpackManifest;
@@ -75,14 +76,14 @@ export function buildSkillMd(
   id: string,
   description: string,
   body: string,
-  _companion: { skillId: string; version: string },
+  companion: { skillId: string; version: string },
 ): string {
   const frontmatter = skillFrontmatterSchema.parse({
     name: id,
     description,
     metadata: {},
   });
-  return buildNormalizedSkillMd(frontmatter, body);
+  return buildNormalizedSkillMd(frontmatter, withSkillUsageInstructions(body, { ...companion, instanceUrl: skillUsageInstanceUrl() }));
 }
 
 export function skillSummary(fm: SkillFrontmatter, manifest: SkillpackManifest): string {
@@ -124,6 +125,8 @@ export interface PublishedSkillVersion {
   version: string;
   checksum: string;
   sizeBytes: number;
+  /** Public instance origin used in the canonical reporting block. */
+  usage_instance_url?: string;
 }
 
 /**
@@ -183,7 +186,7 @@ export async function publishCanonical(input: {
     const published = await withTenantContext({ orgId, userId: actor.id }, (database) =>
       publishSkillVersion({ actor, orgId, payload, archiveKey: key, dependencies, database }),
     );
-    return { ...published, slug: fm.name, checksum: canonical.checksum, sizeBytes: canonical.sizeBytes };
+    return { ...published, slug: fm.name, checksum: canonical.checksum, sizeBytes: canonical.sizeBytes, usage_instance_url: skillUsageInstanceUrl() };
   } catch (error) {
     await deleteSkillArchive({ key }).catch((cleanupError) => {
       captureServerError(cleanupError, {
@@ -473,4 +476,8 @@ export async function publishSkillFromFiles(request: SkillPublishRequest): Promi
     }
     throw error;
   }
+}
+
+function skillUsageInstanceUrl(): string {
+  return process.env.BETTER_AUTH_URL ?? process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";
 }

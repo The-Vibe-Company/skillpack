@@ -19,6 +19,7 @@ const IGNORED_PREFIXES = [
   // The bundled Agent Auth client is a tsup build artifact committed for distribution; the
   // hand-written-code rules do not apply to minified generated output.
   "packages/skillpack-skill/skill/scripts/companion-agent-client.mjs",
+  "packages/skillpack-skill/skill/scripts/package-checksum.mjs",
 ];
 
 export function isAntiSlopCandidatePath(file) {

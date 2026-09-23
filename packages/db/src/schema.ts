@@ -579,6 +579,8 @@ export const skillVersions = pgTable(
     sizeBytes: integer("size_bytes").notNull(),
     checksum: text("checksum").notNull(),
     storagePath: text("storage_path").notNull(),
+    /** Release-maintenance checkpoint for the explicitly authorized historical telemetry retrofit. */
+    usageReportingRevision: integer("usage_reporting_revision").notNull().default(0),
     validation: validationStateEnum("validation").notNull().default("valid"),
     validationError: text("validation_error"),
     createdBy: text("created_by")
@@ -1094,7 +1096,7 @@ export const localSkillInstalls = pgTable(
  * (source = "agent") at the end of the normal install flow; a member can also mark a skill
  * installed / not-installed by hand from the UI (source = "manual", e.g. installed another way, or
  * correcting a false state). `installed_version` is null when a manual mark didn't supply one. The
- * list view compares `installed_version` against the skill's current published version to show
+ * list view compares installed version and checksum against the current published package to show
  * Installed / Update available. One row per member per skill per workspace.
  */
 export const skillInstalls = pgTable(
@@ -1111,6 +1113,8 @@ export const skillInstalls = pgTable(
       .references(() => skills.id, { onDelete: "cascade" }),
     /** Semver the member/agent reported, or null when a manual mark didn't supply one. */
     installedVersion: text("installed_version"),
+    /** Verified package checksum at install time, retained across same-version repairs. */
+    installedChecksum: text("installed_checksum"),
     /** Optional free-form source label, e.g. "Claude Code". */
     agentLabel: text("agent_label"),
     /** How the install was recorded: "agent" (reported by the assistant) or "manual" (marked by hand). */
@@ -1722,3 +1726,29 @@ export const skillDatabaseObjectDeletions = pgTable(
     ),
   }),
 );
+
+/** Unverified, voluntarily reported activations; identities never grant account authority. */
+export const skillUsageEvents = pgTable("skill_usage_events", {
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  skillId: uuid("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),
+  eventId: uuid("event_id").notNull(),
+  version: text("version").notNull(),
+  agent: text("agent"),
+  environment: text("environment"),
+  declaredUserId: text("declared_user_id"),
+  declaredEmail: text("declared_email"),
+  identitySource: text("identity_source"),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.orgId, t.skillId, t.eventId] }),
+  skillTime: index("skill_usage_events_skill_time_idx").on(t.orgId, t.skillId, t.receivedAt),
+  retention: index("skill_usage_events_retention_idx").on(t.receivedAt),
+  validVersion: check("skill_usage_events_version_check", sql`length(${t.version}) between 1 and 128`),
+  validAgent: check("skill_usage_events_agent_check", sql`${t.agent} in ('claude-code', 'codex', 'opencode', 'pi', 'other')`),
+  validEnvironment: check("skill_usage_events_environment_check", sql`${t.environment} in ('conductor', 'ci', 'sandbox', 'local', 'other')`),
+  validUserId: check("skill_usage_events_declared_user_id_check", sql`length(${t.declaredUserId}) between 1 and 128`),
+  validEmail: check("skill_usage_events_declared_email_check", sql`length(${t.declaredEmail}) between 3 and 254`),
+  validSource: check("skill_usage_events_identity_source_check", sql`${t.identitySource} in ('configured', 'skillpack-local', 'git-local', 'git-global')`),
+  validIdentity: check("skill_usage_events_check", sql`(${t.identitySource} is null and ${t.declaredUserId} is null and ${t.declaredEmail} is null)
+    or (${t.identitySource} is not null and (${t.declaredUserId} is not null or ${t.declaredEmail} is not null))`),
+}));

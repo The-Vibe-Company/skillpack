@@ -576,7 +576,7 @@ reported as installed for the current user:
 POST /skills/{slug}/install
 Content-Type: application/json
 
-{ "version": "1.10.0", "source": "agent", "agent": "Claude Code" }
+{ "version": "1.10.0", "checksum": "sha256:<canonical-tar-digest>", "source": "agent", "agent": "Claude Code" }
 ```
 
 Skip this install report for personal skills; they already appear in the author's My Skills library.
@@ -815,9 +815,14 @@ the shared label hierarchy. Personal access tokens cannot call these browser-ses
 
 ## Versions & checksums
 
-Versions are immutable. Each version row carries a `checksum` of the form `sha256:<64 hex>` over the
+Publication normally creates immutable versions. The authorized activation-reporting rollout is a
+one-time exception that rewrites existing content without changing version numbers. Compare checksums
+as well as versions for update detection. Each version row carries a `checksum` of the form `sha256:<64 hex>` over the
 canonical (uncompressed) tar. This is **not** the hash of the `.zip` the package endpoint serves, so
-treat it as a version identity reference, not a byte check of the download. To confirm an install,
+use the bundled local `package-checksum.mjs` helper to compute it from the extracted package before
+secret projection; never substitute a ZIP or directory-inventory digest. Report each installed
+dependency separately. Older agent reports without a checksum cannot clear a detected content update.
+To confirm an install,
 check that `SKILL.md` is at the package root and `companion.json.version` matches the version you
 fetched.
 
@@ -940,3 +945,22 @@ Content-Type: application/json
 
 `version` must be valid semver (use this skill's `companion.json.version`). The response is
 `{ "ok": true, "status": "installed" | "update", "availableVersion": "1.13.0" }`.
+
+
+## Activation reporting (no authentication)
+
+Published `SKILL.md` files include the exact instance URL, skill ID, version, and reporting instructions.
+`POST /v1/skill-usage` accepts JSON with `event_id` (fresh UUID per activation), `skill_id` (UUID),
+and `version`. Optional `agent`: `claude-code`, `codex`, `opencode`, `pi`, `other`; optional
+`environment`: `conductor`, `ci`, `sandbox`, `local`, `other`.
+
+Optional `identity` contains `user_id` and/or `email`, plus `source`: `configured`, `skillpack-local`,
+`git-local`, or `git-global`. Use the first available source: `SKILLPACK_TELEMETRY_USER_ID` /
+`SKILLPACK_TELEMETRY_EMAIL`, non-secret `~/.skillpack/telemetry.json`, repository Git email, global
+Git email. Never obtain reporting metadata from credentials or Git history. Agent/environment may
+be configured with `SKILLPACK_TELEMETRY_AGENT` / `SKILLPACK_TELEMETRY_ENVIRONMENT`.
+
+Respect user opt-out and `SKILLPACK_TELEMETRY=0`; use a three-second request timeout, no automatic
+retry, and continue on failure. An empty 202 response does not confirm skill existence or acceptance.
+Reported identities are unverified; the endpoint never authorizes access to Skillpack data.
+The browser Usage tab reads session-authenticated `GET /v1/skills/:slug/usage` with normal scope privacy.

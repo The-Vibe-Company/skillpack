@@ -30,6 +30,7 @@ import { FileExplorer } from "./fileview";
 import { MarkdownView } from "./markdown";
 import { Discussion } from "./discussion";
 import { SkillSecretConfiguration } from "../secrets/SkillSecretConfiguration";
+import { SkillUsageTab } from "./SkillUsageTab";
 import { SkillDatabaseTab } from "./SkillDatabaseTab";
 import {
   SKILL_ACTIONS,
@@ -80,7 +81,7 @@ function DetailMoreMenu({
   useEffect(() => {
     if (!open) return;
     const onPointer = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
+      if (ref.current && event.target instanceof Node && !ref.current.contains(event.target)) setOpen(false);
     };
     document.addEventListener("mousedown", onPointer);
     return () => document.removeEventListener("mousedown", onPointer);
@@ -110,7 +111,7 @@ function DetailMoreMenu({
         if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
         event.preventDefault();
         const items = Array.from(ref.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)') ?? []);
-        const current = items.indexOf(document.activeElement as HTMLButtonElement);
+        const current = items.findIndex((item) => item === document.activeElement);
         const next = event.key === "ArrowDown" ? current + 1 : current - 1;
         items[(next + items.length) % items.length]?.focus();
       }}
@@ -136,7 +137,7 @@ function DetailMoreMenu({
 }
 
 /** The detail page's top-level sections, shown as a tab bar under the breadcrumb. */
-type DetailTab = "overview" | "files" | "tables" | "dependencies" | "activity" | "discussion";
+type DetailTab = "usage" | "overview" | "files" | "tables" | "dependencies" | "activity" | "discussion";
 
 // Only the active tabpanel is mounted (the Files explorer + scroll-spy shouldn't run
 // hidden). All tabs therefore point `aria-controls` at one stable panel id so no tab
@@ -430,6 +431,7 @@ export function DetailView({
     ...(showDeps
       ? [{ id: "dependencies" as const, label: "Dependencies", icon: "layers", count: reqN + usedN }]
       : []),
+    { id: "usage", label: "Usage", icon: "activity" },
     { id: "activity", label: "Activity", icon: "activity", count: versions.length },
     { id: "discussion", label: "Discussion", icon: "message-square", count: comments.length },
   ];
@@ -631,6 +633,8 @@ export function DetailView({
             />
           </div>
         )}
+
+        {activeTab === "usage" && <SkillUsageTab key={`${orgId}:${skill.id}`} slug={skill.id} />}
 
         {activeTab === "activity" && (
           <div className="ddoc">
