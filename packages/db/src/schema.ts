@@ -1727,12 +1727,15 @@ export const skillDatabaseObjectDeletions = pgTable(
   }),
 );
 
-/** Unverified, voluntarily reported activations; identities never grant account authority. */
+/** Runtime observations and separately classified history; identities remain declarative. */
 export const skillUsageEvents = pgTable("skill_usage_events", {
   orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
   skillId: uuid("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),
   eventId: uuid("event_id").notNull(),
   version: text("version").notNull(),
+  kind: text("kind").notNull().default("legacy"),
+  adapter: text("adapter"),
+  observedAt: timestamp("observed_at", { withTimezone: true }),
   agent: text("agent"),
   environment: text("environment"),
   declaredUserId: text("declared_user_id"),
@@ -1743,6 +1746,8 @@ export const skillUsageEvents = pgTable("skill_usage_events", {
   pk: primaryKey({ columns: [t.orgId, t.skillId, t.eventId] }),
   skillTime: index("skill_usage_events_skill_time_idx").on(t.orgId, t.skillId, t.receivedAt),
   retention: index("skill_usage_events_retention_idx").on(t.receivedAt),
+  validKind: check("skill_usage_events_kind_check", sql`${t.kind} in ('legacy', 'invocation', 'request', 'read')`),
+  validAdapter: check("skill_usage_events_adapter_check", sql`${t.adapter} in ('claude-hook', 'claude-transcript', 'codex-hook', 'codex-transcript', 'opencode-plugin')`),
   validVersion: check("skill_usage_events_version_check", sql`length(${t.version}) between 1 and 128`),
   validAgent: check("skill_usage_events_agent_check", sql`${t.agent} in ('claude-code', 'codex', 'opencode', 'pi', 'other')`),
   validEnvironment: check("skill_usage_events_environment_check", sql`${t.environment} in ('conductor', 'ci', 'sandbox', 'local', 'other')`),
@@ -1751,4 +1756,18 @@ export const skillUsageEvents = pgTable("skill_usage_events", {
   validSource: check("skill_usage_events_identity_source_check", sql`${t.identitySource} in ('configured', 'skillpack-local', 'git-local', 'git-global')`),
   validIdentity: check("skill_usage_events_check", sql`(${t.identitySource} is null and ${t.declaredUserId} is null and ${t.declaredEmail} is null)
     or (${t.identitySource} is not null and (${t.declaredUserId} is not null or ${t.declaredEmail} is not null))`),
+}));
+
+/** Pre-tenant durable receipt store, accessible only through narrow security definers. */
+export const skillUsageInbox = pgTable("skill_usage_inbox", {
+  eventId: uuid("event_id").primaryKey(),
+  declaredSkillId: uuid("declared_skill_id").notNull(),
+  payload: jsonb("payload"),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true }),
+}, (t) => ({
+  boundedPayload: check("skill_usage_inbox_payload_check", sql`octet_length(${t.payload}::text) <= 4096`),
+  pending: index("skill_usage_inbox_pending_idx").on(t.receivedAt).where(sql`${t.processedAt} is null`),
+  admission: index("skill_usage_inbox_admission_idx").on(t.declaredSkillId, t.receivedAt),
+  expiry: index("skill_usage_inbox_expiry_idx").on(t.processedAt).where(sql`${t.processedAt} is not null`),
 }));

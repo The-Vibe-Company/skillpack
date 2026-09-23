@@ -6,7 +6,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { beforeAll, afterAll, describe, expect, it } from "vitest";
 import { schema, withTenantContextOn } from "@skillpack/db";
-import { expireSkillUsage, getSkillUsage, reportSkillUsage } from "@skillpack/core";
+import { expireSkillUsage, processSkillUsage, getSkillUsage, receiveSkillUsage } from "@skillpack/core";
 import { extractRuntimeRoleGrantBlock, resolveRuntimeRoleGrantsFile } from "../../src/migrate";
 import { readFile } from "node:fs/promises";
 import { createIntegrationFixture, integrationDb, integrationSql, seedSkill, type IntegrationFixture, type TestActor } from "./testDatabase";
@@ -25,7 +25,7 @@ const workerDb = drizzle(workerSql, { schema });
 let fixture: IntegrationFixture;
 let orgSkill: Awaited<ReturnType<typeof seedSkill>>;
 let privateSkill: Awaited<ReturnType<typeof seedSkill>>;
-const event = (skillId: string) => ({ event_id: randomUUID(), skill_id: skillId, version: "1.0.0" });
+const event = (skillId: string) => ({ event_id: randomUUID(), skill_id: skillId, version: "1.0.0", schema_version: 1 as const, kind: "invocation" as const, adapter: "codex-hook" as const, observed_at: new Date().toISOString() });
 const usage = (actor: TestActor, skill: typeof orgSkill, orgId = fixture.orgA) =>
   withTenantContextOn(apiDb, { orgId, userId: actor.id }, (database) => getSkillUsage({ actor, orgId, slug: skill.slug, database }));
 
@@ -53,11 +53,13 @@ afterAll(async () => {
 describe("skill usage boundary", () => {
   it("accepts unauthenticated anonymous and identified reports, ignores unknown versions, and deduplicates", async () => {
     const first = event(orgSkill.id);
-    await reportSkillUsage(first, apiDb);
-    await reportSkillUsage(first, apiDb);
-    await reportSkillUsage({ ...event(orgSkill.id), agent: "pi", environment: "sandbox", identity: { email: "Bot@example.test", source: "git-local" } }, apiDb);
-    await reportSkillUsage(event(randomUUID()), apiDb);
-    await reportSkillUsage({ ...event(orgSkill.id), version: "99.0.0" }, apiDb);
+    await receiveSkillUsage(first, apiDb);
+    await receiveSkillUsage(first, apiDb);
+    await receiveSkillUsage({ ...event(orgSkill.id), agent: "pi", environment: "sandbox", identity: { email: "Bot@example.test", source: "git-local" } }, apiDb);
+    await receiveSkillUsage(event(randomUUID()), apiDb);
+    await receiveSkillUsage({ ...event(orgSkill.id), version: "99.0.0" }, apiDb);
+    expect((await usage(fixture.developer, orgSkill))?.total).toBe(0);
+    await processSkillUsage(workerDb);
     const result = await usage(fixture.developer, orgSkill);
     expect(result?.total).toBe(2);
     expect(result?.anonymous).toBe(1);
@@ -65,7 +67,8 @@ describe("skill usage boundary", () => {
     expect(result?.agents).toContainEqual({ label: "pi", count: 1 });
   });
   it("hides personal usage from administrators and non-members, including direct RLS reads", async () => {
-    await reportSkillUsage(event(privateSkill.id), apiDb);
+    await receiveSkillUsage(event(privateSkill.id), apiDb);
+    await processSkillUsage(workerDb);
     expect((await usage(fixture.owner, privateSkill))?.total).toBe(1);
     expect(await usage(fixture.admin, privateSkill)).toBeNull();
     expect(await usage(fixture.outsider, privateSkill, fixture.orgB)).toBeNull();
@@ -77,17 +80,36 @@ describe("skill usage boundary", () => {
     }
     expect(await apiDb.select().from(schema.skillUsageEvents)).toEqual([]);
   });
+  it("keeps requests, file reads and historical reports separate from invocations", async () => {
+    const skill = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner, slug: `signals-${fixture.suffix}`, scope: "org" });
+    const requested = { ...event(skill.id), kind: "request" as const };
+    const invoked = { ...event(skill.id), adapter: "opencode-plugin" as const, agent: "opencode" as const };
+    await receiveSkillUsage(requested, apiDb);
+    await processSkillUsage(workerDb);
+    await receiveSkillUsage(invoked, apiDb);
+    await receiveSkillUsage({ ...event(skill.id), kind: "read" }, apiDb);
+    await processSkillUsage(workerDb);
+    await receiveSkillUsage(invoked, apiDb);
+    await processSkillUsage(workerDb);
+    await integrationDb.insert(schema.skillUsageEvents).values({ orgId: fixture.orgA,
+      skillId: skill.id, eventId: randomUUID(), version: "1.0.0" });
+    const result = await usage(fixture.owner, skill);
+    expect(result).toMatchObject({ total: 1, requests: 1, reads: 1, historical: 1 });
+    expect(result?.adapters).toEqual([{ label: "codex-hook", count: 2 }, { label: "opencode-plugin", count: 1 }]);
+    expect(result?.agents).toContainEqual({ label: "opencode", count: 1 });
+  });
   it("immediately rejects a removed member", async () => {
     await integrationDb.delete(schema.memberships).where(and(eq(schema.memberships.orgId, fixture.orgA), eq(schema.memberships.userId, fixture.developer.id)));
     await expect(usage(fixture.developer, orgSkill)).rejects.toThrow();
   });
   it("expires data and gives cleanup only to the worker, without direct event access", async () => {
     const old = event(orgSkill.id);
-    await reportSkillUsage(old, apiDb);
+    await receiveSkillUsage(old, apiDb);
+    await processSkillUsage(workerDb);
     await integrationDb.update(schema.skillUsageEvents).set({ receivedAt: new Date(Date.now() - 91 * 86400_000) }).where(eq(schema.skillUsageEvents.eventId, old.event_id));
     expect((await usage(fixture.owner, orgSkill))?.total).toBe(2);
     await expect(expireSkillUsage(apiDb)).rejects.toThrow();
-    await expect(reportSkillUsage(event(orgSkill.id), workerDb)).rejects.toThrow();
+    await expect(receiveSkillUsage(event(orgSkill.id), workerDb)).rejects.toThrow();
     await expect(workerDb.select().from(schema.skillUsageEvents)).rejects.toThrow();
     expect(await expireSkillUsage(workerDb)).toBeGreaterThanOrEqual(1);
     expect(await integrationDb.select().from(schema.skillUsageEvents).where(eq(schema.skillUsageEvents.eventId, old.event_id))).toEqual([]);
@@ -95,7 +117,9 @@ describe("skill usage boundary", () => {
   });
   it("caps intake per skill across independent connections", async () => {
     const limited = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner, slug: `limited-${fixture.suffix}`, scope: "org" });
-    await Promise.all(Array.from({ length: 125 }, () => reportSkillUsage(event(limited.id), apiDb)));
+    const admitted = await Promise.all(Array.from({ length: 125 }, () => receiveSkillUsage(event(limited.id), apiDb)));
+    expect(admitted.filter(Boolean)).toHaveLength(120);
+    await processSkillUsage(workerDb);
     expect((await usage(fixture.owner, limited))?.total).toBe(120);
   });
 });

@@ -5,19 +5,21 @@ import { describe, expect, it } from "vitest";
 import { packDir, prepareSkillDirForPublish, withSkillUsageInstructions } from "../src/index";
 
 const input = { skillId: "733fd021-274c-48ac-a843-95ee78b47759", version: "1.0.0", instanceUrl: "https://skills.example.test" };
-describe("portable activation instructions", () => {
+describe("runtime usage metadata", () => {
   it("replaces its block and retains authored content across publications", () => {
     const body = "# Review\n\nRead the code.\n\n```sh\nprintf 'hello'\n```";
     const first = withSkillUsageInstructions(body, input);
     expect(withSkillUsageInstructions(first, input)).toBe(first);
     const updated = withSkillUsageInstructions(first, { ...input, version: "2.0.0", instanceUrl: "https://self-hosted.example.test" });
     expect(updated.match(/<!-- skillpack:usage:start -->/g)).toHaveLength(1);
-    expect(updated).toContain('"version":"2.0.0"');
+    expect(updated).toContain("2.0.0");
     expect(updated).not.toContain("https://skills.example.test");
     expect(updated.endsWith(body)).toBe(true);
     expect(updated).toContain("SKILLPACK_TELEMETRY=0");
-    expect(updated).toContain("--max-time 3 --retry 0");
-    expect(updated).toContain("-TimeoutSec 3");
+    expect(updated).not.toContain("curl");
+    expect(updated).not.toContain("Invoke-RestMethod");
+    expect(updated).toContain("skillpack-runtime");
+    expect(updated).toContain("Do not send");
   });
   it("preserves marker examples inside the authored body", () => {
     const body = "# Documentation\n\n```html\n<!-- skillpack:usage:start -->example<!-- skillpack:usage:end -->\n```";
@@ -37,6 +39,8 @@ describe("portable activation instructions", () => {
       await prepareSkillDirForPublish(dir, input);
       const first = await packDir(dir);
       expect(first.checksum).not.toBe(original.checksum);
+      const manifest = JSON.parse(await readFile(join(dir, "companion.json"), "utf8"));
+      expect(manifest.metadata.usage).toEqual({ schemaVersion: 1, skillId: input.skillId, version: input.version, origin: input.instanceUrl });
       expect(await readFile(join(dir, "SKILL.md"), "utf8")).toContain(input.skillId);
       await prepareSkillDirForPublish(dir, input);
       expect((await packDir(dir)).checksum).toBe(first.checksum);

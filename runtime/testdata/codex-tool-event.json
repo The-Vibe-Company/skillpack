@@ -1,0 +1,8 @@
+{
+  "fixture_schema_version": 1,
+  "event": "skill_invocation",
+  "session_id": "fixture-session-codex",
+  "skill_path": "/fixture/skills/example",
+  "call_id": "fixture-call-codex",
+  "success": true
+}

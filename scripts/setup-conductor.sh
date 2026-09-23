@@ -18,3 +18,6 @@ fi
 
 corepack enable
 pnpm install
+
+# Install the signed collector and register the committed skills for this workspace.
+python3 .agents/skillpack/usage/setup.py

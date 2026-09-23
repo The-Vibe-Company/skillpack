@@ -215,9 +215,17 @@ BEGIN
   END IF;
   IF pg_catalog.to_regclass('public.skill_usage_events') IS NOT NULL THEN
     api_capability_managed_tables := api_capability_managed_tables || ARRAY['public.skill_usage_events'::regclass];
-    api_functions := api_functions || ARRAY['public.skillpack_report_skill_usage(jsonb)'::regprocedure];
+    IF pg_catalog.to_regprocedure('public.skillpack_report_skill_usage(jsonb)') IS NOT NULL THEN
+      api_functions := api_functions || ARRAY['public.skillpack_report_skill_usage(jsonb)'::regprocedure];
+    END IF;
     worker_functions := worker_functions || ARRAY['public.skillpack_expire_skill_usage()'::regprocedure];
     worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY['public.skill_usage_events'::regclass];
+  END IF;
+  IF pg_catalog.to_regclass('public.skill_usage_inbox') IS NOT NULL THEN
+    api_capability_managed_tables := api_capability_managed_tables || ARRAY['public.skill_usage_inbox'::regclass];
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY['public.skill_usage_inbox'::regclass];
+    api_functions := api_functions || ARRAY['public.skillpack_receive_skill_usage(jsonb)'::regprocedure];
+    worker_functions := worker_functions || ARRAY['public.skillpack_process_skill_usage()'::regprocedure];
   END IF;
   IF api_role IS NULL OR worker_role IS NULL OR companion_runtime_role IS NULL THEN
     RAISE EXCEPTION 'companion API, worker, and runtime roles are required';

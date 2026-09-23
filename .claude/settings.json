@@ -1,0 +1,116 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "UserPromptExpansion": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node",
+            "args": [
+              "${CLAUDE_PROJECT_DIR}/.agents/skillpack/usage/hook.mjs",
+              "claude-code"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

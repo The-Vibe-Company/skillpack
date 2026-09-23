@@ -1,0 +1,22 @@
+{
+  "fixture_schema_version": 1,
+  "type": "event_msg",
+  "payload": {
+    "type": "item_completed",
+    "thread_id": "fixture-thread-codex",
+    "turn_id": "fixture-turn-codex",
+    "item": {
+      "type": "CommandExecution",
+      "id": "fixture-command-codex",
+      "status": "completed",
+      "exit_code": 0,
+      "parsed_cmd": [
+        {
+          "type": "read",
+          "name": "SKILL.md",
+          "path": "/fixture/skills/example/SKILL.md"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "fixture_schema_version": 1,
+  "hook_event_name": "UserPromptExpansion",
+  "expansion_type": "slash_command",
+  "command_name": "plan-pr",
+  "command_source": "project",
+  "session_id": "fixture-session-claude-slash",
+  "prompt_id": "fixture-prompt-1"
+}

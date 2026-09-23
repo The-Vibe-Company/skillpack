@@ -23,6 +23,8 @@ from typing import Any
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from runtime_setup import setup_runtime
+
 from bootstrap_integrity import INTEGRITY_BASELINE_FILE, compare_integrity, local_companion_version, sha256_file  # noqa: E402,F401
 from bootstrap_update import companion_auto_update_result, companion_target_statuses, install_companion_update  # noqa: E402
 from companion_lib import (  # noqa: E402
@@ -260,7 +262,12 @@ def collect_context(auto_update: bool = False, agent: str = "companion-bootstrap
             installed_skills = api_get(api_url, token, "/skills?installed=true")
             if not all(isinstance(value, list) for value in (org_skills, mine_skills, installed_skills)):
                 raise RuntimeError("skills listing endpoints returned an unexpected response shape")
+            if auto_update:
+                from runtime_skill_sync import sync_runtime_skill_patches
+                context["runtimeSkillUpdates"] = sync_runtime_skill_patches(api_url, token, workspace_id, [*org_skills, *mine_skills])
             context["skills"] = build_skill_context(workspace_id, api_url, org_skills, mine_skills, installed_skills)
+            from companion_lib import find_project_root
+            context["runtime"] = setup_runtime(skill_dir, api_url, context["skills"]["local"], project_root=find_project_root())
             if context["skills"]["updates"]:
                 context["actions"].append({"kind": "review_skill_updates", "count": len(context["skills"]["updates"])})
         except BaseException as exc:

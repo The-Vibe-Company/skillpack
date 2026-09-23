@@ -1,2 +1,9 @@
 # The historical blob contains an embedded NUL; keep category drag changes reviewable as text.
 apps/web/src/components/skills/dragGeometry.ts text diff
+
+# Installed packages are checksummed byte-for-byte, including on Windows.
+.agents/skills/** -text
+packages/skillpack-skill/skill/** -text
+.agents/skillpack/** text eol=lf
+
+.opencode/plugins/** text eol=lf

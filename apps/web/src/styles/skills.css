@@ -1609,5 +1609,6 @@ body { background: var(--color-canvas); color: var(--color-fg); font-family: var
 .usage-table thead { color: var(--color-muted); }
 .usage-table th:last-child, .usage-table td:last-child { text-align: right; }
 .usage-scroll { overflow-x: auto; }
+.usage-scroll .usage-table { min-width: 540px; }
 .usage-scroll:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
 @media (max-width: 600px) { .usage-breakdowns { grid-template-columns: 1fr; gap: 0; } }

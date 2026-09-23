@@ -5,6 +5,13 @@ metadata:
   short-description: "Implement SwiftUI safely"
 ---
 
+<!-- skillpack:usage:start -->
+## Skillpack runtime
+
+Usage is observed locally by skillpack-runtime when installed through Skillpack. Package: a0e3dc0e-4f95-461e-8f10-43a0658d5d6b@0.1.1, origin: https://skillpack.app.
+Do not send activation reports, run tracking commands, or install hooks during this skill's execution. Setup and updates belong to Skillpack. Continue the task when collection is unavailable. SKILLPACK_TELEMETRY=0 disables collection for this session.
+<!-- skillpack:usage:end -->
+
 # SwiftUI implementation expertise
 
 Use this skill as a narrow implementation capability inside a native iOS task. It improves the

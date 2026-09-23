@@ -5,6 +5,13 @@ metadata:
   short-description: "Own native iOS product work"
 ---
 
+<!-- skillpack:usage:start -->
+## Skillpack runtime
+
+Usage is observed locally by skillpack-runtime when installed through Skillpack. Package: c74c6d15-7b11-4d95-9f55-7f62a5a579e4@0.1.1, origin: https://skillpack.app.
+Do not send activation reports, run tracking commands, or install hooks during this skill's execution. Setup and updates belong to Skillpack. Continue the task when collection is unavailable. SKILLPACK_TELEMETRY=0 disables collection for this session.
+<!-- skillpack:usage:end -->
+
 # Native iOS product development
 
 Use this as the owner skill for a native iOS product change. It covers product intent,

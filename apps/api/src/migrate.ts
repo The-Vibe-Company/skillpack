@@ -8,7 +8,8 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 import { z } from "zod";
-import { rewriteHistoricalSkillUsage } from "./skillUsageRewrite";
+import { createDatabase } from "@skillpack/db";
+import { migrateConfiguredSkillUsageRuntime } from "./skillUsageMigration";
 
 export const MIGRATION_LOCK_CLASS_ID = 72_401;
 export const MIGRATION_LOCK_OBJECT_ID = 20_260_608;
@@ -300,7 +301,7 @@ async function resetRuntimeRoleGrantSession(client: ReturnType<typeof postgres>)
   await client.unsafe("reset companion.runtime_grants_verified").catch(() => undefined);
 }
 
-export async function run(input?: { env?: NodeJS.ProcessEnv; rewriteSkillUsage?: boolean }): Promise<void> {
+export async function run(input?: { env?: NodeJS.ProcessEnv }): Promise<void> {
   const env = input?.env ?? process.env;
   const migrationsFolder = await resolveMigrationsFolder({ env });
   const runtimeRoles = databaseRuntimeRoles(env);
@@ -373,12 +374,8 @@ export async function run(input?: { env?: NodeJS.ProcessEnv; rewriteSkillUsage?:
       }
     }
     console.log("Drizzle migrations applied");
-    if (input?.rewriteSkillUsage) {
-      const count = await rewriteHistoricalSkillUsage(client, {
-        instanceUrl: env.BETTER_AUTH_URL ?? env.COMPANION_API_URL,
-      });
-      console.log(`Historical skill activation reporting: ${count} versions processed`);
-    }
+    const patchedSkills = await migrateConfiguredSkillUsageRuntime(createDatabase(client), env);
+    if (patchedSkills) console.log(`Runtime collection migration published ${patchedSkills} skill patches`);
     await client`select pg_advisory_unlock(${MIGRATION_LOCK_CLASS_ID}, ${MIGRATION_LOCK_OBJECT_ID})`;
     lockAcquired = false;
   } finally {
@@ -496,7 +493,7 @@ function isMain(): boolean {
 }
 
 if (isMain()) {
-  run({ rewriteSkillUsage: true }).catch((error) => {
+  run().catch((error) => {
     console.error("Failed to apply Drizzle migrations");
     console.error(formatMigrationFailure(error instanceof Error ? error : String(error)));
     process.exitCode = 1;

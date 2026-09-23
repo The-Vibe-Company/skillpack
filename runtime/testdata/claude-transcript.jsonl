@@ -1,0 +1,2 @@
+{"fixture_schema_version":1,"type":"assistant","message":{"content":[{"type":"tool_use","id":"fixture-transcript-call","name":"Skill","input":{"skill":"/fixture/skills/example"}}]}}
+{"fixture_schema_version":1,"type":"user","message":{"content":[{"type":"tool_result","tool_use_id":"fixture-transcript-call","is_error":false}]}}

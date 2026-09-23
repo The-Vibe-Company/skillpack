@@ -41,18 +41,25 @@ describe("publication normalization compatibility", () => {
       await mkdir(config);
       await writeFile(join(config, "session.json"), JSON.stringify({ cookie: "session=test" }));
       await execFileAsync(process.execPath, ["--import", "tsx", fileURLToPath(new URL("../index.ts", import.meta.url)), "skills", "push", local, "--json"], {
+        // The real CLI boots tsx and its dependency graph on shared CI runners.
+        timeout: 15_000,
         env: { ...process.env, COMPANION_HOME: config, COMPANION_API_URL: apiUrl },
       });
       expect((await packDir(local)).checksum).toBe(canonical.checksum);
       expect((await loadLockfile(root)).skills.demo?.checksum).toBe(canonical.checksum);
       const text = await readFile(join(local, "SKILL.md"), "utf8");
       expect(text.includes("skillpack:usage:start")).toBe(Boolean(instanceUrl));
-      if (instanceUrl) expect(text).toContain(`${instanceUrl}/v1/skill-usage`);
+      if (instanceUrl) {
+        expect(text).toContain(`origin: ${instanceUrl}`);
+        expect(text).not.toContain("/v1/skill-usage");
+        const manifest = JSON.parse(await readFile(join(local, "companion.json"), "utf8"));
+        expect(manifest.metadata.usage).toMatchObject({ schemaVersion: 1, skillId, version: "1.0.0", origin: instanceUrl });
+      }
       expect(text).not.toContain(apiUrl);
     } finally {
       api.closeAllConnections();
       await new Promise<void>((resolve) => api.close(() => resolve()));
       await rm(root, { recursive: true, force: true });
     }
-  });
+  }, 20_000);
 });

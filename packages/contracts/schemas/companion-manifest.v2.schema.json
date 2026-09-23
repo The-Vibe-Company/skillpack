@@ -31,6 +31,52 @@
       "required": ["changelog"],
       "properties": {
         "companionSkillId": { "type": "string", "format": "uuid" },
+        "usage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schemaVersion",
+            "skillId",
+            "version",
+            "origin"
+          ],
+          "properties": {
+            "schemaVersion": {
+              "const": 1
+            },
+            "skillId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$"
+            },
+            "origin": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https?://[^/?#@]+$"
+            },
+            "migration": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "parentVersion",
+                "parentChecksum"
+              ],
+              "properties": {
+                "parentVersion": {
+                  "type": "string",
+                  "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$"
+                },
+                "parentChecksum": {
+                  "type": "string",
+                  "pattern": "^sha256:[a-f0-9]{64}$"
+                }
+              }
+            }
+          }
+        },
         "changelog": {
           "type": "array",
           "maxItems": 200,

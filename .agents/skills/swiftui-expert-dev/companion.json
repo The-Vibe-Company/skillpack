@@ -1,7 +1,7 @@
 {
   "$schema": "https://thecompanion.sh/schemas/companion-manifest.v2.schema.json",
   "name": "swiftui-expert-dev",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "SwiftUI expert",
   "description": "Apply focused SwiftUI and Swift concurrency expertise for state, composition, navigation, performance, accessibility, and testability.",
   "notes": "## What it does\n\nThis is a narrow reusable implementation capability for native iOS work. It helps an owner skill choose safe state ownership, value-driven navigation, structured concurrency, efficient composition, accessible controls, and deterministic tests.\n\n## Boundary\n\nIt does not own product intent, cross-platform visual direction, API authorization, or build/simulator orchestration. Hand those questions to ios-product-dev, design-frontend-dev, and xcodebuildmcp-cli respectively.",
@@ -9,13 +9,30 @@
     "companionSkillId": "a0e3dc0e-4f95-461e-8f10-43a0658d5d6b",
     "changelog": [
       {
+        "version": "0.1.1",
+        "date": "2026-09-23",
+        "changes": [
+          "Replace model activation reporting with automatic Skillpack runtime collection."
+        ]
+      },
+      {
         "version": "0.1.0",
         "date": "2026-08-24",
         "changes": [
           "Add a portable focused SwiftUI implementation capability for Agents and Claude."
         ]
       }
-    ]
+    ],
+    "usage": {
+      "schemaVersion": 1,
+      "skillId": "a0e3dc0e-4f95-461e-8f10-43a0658d5d6b",
+      "version": "0.1.1",
+      "origin": "https://skillpack.app",
+      "migration": {
+        "parentVersion": "0.1.0",
+        "parentChecksum": "sha256:0cfa6e068a5542e47a0e8078332eb65db825e378c9025370d2169da813f1eb36"
+      }
+    }
   },
   "environment": {
     "env": {},

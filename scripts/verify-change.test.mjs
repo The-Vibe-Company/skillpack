@@ -236,6 +236,7 @@ test("root configuration changes force the full monorepo and every CI lane", () 
   const quality = plan.fastSteps.find(({ id }) => id === "quality");
   assert.equal(quality.args.includes("--filter"), false);
   assert.deepEqual(plan.deferredGates.map(({ id }) => id), [
+    "runtime-native",
     "database",
     "browser",
     "containers",
