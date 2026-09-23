@@ -9,6 +9,7 @@ import platform
 import re
 import stat
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -26,6 +27,21 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
 
 
+def _replace_file(source: str, destination: Path) -> None:
+    """Keep atomic replacement while tolerating short Windows sharing conflicts."""
+    for attempt in range(8):
+        try:
+            os.replace(source, destination)
+            return
+        except OSError as exc:
+            # Windows concurrent renames or scanners can temporarily deny delete
+            # sharing. Never unlink the old file, retry other errors, or hide a
+            # persistent permission failure. Total backoff is bounded at 1.27s.
+            if getattr(exc, 'winerror', None) not in (5, 32, 33) or attempt == 7:
+                raise
+            time.sleep(0.01 * (2 ** attempt))
+
+
 def atomic_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, name = tempfile.mkstemp(prefix='.runtime-', dir=path.parent)
@@ -35,7 +51,7 @@ def atomic_json(path: Path, value: dict) -> None:
             out.write('\n')
             out.flush()
             os.fsync(out.fileno())
-        os.replace(name, path)
+        _replace_file(name, path)
         try:
             directory = os.open(path.parent, os.O_RDONLY)
         except OSError:
@@ -61,7 +77,7 @@ def install_launcher(source: Path, destination: Path) -> None:
             out.flush()
             os.fsync(out.fileno())
         os.chmod(name, 0o700)
-        os.replace(name, destination)
+        _replace_file(name, destination)
         try:
             directory = os.open(destination.parent, os.O_RDONLY)
         except OSError:

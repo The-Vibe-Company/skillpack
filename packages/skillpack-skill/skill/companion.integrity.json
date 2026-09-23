@@ -17,7 +17,7 @@
     "scripts/package-checksum.mjs": "sha256:51f2822fe0966b1b00a87fe69f9033635c508a7eabcaf2cf4586a79c210d6204",
     "scripts/runtime_command.py": "sha256:e5dab65cc2688537172b824ca24d98946abe2ff1c63ac866f0585dd9595dedf8",
     "scripts/runtime_lock.py": "sha256:0437ff789501bc74fc1fe1f814adae9b5fbc842f6c8819c203166e2b389e56f2",
-    "scripts/runtime_setup.py": "sha256:66702c1dba6693f93cb852c393f3f0c7a1a539aa69be84fb84f51259695a6911",
+    "scripts/runtime_setup.py": "sha256:651db7625016330082a00cbe4008b850b14da6f1be54ef9346df3ff7c2c8ff8a",
     "scripts/runtime_skill_sync.py": "sha256:b1d7925da9c376c8a88286dfb202e84c9e88a3091fb6344aa67f851bab9d7348",
     "scripts/secrets_runtime.py": "sha256:bd2167fb6757d383e95d0293e8b3816249678d128b6cb02f0d4a9ae76503e38c",
     "scripts/skill_guard.py": "sha256:327440144111981fe722514a3cdee227c0f68881b87d9a67aa8e918511ee7f1a",

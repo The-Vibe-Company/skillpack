@@ -203,7 +203,64 @@ class RuntimeSetupTests(unittest.TestCase):
             with ThreadPoolExecutor(max_workers=4) as pool:
                 list(pool.map(lambda _index: install_launcher(source, destination), range(8)))
             self.assertEqual(destination.read_text(), 'stable launcher\n')
-            self.assertFalse(any(item.name.endswith('.tmp') for item in destination.parent.iterdir()))
+            self.assertEqual([item.name for item in destination.parent.iterdir()], [destination.name])
+
+    def test_atomic_installs_retry_transient_windows_sharing_errors(self):
+        real_replace = os.replace
+        for writer in ('launcher', 'json'):
+            for code in (5, 32, 33):
+                with self.subTest(writer=writer, winerror=code), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    source, destination = root / 'source', root / 'destination'
+                    source.write_text('new launcher')
+                    destination.write_text('previous')
+                    error = PermissionError('temporarily shared')
+                    error.winerror = code
+                    attempts = []
+
+                    def replace(staged, target):
+                        attempts.append(staged)
+                        if len(attempts) == 1:
+                            self.assertEqual(destination.read_text(), 'previous')
+                            raise error
+                        return real_replace(staged, target)
+
+                    with patch('runtime_setup.os.replace', side_effect=replace), patch('time.sleep'):
+                        if writer == 'launcher':
+                            install_launcher(source, destination)
+                        else:
+                            atomic_json(destination, {'updated': True})
+                    self.assertEqual(len(attempts), 2)
+                    self.assertEqual(attempts[0], attempts[1])
+                    if writer == 'launcher':
+                        self.assertEqual(destination.read_text(), 'new launcher')
+                    else:
+                        self.assertEqual(json.loads(destination.read_text()), {'updated': True})
+                    self.assertEqual({p.name for p in root.iterdir()}, {'source', 'destination'})
+
+    def test_atomic_installs_preserve_previous_file_when_replacement_fails(self):
+        for writer in ('launcher', 'json'):
+            for code, expected_calls in ((5, 8), (32, 8), (33, 8), (None, 1), (112, 1)):
+                with self.subTest(writer=writer, winerror=code), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    source, destination = root / 'source', root / 'destination'
+                    source.write_text('new launcher')
+                    destination.write_text('previous')
+                    error = OSError('replacement unavailable')
+                    if code is not None:
+                        error.winerror = code
+                    with patch('runtime_setup.os.replace', side_effect=error) as replace, \
+                         patch('time.sleep') as sleep:
+                        with self.assertRaises(OSError) as caught:
+                            if writer == 'launcher':
+                                install_launcher(source, destination)
+                            else:
+                                atomic_json(destination, {'updated': True})
+                    self.assertIs(caught.exception, error)
+                    self.assertEqual(replace.call_count, expected_calls)
+                    self.assertLessEqual(sum(call.args[0] for call in sleep.call_args_list), 1.3)
+                    self.assertEqual(destination.read_text(), 'previous')
+                    self.assertEqual({p.name for p in root.iterdir()}, {'source', 'destination'})
 
     def test_empty_or_unverified_inventory_still_installs_hooks_with_explicit_status(self):
         with tempfile.TemporaryDirectory() as tmp:
