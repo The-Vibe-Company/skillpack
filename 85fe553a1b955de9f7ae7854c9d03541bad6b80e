@@ -1,0 +1,141 @@
+apps/web/src/components/skills/GettingStartedCard.tsx
+  s_d75a7804b79399::t_25d0f8563cc7a8 16,22-23,33,40,47,87,129-130,143-144,194-196,199-204,225,228,233
+  s_d75a7804b79399::t_52a4d15f05a8d1 14,197-198
+apps/web/src/lib/onboarding.ts
+  s_d75a7804b79399::t_b8cbca364b58bc 93
+  s_d75a7804b79399::t_793c7488588325 49-51,55-64
+  s_d75a7804b79399::t_86c6eefbe4f5d3 3,27,31-32,36-48,52-54,65-82
+  s_d75a7804b79399::t_896ff30137d429 83
+apps/web/src/app/(app)/onboarding/page.tsx
+  s_d75a7804b79399::t_85c06ad711acdc 7,19-21,26-44,61
+apps/web/src/components/agents/ConnectAgentPanel.tsx
+  s_d75a7804b79399::t_396283d27e5ac2 1-96,98-115
+  s_d75a7804b79399::t_ddc4da658d145c 97
+apps/web/src/components/onboarding/useBrandIcon.ts
+  s_d75a7804b79399::t_e5dd3ba770ed16 1-50
+apps/web/src/components/org/useOrgActions.ts
+  s_d75a7804b79399::t_1e4afe5f7b51fe 6,11,28,32,34,53,63
+  s_d75a7804b79399::t_52a4d15f05a8d1 22,38,57
+apps/web/src/app/(auth)/login/LoginForm.tsx
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+  s_d75a7804b79399::t_6a774c45d543ee 627
+e2e/critical-flows.spec.ts
+  s_d75a7804b79399::t_9a7f53313bed7b 76,118-119
+apps/web/src/components/onboarding/WorkspaceStep.tsx
+  s_d75a7804b79399::t_a5a2d1b305f06d 139
+  s_d75a7804b79399::t_0dd68e17f5c581 1-138,140-155
+apps/web/src/styles/agents.css
+  s_d75a7804b79399::t_f364ab80309c98 19
+  s_d75a7804b79399::t_101dcde3e6987d 1-18,20-42
+packages/contracts/test/onboarding.test.ts
+  s_d75a7804b79399::t_34ecbe13ebd85d 2-8,58-69
+  s_d75a7804b79399::t_f219f84676bf70 70
+apps/web/src/components/onboarding/TeamStep.tsx
+  s_d75a7804b79399::t_4ef2f9c3698488 141-142
+  s_d75a7804b79399::t_a97e983245559c 1-140,143-202
+DESIGN.md
+  s_d75a7804b79399::t_746b6e2ec18a02 188-189,224-227,316-326
+  s_d75a7804b79399::t_b2adf7fde7b127 327
+apps/web/src/app/globals.css
+  s_d75a7804b79399::t_101dcde3e6987d 11
+apps/web/src/components/onboarding/OnboardingFlow.tsx
+  s_d75a7804b79399::t_786d3eb0a340e1 3,5,7-23,26-27,31-46,51-61,64-65,67,69-86,90-98,104,106,109,111,113-117,119,121,124,127,129,132-141,144-146,148,150-156,159-175,177-179,185-187
+  s_d75a7804b79399::t_52a4d15f05a8d1 29,100,123
+  s_d75a7804b79399::t_4096560c0bc8e1 28,30
+apps/web/src/components/org/ProfilePane.tsx
+  s_d75a7804b79399::t_6b6dee908e3c52 130,189,193
+apps/web/src/lib/onboarding.test.ts
+  s_d75a7804b79399::t_acc9dd8b38fe9d 2-11,56-93
+  s_d75a7804b79399::t_32b555e9111edf 94
+packages/contracts/src/onboarding.ts
+  s_d75a7804b79399::t_5c21a54e3defba 39-53
+apps/web/src/lib/org.ts
+  s_d75a7804b79399::t_1e4afe5f7b51fe 14-15,18
+apps/web/src/components/org/WorkspaceDialog.tsx
+  s_d75a7804b79399::t_1e4afe5f7b51fe 1-123
+apps/web/src/lib/queries.ts
+  s_d75a7804b79399::t_edcbe0b9d857e9 471-475
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+apps/web/src/components/skills/LocalSkillsView.tsx
+  s_d75a7804b79399::t_1cd1d0db650c60 8-9,214,225,227,236,379,382,384-386,394,398-399
+apps/web/src/components/skills/GettingStartedCard.test.ts
+  s_d75a7804b79399::t_600e919f2d8ac0 98,117-119,157-174,181,183
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+apps/web/src/components/onboarding/OnboardingFlow.test.ts
+  s_d75a7804b79399::t_2f655ac99665f9 28,39,43,45,51,53
+  s_d75a7804b79399::t_c0d8147165fb2a 1-27,29-38,40-42,44,46-50,52,54-246
+apps/web/src/components/agents/AgentPicker.tsx
+  s_d75a7804b79399::t_bf5030a21d353f 1-39
+apps/web/src/components/skills/SkillsApp.tsx
+  s_d75a7804b79399::t_1e4afe5f7b51fe 74,1684,1902-1905
+apps/web/src/components/org/SettingsApp.test.ts
+  s_d75a7804b79399::t_9a7f53313bed7b 76
+apps/web/src/components/onboarding/ConnectAgentStep.tsx
+  s_d75a7804b79399::t_72ee7c39a4aa1f 1-173
+apps/web/src/styles/cds.css
+  s_d75a7804b79399::t_a5a2d1b305f06d 26-27
+apps/web/src/components/secrets/SecretsApp.test.ts
+  s_d75a7804b79399::t_4f22f2a33127b3 29
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+  s_d75a7804b79399::t_1e4afe5f7b51fe 26,33
+apps/web/src/components/skills/prompts.ts
+  s_d75a7804b79399::t_396283d27e5ac2 32-39
+apps/web/src/components/onboarding/OnboardingShell.tsx
+  s_d75a7804b79399::t_e5dd3ba770ed16 1-90
+packages/core/src/onboarding.ts
+  s_d75a7804b79399::t_5e70d1c6ca9341 1
+  s_d75a7804b79399::t_8eb150d3af2500 119
+  s_d75a7804b79399::t_e80961947e3826 120-155,157-162,164-167,169-173
+apps/web/src/components/secrets/SecretsApp.tsx
+  s_d75a7804b79399::t_1e4afe5f7b51fe 20,346,504
+apps/web/src/components/skills/SkillsApp.test.ts
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+  s_d75a7804b79399::t_1324b2b69f0ca0 2058,2099-2100,2107-2108,2140,2171,2183-2184
+apps/web/src/components/onboarding/StepHeading.tsx
+  s_d75a7804b79399::t_0dd68e17f5c581 1-36
+apps/web/src/lib/agents.ts
+  s_d75a7804b79399::t_52a4d15f05a8d1 5,7-8,22-24,30
+  s_d75a7804b79399::t_bf5030a21d353f 1-4,6,9-21,25-29,31-42
+apps/web/src/components/skills/LocalSkillsView.test.ts
+  s_d75a7804b79399::t_e302653004ddd5 97,99-101
+  s_d75a7804b79399::t_5e70d1c6ca9341 2
+apps/web/src/styles/onboarding.css
+  s_d75a7804b79399::t_a8f9c97e15a626 2-6,10-11,13-18,21,23,25,28-31,33-38,41,43-47,49-63,65,68-94,132-154,157-177,198-221,223-237,239-246
+  s_d75a7804b79399::t_4ef2f9c3698488 155-156
+apps/web/src/lib/authRouteStates.test.ts
+  s_d75a7804b79399::t_53865265b7ccf8 25-28,68-96,101-102
+  s_d75a7804b79399::t_5e70d1c6ca9341 1,97-100
+  s_d75a7804b79399::t_aaf737538e0f78 103
+apps/web/src/components/cds.tsx
+  s_d75a7804b79399::t_a5a2d1b305f06d 14
+apps/web/src/components/onboarding/ConnectAgentStep.test.ts
+  s_d75a7804b79399::t_2f655ac99665f9 26,34
+  s_d75a7804b79399::t_1874137b5950b0 1-25,27-33,35-231
+e2e/onboarding.spec.ts
+  s_d75a7804b79399::t_2f655ac99665f9 46,57,121
+  s_d75a7804b79399::t_8b9bcb5e928028 1-45,47-56,58-120,122-140
+apps/web/src/components/agents/AgentLogo.tsx
+  s_d75a7804b79399::t_bf5030a21d353f 1-33,35-38,40-50
+  s_d75a7804b79399::t_52a4d15f05a8d1 34,39
+apps/web/src/styles/skills.css
+  s_d75a7804b79399::t_86aa9a25a2b490 1310,1321
+  s_d75a7804b79399::t_ff6c75dfe204bd 1331-1333
+  s_d75a7804b79399::t_44fc107d743b27 323
+  s_d75a7804b79399::t_4b92cab9b70690 1336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "85fe553a1b955de9f7ae7854c9d03541bad6b80e",
+  "prompts": {},
+  "sessions": {
+    "s_d75a7804b79399": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c49f2f9-6111-4420-b8a6-33fa43e48152",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
