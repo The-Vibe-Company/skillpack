@@ -48,11 +48,3 @@ Use LINEAR_TVC_API_KEY, falling back to LINEAR_API_KEY. See `docs/agents/issue-t
 Triage labels: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix;
 see `docs/agents/triage-labels.md`. Domain context lives in root CONTEXT.md and docs/adr/;
 see `docs/agents/domain.md`.
-
-## Plan PR workflow
-
-Use the repository's [plan-pr](.agents/skills/plan-pr/SKILL.md) to prepare an implementation
-plan for approval, then [ship-pr-dev](.agents/skills/ship-pr-dev/SKILL.md) for delivery.
-All dependencies are bundled in `.agents/skills/`; Claude Code uses relative links in
-`.claude/skills/`. Prefer these copies over global skills. See the
-[shared workflow guide](.agents/skills/plan-pr-bundle.md) for usage and prerequisites.

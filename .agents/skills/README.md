@@ -20,7 +20,7 @@ avoid duplicate skill names.
 
 ## Plan PR bundle
 
-See [plan-pr-bundle.md](plan-pr-bundle.md). For this bundle, `.agents/skills/` is canonical
+For this bundle, `.agents/skills/` is canonical
 and `.claude/skills/` contains relative links. Its `tdd` and `grilling` packages are the
-documented Skillpack adaptations; exclude them from the generic Matt Pocock copy update
+Skillpack adaptations; exclude them from the generic Matt Pocock copy update
 above and update them with the full Plan PR dependency closure instead.
