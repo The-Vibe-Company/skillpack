@@ -17,3 +17,10 @@ To update them, copy the skill folders from a newer release (or run
 `npx skills@latest add mattpocock/skills`) into both `.agents/skills/` and `.claude/skills/`, then
 bump the version here. If you also have the Claude Code plugin installed, disable one of the two to
 avoid duplicate skill names.
+
+## Plan PR bundle
+
+See [plan-pr-bundle.md](plan-pr-bundle.md). For this bundle, `.agents/skills/` is canonical
+and `.claude/skills/` contains relative links. Its `tdd` and `grilling` packages are the
+documented Skillpack adaptations; exclude them from the generic Matt Pocock copy update
+above and update them with the full Plan PR dependency closure instead.
