@@ -1088,10 +1088,12 @@ export async function listSkills(input: {
   // just the displayed rows) so dependency-aware roll-up can see installs outside the current filter/
   // view. A separate query (not a join) keeps the grouped main select simple; guarded for mocked DBs.
   const installBySkill = new Map<string, string | null>();
+  const installChecksumBySkill = new Map<string, string | null>();
   const installRows = await database
     .select({
       skill_id: schema.skillInstalls.skillId,
       installed_version: schema.skillInstalls.installedVersion,
+      installed_checksum: schema.skillInstalls.installedChecksum,
     })
     .from(schema.skillInstalls)
     .where(
@@ -1099,6 +1101,7 @@ export async function listSkills(input: {
     );
   for (const row of Array.isArray(installRows) ? installRows : []) {
     installBySkill.set(row.skill_id, row.installed_version);
+    installChecksumBySkill.set(row.skill_id, row.installed_checksum);
   }
 
   // Dependency-aware update detection: a skill is "update" if it is behind its own current version,
@@ -1108,8 +1111,8 @@ export async function listSkills(input: {
   const selfBehind = (id: string): boolean => {
     const installedVersion = installBySkill.get(id);
     const current = graph.byId.get(id)?.currentVersion ?? null;
-    if (installedVersion == null || current == null) return false;
-    return compareSemver(installedVersion, current) < 0;
+    return computeSkillInstallStatus(installBySkill.has(id), installedVersion ?? null, current,
+      installChecksumBySkill.get(id), graph.byId.get(id)?.currentChecksum) === "update";
   };
 
   return rows.map((r) => {
@@ -1188,6 +1191,8 @@ export async function listSkills(input: {
           Boolean(r.installed),
           installBySkill.get(r.id) ?? null,
           r.current_version,
+          installChecksumBySkill.get(r.id),
+          r.checksum,
         );
         // Roll up a stale dependency into an "update" hint on the installed parent.
         if (own === "installed" && depGraphClosureHasUpdate(r.id, graph, selfBehind)) {
@@ -3232,6 +3237,7 @@ interface DepGraphSkill {
   currentVersionId: string | null;
   /** Current published version string (null when no version), for org-wide update comparisons. */
   currentVersion: string | null;
+  currentChecksum: string | null;
 }
 
 interface DepEdge {
@@ -3284,6 +3290,7 @@ async function loadDepGraph(database: Db, orgId: string): Promise<DepGraph> {
       archivedAt: schema.skills.archivedAt,
       currentVersionId: schema.skills.currentVersionId,
       currentVersion: schema.skillVersions.version,
+      currentChecksum: schema.skillVersions.checksum,
     })
     .from(schema.skills)
     .leftJoin(schema.skillVersions, eq(schema.skillVersions.id, schema.skills.currentVersionId))
@@ -3302,6 +3309,7 @@ async function loadDepGraph(database: Db, orgId: string): Promise<DepGraph> {
       archivedAt: s.archivedAt,
       currentVersionId: s.currentVersionId,
       currentVersion: s.currentVersion ?? null,
+      currentChecksum: s.currentChecksum ?? null,
     };
     byId.set(s.id, entry);
     bySlug.set(s.slug, entry);
@@ -3829,6 +3837,7 @@ function depGraphDependentFor(input: { graph: DepGraph; slug: string }): DepGrap
     archivedAt: null,
     currentVersionId: existing?.currentVersionId ?? null,
     currentVersion: existing?.currentVersion ?? null,
+    currentChecksum: existing?.currentChecksum ?? null,
   };
 }
 
@@ -4680,15 +4689,19 @@ export function computeLocalSkillStatus(
 
 /**
  * Install status for a PUBLISHED skill row from the caller's point of view. Distinct from
- * `computeLocalSkillStatus` because a manual mark can have a null version: a present-but-version-
- * unknown install is "installed", never "update".
+ * `computeLocalSkillStatus` because manual marks may omit a version while still retaining a
+ * package checksum. Both version upgrades and same-version package repairs require an update.
  */
 export function computeSkillInstallStatus(
   hasInstall: boolean,
   installedVersion: string | null,
   currentVersion: string | null,
+  installedChecksum?: string | null,
+  currentChecksum?: string | null,
 ): LocalSkillStatus {
   if (!hasInstall) return "none";
+  if (installedChecksum && currentChecksum && (!installedVersion || installedVersion === currentVersion)
+    && installedChecksum !== currentChecksum) return "update";
   if (!installedVersion || !currentVersion) return "installed";
   return compareSemver(installedVersion, currentVersion) < 0 ? "update" : "installed";
 }
@@ -4741,6 +4754,7 @@ function depGraphClosureHasUpdate(
  * the UI calls it for a manual mark (source "manual"). Visibility-gated via `getSkillBySlug`.
  */
 export async function installSkill(input: {
+  checksum?: string | null;
   actor: ActorContext;
   orgId: string;
   slug: string;
@@ -4771,6 +4785,26 @@ export async function installSkill(input: {
     );
   }
 
+  // Agent reports must identify the bytes they actually installed. A missing checksum remains
+  // unknown; manual marks may snapshot the registry package explicitly selected by the member.
+  let installedChecksum = input.checksum ?? null;
+  if (!installedChecksum && source === "agent") {
+    const [previous] = await database.select({ checksum: schema.skillInstalls.installedChecksum, version: schema.skillInstalls.installedVersion })
+      .from(schema.skillInstalls).where(and(eq(schema.skillInstalls.orgId, input.orgId),
+        eq(schema.skillInstalls.userId, input.actor.id), eq(schema.skillInstalls.skillId, skill.id))).limit(1);
+    // A digest from a different known version cannot describe the newly reported package.
+    if (!version || !previous?.version || previous.version === version) installedChecksum = previous?.checksum ?? null;
+  }
+  if (!installedChecksum && source === "manual") {
+    if (!version || version === skill.current_version) installedChecksum = skill.checksum;
+    else {
+      const [published] = await database.select({ checksum: schema.skillVersions.checksum })
+        .from(schema.skillVersions).where(and(eq(schema.skillVersions.orgId, input.orgId),
+          eq(schema.skillVersions.skillId, skill.id), eq(schema.skillVersions.version, version))).limit(1);
+      installedChecksum = published?.checksum ?? null;
+    }
+  }
+
   await database
     .insert(schema.skillInstalls)
     .values({
@@ -4778,6 +4812,7 @@ export async function installSkill(input: {
       userId: input.actor.id,
       skillId: skill.id,
       installedVersion: version,
+      installedChecksum,
       agentLabel,
       source,
       installedAt: now,
@@ -4785,7 +4820,7 @@ export async function installSkill(input: {
     })
     .onConflictDoUpdate({
       target: [schema.skillInstalls.orgId, schema.skillInstalls.userId, schema.skillInstalls.skillId],
-      set: { installedVersion: version, agentLabel, source, lastReportedAt: now },
+      set: { installedVersion: version, installedChecksum, agentLabel, source, lastReportedAt: now },
     });
 
   await database.insert(schema.auditLog).values({
@@ -4797,14 +4832,13 @@ export async function installSkill(input: {
     metadata: { slug: skill.slug, version, agent: agentLabel, source },
   });
 
-  // Installing a skill also installs its dependency set, so record each resolved (live) dependency in
-  // the closure at its current version. This gives dependency-aware update detection a per-dependency
-  // baseline to compare against later. Idempotent; cascades on every report so a reinstall refreshes
-  // the dependencies too. No audit row per dependency — the parent install is the user-facing action.
+  // Manual marks also track the resolved dependency set. Agents report each dependency with its
+  // verified checksum separately, so stale downloads cannot confirm fresh dependency packages. This gives dependency-aware update detection a per-dependency
+  // baseline to compare against later. Idempotent; cascades on manual reports. No audit row per dependency — the parent install is the user-facing action.
   // The dependency graph is current-version-only, so this only matches reality when the reported
   // install IS the current version (or unknown); reporting an older version may declare a different
   // dependency set, so we skip the cascade rather than record dependencies it might not pull.
-  const reflectsCurrentVersion = version === null || version === skill.current_version;
+  const reflectsCurrentVersion = source === "manual" && (version === null || version === skill.current_version);
   const graph = reflectsCurrentVersion ? await loadDepGraph(database, input.orgId) : null;
   const closure = new Set<string>();
   const collect = (id: string) => {
@@ -4819,7 +4853,7 @@ export async function installSkill(input: {
   if (graph) collect(skill.id);
   if (closure.size) {
     const versionRowsRaw = await database
-      .select({ id: schema.skills.id, version: schema.skillVersions.version })
+      .select({ id: schema.skills.id, version: schema.skillVersions.version, checksum: schema.skillVersions.checksum })
       .from(schema.skills)
       .innerJoin(schema.skillVersions, eq(schema.skillVersions.id, schema.skills.currentVersionId))
       .where(and(eq(schema.skills.orgId, input.orgId), inArray(schema.skills.id, [...closure])));
@@ -4832,6 +4866,7 @@ export async function installSkill(input: {
           userId: input.actor.id,
           skillId: dep.id,
           installedVersion: dep.version,
+          installedChecksum: dep.checksum,
           agentLabel,
           source,
           installedAt: now,
@@ -4839,13 +4874,13 @@ export async function installSkill(input: {
         })
         .onConflictDoUpdate({
           target: [schema.skillInstalls.orgId, schema.skillInstalls.userId, schema.skillInstalls.skillId],
-          set: { installedVersion: dep.version, agentLabel, source, lastReportedAt: now },
+          set: { installedVersion: dep.version, installedChecksum: dep.checksum, agentLabel, source, lastReportedAt: now },
         });
     }
   }
 
   return {
-    status: computeSkillInstallStatus(true, version, skill.current_version),
+    status: computeSkillInstallStatus(true, version, skill.current_version, installedChecksum, skill.checksum),
     installedVersion: version,
     currentVersion: skill.current_version,
   };

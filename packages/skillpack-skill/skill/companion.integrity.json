@@ -1,19 +1,20 @@
 {
   "files": {
-    "SKILL.md": "sha256:e59ad602081786ea889e66ba469df37072f2ca75b2acf08f2da855a489dca8b3",
-    "companion.json": "sha256:958302ffeffd3e33743a74b296a1d611fbe4952b886659e5d92e8c15eb5ecf87",
+    "SKILL.md": "sha256:d033c3966b4980323d7d0a9dc0cd95ae0f8a4371aaff886a59fadb245f1900ec",
+    "companion.json": "sha256:1370d47a67a3026db89b02edb75fcf0f9c8d9ab2783ef6d12e0a3db120c88dee",
     "evals/evals.json": "sha256:2ccbe0ef273ec71200410bdef434fcdc3e8efe58219b47a738694f330a318e7f",
     "scripts/bootstrap.py": "sha256:17be13b802db3ccbeefea63f29aa236e290a99c18ebfc8727e5b88e1cd1c195b",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",
     "scripts/check_updates.py": "sha256:d287638fe8dc12b44b913b2613371914f82d3a32cb2837bc02f042b7270efa70",
-    "scripts/companion-agent-client.mjs": "sha256:8419f62b0166f79e86328da892b069e7448ff996d3d79dc410900903e0b296e4",
-    "scripts/companion_lib.py": "sha256:961142293393abe0eae62b6390b8f3e50cb6c8a9ed42102a3459b641c69e0f37",
+    "scripts/companion-agent-client.mjs": "sha256:5b5242603e174fe64c80cb81f9d3db13138581929d7afd1c9a71fdc7dda6f5e0",
+    "scripts/companion_lib.py": "sha256:a6a95b903055f0c55a5192008213e02d96ed6cd9912749abe036d78d3b0f5641",
     "scripts/create_secret.py": "sha256:88a5c46e499059ecd8d8712b978ace6de72389fd53f57db6ea760478fefd8c65",
-    "scripts/install_skill.py": "sha256:28e1571d7256322132e900d98731b4de3e54c824cb17b0bda406b05eb6bfff04",
+    "scripts/install_skill.py": "sha256:0a4f3ed237fef1c8c39d288b89a11b2d3dc439936c3a01af27528597de1834a3",
     "scripts/onboarding_scan.py": "sha256:bd84fd9922799c5c87e8d9176969fe36d92a797ea5ddec55b02a53d1c081c16c",
+    "scripts/package-checksum.mjs": "sha256:2420a2ba9673e2a0bd498d6b97881bed638f95d159bc985f50c7a54793e1c223",
     "scripts/secrets_runtime.py": "sha256:bd2167fb6757d383e95d0293e8b3816249678d128b6cb02f0d4a9ae76503e38c",
-    "scripts/skill_guard.py": "sha256:f9777e434eca4f3443e67ded98191203cd6d83d2f7bdf48d2f1ef4e497c0223f",
+    "scripts/skill_guard.py": "sha256:327440144111981fe722514a3cdee227c0f68881b87d9a67aa8e918511ee7f1a",
     "scripts/skillpack-agent-client.mjs": "sha256:c1ca0677daea08d98b202120865af7ebcee2572c7cb1ed713096b3f3b9514a03",
     "scripts/sync_companion.py": "sha256:9a69b956155208901b524af559727de38cbb464154286b8828e1edffb61d38e1",
     "scripts/sync_secrets.py": "sha256:c80f6ec4b65f3c4f986dfbec6a01671e0f895672f1ab5ce75a1b9cbe34168e82",
@@ -21,5 +22,5 @@
     "scripts/tools.json": "sha256:2b7701dd84397cb6dafe7b60667c7c6f198f46377ab48ef9107f9b22aead3c7d"
   },
   "schemaVersion": 1,
-  "version": "1.117.0"
+  "version": "1.118.0"
 }

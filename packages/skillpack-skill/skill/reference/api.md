@@ -576,7 +576,7 @@ reported as installed for the current user:
 POST /skills/{slug}/install
 Content-Type: application/json
 
-{ "version": "1.10.0", "source": "agent", "agent": "Claude Code" }
+{ "version": "1.10.0", "checksum": "sha256:<canonical-tar-digest>", "source": "agent", "agent": "Claude Code" }
 ```
 
 Skip this install report for personal skills; they already appear in the author's My Skills library.
@@ -815,9 +815,14 @@ the shared label hierarchy. Personal access tokens cannot call these browser-ses
 
 ## Versions & checksums
 
-Versions are immutable. Each version row carries a `checksum` of the form `sha256:<64 hex>` over the
+Publication normally creates immutable versions. The authorized activation-reporting rollout is a
+one-time exception that rewrites existing content without changing version numbers. Compare checksums
+as well as versions for update detection. Each version row carries a `checksum` of the form `sha256:<64 hex>` over the
 canonical (uncompressed) tar. This is **not** the hash of the `.zip` the package endpoint serves, so
-treat it as a version identity reference, not a byte check of the download. To confirm an install,
+use the bundled local `package-checksum.mjs` helper to compute it from the extracted package before
+secret projection; never substitute a ZIP or directory-inventory digest. Report each installed
+dependency separately. Older agent reports without a checksum cannot clear a detected content update.
+To confirm an install,
 check that `SKILL.md` is at the package root and `companion.json.version` matches the version you
 fetched.
 

@@ -13,3 +13,6 @@ short-lived grants authorize retrieval. Declared Skill Databases provide tenant-
 Skillpack completes authorized workflows end to end with credentials it already holds.
 Hosted teammates, chat, Box/Pi execution, routines, triggers, plugins, and native chat clients are
 retired. Skillpack does not launch external coding agents or execute skill package scripts.
+
+The reporting rollout includes an explicitly authorized historical-package retrofit; installed
+copies can detect same-version content updates through checksums.

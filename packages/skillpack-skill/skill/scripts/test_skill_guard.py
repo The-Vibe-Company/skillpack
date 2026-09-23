@@ -11,6 +11,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -136,6 +137,13 @@ class ConflictDetectionTests(unittest.TestCase):
         conflicts = skill_guard.detect_conflicts(entries, online_index())
         self.assertIn(skill_guard.KIND_SLUG_MULTIPLE_IDS, kinds(conflicts))
         self.assertTrue(skill_guard.has_blocking(conflicts))
+
+    def test_same_version_checksum_change_is_an_update(self):
+        local = {"name": "alpha", "version": "1.0.0", "checksum": "sha256:old"}
+        remote = {"alpha": {"current_version": "1.0.0", "checksum": "sha256:new"}}
+        self.assertEqual("update", companion_lib.status_for_local(local, remote, {})[0])
+        local["checksum"] = "sha256:new"
+        self.assertEqual("current", companion_lib.status_for_local(local, remote, {})[0])
 
     def test_archived_online_is_missing_or_archived_not_current(self):
         status, _ = companion_lib.status_for_local_guarded(
@@ -400,6 +408,57 @@ class ReportTests(unittest.TestCase):
         self.assertTrue(opts["json"])
         self.assertEqual("alpha", opts["create_check"])
         self.assertEqual(["dir-1", "dir-2"], opts["scan_roots"])
+
+
+class TargetPackageChecksumTests(unittest.TestCase):
+    def test_one_tool_update_preserves_legacy_other_target_baseline(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "skills.lock.json"
+            skill = {"name": "alpha", "slug": "alpha", "version": "1.0.0", "checksum": "sha256:old"}
+            targets = [{"tool": tool, "scope": "user", "path": f"/{tool}/alpha", "checksum": "folder-old"}
+                       for tool in ("codex", "claude-code")]
+            companion_lib.upsert_skill_lock_record(path, "ws", "https://api/v1", skill, targets, None)
+            # Existing installations predate per-target canonical checksums.
+            raw = json.loads(path.read_text())
+            for target in raw["workspaces"]["ws"]["skills"]["alpha"]["targets"]:
+                target.pop("packageChecksum")
+            path.write_text(json.dumps(raw))
+            skill["checksum"] = "sha256:new"
+            targets[0]["checksum"] = "folder-new"
+            companion_lib.upsert_skill_lock_record(path, "ws", "https://api/v1", skill, targets[:1], None)
+            record = companion_lib.load_inventory_from(path, "ws", "https://api/v1")[0]
+            by_tool = {target["tool"]: target for target in record["targets"]}
+            self.assertEqual("sha256:old", by_tool["claude-code"]["packageChecksum"])
+            self.assertEqual("sha256:new", by_tool["codex"]["packageChecksum"])
+            self.assertEqual("folder-old", by_tool["claude-code"]["checksum"])
+            remote = {"alpha": {"current_version": "1.0.0", "checksum": "sha256:new"}}
+            self.assertEqual("update", companion_lib.status_for_local(record, remote, {})[0])
+            companion_lib.upsert_skill_lock_record(path, "ws", "https://api/v1", skill, targets[1:], None)
+            record = companion_lib.load_inventory_from(path, "ws", "https://api/v1")[0]
+            self.assertEqual("current", companion_lib.status_for_local(record, remote, {})[0])
+
+    def test_guard_keeps_checksum_drift_without_server_install_report(self):
+        record = {"name": "alpha", "slug": "alpha", "version": "1.0.0", "checksum": "sha256:new",
+                  "targets": [{"tool": "codex", "scope": "user", "path": "/codex/alpha",
+                               "version": "1.0.0", "checksum": "folder-checksum", "packageChecksum": "sha256:old"}]}
+        remote = online_index(by_slug={"alpha": {"current_version": "1.0.0", "checksum": "sha256:new"}})
+        with tempfile.TemporaryDirectory() as directory:
+            with patch.object(skill_guard, "_lock_records", return_value=[record]), \
+                 patch.object(skill_guard, "load_project_inventory", return_value=(None, [record])), \
+                 patch.object(skill_guard, "legacy_log_path", return_value=Path(directory) / "absent"):
+                entries = skill_guard.build_local_inventory("ws", "https://api/v1", [])
+            report = skill_guard.build_report("ws", "https://api/v1", {}, entries, remote, [], None)
+        self.assertEqual(["lockfile", "project_lockfile"], [row["source"] for row in report["inventory"]])
+        self.assertEqual(["update", "update"], [row["status"] for row in report["inventory"]])
+        # Single-record legacy checksums also survive the guard's collection and report pipeline.
+        record.pop("targets")
+        record["checksum"] = "sha256:old"
+        with patch.object(skill_guard, "_lock_records", return_value=[record]), \
+             patch.object(skill_guard, "load_project_inventory", return_value=(None, [])), \
+             patch.object(skill_guard, "legacy_log_path", return_value=Path("/nonexistent-checksum-log")):
+            entries = skill_guard.build_local_inventory("ws", "https://api/v1", [])
+        report = skill_guard.build_report("ws", "https://api/v1", {}, entries, remote, [], None)
+        self.assertEqual("update", report["inventory"][0]["status"])
 
 
 if __name__ == "__main__":

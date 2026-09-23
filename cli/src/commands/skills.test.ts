@@ -108,7 +108,9 @@ describe("skills pull safeguards", () => {
 
   it("refuses to replace a locally modified tracked install without --force", async () => {
     await withSkillDir(async (dir) => {
-      const locked = { checksum: "sha256:old" } as LockedSkill;
+      // SAFETY: This fixture supplies the only LockedSkill field the replacement guard reads.
+      // SAFETY: The classification fixture includes every LockedSkill field read by classify.
+    const locked = { checksum: "sha256:old" } as LockedSkill;
       await expect(assertCanReplaceExistingInstall(dir, locked, false)).rejects.toThrow(/local changes detected/);
       await expect(assertCanReplaceExistingInstall(dir, locked, true)).resolves.toBeUndefined();
     });
@@ -233,12 +235,14 @@ describe("skills push version resolution", () => {
 
 describe("skills status drift classification", () => {
   it("keeps a freshly pushed package up-to-date after local normalization matches the registry", () => {
+    // SAFETY: The classification fixture includes every LockedSkill field read by classify.
     const locked = {
       name: "demo",
       pinned: null,
       resolved: "1.0.0",
       checksum: "sha256:server-normalized",
     } as LockedSkill;
+    // SAFETY: This registry fixture includes every field read by classify.
     const registry = {
       exists: true,
       id: "skill-1",
@@ -248,5 +252,24 @@ describe("skills status drift classification", () => {
     } as RegistryInfo;
 
     expect(classify(locked, "sha256:server-normalized", registry, "1.0.0")).toBe("up-to-date");
+  });
+});
+
+describe("same-version registry repairs", () => {
+  const registry: RegistryInfo = {
+    exists: true, id: "skill-1", currentVersion: "2.0.0", versions: ["1.0.0", "2.0.0"],
+    checksums: { "1.0.0": "new", "2.0.0": "latest" },
+  };
+  it.each([null, "1.0.0"])("updates an unchanged install pinned to %s", (pinned) => {
+    // SAFETY: The classification fixture includes every LockedSkill field read by classify.
+    const locked = { name: "demo", pinned, resolved: "1.0.0", checksum: "old" } as LockedSkill;
+    expect(classify(locked, "old", registry, "1.0.0")).toBe("outdated");
+    expect(classify(locked, "edited", registry, "1.0.0")).toBe("conflict");
+  });
+  it("keeps an exact version pin after its checksum is refreshed", () => {
+    // SAFETY: The classification fixture includes every LockedSkill field read by classify.
+    const locked = { name: "demo", pinned: "1.0.0", resolved: "1.0.0", checksum: "new" } as LockedSkill;
+    expect(classify(locked, "new", registry, "1.0.0")).toBe("pinned");
+    expect(classify(locked, "edited", registry, "1.0.0")).toBe("modified");
   });
 });

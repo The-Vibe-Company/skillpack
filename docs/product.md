@@ -32,8 +32,10 @@ slash-separated, multi-assigned, and may exist without skills.
 ## Reported skill activations
 
 New published versions include a visible reporting instruction in `SKILL.md`. An external agent
-can report each activation without logging into Skillpack or installing a binary. Existing immutable
-versions are unchanged; copied skills need updating. Collection is best effort, not evidence of
+can report each activation without logging into Skillpack or installing a binary. At deployment, an
+explicitly authorized one-time retrofit also rewrites all existing published versions, including
+historical, archived and personal skills, without changing their version numbers. Installed copies
+show an update when their checksum differs and must be downloaded again. Collection is best effort, not evidence of
 successful execution. `SKILLPACK_TELEMETRY=0` or the user's instruction disables reporting.
 
 The Usage tab shows the last 90 days of reported activations, daily UTC totals, agent/environment

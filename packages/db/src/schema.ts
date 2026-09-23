@@ -579,6 +579,8 @@ export const skillVersions = pgTable(
     sizeBytes: integer("size_bytes").notNull(),
     checksum: text("checksum").notNull(),
     storagePath: text("storage_path").notNull(),
+    /** Release-maintenance checkpoint for the explicitly authorized historical telemetry retrofit. */
+    usageReportingRevision: integer("usage_reporting_revision").notNull().default(0),
     validation: validationStateEnum("validation").notNull().default("valid"),
     validationError: text("validation_error"),
     createdBy: text("created_by")
@@ -1094,7 +1096,7 @@ export const localSkillInstalls = pgTable(
  * (source = "agent") at the end of the normal install flow; a member can also mark a skill
  * installed / not-installed by hand from the UI (source = "manual", e.g. installed another way, or
  * correcting a false state). `installed_version` is null when a manual mark didn't supply one. The
- * list view compares `installed_version` against the skill's current published version to show
+ * list view compares installed version and checksum against the current published package to show
  * Installed / Update available. One row per member per skill per workspace.
  */
 export const skillInstalls = pgTable(
@@ -1111,6 +1113,8 @@ export const skillInstalls = pgTable(
       .references(() => skills.id, { onDelete: "cascade" }),
     /** Semver the member/agent reported, or null when a manual mark didn't supply one. */
     installedVersion: text("installed_version"),
+    /** Verified package checksum at install time, retained across same-version repairs. */
+    installedChecksum: text("installed_checksum"),
     /** Optional free-form source label, e.g. "Claude Code". */
     agentLabel: text("agent_label"),
     /** How the install was recorded: "agent" (reported by the assistant) or "manual" (marked by hand). */

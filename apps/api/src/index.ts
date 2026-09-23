@@ -2492,6 +2492,7 @@ app.post("/v1/skills/:slug/install", async (c) => {
           orgId,
           slug: c.req.param("slug"),
           version: input.version ?? null,
+          checksum: input.checksum ?? null,
           agentLabel: input.agent ?? null,
           source: input.source ?? "manual",
           database,

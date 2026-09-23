@@ -13,7 +13,7 @@ location in the right lockfile so updates and audits stay tool-aware:
 The tool set comes from ~/.companion/config.json (see `detect_tools`), overridable with --tools.
 A target whose on-disk folder was locally customized (its checksum diverges from the lockfile) is
 skipped unless --force, so a multi-tool update never clobbers local edits. The aggregate install
-report (POST /skills/:slug/install) stays a single call; pass --report to send it from here.
+report (POST /skills/:slug/install) includes each installed package's canonical checksum; pass --report.
 """
 
 from __future__ import annotations
@@ -37,6 +37,7 @@ from companion_lib import (  # noqa: E402
     api_get,
     api_post_json,
     compute_dir_checksum,
+    compute_package_checksum,
     config_path,
     detect_tools,
     fail,
@@ -579,6 +580,7 @@ def install_node(
     zip_bytes = api_download_bytes(api_url, token, f"/skills/{api_quote(node['slug'])}/versions/{api_quote(node['version'])}/package")
     with tempfile.TemporaryDirectory(prefix="companion-install-") as tmp:
         package_dir = extract_package(zip_bytes, Path(tmp))
+        node["skill"]["checksum"] = compute_package_checksum(package_dir)
         return install_prepared_node(api_url, workspace_id, node, package_dir, plan, registry, project_root, prior_user, prior_project, force, secret_context)
 
 
@@ -660,6 +662,8 @@ def install_prepared_node(
     for row in results:
         row["slug"] = node["slug"]
         row["version"] = node["version"]
+        if row["status"] == "installed":
+            row["packageChecksum"] = node["skill"].get("checksum")
 
     installed = [row for row in results if row["status"] == "installed"]
     user_targets = [row for row in installed if row["scope"] == "user"]
@@ -697,6 +701,7 @@ def install_nodes(
                 destination = Path(temp_packages.name) / str(index)
                 destination.mkdir()
                 prepared[node["slug"]] = extract_package(zip_bytes, destination)
+                node["skill"]["checksum"] = compute_package_checksum(prepared[node["slug"]])
 
         for index, node in enumerate(nodes):
             results = install_prepared_node(
@@ -718,12 +723,12 @@ def install_nodes(
     return {"targets": all_results, "completed": completed, "skipped": skipped}
 
 
-def report_install(api_url: str, token: str, slug: str, version: str, agent: str) -> dict[str, Any]:
+def report_install(api_url: str, token: str, slug: str, version: str, agent: str, checksum: str | None = None) -> dict[str, Any]:
     return api_post_json(
         api_url,
         token,
         f"/skills/{api_quote(slug)}/install",
-        {"version": version, "agent": agent, "source": "agent"},
+        {"version": version, "agent": agent, "source": "agent", **({"checksum": checksum} if checksum else {})},
     )
 
 
@@ -885,7 +890,10 @@ def main() -> None:
     if args.report and complete:
         installed_tools = sorted({registry[row["tool"]].get("displayName", row["tool"]) for row in installed})
         agent_label = args.agent or ", ".join(installed_tools)
-        report = report_install(api_url, token, root["slug"], root["version"], agent_label)
+        for node in nodes:
+            result = report_install(api_url, token, node["slug"], node["version"], agent_label, node["skill"].get("checksum"))
+            if node["slug"] == root["slug"]:
+                report = result
 
     summary = {
         "slug": root["slug"],

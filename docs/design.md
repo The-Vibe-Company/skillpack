@@ -118,3 +118,23 @@ returns 90-day totals, daily UTC counts, agent/environment breakdowns, anonymous
 500 declared identities with an explicit truncation flag. Identity source remains visible; identities
 are not automatically linked to member profiles. Future events after Share follow the skill's new
 organization scope, as do retained statistics for that skill.
+
+### Historical reporting retrofit
+
+The release migration entrypoint runs a resumable maintenance pass after schema/grants, under the
+migration lock and table-owner credential. Migration 0189 first snapshots installed checksums; 0190
+adds a per-version revision checkpoint. The pass covers all tenants, scopes, archived skills and
+historical versions. This is an explicitly authorized exception to published-version immutability.
+
+It verifies each old archive checksum, changes only the SKILL.md reporting block, preserves version
+numbers and manifest/dependency/secret/database declarations, and writes to a new content-addressed
+object. A per-version transaction then replaces checksum, size, body and storage references, updates
+the pinned public ZIP tuple if necessary, revokes outstanding transfer tickets, writes a creator-private
+audit event for personal skills and queues organization GitHub mirrors. Storage failure rolls back
+references; completed versions are skipped on retry. Original objects are retained for rollback.
+
+Install reports accept the canonical tar checksum. Agent reports without one retain their previous
+baseline; manual confirmation uses the registry checksum. The distributed installer computes the
+checksum from actual downloaded files with the shared local packer before projecting secrets, and
+reports each package after the full install succeeds. CLI and local inventory compare same-version
+checksums while preserving local-edit protection. Runtime API/worker roles cannot invoke the retrofit.

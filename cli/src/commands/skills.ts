@@ -402,7 +402,7 @@ export async function sync(opts: { dryRun?: boolean; force?: boolean }, g: Globa
   const { lock, rows } = await driftRows(client, lockDir);
   const changed: string[] = [];
   for (const row of rows) {
-    if (!row.target || row.target === row.locked.resolved) continue;
+    if (!row.target || (row.target === row.locked.resolved && !["outdated", "missing", "conflict"].includes(row.state))) continue;
     if (!opts.force && !["outdated", "missing"].includes(row.state)) continue;
     if (opts.dryRun) {
       changed.push(`${row.locked.name}@${row.target}`);
@@ -414,6 +414,7 @@ export async function sync(opts: { dryRun?: boolean; force?: boolean }, g: Globa
     if (updated) {
       lock.skills[row.locked.name] = updated;
       updated.resolved = row.target;
+      updated.pinned = row.locked.pinned;
       updated.updatedAt = nowIso();
     }
     changed.push(`${row.locked.name}@${row.target}`);

@@ -537,7 +537,7 @@ class LockRecordTests(EnvSandbox):
         legacy = companion_lib.normalize_targets({"installPath": "/legacy", "checksum": "sha256:2", "version": "1.0.0"})
         self.assertEqual(
             legacy,
-            [{"tool": "claude-code", "scope": "user", "path": "/legacy", "checksum": None, "version": "1.0.0"}],
+            [{"tool": "claude-code", "scope": "user", "path": "/legacy", "checksum": None, "packageChecksum": "sha256:2", "version": "1.0.0"}],
         )
 
     def test_skill_records_from_lock_surfaces_targets(self) -> None:
@@ -1342,7 +1342,7 @@ class DependencyInstallPlanTests(EnvSandbox):
         self.assertFalse(payload["complete"])
         self.assertEqual(calls, [])
 
-    def test_main_complete_install_reports_root_once(self) -> None:
+    def test_main_complete_install_reports_each_package_once(self) -> None:
         calls: list[tuple[str, str]] = []
         dep = {"slug": "dep", "version": "1.0.0", "skill": {"name": "dep", "slug": "dep", "version": "1.0.0"}}
         root = {"slug": "root", "version": "1.0.0", "skill": {"name": "root", "slug": "root", "version": "1.0.0"}}
@@ -1366,7 +1366,7 @@ class DependencyInstallPlanTests(EnvSandbox):
             "skipped": [],
         }
 
-        def fake_report(_api_url: str, _token: str, slug: str, version: str, _agent: str):
+        def fake_report(_api_url: str, _token: str, slug: str, version: str, _agent: str, _checksum: str | None):
             calls.append((slug, version))
             return {"ok": True}
 
@@ -1386,7 +1386,7 @@ class DependencyInstallPlanTests(EnvSandbox):
         payload = json.loads(out)
         self.assertTrue(payload["complete"])
         self.assertFalse(payload["reportWithheld"])
-        self.assertEqual(calls, [("root", "1.0.0")])
+        self.assertEqual(calls, [("dep", "1.0.0"), ("root", "1.0.0")])
 
     def test_install_nodes_records_dependency_and_root_lockfiles(self) -> None:
         original_download = install_skill.api_download_bytes

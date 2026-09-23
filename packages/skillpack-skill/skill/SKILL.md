@@ -30,7 +30,8 @@ New versions published through Skillpack receive a visible activation-reporting 
 checksum is computed. Preserve this generated block when editing; publication replaces it automatically.
 It works without Agent Auth and sends optional declared IDs/emails to the publishing instance.
 Respect `SKILLPACK_TELEMETRY=0` and user opt-out. Reporting failure never blocks the skill's task.
-Existing installed copies require an update to gain reporting. Usage statistics are best-effort and
+The deployment also retrofits all historical published versions in place. Version numbers stay the
+same; use checksum changes to detect updates. Existing installed copies require a download to gain reporting. Usage statistics are best-effort and
 identities unverified; personal-skill statistics remain creator-only. See `reference/api.md` for the contract.
 
 ## Configuration
@@ -1379,7 +1380,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.117.0","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.118.0","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 

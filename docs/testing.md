@@ -12,6 +12,8 @@ providers and identities, not authorization, persistence, or tenant scoping.
 - Usage reports work without credentials, deduplicate per activation, expire after 90 days, and
   reveal neither skill existence nor private usage to unauthorized callers. Reported identities
   remain unverified and never grant account authority.
+- Historical reporting retrofits preserve authored files, scopes, version numbers and install baselines;
+  retries do not duplicate updates, and storage failures never expose mismatched public/private bytes.
 - Public releases pin one exact version; GitHub mirrors stay deterministic and idempotent.
 - Secret grants cannot replay or leak plaintext through ordinary metadata, errors, logs, or audit.
 - Agent Auth and child PATs remain exact-workspace and capability constrained.

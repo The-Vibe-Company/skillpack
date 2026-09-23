@@ -1324,6 +1324,20 @@
       "when": 1793408800000,
       "tag": "0188_skill_usage",
       "breakpoints": true
+    },
+    {
+      "idx": 189,
+      "version": "7",
+      "when": 1793412400000,
+      "tag": "0189_skill_install_checksums",
+      "breakpoints": true
+    },
+    {
+      "idx": 190,
+      "version": "7",
+      "when": 1793416000000,
+      "tag": "0190_skill_usage_rewrite",
+      "breakpoints": true
     }
   ]
 }
