@@ -11,10 +11,11 @@ export async function setCurrentOrg(orgId: string): Promise<void> {
   });
 }
 
-export async function createOrg(name: string, kind: "personal" | "team"): Promise<{ id: string; slug: string }> {
+/** Create another team workspace; personal skills are a scope inside every workspace. */
+export async function createOrg(name: string): Promise<{ id: string; slug: string }> {
   return apiFetch("/v1/orgs", {
     method: "POST",
-    body: JSON.stringify({ name, kind }),
+    body: JSON.stringify({ name, kind: "team" }),
   });
 }
 

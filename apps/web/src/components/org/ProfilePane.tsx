@@ -127,7 +127,7 @@ export function ProfilePane({ ctx }: { ctx: OrgCtx }) {
   // `fetch` + `router.push` races the redirect — the still-live cookie bounces back to /skills.
   const logoutForm = useRef<HTMLFormElement>(null);
   const signOut = () => logoutForm.current?.submit();
-  const resumeOnboarding = async () => {
+  const showGettingStarted = async () => {
     if (resuming) return;
     setResuming(true);
     try {
@@ -186,11 +186,11 @@ export function ProfilePane({ ctx }: { ctx: OrgCtx }) {
           <button
             className="btn-sec"
             type="button"
-            onClick={() => void resumeOnboarding()}
+            onClick={() => void showGettingStarted()}
             disabled={resuming}
           >
             <Icon name="arrow-right" size={14} />
-            {resuming ? "Opening" : "Resume onboarding"}
+            {resuming ? "Opening" : "Show getting started"}
           </button>
         </div>
       ) : null}

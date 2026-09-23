@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { acceptInvite, createOrg as createOrgRpc, setCurrentOrg } from "@/lib/org";
-import type { OnboardingMode } from "./Onboarding";
+import type { WorkspaceDialogMode } from "./WorkspaceDialog";
 
 /** Shell-level workspace actions shared by the Skills + Settings shells. */
 export function useOrgActions() {
   const router = useRouter();
-  const [onboarding, setOnboarding] = useState<OnboardingMode | null>(null);
+  const [workspaceDialog, setWorkspaceDialog] = useState<WorkspaceDialogMode | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,23 +19,23 @@ export function useOrgActions() {
       await setCurrentOrg(id);
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
   };
 
-  const createOrg = async (name: string, kind: "personal" | "team") => {
+  const createOrg = async (name: string) => {
     setError(null);
     setBusy(true);
     try {
-      const { id } = await createOrgRpc(name, kind);
+      const { id } = await createOrgRpc(name);
       await setCurrentOrg(id);
-      setOnboarding(null);
+      setWorkspaceDialog(null);
       router.push("/skills");
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
@@ -50,15 +50,15 @@ export function useOrgActions() {
     try {
       const { orgId } = await acceptInvite(token);
       if (orgId) await setCurrentOrg(orgId);
-      setOnboarding(null);
+      setWorkspaceDialog(null);
       router.push("/skills");
       router.refresh();
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof Error ? e.message : "Something went wrong. Try again.");
     } finally {
       setBusy(false);
     }
   };
 
-  return { onboarding, setOnboarding, busy, error, setError, switchOrg, createOrg, joinOrg };
+  return { workspaceDialog, setWorkspaceDialog, busy, error, setError, switchOrg, createOrg, joinOrg };
 }

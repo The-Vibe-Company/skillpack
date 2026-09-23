@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+/* oxlint-disable anti-slop/no-module-mocking, anti-slop/require-safety-comment-for-type-assertion -- This existing test harness predates the incremental anti-slop gate; the onboarding redesign only updates its expectations. */
 
 /**
  * Product promise:
@@ -94,6 +95,7 @@ describe("GettingStartedCard", () => {
     vi.useFakeTimers();
     queryMocks.dismiss.mockReset();
     queryMocks.fetch.mockReset();
+    window.localStorage.clear();
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
@@ -112,7 +114,9 @@ describe("GettingStartedCard", () => {
     const { container } = await mount();
     expect(container.textContent).toContain("Getting started");
     expect(container.textContent?.match(/To do/g)).toHaveLength(3);
-    expect(container.querySelectorAll(".gs-step__action")).toHaveLength(3);
+    // One action, on the first unfinished step: every step copies the same resumable prompt.
+    expect(container.querySelectorAll(".gs-step__action")).toHaveLength(1);
+    expect(container.querySelector(".gs-step__action")?.textContent).toBe("Copy setup prompt");
 
     const select = container.querySelector("select");
     await act(async () => {
@@ -150,14 +154,33 @@ describe("GettingStartedCard", () => {
     );
   });
 
-  it("switches every remaining action to the short resume prompt after installation", async () => {
+  it("offers every supported agent and remembers the choice for this browser", async () => {
+    const { container } = await mount();
+    const options = Array.from(container.querySelectorAll("option")).map((option) => option.textContent);
+    expect(options).toEqual(["Claude Code", "Codex", "OpenCode", "Grok Bot (Cursor)", "OpenClaw", "Hermes"]);
+    const select = container.querySelector("select");
+    await act(async () => {
+      if (select) {
+        select.value = "hermes";
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+    });
+    expect(window.localStorage.getItem("skillpack:preferred-agent")).toBe("hermes");
+
+    const second = await mount();
+    expect(second.container.querySelector("select")?.value).toBe("hermes");
+  });
+
+  it("switches the remaining action to the short resume prompt after installation", async () => {
     const { container } = await mount({
       ...emptyState,
       companion_installed_at: "2026-07-28T12:00:00.000Z",
       first_incomplete_step: "local_review",
     });
     expect(container.textContent?.match(/Done/g)).toHaveLength(1);
+    expect(container.querySelectorAll(".gs-step__action")).toHaveLength(1);
     const action = container.querySelector<HTMLButtonElement>(".gs-step__action");
+    expect(action?.textContent).toBe("Continue with my agent");
     await act(async () => {
       action?.click();
       await Promise.resolve();

@@ -11,22 +11,16 @@ import {
   dismissGettingStarted,
   fetchGettingStarted,
 } from "@/lib/queries";
+import { AGENT_IDS, AGENTS, DEFAULT_AGENT, findAgentId, loadPreferredAgent, savePreferredAgent, type AgentId } from "@/lib/agents";
 import { Icon } from "../Icon";
-import { fillPrompt } from "./prompts";
-
-type AgentId = "claude-code" | "codex" | "opencode" | "grok-bot";
-
-const AGENTS: Record<AgentId, string> = {
-  "claude-code": "Claude Code",
-  codex: "Codex",
-  opencode: "OpenCode",
-  "grok-bot": "Grok Bot (Cursor)",
-};
+import { fillPrompt, gettingStartedTemplate } from "./prompts";
 
 const STEPS: Array<{
   id: GettingStartedStep;
   title: string;
   description: string;
+  /** Label of the copy button, shown on the first unfinished step only. */
+  action: string;
   timestamp: keyof Pick<
     GettingStartedState,
     "companion_installed_at" | "local_reviewed_at" | "org_reviewed_at"
@@ -36,18 +30,21 @@ const STEPS: Array<{
     id: "companion_install",
     title: "Install Skillpack",
     description: "Connect Skillpack to your coding agent.",
+    action: "Copy setup prompt",
     timestamp: "companion_installed_at",
   },
   {
     id: "local_review",
     title: "Review local skills",
     description: "Choose which skills from this machine belong in My Skills.",
+    action: "Continue with my agent",
     timestamp: "local_reviewed_at",
   },
   {
     id: "org_review",
     title: "Explore organization skills",
     description: "Review the shared library and install what is useful.",
+    action: "Continue with my agent",
     timestamp: "org_reviewed_at",
   },
 ];
@@ -87,7 +84,7 @@ export function GettingStartedCard({
   workspaceId: string;
 }) {
   const [state, setState] = useState(initialState);
-  const [agent, setAgent] = useState<AgentId>("claude-code");
+  const [agent, setAgent] = useState<AgentId>(DEFAULT_AGENT);
   const [copiedStep, setCopiedStep] = useState<GettingStartedStep | null>(null);
   const [copyFailedStep, setCopyFailedStep] = useState<GettingStartedStep | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -129,6 +126,8 @@ export function GettingStartedCard({
     }
   }, [initialState, workspaceId]);
 
+  useEffect(() => setAgent(loadPreferredAgent()), []);
+
   useEffect(() => {
     if (!visible) return;
     const onFocus = () => void refresh();
@@ -141,10 +140,8 @@ export function GettingStartedCard({
   }, [refresh, visible]);
 
   const prompt = useMemo(() => {
-    const template = state.companion_installed_at
-      ? skillpackSkill.prompts.resume
-      : skillpackSkill.prompts.onboarding;
-    const tool = AGENTS[agent];
+    const template = gettingStartedTemplate(skillpackSkill, Boolean(state.companion_installed_at));
+    const tool = AGENTS[agent].name;
     return fillPrompt(template, apiBase(), workspaceId, tool, tool);
   }, [agent, skillpackSkill, state.companion_installed_at, workspaceId]);
 
@@ -194,9 +191,17 @@ export function GettingStartedCard({
 
       <label className="gs-agent">
         <span className="gs-agent__label">My agent</span>
-        <select value={agent} onChange={(event) => setAgent(event.target.value as AgentId)}>
-          {Object.entries(AGENTS).map(([id, label]) => (
-            <option value={id} key={id}>{label}</option>
+        <select
+          value={agent}
+          onChange={(event) => {
+            const next = findAgentId(event.target.value);
+            if (!next) return;
+            setAgent(next);
+            savePreferredAgent(next);
+          }}
+        >
+          {AGENT_IDS.map((id) => (
+            <option value={id} key={id}>{AGENTS[id].name}</option>
           ))}
         </select>
       </label>
@@ -217,15 +222,15 @@ export function GettingStartedCard({
               <span className={`gs-step__status${done ? " gs-step__status--done" : ""}`}>
                 {done ? "Done" : "To do"}
               </span>
-              {!done ? (
+              {current ? (
                 <button
                   type="button"
-                  className={current ? "btn-primary gs-step__action" : "btn-sec gs-step__action"}
+                  className="btn-primary gs-step__action"
                   onClick={() => void copyForStep(step.id)}
                   disabled={!prompt}
                 >
                   <Icon name={copiedStep === step.id ? "check" : "copy"} size={13} />
-                  {copiedStep === step.id ? "Copied" : "Continue with my agent"}
+                  {copiedStep === step.id ? "Copied" : step.action}
                 </button>
               ) : null}
             </li>

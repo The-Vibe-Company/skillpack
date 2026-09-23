@@ -1,3 +1,4 @@
+/* oxlint-disable anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- These row casts predate the incremental anti-slop gate; the onboarding redesign only removes a dead catch. */
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db, schema, type Db } from "@skillpack/db";
 import { TEAM_BRAND_COLORS } from "@skillpack/contracts";
@@ -115,67 +116,61 @@ export async function completeOnboarding(
   const orgId = crypto.randomUUID();
   const orgSlug = uniqueSlug(input.org.name, crypto.randomUUID());
 
-  await database
-    .transaction(async (tx) => {
-      await tx.execute(
-        sql`select set_config('app.org_id', ${orgId}, true), set_config('app.user_id', ${actor.id}, true)`,
-      );
-      const [org] = await tx
-        .insert(schema.organizations)
-        .values({
-          id: orgId,
-          name: input.org.name,
-          slug: orgSlug,
-          kind: "team",
-          domain: orgDomain,
-          domainAutoJoin: domainAccessEnabled,
-          color: orgColor,
-          logoUrl: input.org.logoUrl ?? null,
-        })
-        .returning();
-      if (!org) throw new Error("could not create organization");
+  await database.transaction(async (tx) => {
+    await tx.execute(
+      sql`select set_config('app.org_id', ${orgId}, true), set_config('app.user_id', ${actor.id}, true)`,
+    );
+    const [org] = await tx
+      .insert(schema.organizations)
+      .values({
+        id: orgId,
+        name: input.org.name,
+        slug: orgSlug,
+        kind: "team",
+        domain: orgDomain,
+        domainAutoJoin: domainAccessEnabled,
+        color: orgColor,
+        logoUrl: input.org.logoUrl ?? null,
+      })
+      .returning();
+    if (!org) throw new Error("could not create organization");
 
-      if (orgDomain && domainAccessEnabled) {
-        await tx
-          .insert(schema.organizationDomains)
-          .values({ orgId: org.id, domain: orgDomain, createdBy: actor.id })
-          .onConflictDoNothing();
-      }
-
-      await tx.insert(schema.memberships).values({ orgId: org.id, userId: actor.id, orgRole: "owner" });
-
-      const seen = new Set<string>();
-      const self = actor.email.toLowerCase();
-      for (const raw of input.invites) {
-        const email = raw.trim().toLowerCase();
-        if (!email || email === self || seen.has(email)) continue;
-        seen.add(email);
-        const token = crypto.randomUUID().replaceAll("-", "");
-        const [row] = await tx
-          .insert(schema.invitations)
-          .values({
-            orgId: org.id,
-            email,
-            orgRole: "developer",
-            token,
-            createdBy: actor.id,
-            expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-          })
-          .onConflictDoNothing()
-          .returning({ id: schema.invitations.id });
-        if (row) inviteTokens.push({ email, token });
-      }
-
+    if (orgDomain && domainAccessEnabled) {
       await tx
-        .update(schema.profiles)
-        .set({ onboardedAt: new Date() })
-        .where(and(eq(schema.profiles.id, actor.id), isNull(schema.profiles.onboardedAt)));
+        .insert(schema.organizationDomains)
+        .values({ orgId: org.id, domain: orgDomain, createdBy: actor.id })
+        .onConflictDoNothing();
+    }
 
-    })
-    .catch((error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error);
-      throw error;
-    });
+    await tx.insert(schema.memberships).values({ orgId: org.id, userId: actor.id, orgRole: "owner" });
+
+    const seen = new Set<string>();
+    const self = actor.email.toLowerCase();
+    for (const raw of input.invites) {
+      const email = raw.trim().toLowerCase();
+      if (!email || email === self || seen.has(email)) continue;
+      seen.add(email);
+      const token = crypto.randomUUID().replaceAll("-", "");
+      const [row] = await tx
+        .insert(schema.invitations)
+        .values({
+          orgId: org.id,
+          email,
+          orgRole: "developer",
+          token,
+          createdBy: actor.id,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+        })
+        .onConflictDoNothing()
+        .returning({ id: schema.invitations.id });
+      if (row) inviteTokens.push({ email, token });
+    }
+
+    await tx
+      .update(schema.profiles)
+      .set({ onboardedAt: new Date() })
+      .where(and(eq(schema.profiles.id, actor.id), isNull(schema.profiles.onboardedAt)));
+  });
 
   return { orgId, inviteTokens };
 }

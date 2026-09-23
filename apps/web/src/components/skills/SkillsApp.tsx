@@ -71,7 +71,7 @@ import {
   shareSkillToOrg,
   unassignPersonalSkillLabel,
 } from "@/lib/queries";
-import { Onboarding } from "../org/Onboarding";
+import { WorkspaceDialog } from "../org/WorkspaceDialog";
 import { settingsHref } from "../org/SettingsApp";
 import { SettingsDrawer, SettingsDrawerError } from "../org/SettingsDrawer";
 import { useOrgActions } from "../org/useOrgActions";
@@ -1681,7 +1681,7 @@ export function SkillsApp({
         orgs={orgs}
         currentOrg={currentOrg}
         onSwitchOrg={orgActions.switchOrg}
-        onOnboard={(m) => orgActions.setOnboarding(m)}
+        onOnboard={(m) => orgActions.setWorkspaceDialog(m)}
         onOpenSettings={openSettings}
         onWarmSettings={() => {
           void warmSettings();
@@ -1899,10 +1899,10 @@ export function SkillsApp({
           {labelNotice}
         </div>
       )}
-      {orgActions.onboarding && (
-        <Onboarding
-          mode={orgActions.onboarding}
-          onMode={orgActions.setOnboarding}
+      {orgActions.workspaceDialog && (
+        <WorkspaceDialog
+          mode={orgActions.workspaceDialog}
+          onClose={() => orgActions.setWorkspaceDialog(null)}
           onCreate={orgActions.createOrg}
           onJoin={orgActions.joinOrg}
           busy={orgActions.busy}

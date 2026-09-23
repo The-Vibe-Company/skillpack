@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+/* oxlint-disable anti-slop/no-module-mocking, anti-slop/require-safety-comment-for-type-assertion -- This existing test harness predates the incremental anti-slop gate; the onboarding redesign only updates its expectations. */
 
 import React from "react";
 import { act } from "react";
@@ -93,9 +94,11 @@ describe("LocalSkillsView", () => {
     vi.useRealTimers();
   });
 
-  it("auto-opens the dismissible connect dialog with an assistant chooser when not installed", async () => {
+  it("auto-opens the dismissible connect dialog with the shared agent chooser when not installed", async () => {
     const container = await mount();
-    expect(container.textContent).toContain("Connect Skillpack to your assistant");
+    expect(container.textContent).toContain("Connect your coding agent");
+    // The Companion-era letter mark is gone: the dialog carries the Skillpack brand tile.
+    expect(container.querySelector(".ls-gate__mark")?.textContent).toBe("");
     // All supported assistant tiles are offered; the install is no longer forced ("Maybe later" is available).
     expect(container.textContent).toContain("Claude Code");
     expect(container.textContent).toContain("Codex");

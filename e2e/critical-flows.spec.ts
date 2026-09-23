@@ -73,7 +73,7 @@ async function signIn(page: Page): Promise<void> {
  * refresh, and the rendered checklist as one user-visible workflow.
  *
  * Failure proof:
- * Moving dismissal to localStorage, removing Resume onboarding, or ignoring focus refetch makes the
+ * Moving dismissal to localStorage, removing Show getting started, or ignoring focus refetch makes the
  * second-context, restoration, or completed-state assertion fail.
  */
 test("getting started persists dismissal across contexts and resumes from Account settings", async ({ page, browser }) => {
@@ -115,8 +115,8 @@ test("getting started persists dismissal across contexts and resumes from Accoun
     await secondPage.waitForLoadState("networkidle");
     await expect(secondPage.locator(".gs-card")).toHaveCount(0);
     await secondPage.getByRole("button", { name: "Settings", exact: true }).click();
-    await expect(secondPage.getByRole("button", { name: "Resume onboarding", exact: true })).toBeVisible();
-    await secondPage.getByRole("button", { name: "Resume onboarding", exact: true }).click();
+    await expect(secondPage.getByRole("button", { name: "Show getting started", exact: true })).toBeVisible();
+    await secondPage.getByRole("button", { name: "Show getting started", exact: true }).click();
     await expect(secondPage).toHaveURL(/\/skills(?:\?|$)/);
     await expect(secondPage.locator(".gs-card")).toBeVisible();
 
