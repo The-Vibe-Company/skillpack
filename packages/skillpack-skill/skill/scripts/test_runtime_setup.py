@@ -316,6 +316,30 @@ class RuntimeSetupTests(unittest.TestCase):
             self.assertEqual(result['registeredSkills'], 1)
             self.assertTrue(any('register' in call.args[0] for call in run.call_args_list))
 
+    def test_inventory_ignores_deleted_legacy_targets_and_keeps_verified_skills(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            installed = root / 'installed'
+            installed.mkdir()
+            (installed / 'SKILL.md').write_text('verified skill\n')
+            incomplete = root / 'incomplete'
+            incomplete.mkdir()
+            (incomplete / 'README.md').write_text('no longer a skill\n')
+            identifier = '33333333-3333-4333-8333-333333333333'
+            rows = [{'skillId': identifier, 'version': '1.0.0', 'targets': [
+                {'path': str(root / 'deleted'), 'packageChecksum': 'sha256:legacy'},
+                {'path': str(incomplete), 'packageChecksum': 'sha256:legacy'},
+                {'path': str(installed), 'checksum': companion_lib.compute_dir_checksum(installed)},
+            ]}]
+            with patch.dict(os.environ, {'SKILLPACK_RUNTIME_HOME': str(root / 'state')}):
+                inventory = verified_inventory(rows, 'https://api.example')
+            self.assertEqual(inventory['skills'], [{
+                'path': str(installed.resolve()), 'skill_id': identifier,
+                'version': '1.0.0', 'origin': 'https://api.example',
+            }])
+            self.assertFalse((root / 'deleted').exists())
+            self.assertEqual((incomplete / 'README.md').read_text(), 'no longer a skill\n')
+
     def test_distribution_failure_preserves_runtime_without_registering_new_inventory(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
