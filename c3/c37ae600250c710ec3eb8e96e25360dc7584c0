@@ -1,0 +1,169 @@
+.agents/skills/README.md
+  s_524f399a310bce::t_490071b2eb47af 20-26
+.agents/skills/better-ui/LICENSE
+  s_524f399a310bce::t_5a65c4db756764 1-21
+.agents/skills/better-ui/SKILL.md
+  s_524f399a310bce::t_0238fbd37b5414 1-8,10-11,13,15,17,19-26,28,30-32,34-37,39,41,43,45,47,49,51,53,55,57-69,71,73,75,77,79,81,83,85,87,89,91,93,95,97,99,101,103,105,107,109,111,113,115,117-145,147,149
+.agents/skills/better-ui/SOURCE.md
+  s_524f399a310bce::t_aa6520b8b46da3 1,3-6,8,10,12-13
+.agents/skills/better-ui/animations.md
+  s_524f399a310bce::t_805c0bee2dd053 1,3,5,7,9,11-26,28-29,31-35,37-38,40,42,44,46,48,50-55,57-58,62,64-67,70,72-75,78,80,82-83,85-97,100-102,105,107,109,111-123,125,127,129,131-137,140,142,144,146,148-149,151,153-155,157-164,166,168-171,173-175,177,181,183,185,187,189-191,193-198,200-203
+.agents/skills/better-ui/companion.json
+  s_524f399a310bce::t_245cc7d8c767a6 2-7,9,12-13,15,20,22-23,33,35
+.agents/skills/better-ui/enter-exit.md
+  s_524f399a310bce::t_090517a1c7b2c8 1-58,60,62-68,70-72,74-81,83,85,87,89-100,103-116,119,121-134,136-138,142-146
+.agents/skills/better-ui/icon-transitions.md
+  s_524f399a310bce::t_faba5261199ce0 1,3,5,7,9,11,13-14,16-31,35-72,75,77,79-84,86,88,90-95,97-101
+.agents/skills/better-ui/icons.md
+  s_524f399a310bce::t_458ec8eb04595f 1,3,5,7,9-13,15-26,29,31-32,34,36,39-40,43-47,51-54,57,59,61,63-66,68-70,72-73,76,78,80,82-85,87,89,91-96,99-101,106-107,110
+.agents/skills/better-ui/performance.md
+  s_524f399a310bce::t_b7c64222807fe3 1,3,5,7,9,11-13,15,17-22,25-27,31-45,47,49,51-72,75-88
+.agents/skills/better-ui/surfaces.md
+  s_524f399a310bce::t_47006a18985b44 1,3,5,7,9-25,27-35,37-53,55,57,59-64,67-70,73-75,77,79-84,87-90,92-94,97-99,103,105,107-109,111-114,117,119,121,123,125,127-137,140-142,144-149,151,153,156-164,168,170-176,178,180,182,184-204,207-219
+.agents/skills/capture-learning-tools/SKILL.md
+  s_524f399a310bce::t_65611f36c5276a 15-43
+.agents/skills/capture-learning-tools/companion.json
+  s_524f399a310bce::t_7c46cf1ec9bbe2 2,4,11-17
+.agents/skills/design-frontend-dev/SKILL.md
+  s_524f399a310bce::t_4447feec73156c 15-43
+.agents/skills/design-frontend-dev/companion.json
+  s_524f399a310bce::t_968ba4b649949f 2,4,11-17
+.agents/skills/design-frontend-dev/reference/harden.md
+  s_524f399a310bce::t_178fc5a5bd9f0d 124-126,238
+.agents/skills/design-frontend-dev/reference/optimize.md
+  s_524f399a310bce::t_fe08e097a8ea96 37
+.agents/skills/emil-design-eng/LICENSE
+  s_524f399a310bce::t_7002ed0ee09c1c 1-21
+.agents/skills/emil-design-eng/SKILL.md
+  s_524f399a310bce::t_5f52db14714c7d 1-8,10-11,13,15,17,19-71,73,75,77-79,81-87,89-95,97,99,101,103,105,107-112,114-155,158,160,162,164-170,172,174,176,178-180,182,184,186,188,190-193,195,197-209,212,214-222,224-226,228,230,232,234-247,250,252,254-268,271,273-279,282,284,286,288-292,294-298,300-304,306,308,310-314,316-324,327,329,331,333,335-338,340-342,344-346,348-351,354-364,366-370,373,375-380,383-387,389-398,401,403-423,426-436,438-457,460-474,476-488,491-493,495-507,510-512,514-559,562,564-574,577-582,584-589,591-711
+.agents/skills/emil-design-eng/SOURCE.md
+  s_524f399a310bce::t_b8badf64370847 1,3-6,8,10,12-13
+.agents/skills/emil-design-eng/companion.json
+  s_524f399a310bce::t_e541bf93e636f8 2-7,9,12-13,15,19-20,22-23,33
+.agents/skills/grilling/LICENSE
+  s_524f399a310bce::t_2ca49d7fff9eb0 1-21
+.agents/skills/grilling/SKILL.md
+  s_524f399a310bce::t_2bc1ec56f22830 3-7,10-39,59,61
+.agents/skills/grilling/SOURCE.md
+  s_524f399a310bce::t_66e2c4ad45eee9 1-12
+.agents/skills/grilling/companion.json
+  s_524f399a310bce::t_3d21529979ce93 2-7,9,12-13,15,19-20,22-23,33
+.agents/skills/plan-pr-bundle.md
+  s_524f399a310bce::t_7f085afa819e01 1-59
+.agents/skills/plan-pr/SKILL.md
+  s_524f399a310bce::t_a975e186b29025 1-12,14-15,17,19,21,24,27-30,32,34-35,38-39,41,43,45,47,49-54,56,58,60,62,64,66,68,70,72,74,76-81,83,85,87,89,91,93,95,97,99,101,103-106,108,110,112,114,116,118,120,122,124
+.agents/skills/plan-pr/companion.json
+  s_524f399a310bce::t_38aabef8471c18 2-8,10,13-14,16,21,23-25,35-40,44-45,48-49,52-53
+.agents/skills/plan-pr/evals/evals.json
+  s_524f399a310bce::t_263c580531ea6c 2,6-17,21-32,36-47,51-62,66-76,80-91,95-106,109
+.agents/skills/plan-pr/evals/fixtures/project/AGENTS.md
+  s_524f399a310bce::t_8961bdf3b4f16b 1-2
+.agents/skills/plan-pr/evals/fixtures/project/approved-plan.md
+  s_524f399a310bce::t_713cc3dd5ff23d 1-8
+.agents/skills/plan-pr/evals/fixtures/project/docs/agents/plan-pr-validation.md
+  s_524f399a310bce::t_594a54c66b64cc 1-4
+.agents/skills/plan-pr/evals/fixtures/project/docs/agents/plan-pr.md
+  s_524f399a310bce::t_d1df5cd5f9e00d 1-4
+.agents/skills/plan-pr/evals/fixtures/project/package.json
+  s_524f399a310bce::t_accd452f9dc325 1-7
+.agents/skills/plan-pr/evals/fixtures/project/src/copy.js
+  s_524f399a310bce::t_224018ddc2b17d 1
+.agents/skills/plan-pr/evals/fixtures/project/src/export.js
+  s_524f399a310bce::t_823bcd4f40958c 1-4
+.agents/skills/plan-pr/evals/fixtures/project/src/export.test.js
+  s_524f399a310bce::t_9e8db39c1d5d65 1-5
+.agents/skills/plan-pr/evals/fixtures/project/src/graph.js
+  s_524f399a310bce::t_a035530f4adc59 1-4
+.agents/skills/plan-pr/evals/fixtures/project/tickets/APP-10.md
+  s_524f399a310bce::t_99d232b4ddf09d 1-2
+.agents/skills/plan-pr/evals/fixtures/project/tickets/APP-42.md
+  s_524f399a310bce::t_438808d2fcb24b 1-5
+.agents/skills/plan-pr/evals/fixtures/project/tickets/APP-43.md
+  s_524f399a310bce::t_9b2dd06b635612 1-2
+.agents/skills/plan-pr/evals/fixtures/project/tickets/APP-44.md
+  s_524f399a310bce::t_e6d7b25545eac5 1-2
+.agents/skills/plan-pr/evals/fixtures/project/tickets/APP-9.md
+  s_524f399a310bce::t_14bd637becf6eb 1-2
+.agents/skills/plan-pr/references/plan-contract.md
+  s_524f399a310bce::t_e5817a4316947a 1,3,5,7-11,13-14,16-19,21-23,25-27,29-32,34-36,38-40,42,44,46,48
+.agents/skills/plan-pr/references/setup.md
+  s_524f399a310bce::t_bc2812a3b08348 1,3,5,7,9,12-23,26,28,31-47,50,52
+.agents/skills/plan-pr/references/ticket-intake.md
+  s_524f399a310bce::t_f9b4d425b528af 1-18
+.agents/skills/review-code-dev/LICENSE
+  s_524f399a310bce::t_df994a87a9fb78 44,51-60,83,118,136,169-170,178-189
+.agents/skills/review-code-dev/SKILL.md
+  s_524f399a310bce::t_30a0f3ce0dc17a 3-17,20-21,23,25,27,29-31,33-36,38,40-47,49,51,53,55-59,62,65-88,90,92,94-96,98-102,104,106-110,112,114-116,118,120,122-127,129,131,134-140,142,144,146,148-151,153,155,157,159-166,168,170,172,174-253
+.agents/skills/review-code-dev/UPSTREAM.md
+  s_524f399a310bce::t_c7d3866245063a 1-14
+.agents/skills/review-code-dev/companion.json
+  s_524f399a310bce::t_77d64698271136 2,4-7,11-35,85-90,93,96-97,100-101,105
+.agents/skills/review-code-dev/scripts/.gitignore
+  s_524f399a310bce::t_92f11ff1960b94 2
+.agents/skills/review-code-dev/scripts/ocr.py
+  s_524f399a310bce::t_2f42222ffc9c74 2,5-6,8-77,81-85
+.agents/skills/review-code-dev/scripts/test_ocr.py
+  s_524f399a310bce::t_109de72a64699b 1-2,4-6,8,10,13-15,18-26,28-43,45-52,54-59,61-69
+.agents/skills/ship-pr-dev/SKILL.md
+  s_524f399a310bce::t_365c934b7f5072 9-11,16-44,55-56,67-68,71,86-91,97-99,102,112-114,125,127,133-134,139,141,143,145,159,172-176
+.agents/skills/ship-pr-dev/companion.json
+  s_524f399a310bce::t_376a34570f3dc7 2,4,6-7,11-52
+.agents/skills/ship-pr-dev/evals/evals.json
+  s_524f399a310bce::t_95506d916235b9 7,12,22,37,47,57,62,68-127
+.agents/skills/ship-pr-dev/references/agent-routing.md
+  s_524f399a310bce::t_d3460cc01acea4 43-45,47,51,62,71,73,98,116
+.agents/skills/ship-pr-dev/references/pr-template.md
+  s_524f399a310bce::t_08e427a6c66134 24-26,38-42,49-51,56,65-69
+.agents/skills/ship-pr-dev/references/readiness-gates.md
+  s_524f399a310bce::t_c022df313ea1f0 7,12-14,20,38,45-47,61-64,70,72,74,76-78,87
+.agents/skills/ship-pr-dev/references/review-gate.md
+  s_524f399a310bce::t_b3b9232b170387 1-37,40-57,60,62,64,66
+.agents/skills/ship-pr-dev/references/workflow.md
+  s_524f399a310bce::t_cbaecf0b12c0f7 9,17,21,25,31,33,39,52
+.agents/skills/ship-pr-dev/scripts/prepare_ship_run.py
+  s_524f399a310bce::t_b8c9994f2f5024 32-41
+.agents/skills/tdd/LICENSE
+  s_524f399a310bce::t_4cbf197361f99a 1-21
+.agents/skills/tdd/SKILL.md
+  s_524f399a310bce::t_02550368d3e7b9 3-7,10-38,55,57,69
+.agents/skills/tdd/SOURCE.md
+  s_524f399a310bce::t_a71f31ed2d572b 1-12
+.agents/skills/tdd/companion.json
+  s_524f399a310bce::t_b07c61b1a70e2c 1-34
+.claude/skills/better-ui
+  s_524f399a310bce::t_9964c639245103 1
+.claude/skills/capture-learning-tools
+  s_524f399a310bce::t_3587c8347ac16e 1
+.claude/skills/design-frontend-dev
+  s_524f399a310bce::t_cbcedc691094a6 1
+.claude/skills/emil-design-eng
+  s_524f399a310bce::t_4efa9711e33db5 1
+.claude/skills/grilling
+  s_524f399a310bce::t_a505459b4cf45f 1
+.claude/skills/plan-pr
+  s_524f399a310bce::t_4d29ef4d113a00 1
+.claude/skills/review-code-dev
+  s_524f399a310bce::t_b4b4d8b8563a2d 1
+.claude/skills/ship-pr-dev
+  s_524f399a310bce::t_6ee224885ee39d 1
+.claude/skills/tdd
+  s_524f399a310bce::t_eb930df2398a2b 1
+CLAUDE.md
+  s_524f399a310bce::t_37f68ee19aa3d1 51-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c3c37ae600250c710ec3eb8e96e25360dc7584c0",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
