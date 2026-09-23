@@ -86,7 +86,7 @@ assert_no_symlink_ancestors() {
 json_field() {
   key=$1
   file=$2
-  value=$(sed -n 's/.*"'$key'"[:][[:space:]]*"\([^"\\]*\)".*/\1/p' "$file" | head -n 1)
+  value=$(sed -n 's/.*"'"$key"'"[:][[:space:]]*"\([^"\\]*\)".*/\1/p' "$file" | head -n 1)
   [ -n "$value" ] || return 1
   printf '%s' "$value" | sed 's/\\\\/\\/g; s/\\"/"/g'
 }
@@ -95,12 +95,16 @@ validate_existing_launcher() {
   launcher=$1
   versions=$2
   receipt=$3
-  [ -f "$receipt" ] && [ ! -L "$receipt" ] || die "managed launcher has no private installation receipt"
+  if ! { [ -f "$receipt" ] && [ ! -L "$receipt" ]; }; then
+    die "managed launcher has no private installation receipt"
+  fi
   receipt_launcher=$(json_field executablePath "$receipt") || die "installation receipt is missing executablePath"
   [ "$receipt_launcher" = "$launcher" ] || die "installation receipt does not own the launcher"
   old_binary=$(json_field binaryPath "$receipt") || die "installation receipt is missing binaryPath"
   case "$old_binary" in "$versions"/*) ;; *) die "installation receipt points outside managed versions" ;; esac
-  [ -f "$old_binary" ] && [ ! -L "$old_binary" ] || die "installation receipt points to a missing managed binary"
+  if ! { [ -f "$old_binary" ] && [ ! -L "$old_binary" ]; }; then
+    die "installation receipt points to a missing managed binary"
+  fi
   [ -L "$launcher" ] || die "refusing to replace an unmanaged launcher"
   existing=$(readlink "$launcher")
   [ "$existing" = "$old_binary" ] || die "installation receipt does not match the launcher"
@@ -142,7 +146,9 @@ install() {
       *) die "unsafe extracted runtime entry" ;;
     esac
   done
-  [ -f "$stage/skillpack" ] && [ -f "$stage/skillpack-runtime" ] || die "runtime archive is missing a native binary"
+  if ! { [ -f "$stage/skillpack" ] && [ -f "$stage/skillpack-runtime" ]; }; then
+    die "runtime archive is missing a native binary"
+  fi
   [ "$("$stage/skillpack-runtime" --version 2>/dev/null)" = "skillpack-runtime $version" ] || die "runtime version self-test failed"
   [ "$("$stage/skillpack" --version 2>/dev/null)" = "skillpack $version" ] || die "CLI version self-test failed"
   "$stage/skillpack" --help >/dev/null 2>&1 || die "CLI help self-test failed"
@@ -168,7 +174,9 @@ install() {
   assert_no_symlink_ancestors "$versions"
   version_dir="$versions/$version"
   if [ -e "$version_dir" ] || [ -L "$version_dir" ]; then
-    [ -d "$version_dir" ] && [ ! -L "$version_dir" ] || die "managed version slot is not a directory"
+    if ! { [ -d "$version_dir" ] && [ ! -L "$version_dir" ]; }; then
+      die "managed version slot is not a directory"
+    fi
     cmp -s "$stage/skillpack" "$version_dir/skillpack" || die "managed version slot differs"
     cmp -s "$stage/skillpack-runtime" "$version_dir/skillpack-runtime" || die "managed version slot differs"
   else
