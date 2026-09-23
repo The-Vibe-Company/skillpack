@@ -117,7 +117,11 @@ def windows_hook_command(args: list[str]) -> str:
     def quote(value: str) -> str:
         return "'" + value.replace("'", "''") + "'"
 
-    script = '& ' + ' '.join(quote(str(value)) for value in args) + '\nexit $LASTEXITCODE\n'
+    script = (
+        "$ProgressPreference = 'SilentlyContinue'\n"
+        + '& ' + ' '.join(quote(str(value)) for value in args) + '\n'
+        + 'exit $LASTEXITCODE\n'
+    )
     encoded = base64.b64encode(script.encode('utf-16le')).decode('ascii')
     return f'powershell.exe -NoProfile -NonInteractive -EncodedCommand {encoded}'
 

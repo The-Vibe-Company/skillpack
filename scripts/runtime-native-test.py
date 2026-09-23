@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the actual native executable, offline, with an isolated state directory."""
 import json
+from contextlib import closing
 import hashlib
 import shutil
 import os
@@ -40,7 +41,7 @@ def main():
         assert invoke('hook', '--agent', 'claude-code', payload=event)['captured'] is True
         invoke('hook', '--agent', 'claude-code', payload=event)
         assert invoke('doctor', '--json')['queue']['pending'] == 1
-        with sqlite3.connect(state / 'runtime.sqlite3') as db:
+        with closing(sqlite3.connect(state / 'runtime.sqlite3')) as db:
             payload = json.loads(db.execute('SELECT payload FROM events').fetchone()[0])
         assert set(payload) == {'schema_version', 'event_id', 'skill_id', 'version', 'kind', 'adapter', 'observed_at', 'agent', 'environment'}
         assert payload['kind'] == 'invocation' and payload['version'] == '1.2.3'
@@ -65,7 +66,7 @@ def main():
         completed = subprocess.run(command, cwd=repo / 'runtime', env=bridge_env, input=json.dumps({
             'hook_event_name': 'SessionStart', 'session_id': 'bridge-session', 'cwd': str(repo / 'runtime')}),
             capture_output=True, text=True, timeout=10, check=True)
-        assert not completed.stdout and not completed.stderr
+        assert not completed.stdout and not completed.stderr, f'bridge stdout={completed.stdout!r} stderr={completed.stderr!r}'
         assert invoke('doctor', '--json')['hooks']['codex']['last_seen']
         # Exercise the shipped OpenCode plugin against the native executable;
         # the host callback shape comes from the isolated OpenCode 1.18 probe.
@@ -82,8 +83,8 @@ await hooks['tool.execute.after'](input, output);
         completed = subprocess.run(['node', '--input-type=module', '-e', plugin_test,
             str(repo / '.opencode/plugins/skillpack-runtime.js'), str(skill)],
             env=bridge_env, capture_output=True, text=True, timeout=15, check=True)
-        assert not completed.stdout and not completed.stderr
-        with sqlite3.connect(state / 'runtime.sqlite3') as db:
+        assert not completed.stdout and not completed.stderr, f'bridge stdout={completed.stdout!r} stderr={completed.stderr!r}'
+        with closing(sqlite3.connect(state / 'runtime.sqlite3')) as db:
             events = db.execute("SELECT payload FROM events WHERE agent='opencode'").fetchall()
         assert len(events) == 1
         assert json.loads(events[0][0])['adapter'] == 'opencode-plugin'

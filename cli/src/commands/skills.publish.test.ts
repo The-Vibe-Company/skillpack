@@ -41,6 +41,8 @@ describe("publication normalization compatibility", () => {
       await mkdir(config);
       await writeFile(join(config, "session.json"), JSON.stringify({ cookie: "session=test" }));
       await execFileAsync(process.execPath, ["--import", "tsx", fileURLToPath(new URL("../index.ts", import.meta.url)), "skills", "push", local, "--json"], {
+        // The real CLI boots tsx and its dependency graph on shared CI runners.
+        timeout: 15_000,
         env: { ...process.env, COMPANION_HOME: config, COMPANION_API_URL: apiUrl },
       });
       expect((await packDir(local)).checksum).toBe(canonical.checksum);
@@ -59,5 +61,5 @@ describe("publication normalization compatibility", () => {
       await new Promise<void>((resolve) => api.close(() => resolve()));
       await rm(root, { recursive: true, force: true });
     }
-  });
+  }, 20_000);
 });

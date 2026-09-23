@@ -137,8 +137,10 @@ class RuntimeSetupTests(unittest.TestCase):
             self.assertTrue(hook['commandWindows'].startswith('powershell.exe -NoProfile -NonInteractive -EncodedCommand '))
             encoded = hook['commandWindows'].rsplit(' ', 1)[-1]
             decoded = base64.b64decode(encoded).decode('utf-16le')
+            self.assertTrue(decoded.startswith("$ProgressPreference = 'SilentlyContinue'\n"))
             self.assertIn("'C:\\Program Files\\Python\\python.exe'", decoded)
             self.assertIn("'C:\\Skill Pack\\runtime-launch.py'", decoded)
+            self.assertIn('\nexit $LASTEXITCODE\n', decoded)
             path.write_text(json.dumps({'hooks': {'PostToolUse': [{'hooks': ['malformed']} ]}}))
             with self.assertRaisesRegex(ValueError, 'hook handler'):
                 merge_hooks(path, 'python runtime-launch.py hook --agent codex', 'codex')
