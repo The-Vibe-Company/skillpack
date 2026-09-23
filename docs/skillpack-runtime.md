@@ -104,7 +104,11 @@ non-secret identifiers on that service together:
 - `SKILLPACK_USAGE_MIGRATION_ACTOR_ID`: a member authorized to publish its organization skills.
 - `SKILLPACK_USAGE_MIGRATION_ORIGIN`: the public HTTPS origin, for example `https://skillpack.app`.
 
-The release service uses its existing migration-owner database connection and archive storage. The
+The release service needs its migration-owner database connection and the same archive-storage
+configuration as the API: `S3_ENDPOINT`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`,
+`S3_BUCKET_SKILL_ARCHIVES`, and optional `S3_REGION` / `S3_FORCE_PATH_STYLE`. Use service-variable
+references when supported so secrets stay in the deployment provider. A schema-only release service
+may not have these storage variables yet; configure them before enabling catalogue migration. The
 runtime publication job receives none of those credentials. Without the three variables, schema
 migrations run but the catalogue phase does not mutate an organization implicitly.
 

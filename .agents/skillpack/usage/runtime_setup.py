@@ -532,6 +532,10 @@ def verified_inventory(rows: list[dict], origin: str, *, project_root: Path | No
                 if project_root is None:
                     continue
                 path = project_root / path
+            # Legacy lockfiles retain removed installations. Check presence before
+            # invoking a checksum helper, which requires a real skill directory.
+            if not path.is_dir() or not (path / 'SKILL.md').is_file():
+                continue
             # A local edit is preserved, but is not described as verified official content.
             baseline = target.get('checksum')
             if baseline:

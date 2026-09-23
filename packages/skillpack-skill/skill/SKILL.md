@@ -234,8 +234,8 @@ version's official baseline from `companion.integrity.json`, `--auto-update-skil
 stages, verifies, backs up, replaces, and reports the installed version through
 `POST /local-skills/skillpack/installed`. If any tracked local file is `modified` or `missing`
 against that installed baseline, the bootstrap blocks replacement with
-`reason: "local_customizations"` and preserves the local folder. It never installs updates for other
-skills; it only reports those as recommended actions.
+`reason: "local_customizations"` and preserves the local folder. It automatically applies only the technical runtime migration patches described above to eligible
+clean installs; ordinary updates remain recommended actions.
 
 After installing a Skillpack update, stop the current operation and tell the user to rerun the
 original Skillpack command unless this runtime can safely reload the updated skill instructions
@@ -1394,7 +1394,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.118.1","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.118.2","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 
