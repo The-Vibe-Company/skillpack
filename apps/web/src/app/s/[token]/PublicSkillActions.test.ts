@@ -6,6 +6,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildPublicInstallPrompt, PublicSkillActions } from "./PublicSkillActions";
 
+// SAFETY: happy-dom reads this documented React test flag from the global object; no external payload is narrowed here.
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const release = {
@@ -16,51 +17,37 @@ const release = {
 };
 
 describe("buildPublicInstallPrompt", () => {
-  it("pins Agent Auth, the exact release, and safe atomic extraction", () => {
+  it("pins the API-key scope, exact release, and root-only native install", () => {
     const prompt = buildPublicInstallPrompt({
       origin: "https://companion.example",
       token: "public-token",
       slug: "release-helper",
       release,
     });
-    expect(prompt).toContain("@auth/agent-cli@0.5.1");
-    expect(prompt).toContain("--url=https://companion.example");
-    expect(prompt).toContain('connection "$agent_id"');
-    expect(prompt).toContain('status "$agent_id"');
-    expect(prompt.split('status "$agent_id"')).toHaveLength(4);
-    expect(prompt).toContain('request "$agent_id" --capabilities public-skills:install');
-    expect(prompt).toContain("--preferred-method device_authorization");
-    expect(prompt).toContain('connect --provider https://companion.example --mode delegated');
-    expect(prompt).toContain('status is exactly "active"');
-    expect(prompt).toContain("agent_capability_grants contains public-skills:install");
-    expect(prompt).toContain("agent is active but that active grant is absent");
-    expect(prompt).toContain("live status is not active");
-    expect(prompt).toContain("agent_not_found");
-    expect(prompt).toContain("host_revoked or host_not_found");
-    expect(prompt).toContain("fresh empty mode-0700 storage directory");
-    expect(prompt).toContain("Do not copy the revoked host.json");
-    expect(prompt.indexOf('connection "$agent_id"')).toBeLessThan(prompt.indexOf('status "$agent_id"'));
-    expect(prompt.indexOf('status "$agent_id"')).toBeLessThan(prompt.indexOf('request "$agent_id"'));
-    expect(prompt).not.toContain(" connections ");
+    expect(prompt).toContain("skillpack auth login --api-url https://companion.example/v1");
+    expect(prompt).toContain("skillpack auth status --json");
+    expect(prompt).toContain("SKILLPACK_API_KEY");
+    expect(prompt).toContain("skillpack install --public public-token --version 2.3.4 --scope project");
+    expect(prompt).toContain("--scope user");
+    expect(prompt).toContain("root-only");
+    expect(prompt).toContain("does not");
+    expect(prompt).toContain("resolve dependencies, retrieve secrets, or submit an install report");
     expect(prompt).toContain("public-skills:install");
     expect(prompt).toContain("release-helper@2.3.4");
     expect(prompt).toContain("public-token");
     expect(prompt).toContain(release.checksum);
     expect(prompt).toContain("4096 bytes");
-    expect(prompt).toContain("Reject absolute paths, .. traversal");
-    expect(prompt).toContain("atomically swap");
-    expect(prompt).toContain("Never interpolate the ticket");
-    expect(prompt).toContain("Pipe the captured JSON over stdin");
-    expect(prompt).toContain("do not resolve dependencies, secrets, skill_installs, or scripts");
+    expect(prompt).toContain("Let the native CLI verify the server metadata and package digest");
     expect(prompt).toContain("Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, or Hermes");
-    expect(prompt).toContain("~/.cursor/skills/<slug>");
-    expect(prompt).toContain("<project>/.cursor/skills/<slug>");
-    expect(prompt).toContain("~/.openclaw/skills/<slug>");
-    expect(prompt).toContain("~/.hermes/skills/<slug>");
+    expect(prompt).not.toContain("@auth/agent-cli");
+    expect(prompt).not.toContain("npx ");
+    expect(prompt).not.toContain("Agent Auth");
+    expect(prompt).not.toContain("mint a PAT");
     expect(prompt).toContain("Hermes is global-only");
-    expect(prompt).toContain("do not offer project scope for Hermes");
-    expect(prompt).toContain("<workspace>/skills/<slug>");
-    expect(prompt).not.toContain("and whether to install globally or in the current project, then show");
+    expect(prompt).toContain("releases/download/runtime-v0.2.0/");
+    expect(prompt).toContain("install.sh");
+    expect(prompt).toContain("install.ps1");
+    expect(prompt).toContain("SHA256SUMS");
   });
 });
 

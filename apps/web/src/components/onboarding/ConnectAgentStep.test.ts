@@ -165,7 +165,7 @@ describe("ConnectAgentStep", () => {
     await flush();
 
     expect(writeText).toHaveBeenCalledWith(
-      "onboard https://skillpack.example/v1 org-1 in Codex [PAT intentionally omitted; use Agent Auth]",
+      "onboard https://skillpack.example/v1 org-1 in Codex [API key intentionally omitted; use SKILLPACK_API_KEY or hidden auth login]",
     );
     expect(container.textContent).toContain("Copied");
     expect(window.localStorage.getItem("skillpack:preferred-agent")).toBe("codex");

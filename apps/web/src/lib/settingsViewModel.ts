@@ -3,6 +3,7 @@ import {
   billingOverviewSchema,
   orgSettingsResponseSchema,
   TEAM_BRAND_COLORS,
+  TOKEN_SCOPES,
   type ApiTokenRow,
   type BillingOverview,
   type GettingStartedState,
@@ -25,6 +26,7 @@ export function initialsOf(name: string): string {
   return ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase();
 }
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- Zod safeParse is the response boundary that decodes the server payload.
 export function parseOrgSettingsResponse(raw: unknown): OrgSettingsResponse | null {
   const result = orgSettingsResponseSchema.safeParse(raw);
   if (result.success) return result.data;
@@ -39,6 +41,7 @@ export function parseOrgSettingsResponse(raw: unknown): OrgSettingsResponse | nu
 }
 
 /** Validate the raw `GET /v1/tokens` payload; drops any malformed rows. */
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- Each token row is decoded by apiTokenRowSchema at this response boundary.
 export function parseApiTokensResponse(raw: unknown): ApiTokenRow[] {
   if (!Array.isArray(raw)) return [];
   const rows: ApiTokenRow[] = [];
@@ -49,6 +52,7 @@ export function parseApiTokensResponse(raw: unknown): ApiTokenRow[] {
   return rows;
 }
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- Zod safeParse is the response boundary that decodes billing data.
 export function parseBillingOverview(raw: unknown): BillingOverview | null {
   const result = billingOverviewSchema.safeParse(raw);
   return result.success ? result.data : null;
@@ -56,10 +60,13 @@ export function parseBillingOverview(raw: unknown): BillingOverview | null {
 
 /** Map a stored token row to its masked, display-ready view-model. */
 export function mapApiKey(row: ApiTokenRow): ApiKeyVM {
+  const access = TOKEN_SCOPES.every((scope) => row.scopes.includes(scope)) ? "full" : "limited";
   return {
     id: row.id,
     name: row.name,
     scope: row.scopes.some((scope) => scope.endsWith(":write")) ? "write" : "read",
+    access,
+    scopes: [...row.scopes],
     prefix: row.prefix,
     // The raw secret is never stored; the prefix is the only post-creation visible part.
     last4: row.prefix.slice(-4),
@@ -78,9 +85,8 @@ export function buildSettingsAppData(input: {
   gettingStarted?: GettingStartedState | null;
 }): SettingsAppData {
   const { me, current, settings, tokens = [], billing = null, gettingStarted = null } = input;
-  const users: Record<string, SeedUser> = {
-    [me.id]: { id: me.id, name: me.name, email: me.email, initials: me.initials, avatarUrl: me.avatarUrl },
-  };
+  const users: Record<string, SeedUser> = {};
+  users[me.id] = { id: me.id, name: me.name, email: me.email, initials: me.initials, avatarUrl: me.avatarUrl };
 
   for (const member of settings.members) {
     users[member.userId] = {

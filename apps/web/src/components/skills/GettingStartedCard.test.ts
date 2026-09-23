@@ -132,7 +132,7 @@ describe("GettingStartedCard", () => {
       await Promise.resolve();
     });
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      "onboard https://companion.example/v1 org-1 in Codex as Codex [PAT intentionally omitted; use Agent Auth]",
+      "onboard https://companion.example/v1 org-1 in Codex as Codex [API key intentionally omitted; use SKILLPACK_API_KEY or hidden auth login]",
     );
     expect(queryMocks.fetch).not.toHaveBeenCalled();
     expect(container.textContent).toContain("0 of 3 completed");
@@ -153,7 +153,7 @@ describe("GettingStartedCard", () => {
       await Promise.resolve();
     });
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      "onboard https://companion.example/v1 org-1 in Grok Bot (Cursor) as Grok Bot (Cursor) [PAT intentionally omitted; use Agent Auth]",
+      "onboard https://companion.example/v1 org-1 in Grok Bot (Cursor) as Grok Bot (Cursor) [API key intentionally omitted; use SKILLPACK_API_KEY or hidden auth login]",
     );
   });
 

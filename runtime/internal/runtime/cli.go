@@ -82,7 +82,7 @@ func extractStateDir(args []string) (string, []string, error) {
 }
 
 func writeUsage(out io.Writer) {
-	_, _ = fmt.Fprintln(out, `skillpack-runtime 0.1.0
+	_, _ = fmt.Fprintf(out, `skillpack-runtime %s
 
 Usage: skillpack-runtime [--state-dir PATH] <command>
 
@@ -94,7 +94,7 @@ Commands:
   worker                    send queued events until 120 seconds idle
   watch                     continuously reconcile and send until interrupted
   doctor --json             print local health and coverage diagnostics
-  telemetry enable|disable enable or disable local capture and delivery`)
+  telemetry enable|disable enable or disable local capture and delivery`, RuntimeVersion)
 }
 
 func runRegister(ctx context.Context, store *Store, args []string, out, errOut io.Writer) int {

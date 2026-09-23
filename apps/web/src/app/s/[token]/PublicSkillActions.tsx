@@ -16,50 +16,36 @@ export function buildPublicInstallPrompt(input: {
   release: PublicReleasePreview;
 }): string {
   const { origin, token, slug, release } = input;
+  const apiBase = `${origin.replace(/\/$/, "")}/v1`;
   return `Install the public Skillpack skill ${slug}@${release.version} from ${origin}.
 
-Authenticate through Skillpack Agent Auth. Use the official CLI pinned to @auth/agent-cli@0.5.1 and the instance discovery document at ${origin}/.well-known/agent-configuration. Reuse an existing grant for public-skills:install on this instance when available; otherwise start the delegated device flow and wait for the user to approve it.
+Authenticate with an API key that has the exact public-skills:install scope:
+1. Human setup: \`skillpack auth login --api-url ${apiBase}\` (the key is read through hidden terminal input).
+2. Automation: set SKILLPACK_API_KEY and SKILLPACK_API_URL=${apiBase} in the process environment.
+3. Verify with \`skillpack auth status --json\`; require an active, unexpired key with public-skills:install
+   for the intended workspace. Never put the API key in this prompt, chat, argv, source, or logs.
 
-Use only the pinned CLI commands (never an unversioned global binary):
-npx --yes @auth/agent-cli@0.5.1 --url=${origin} discover ${origin}
-# Look up the non-secret connection record for this exact origin in
-# ~/.companion/public-agent-connections.json. Set storage_dir from that record, or default it to the
-# CLI's existing ~/.agent-auth directory when the record is absent or is a legacy string-valued
-# agent id. Then check that the local key material still exists without printing private state:
-npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} connection "$agent_id"
-# connection reads local state only. Always revalidate the live server state immediately afterward:
-status_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} status "$agent_id")"
-# Parse status_response in memory. Reuse the connection only when status is exactly "active" and
-# agent_capability_grants contains public-skills:install with status exactly "active".
-# If the agent is active but that active grant is absent, request it on the existing agent:
-request_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} request "$agent_id" --capabilities public-skills:install --preferred-method device_authorization --reason "Install public Skillpack skills from this instance")"
-# After approval, discard request_response and revalidate instead of trusting cached grant state:
-status_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} status "$agent_id")"
-# If the local connection is absent, live status is not active (including revoked, rejected, or
-# expired), or the CLI reports agent_not_found, create a new delegated agent with the same pinned CLI:
-connect_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} connect --provider ${origin} --mode delegated --preferred-method device_authorization --capabilities public-skills:install --name "Skillpack installer" --reason "Install public Skillpack skills from this instance")"
-# If status or connect reports host_revoked or host_not_found, do not reuse that host identity.
-# Create a fresh empty mode-0700 storage directory, set storage_dir to it, and rerun the exact connect
-# command above with --storage-dir "$storage_dir". Do not copy the revoked host.json into it.
-# Parse agentId from connect_response in memory. Atomically store only the non-secret
-# { origin: { agentId, storageDir } } record in ~/.companion/public-agent-connections.json with mode
-# 0600. The CLI keeps all private key material separately. Before continuing, run status once more
-# and require both the active agent status and the active public-skills:install grant described above.
-status_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} status "$agent_id")"
-# Then execute with that id, capturing the JSON without echoing it:
-install_response="$(npx --yes @auth/agent-cli@0.5.1 --storage-dir "$storage_dir" --url=${origin} execute "$agent_id" public-skills:install --args '{"token":"${token}","version":"${release.version}"}')"
-
-Request an install ticket for this exact release with token ${token} and version ${release.version}. Pipe the captured JSON over stdin to a small local program that parses the ticket in memory and performs the HTTP request itself. Never interpolate the ticket into a shell command, URL, argv, log, file, or chat output. Send it only as the X-Companion-Transfer-Ticket request header, then download the package from:
-${origin}${publicPackageUrl(token, release.version)}
+Use the exact native command after asking for the destination and selected tools:
+\`skillpack install --public ${token} --version ${release.version} --scope project --tools <selected> --api-url ${apiBase} --json\`
+Use \`--scope user\` only when the user explicitly requests a user-wide install. This command is root-only:
+it installs this reviewed public package, preserves the declared prerequisite list as warnings, and does not
+resolve dependencies, retrieve secrets, or submit an install report.
 
 Before writing anything:
-1. Verify SHA-256 ${release.checksum} and an exact size of ${release.size_bytes} bytes.
-2. Inspect the ZIP without executing package scripts. Reject absolute paths, .. traversal, duplicate/case-colliding paths, symlinks, hardlinks, devices, and any entry escaping the destination.
-3. Require SKILL.md at the archive root. Install only this root package; do not resolve dependencies, secrets, skill_installs, or scripts. Report declared prerequisites as warnings.
-4. Ask which compatible target to use (Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, or Hermes), then show the resolved destination. For Claude Code, Codex, OpenCode, Grok Bot, and OpenClaw, ask whether to install globally or in the current project. Grok Bot is Cursor's desktop assistant; for Grok Bot (Cursor), use ~/.cursor/skills/<slug> globally or <project>/.cursor/skills/<slug> for the current project. For OpenClaw, use ~/.openclaw/skills/<slug> globally or <workspace>/skills/<slug> for the current workspace. Hermes is global-only at ~/.hermes/skills/<slug>; do not offer project scope for Hermes. If the destination exists, ask before replacing it.
-5. Extract to a sibling temporary directory, fsync where supported, and atomically swap it into place. On failure, leave the previous installation intact.
+1. Confirm the reviewed release is still ${slug}@${release.version}, SHA-256 ${release.checksum}, exactly ${release.size_bytes} bytes.
+2. Let the native CLI verify the server metadata and package digest. Reject a changed version, checksum, or size.
+3. Use the requested compatible target (Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, or Hermes), then show
+   the resolved destination. Ask only for a missing target or scope choice. Hermes is global-only. If the
+   destination exists and replacement was not already authorized, ask before replacing it.
+4. Preserve declared prerequisites in the result and tell the user what still needs attention. Do not fetch
+   dependency packages, secrets, or configuration as part of this public root install.
 
-Finish by reporting ${slug}@${release.version}, the destination, and any declared prerequisites. Never print credentials or ticket values.`;
+If the native CLI is missing, use the official runtime-v0.2.0 HTTPS installers:
+- POSIX: download install.sh and the adjacent SHA256SUMS from https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.2.0/, verify install.sh against its SHA256SUMS entry, then run sh install.sh.
+- Windows PowerShell: download install.ps1 and the adjacent SHA256SUMS from that URL, compare Get-FileHash .\\install.ps1 -Algorithm SHA256 with its entry, then run the script.
+The installer independently verifies the pinned archive digest. Never run an installer or archive whose checksum differs from release metadata.
+
+Finish by reporting ${slug}@${release.version}, the destination, and declared prerequisites. Never print credentials.`;
 }
 
 export function PublicSkillActions({
@@ -82,8 +68,9 @@ export function PublicSkillActions({
   const loginHref = `/login?next=${encodeURIComponent(returnPath)}`;
 
   const prompt = useMemo(() => {
-    if (!release || typeof window === "undefined") return null;
-    return buildPublicInstallPrompt({ origin: window.location.origin, token, slug, release });
+    const origin = globalThis.location?.origin;
+    if (!release || !origin) return null;
+    return buildPublicInstallPrompt({ origin, token, slug, release });
   }, [release, slug, token]);
 
   useEffect(() => {
@@ -155,7 +142,7 @@ export function PublicSkillActions({
           ? "Could not copy the prompt. Check browser clipboard access and try again."
           : authenticated
             ? "The ZIP is pinned to the public release shown above."
-            : "Agent installs use delegated approval. Direct downloads require a Skillpack account."}
+            : "Native installs use an API key with public-skills:install. Direct downloads require a Skillpack account."}
       </p>
     </div>
   );

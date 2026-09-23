@@ -17,6 +17,7 @@ const HYGIENE_TESTS = [
   "scripts/lint-anti-slop.test.mjs",
   "scripts/verify-change.test.mjs",
   "scripts/runtime-release.test.mjs",
+  "scripts/runtime-install.test.mjs",
 ];
 
 function splitNullTerminated(output) {

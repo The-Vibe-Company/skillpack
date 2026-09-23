@@ -1,12 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { issueTokenInputSchema, tokenScopeSchema } from "../src/token";
+import { issueTokenInputSchema, TOKEN_SCOPES, tokenScopeSchema } from "../src/token";
 
 describe("PAT issuance contract", () => {
   it("keeps the existing human scoped form compatible", () => {
     expect(issueTokenInputSchema.parse({ scopes: ["skills:read"], name: "automation" })).toEqual({
       scopes: ["skills:read"],
       name: "automation",
+    });
+  });
+
+  it("defaults a human token without scopes to every current capability", () => {
+    expect(issueTokenInputSchema.parse({ name: "native CLI" })).toEqual({
+      name: "native CLI",
+      scopes: TOKEN_SCOPES,
     });
   });
 

@@ -364,7 +364,11 @@ def extract_runtime(data: bytes, destination: Path, binary: str, zipped: bool) -
     import stat
     import tarfile
     import zipfile
-    allowed = {binary, 'LICENSE', 'NOTICE', 'SOURCE.json'}
+    # Native releases carry the new CLI beside the legacy runtime. Keep the
+    # legacy binary required and selected by install_runtime while allowing the
+    # optional sibling through this extractor only.
+    cli_binary = 'skillpack.exe' if binary.endswith('.exe') else 'skillpack'
+    allowed = {binary, cli_binary, 'LICENSE', 'NOTICE', 'SOURCE.json'}
     seen = set()
     total = 0
     if zipped:
@@ -394,6 +398,8 @@ def extract_runtime(data: bytes, destination: Path, binary: str, zipped: bool) -
     if binary not in seen:
         raise ValueError('runtime binary missing from archive')
     os.chmod(destination / binary, 0o700)
+    if cli_binary in seen:
+        os.chmod(destination / cli_binary, 0o700)
 
 
 def install_runtime(config: dict, state_dir: Path, *, fetch=download) -> dict:

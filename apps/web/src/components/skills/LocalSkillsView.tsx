@@ -389,7 +389,7 @@ function InstallGate({
               Connect your coding agent
             </h2>
             <p className="ls-gate__lede">
-              Your agent installs the Skillpack skill on this machine. Approve access when it asks.
+              Your agent installs the Skillpack skill on this machine. Authenticate through the CLI's hidden input or environment key when it asks.
             </p>
           </div>
           <button type="button" className="ls-gate__close" aria-label="Close" onClick={onDismiss}>
@@ -586,7 +586,7 @@ export function LocalSkillDrawer({
               What your assistant will be told
             </div>
             <CodeBlock text={prompt} scroll copyLabel="Copy prompt" />
-            <p className="ls-prompt-hint">Delegated Agent Auth · one-minute JWTs · progressive workspace approval.</p>
+            <p className="ls-prompt-hint">Native Skillpack CLI · API key stays in hidden login input or the process environment.</p>
             {copied && (
               <div className="ls-copied" role="status">
                 <Icon name="check" size={14} />

@@ -55,6 +55,7 @@ export const COMPANION_AGENT_OPERATION_REGISTRY = [
   { method: "GET", path: "/skills/:slug", capability: "skills:read", transport: "rest" },
   { method: "GET", path: "/skills/:slug/download", capability: "skills:read", transport: "rest" },
   { method: "GET", path: "/skills/:slug/share-plan", capability: "skills:read", transport: "rest" },
+  { method: "GET", path: "/skills/:slug/versions", capability: "skills:read", transport: "rest" },
   { method: "POST", path: "/skills/:slug/share", capability: "skills:write", transport: "rest" },
   { method: "POST", path: "/skills/:slug/rename", capability: "skills:write", transport: "rest" },
   // Install state is caller-owned personal state. It intentionally needs read, not catalog-write.

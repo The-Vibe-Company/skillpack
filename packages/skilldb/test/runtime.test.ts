@@ -410,6 +410,28 @@ describe("SQLite WASM skill database runtime", () => {
     }
   });
 
+  it("reserves a starting worker for the first request without queueing behind it", async () => {
+    const cold = new SqliteWasmSkillDatabaseRuntime(1);
+    const input = {
+      image: null,
+      tables: { state: stateTable },
+      schemaGeneration: 1,
+      fileSchemaGeneration: 0,
+      sql: "SELECT 1",
+      params: [],
+      mode: "read" as const,
+      limits,
+      queueIfBusy: false,
+    };
+    try {
+      const first = cold.execute(input);
+      await expect(cold.execute(input)).rejects.toMatchObject({ code: "overloaded" });
+      await expect(first).resolves.toMatchObject({ rows: [[1]] });
+    } finally {
+      await cold.close();
+    }
+  });
+
   it("rejects immediately instead of queueing while the caller holds an external lock", async () => {
     const constrained = new SqliteWasmSkillDatabaseRuntime(1);
     try {

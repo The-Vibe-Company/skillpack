@@ -6,7 +6,7 @@ interface QueuedTask {
   id: string;
   input: Parameters<SkillDatabaseRuntime["execute"]>[0];
   resolve(value: SkillDatabaseRuntimeResult): void;
-  reject(error: unknown): void;
+  reject(error: Error): void;
 }
 
 interface WorkerSlot {
@@ -162,7 +162,7 @@ export class SqliteWasmSkillDatabaseRuntime implements SkillDatabaseRuntime {
     slot.task = null;
   }
 
-  private rejectQueuedIfUnavailable(error: unknown): void {
+  private rejectQueuedIfUnavailable(error: Error): void {
     if (this.slots.length || this.pendingRestarts.size) return;
     const unavailable = error instanceof SkillDatabaseError
       ? error
@@ -170,7 +170,7 @@ export class SqliteWasmSkillDatabaseRuntime implements SkillDatabaseRuntime {
     for (const queued of this.queue.splice(0)) queued.reject(unavailable);
   }
 
-  private replaceFailedSlot(slot: WorkerSlot, error: unknown): void {
+  private replaceFailedSlot(slot: WorkerSlot, error: Error): void {
     const index = this.slots.indexOf(slot);
     if (index === -1) return;
     const task = slot.task;
@@ -219,7 +219,10 @@ export class SqliteWasmSkillDatabaseRuntime implements SkillDatabaseRuntime {
 
   execute(input: Parameters<SkillDatabaseRuntime["execute"]>[0]): Promise<SkillDatabaseRuntimeResult> {
     if (this.closed) return Promise.reject(new Error("skill database runtime is closed"));
-    if (input.queueIfBusy === false && !this.slots.some((slot) => slot.ready && !slot.task)) {
+    // A starting worker can accept its first reservation; it is not busy yet.
+    // Count queued reservations so callers never wait behind another statement.
+    const unoccupiedSlots = this.slots.filter((slot) => !slot.task).length;
+    if (input.queueIfBusy === false && unoccupiedSlots <= this.queue.length) {
       return Promise.reject(
         new SkillDatabaseError("overloaded", "skill database workers are busy; retry later"),
       );

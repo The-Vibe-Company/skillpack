@@ -178,11 +178,12 @@ test("non-pull-request events force every scope", () => {
 test("code pull requests run the same full Node quality suite as main", () => {
   const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
   assert.match(workflow, /- name: Run full quality checks\n\s+run: pnpm ci:quality --output-logs=errors-only/);
+  assert.match(workflow, /- name: Check generated native contracts\n\s+run: pnpm --filter @skillpack\/skilldb exec tsx \.\.\/\.\.\/scripts\/generate-native-contracts\.ts --check/);
   assert.doesNotMatch(workflow, /Run affected quality checks|turbo run lint typecheck test --affected/);
 });
 
 test("runtime, installer and project hooks require native runtime checks", () => {
-  for (const file of ["runtime/internal/runtime/events.go", "runtime/go.sum", "scripts/runtime-release.mjs", "packages/skillpack-skill/skill/scripts/runtime_setup.py", ".agents/skillpack/usage/setup.py", ".codex/hooks.json", ".opencode/plugins/skillpack-runtime.js", "scripts/test_runtime_project.py", ".agents/skills/plan-pr/SKILL.md", ".gitattributes"]) {
+  for (const file of ["runtime/internal/runtime/events.go", "runtime/go.sum", "runtime/install.sh", "runtime/install.ps1", "scripts/runtime-release.mjs", "scripts/generate-native-contracts.ts", "packages/contracts/src/skills.ts", "packages/skillpack-skill/skill/scripts/runtime_setup.py", ".agents/skillpack/usage/setup.py", ".codex/hooks.json", ".opencode/plugins/skillpack-runtime.js", "scripts/test_runtime_project.py", ".agents/skills/plan-pr/SKILL.md", ".gitattributes"]) {
     assert.equal(classifyFiles([file]).runtime, true, file);
   }
 });

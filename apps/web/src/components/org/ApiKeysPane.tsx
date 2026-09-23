@@ -6,20 +6,9 @@ import { Dialog } from "./primitives";
 import { PaneHead } from "./paneKit";
 import type { ApiKeyVM, OrgCtx } from "./model";
 
-/** The two real, enforceable key scopes (label + description). The scope→API-scope-strings
- *  mapping lives in SettingsApp.createApiKey, the single place that issues keys. */
-const KEY_SCOPES = {
-  read: { label: "Read", desc: "Read-only access to skills." },
-  write: { label: "Read & write", desc: "Read plus create/edit skills." },
-} as const;
-const KEY_SCOPE_ORDER = ["read", "write"] as const;
-
-type KeyScope = (typeof KEY_SCOPE_ORDER)[number];
-
 /** The one-time secret payload surfaced by CreateKeyDialog and revealed by KeyRevealDialog. */
 interface RevealedKey {
   name: string;
-  scope: KeyScope;
   secret: string;
 }
 
@@ -57,17 +46,19 @@ export function ApiKeysPane({ ctx, keys }: { ctx: OrgCtx; keys: ApiKeyVM[] }) {
           </div>
           <div className="mlist">
             {keys.map((k) => (
-              <div className="mrow" key={k.id}>
+              <div className="mrow mrow--apikey" key={k.id}>
                 <span className="keyic">
                   <Icon name="key" size={16} />
                 </span>
                 <div className="mrow__id">
                   <div className="og-mname">
                     {k.name}
-                    <span className="badge scopebadge">{KEY_SCOPES[k.scope].label}</span>
+                    <span className="badge scopebadge">{k.access === "full" ? "Full" : "Limited"}</span>
                   </div>
                   <div className="keytok">
-                    <b>{k.prefix}</b>••••••••••••{k.last4} · created {k.created} · expires {k.expires}
+                    <span className="keytok__part"><b>{k.prefix}</b>••••••••••••{k.last4}</span>
+                    <span className="keytok__part">created {k.created}</span>
+                    <span className="keytok__part">expires {k.expires}</span>
                   </div>
                 </div>
                 <div className="mrow__end">
@@ -99,7 +90,7 @@ export function ApiKeysPane({ ctx, keys }: { ctx: OrgCtx; keys: ApiKeyVM[] }) {
   );
 }
 
-/** Name + scope picker; on submit issues the key and hands its one-time secret to the reveal dialog. */
+/** Name-only creation; every new human key carries the complete current capability set. */
 function CreateKeyDialog({
   ctx,
   onClose,
@@ -110,15 +101,14 @@ function CreateKeyDialog({
   onCreated: (revealed: RevealedKey) => void;
 }) {
   const [name, setName] = useState("");
-  const [scope, setScope] = useState<KeyScope>("read");
   const [busy, setBusy] = useState(false);
   const valid = name.trim().length >= 2;
   const submit = async () => {
     if (!valid || busy) return;
     setBusy(true);
     try {
-      const secret = await ctx.createApiKey(name.trim(), scope);
-      onCreated({ name: name.trim(), scope, secret });
+      const secret = await ctx.createApiKey(name.trim());
+      onCreated({ name: name.trim(), secret });
     } catch {
       // createApiKey already surfaced the failure via ctx.setError; swallow here so the
       // `void submit()` callers don't produce an unhandled rejection. The dialog stays open
@@ -131,7 +121,7 @@ function CreateKeyDialog({
     <Dialog
       icon="key"
       title="Create API key"
-      desc="Name the key and choose its scope. You'll see the secret once."
+      desc="Name the key. It will have full access to the skills, secrets, and databases you can use. You'll see the secret once."
       onClose={onClose}
       foot={
         <>
@@ -159,17 +149,6 @@ function CreateKeyDialog({
           }}
         />
         <span className="og-field__hint">A label so you can recognize this key later.</span>
-      </div>
-      <div className="og-field">
-        <label className="og-field__label">Scope</label>
-        <div className="og-seg">
-          {KEY_SCOPE_ORDER.map((s) => (
-            <button key={s} className={"og-seg__btn" + (scope === s ? " is-on" : "")} onClick={() => setScope(s)}>
-              {KEY_SCOPES[s].label}
-            </button>
-          ))}
-        </div>
-        <span className="og-field__hint">{KEY_SCOPES[scope].desc}</span>
       </div>
     </Dialog>
   );
@@ -213,8 +192,8 @@ function KeyRevealDialog({ data, onClose }: { data: RevealedKey; onClose: () => 
         </div>
         <span className="og-field__hint">
           <Icon name="alert-triangle" size={11} style={{ verticalAlign: "-1px", marginRight: 4 }} />
-          Store it in a secret manager. Anyone with this key has {KEY_SCOPES[data.scope].label.toLowerCase()} access as
-          you.
+          Store it in a secret manager. Anyone with this key has full access to the skills, secrets, and databases you
+          can use.
         </span>
       </div>
     </Dialog>

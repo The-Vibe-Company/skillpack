@@ -42,7 +42,8 @@ export const tokenScopesSchema = z.array(tokenScopeSchema).min(1);
 
 /** Existing browser-session form of `POST /v1/tokens`. */
 export const issueHumanTokenInputSchema = z.object({
-  scopes: tokenScopesSchema,
+  /** Omitting scopes is the full-capability human API-key flow. */
+  scopes: tokenScopesSchema.default(() => [...TOKEN_SCOPES]),
   name: z.string().min(1).max(120).optional(),
   /** Prevent this branch from silently accepting the Agent Auth-only discriminator. */
   inherit_agent_grants: z.never().optional(),

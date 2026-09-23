@@ -6,10 +6,7 @@ export function promptFor(skill: LocalSkillRow): string {
   return skill.prompts.install;
 }
 
-/**
- * Fill non-secret prompt placeholders. A mixed-version API may still return an old PAT template;
- * the web client deliberately substitutes an instruction instead of minting or injecting a token.
- */
+/** Fill non-secret prompt placeholders without minting or injecting an API key. */
 export function fillPrompt(
   template: string,
   base: string,
@@ -25,7 +22,7 @@ export function fillPrompt(
     .split("{tool}")
     .join(tool)
     .split("{token}")
-    .join("[PAT intentionally omitted; use Agent Auth]")
+    .join("[API key intentionally omitted; use SKILLPACK_API_KEY or hidden auth login]")
     .split("<your assistant>")
     .join(agent);
 }

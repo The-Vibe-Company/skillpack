@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, writeFileSync, rmSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHash, generateKeyPairSync, verify } from "node:crypto";
@@ -35,6 +36,31 @@ test("manifest signs all six exact-SHA archives and rejects tampering or missing
   assert.ok(verify(null, bundle.files.get("manifest.json"), f.publicKey, Buffer.from(bundle.files.get("manifest.sig").toString().trim(), "base64")));
   writeFileSync(join(f.dir, "linux_arm64.json"), "{}");
   assert.throws(() => prepareRelease({ ...f, version: "0.1.0" }), /asset metadata/);
+});
+
+test("release publisher renders installers with a pinned hash for every target", (t) => {
+  const f = fixture(t);
+  const bundle = prepareRelease({
+    ...f,
+    version: "0.1.0",
+    installerTemplates: {
+      shell: readFileSync(new URL("../runtime/install.sh", import.meta.url), "utf8"),
+      powershell: readFileSync(new URL("../runtime/install.ps1", import.meta.url), "utf8"),
+    },
+  });
+  assert.equal(bundle.files.size, 11);
+  const shell = bundle.files.get("install.sh").toString();
+  const powershell = bundle.files.get("install.ps1").toString();
+  execFileSync("sh", ["-n"], { input: shell });
+  assert.doesNotMatch(shell, /__SKILLPACK_[A-Z_]+__/);
+  assert.doesNotMatch(powershell, /__SKILLPACK_[A-Z_]+__/);
+  for (const target of TARGETS) {
+    const name = `skillpack-runtime_0.1.0_${target}${target.startsWith("windows") ? ".zip" : ".tar.gz"}`;
+    const expected = createHash("sha256").update(readFileSync(join(f.dir, name))).digest("hex");
+    assert.match(shell, new RegExp(expected));
+    assert.match(powershell, new RegExp(expected));
+    assert.match(bundle.files.get("SHA256SUMS").toString(), new RegExp(`${expected}  ${name}`));
+  }
 });
 
 function remote() {

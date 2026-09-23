@@ -14,7 +14,7 @@ func TestRunVersionPrintsPinnedVersion(t *testing.T) {
 	if code != 0 {
 		t.Fatalf("version exited with %d: %s", code, errOut.String())
 	}
-	if got, want := out.String(), "skillpack-runtime 0.1.0\n"; got != want {
+	if got, want := out.String(), "skillpack-runtime "+RuntimeVersion+"\n"; got != want {
 		t.Fatalf("version output = %q, want %q", got, want)
 	}
 }

@@ -2079,9 +2079,9 @@ describe("Skillpack skills install gate", () => {
       changes: [],
       integrity: { packageChecksum: `sha256:${"a".repeat(64)}`, files: { "SKILL.md": `sha256:${"b".repeat(64)}` } },
       prompts: {
-        install: "install {base} {workspaceId} with Agent Auth",
-        update: "update {base} {workspaceId} with Agent Auth",
-        use: "use {base} {workspaceId} with Agent Auth",
+        install: "install {base} {workspaceId} with native skillpack SKILLPACK_API_KEY",
+        update: "update {base} {workspaceId} with native skillpack",
+        use: "use {base} {workspaceId} with native skillpack",
         onboarding: "onboard {base} {workspaceId} in {tool}",
         resume: "resume {base} {workspaceId} in {tool}",
       },
@@ -2111,7 +2111,7 @@ describe("Skillpack skills install gate", () => {
     expect(window.localStorage.getItem(dismissKey)).toBe("1");
   });
 
-  it("copies an Agent Auth prompt without minting a PAT", async () => {
+  it("copies a native CLI prompt without minting a key", async () => {
     const { container } = await mountSkillsApp(
       { kind: "local" },
       { props: { initialLocalSkills: [localSkill("none")] } },
@@ -2122,7 +2122,7 @@ describe("Skillpack skills install gate", () => {
     clickGateCopy(container);
     await flushEffects();
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
-    expect(clipboardWrite).toHaveBeenCalledWith("install http://127.0.0.1:3001 org-1 with Agent Auth");
+    expect(clipboardWrite).toHaveBeenCalledWith("install http://127.0.0.1:3001 org-1 with native skillpack SKILLPACK_API_KEY");
     expect(container.textContent).toContain("Copied");
   });
 
@@ -2137,7 +2137,7 @@ describe("Skillpack skills install gate", () => {
     clickGateCopy(container);
     await flushEffects();
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
-    expect(container.textContent).toContain("Approve access when it asks");
+    expect(container.textContent).toContain("Authenticate through the CLI's hidden input or environment key");
     expect(container.textContent).toContain("Copied");
   });
 

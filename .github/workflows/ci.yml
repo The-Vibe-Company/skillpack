@@ -87,7 +87,7 @@ jobs:
           fetch-depth: 0
 
       - name: Test CI scope classifier and local verifier
-        run: node --test scripts/agent-browser-box-center.test.mjs scripts/railway-config.test.mjs scripts/ci-scope.test.mjs scripts/ci-playwright-policy.test.mjs scripts/ci-gate.test.mjs scripts/lint-anti-slop.test.mjs scripts/verify-change.test.mjs scripts/runtime-release.test.mjs
+        run: node --test scripts/agent-browser-box-center.test.mjs scripts/railway-config.test.mjs scripts/ci-scope.test.mjs scripts/ci-playwright-policy.test.mjs scripts/ci-gate.test.mjs scripts/lint-anti-slop.test.mjs scripts/verify-change.test.mjs scripts/runtime-release.test.mjs scripts/runtime-install.test.mjs
 
       - name: Validate GitHub Actions workflows
         run: >-
@@ -208,6 +208,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Check generated native contracts
+        run: pnpm --filter @skillpack/skilldb exec tsx ../../scripts/generate-native-contracts.ts --check
 
       - name: Audit production dependencies
         if: needs.scope.outputs.dependencies == 'true'

@@ -389,13 +389,25 @@
 /* ========================================================================== */
 .keyic { width: 34px; height: 34px; border-radius: var(--radius-md); display: grid; place-items: center; flex: none;
   background: var(--color-surface-raised); border: 1px solid var(--color-line); color: var(--color-muted); }
-.keytok { font-family: var(--font-mono); font-size: 11px; color: var(--color-faint); margin-top: 2px; }
+.keytok { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 10px; font-family: var(--font-mono); font-size: 11px; color: var(--color-faint); margin-top: 2px; }
+.keytok__part { white-space: nowrap; }
 .keytok b { color: var(--color-muted); font-weight: 500; letter-spacing: 0.06em; }
 .secretbox { display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg);
   padding: 11px 12px; border: 1px solid var(--color-accent-line); background: var(--color-accent-tint); border-radius: var(--radius-md); word-break: break-all; }
 .secretbox span { flex: 1; min-width: 0; }
 .secretbox .iconbtn { flex: none; }
 .scopebadge { text-transform: lowercase; }
+
+@media (max-width: 560px) {
+  .mrow--apikey { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: start; gap: 8px 10px; }
+  .mrow--apikey .mrow__id,
+  .mrow--apikey .mrow__end { grid-column: 2; min-width: 0; }
+  .mrow--apikey .mrow__id { width: 100%; }
+  .mrow--apikey .mrow__end { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: 8px; width: 100%; }
+  .mrow--apikey .mrow__meta { min-width: 0 !important; justify-content: flex-start; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mrow--apikey .mrow__x { opacity: 1; justify-self: end; }
+  .mrow--apikey .og-mname { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; }
+}
 
 /* lock / disclosure bars (non-admin notices, secret-once warning) */
 .og-lockbar { display: inline-flex; align-items: flex-start; gap: 8px; margin-bottom: 14px; padding: 8px 11px; border: 1px solid var(--color-line);

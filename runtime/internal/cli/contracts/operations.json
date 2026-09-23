@@ -1,0 +1,398 @@
+[
+  {
+    "method": "GET",
+    "path": "/orgs/current/skill-naming-policy",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills",
+    "capability": "skills:write",
+    "transport": "transfer-ticket-upload"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/create",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/download",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/share-plan",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/versions",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/share",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/rename",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/install",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/install",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/personal-labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/personal-labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/dependencies",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/archive",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/restore",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/skills/:slug/public-version",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/public-version",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/versions/:version/package",
+    "capability": "skills:read",
+    "transport": "transfer-ticket-download"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/versions/:version/files",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/versions/:version/files/content",
+    "capability": "skills:read",
+    "transport": "transfer-ticket-download"
+  },
+  {
+    "method": "GET",
+    "path": "/labels",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/labels/rename",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/labels/color",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/labels/icon",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/personal-labels",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/personal-labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/personal-labels/rename",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/personal-labels/color",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "PUT",
+    "path": "/personal-labels/icon",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "DELETE",
+    "path": "/personal-labels",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/local-skills",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/local-skills/:key",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/local-skills/:key/package",
+    "capability": "skills:read",
+    "transport": "transfer-ticket-download"
+  },
+  {
+    "method": "POST",
+    "path": "/local-skills/:key/installed",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/getting-started",
+    "capability": "skills:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/getting-started/steps",
+    "capability": "skills:write",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/tokens",
+    "capability": "skills:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/database",
+    "capability": "database:read",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/database/shares",
+    "capability": "database:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "PUT",
+    "path": "/skills/:slug/database/shares",
+    "capability": "database:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/database/query",
+    "capability": "database:read",
+    "transport": "rest"
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/database/execute",
+    "capability": "database:write",
+    "transport": "rest"
+  },
+  {
+    "method": "GET",
+    "path": "/secrets",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/secrets",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "GET",
+    "path": "/secrets/:id",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "PATCH",
+    "path": "/secrets/:id",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "DELETE",
+    "path": "/secrets/:id",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/secrets/:id/rotate",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "GET",
+    "path": "/skills/:slug/secret-configuration",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "PUT",
+    "path": "/skills/:slug/secret-bindings/:slotId",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/secret-bindings/:slotId",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "PUT",
+    "path": "/skills/:slug/secret-suggestions/:slotId",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "DELETE",
+    "path": "/skills/:slug/secret-suggestions/:slotId",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/skills/:slug/secret-suggestions/:slotId/accept",
+    "capability": "secrets:write",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/secret-retrievals/preflight",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/secret-retrievals/:planId/grant",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  },
+  {
+    "method": "POST",
+    "path": "/secret-grants/redeem",
+    "capability": "secrets:read",
+    "transport": "rest",
+    "sensitive": true
+  }
+]

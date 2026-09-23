@@ -1,23 +1,23 @@
 {
   "files": {
-    "SKILL.md": "sha256:d8d757f15a2e9807e687d69c2f5e3552905bde34225e75bcb28e39bc8f70a243",
-    "companion.json": "sha256:5d8f4640112bf0b5e3911674d640421e40ae2cb4649cdb4629a6fff1cb93ded2",
-    "evals/evals.json": "sha256:2ccbe0ef273ec71200410bdef434fcdc3e8efe58219b47a738694f330a318e7f",
-    "runtime-release.json": "sha256:6b8e1f9f0f644e8b57f5a36f8433a951e28743e0293b12630dfb22674fa93c55",
+    "SKILL.md": "sha256:3552cfdc4f627afdb976f610c8e1fbff137076d55f7ba545dce17e462eb4c674",
+    "companion.json": "sha256:01f9d1c29b376b90aa701ff30f656f4aa95daba3865021a919f463fdc0c71d98",
+    "evals/evals.json": "sha256:944dfe9bb05ac45bf1b6028a0cc213bd0fa892855d8b3598ea0cd391720cf504",
+    "runtime-release.json": "sha256:ebe2fe47df2d64d3fa05666f457e9f0922af6631ea09b47e0325b61652aacff3",
     "scripts/bootstrap.py": "sha256:f4f4cad2ab05b2ef97e1119430bb272a4012d2bd8fc8db7ddd5bec7b0e57e0f5",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",
     "scripts/check_updates.py": "sha256:d287638fe8dc12b44b913b2613371914f82d3a32cb2837bc02f042b7270efa70",
-    "scripts/companion-agent-client.mjs": "sha256:4a9c06ce0abc887f58af3cf65ff405084b428097e7e66ae97f38ac653f1a9525",
+    "scripts/companion-agent-client.mjs": "sha256:b406e18bceceb2bc1ed0b94314d15d38c52e1fa5f59c6aa0a72f9d4719462e6c",
     "scripts/companion_lib.py": "sha256:44ceda2cbd4d066ea5abf7c1a64c9adebcac15a29d4d90dc5fcceec659a05e33",
     "scripts/create_secret.py": "sha256:88a5c46e499059ecd8d8712b978ace6de72389fd53f57db6ea760478fefd8c65",
     "scripts/install_skill.py": "sha256:2ef768c8b855c43c26c30e1385fd92b052bc5cebf894ce71cb6e917e2c357af4",
     "scripts/onboarding_scan.py": "sha256:bd84fd9922799c5c87e8d9176969fe36d92a797ea5ddec55b02a53d1c081c16c",
     "scripts/opencode-runtime.mjs": "sha256:c079f1ff961b77aac9a42968e68e76a302b3430cf40ac70c38c0f4f3e5605972",
-    "scripts/package-checksum.mjs": "sha256:51f2822fe0966b1b00a87fe69f9033635c508a7eabcaf2cf4586a79c210d6204",
+    "scripts/package-checksum.mjs": "sha256:a088b6337fdbba512c808ca1b1fc6e191892564575887166272d7b81fd6060e1",
     "scripts/runtime_command.py": "sha256:e5dab65cc2688537172b824ca24d98946abe2ff1c63ac866f0585dd9595dedf8",
     "scripts/runtime_lock.py": "sha256:0437ff789501bc74fc1fe1f814adae9b5fbc842f6c8819c203166e2b389e56f2",
-    "scripts/runtime_setup.py": "sha256:fa6a92acc2875439e23b55c86118aed904d636f379b1b61d3e096ec9a1134494",
+    "scripts/runtime_setup.py": "sha256:d7b1f81c4b10e174ca361a70aaaa75aba7a0cefb97e6d8e1756d22686a99c7a7",
     "scripts/runtime_skill_sync.py": "sha256:b1d7925da9c376c8a88286dfb202e84c9e88a3091fb6344aa67f851bab9d7348",
     "scripts/secrets_runtime.py": "sha256:bd2167fb6757d383e95d0293e8b3816249678d128b6cb02f0d4a9ae76503e38c",
     "scripts/skill_guard.py": "sha256:327440144111981fe722514a3cdee227c0f68881b87d9a67aa8e918511ee7f1a",
@@ -30,5 +30,5 @@
     "scripts/verify-runtime-release.mjs": "sha256:b43631b99763441bf2a5b1a72a268ff29d1bc31ac71caa6b538b1d4faeddc93e"
   },
   "schemaVersion": 1,
-  "version": "1.118.2"
+  "version": "1.119.0"
 }

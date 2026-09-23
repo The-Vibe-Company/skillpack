@@ -75,6 +75,7 @@ import {
   listSkillVersions,
   prepareSkillPublishDependencies,
   refreshApiToken,
+  resolveApiToken,
   renameSkill,
   renameLabel,
   reportLocalSkillInstall,
@@ -97,6 +98,7 @@ import {
   clearUserAvatar,
   getUserAvatarAsset,
   getMyAvatarUrl,
+  getCurrentApiTokenMetadata,
   getUserTimezone,
   shareSkill,
   installSkill,
@@ -2298,9 +2300,11 @@ app.get("/v1/skills/:slug/usage", async (c) => {
 
 app.get("/v1/skills/:slug/versions", async (c) => {
   try {
-    return c.json(await withTenant(c, ({ actor, orgId, database }) => listSkillVersions({ actor, orgId, slug: c.req.param("slug"), database })));
+    actorFromContext(c, true);
+    await requireScope(c, "skills:read");
+    return c.json(await withTenant(c, ({ actor, orgId, database }) => listSkillVersions({ actor, orgId, slug: c.req.param("slug"), database }), true));
   } catch (error) {
-    return jsonError(c, error);
+    return jsonError(c, error, 401);
   }
 });
 
@@ -3901,6 +3905,50 @@ app.get("/v1/tokens", async (c) => {
     return c.json(await withTenant(c, ({ actor, orgId, database }) => listApiTokens({ actor, orgId, database })));
   } catch (error) {
     return jsonError(c, error, 401);
+  }
+});
+
+/**
+ * Return the identity and metadata of the bearer PAT itself. This route is deliberately PAT-only:
+ * it resolves the Authorization header directly so an attached browser cookie cannot replace the
+ * PAT actor or organization. The resolver proves active membership/revocation/expiry first; the
+ * tenant-scoped metadata lookup then returns no secret and no fields from another organization.
+ */
+app.get("/v1/tokens/current", async (c) => {
+  const bearer = bearerFromHeader(c.req.header("authorization"));
+  if (!bearer) return jsonError(c, "personal access token required", 401);
+
+  try {
+    const resolved = await resolveApiToken(
+      bearer,
+      undefined,
+      c.req.header("x-companion-delegation-target")?.trim() || null,
+    );
+    if (!resolved) return jsonError(c, "not authenticated", 401);
+
+    const metadata = await withTenantContext(
+      { orgId: resolved.orgId, userId: resolved.actor.id },
+      (database) => getCurrentApiTokenMetadata({
+        rawToken: bearer,
+        actor: resolved.actor,
+        orgId: resolved.orgId,
+        database,
+      }),
+    );
+    if (!metadata) return jsonError(c, "not authenticated", 401);
+
+    const organizations = await listOrgs(resolved.actor);
+    const workspace = organizations.find((org) => org.org_id === resolved.orgId);
+    if (!workspace) return jsonError(c, "not authenticated", 401);
+
+    c.header("Cache-Control", "private, no-store");
+    return c.json({
+      user: resolved.actor,
+      workspace: { id: workspace.org_id, name: workspace.name },
+      token: metadata,
+    });
+  } catch (error) {
+    return jsonError(c, error, 500);
   }
 });
 
