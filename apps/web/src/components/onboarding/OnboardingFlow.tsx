@@ -1,238 +1,189 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Icon } from "@/components/Icon";
-import { completeOnboarding, joinByDomain, type OnboardingContext } from "@/lib/onboarding";
+import { hashColor } from "@/components/branding";
 import {
-  Aside,
-  ScreenAccount,
-  ScreenCreateOrg,
-  ScreenDetecting,
-  ScreenFound,
-  ScreenInvite,
-  ScreenWelcome,
-  hashColor,
-  initialsOf,
-  type OrgDraft,
-} from "./screens";
+  completeOnboarding,
+  initialDisplayName,
+  joinByDomain,
+  suggestWorkspaceName,
+  type OnboardingContext,
+} from "@/lib/onboarding";
+import { updateMe } from "@/lib/org";
+import { ConnectAgentStep } from "./ConnectAgentStep";
+import { OnboardingShell, type OnboardingStep } from "./OnboardingShell";
+import { TeamStep } from "./TeamStep";
+import { useBrandIcon } from "./useBrandIcon";
+import { WorkspaceStep, type WorkspaceMode } from "./WorkspaceStep";
 
-type Screen = "account" | "detecting" | "found" | "create_org" | "invite" | "welcome";
-type Path = "create" | "join" | null;
-
-const CREATE_STEPS = ["Account", "Organization", "Invite collaborators", "You're in"];
-const JOIN_STEPS = ["Account", "Your organization", "You're in"];
-
-function stepOf(screen: Screen, path: Path): number {
-  if (path === "join") {
-    if (screen === "account") return 0;
-    if (screen === "detecting" || screen === "found") return 1;
-    return 2;
-  }
-  switch (screen) {
-    case "account":
-      return 0;
-    case "detecting":
-    case "found":
-    case "create_org":
-      return 1;
-    case "invite":
-      return 2;
-    default:
-      return 3;
-  }
+/** The workspace the member ended up in; step 3 connects their agent to it. */
+export interface OnboardedWorkspace {
+  id: string;
+  name: string;
 }
 
-export function OnboardingFlow({ context, me }: { context: OnboardingContext; me: { name: string; email: string } }) {
-  const router = useRouter();
-  const logoutForm = useRef<HTMLFormElement>(null);
-  const detectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+/** Step 3 must survive a reload: the member is already onboarded once the workspace exists. */
+const AGENT_STEP_URL = "/onboarding?step=agent";
 
+const FALLBACK_ERROR = "Something went wrong. Try again.";
+
+/**
+ * First-run setup: Workspace (create or join by email domain) → Team (invitations, create path only)
+ * → Agent (hand the Skillpack setup prompt to a coding agent and watch it connect). Nothing is
+ * created until the member confirms on the Team step, and every button does what its label says.
+ */
+export function OnboardingFlow({
+  context,
+  me,
+  initialStep = "workspace",
+  workspace = null,
+}: {
+  context: OnboardingContext;
+  me: { name: string; email: string };
+  initialStep?: "workspace" | "agent";
+  workspace?: OnboardedWorkspace | null;
+}) {
+  const router = useRouter();
   const email = context.email || me.email;
   const corporateDomain = context.isPersonal ? null : context.domain;
 
-  const [name, setName] = useState(me.name || "");
-  const [screen, setScreen] = useState<Screen>("account");
-  const [path, setPath] = useState<Path>(null);
+  const [step, setStep] = useState<OnboardingStep>(workspace ? initialStep : "workspace");
+  const [mode, setMode] = useState<WorkspaceMode>(context.matchedOrgs.length > 0 ? "join" : "create");
+  const [name, setName] = useState(() => initialDisplayName(me.name, email));
+  const [savedName, setSavedName] = useState(() => me.name.trim());
+  const [workspaceName, setWorkspaceName] = useState(() => suggestWorkspaceName(corporateDomain));
+  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(context.matchedOrgs[0]?.id ?? null);
+  const [invites, setInvites] = useState<string[]>([]);
+  const [allowDomain, setAllowDomain] = useState(Boolean(corporateDomain));
+  const [result, setResult] = useState<(OnboardedWorkspace & { invitedCount: number | null }) | null>(
+    workspace ? { ...workspace, invitedCount: null } : null,
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedOrgId, setSelectedOrgId] = useState<string | null>(() => context.matchedOrgs[0]?.id ?? null);
+  const [movedOn, setMovedOn] = useState(false);
+  const logoSrc = useBrandIcon(corporateDomain);
 
-  const [org, setOrg] = useState<OrgDraft>({ name: "", website: "", logo: null, candidates: [], fetchedFrom: "", domain: "" });
-  const [invites, setInvites] = useState<string[]>([]);
-  const [allowDomain, setAllowDomain] = useState<boolean>(!!corporateDomain);
-
-  useEffect(() => () => {
-    if (detectTimer.current) clearTimeout(detectTimer.current);
-  }, []);
-
-  function seedCreateOrg() {
-    setPath("create");
-    setOrg((o) => ({ ...o, domain: corporateDomain ?? "", website: corporateDomain ?? "" }));
-    setScreen("create_org");
-  }
-
-  function gotoDetect() {
+  const goTo = (next: OnboardingStep) => {
     setError(null);
-    setScreen("detecting");
-    if (detectTimer.current) clearTimeout(detectTimer.current);
-    detectTimer.current = setTimeout(() => {
-      if (context.matchedOrgs.length > 0) {
-        setPath("join");
-        setScreen("found");
-      } else {
-        seedCreateOrg();
-      }
-    }, 1400);
-  }
+    setMovedOn(true);
+    setStep(next);
+  };
 
-  async function joinOrg() {
-    const orgId = selectedOrgId ?? context.matchedOrgs[0]?.id;
-    if (!orgId) {
-      setError("Choose an organization to join.");
-      return;
-    }
+  const saveName = async () => {
+    const trimmed = name.trim();
+    if (trimmed === savedName) return;
+    await updateMe(trimmed);
+    setSavedName(trimmed);
+  };
+
+  const enterAgentStep = (next: OnboardedWorkspace & { invitedCount: number | null }) => {
+    setResult(next);
+    window.history.replaceState(null, "", AGENT_STEP_URL);
+    goTo("agent");
+  };
+
+  const submitWorkspace = async () => {
     setError(null);
     setBusy(true);
     try {
-      await joinByDomain(orgId);
-      setPath("join");
-      setScreen("welcome");
+      await saveName();
+      if (mode === "join") {
+        const org = context.matchedOrgs.find((o) => o.id === selectedOrgId) ?? context.matchedOrgs[0];
+        if (!org) throw new Error("Choose a workspace to join.");
+        const joined = await joinByDomain(org.id);
+        enterAgentStep({ id: joined.orgId, name: org.name, invitedCount: null });
+      } else {
+        goTo("team");
+      }
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof Error && e.message ? e.message : FALLBACK_ERROR);
     } finally {
       setBusy(false);
     }
-  }
+  };
 
-  async function finishCreate() {
+  const createWorkspace = async (finalInvites: string[]) => {
     setError(null);
     setBusy(true);
+    const orgName = workspaceName.trim();
     try {
-      await completeOnboarding({
+      const created = await completeOnboarding({
         org: {
-          name: org.name.trim(),
-          domain: org.domain || undefined,
-          autoJoin: allowDomain,
-          color: org.logo?.color ?? null,
-          logoUrl: org.logo?.src ?? null,
+          name: orgName,
+          domain: corporateDomain,
+          autoJoin: Boolean(corporateDomain) && allowDomain,
+          color: hashColor(orgName),
+          logoUrl: logoSrc,
         },
-        invites,
+        invites: finalInvites,
       });
-      router.push("/skills");
-      router.refresh();
+      enterAgentStep({ id: created.orgId, name: orgName, invitedCount: created.invited.length });
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof Error && e.message ? e.message : FALLBACK_ERROR);
+    } finally {
       setBusy(false);
     }
-  }
+  };
 
-  function openApp() {
+  const openApp = () => {
     router.push("/skills");
     router.refresh();
-  }
+  };
 
-  function logout() {
-    logoutForm.current?.submit();
-  }
-
-  const steps = path === "join" ? JOIN_STEPS : CREATE_STEPS;
-  const stepIndex = stepOf(screen, path);
-  const showEmailChip = screen !== "account";
-
-  let panel: React.ReactNode = null;
-  if (screen === "account") {
-    panel = <ScreenAccount name={name} email={email} setName={setName} onNext={gotoDetect} />;
-  } else if (screen === "detecting") {
-    panel = <ScreenDetecting domain={context.domain} />;
-  } else if (screen === "found" && context.matchedOrgs.length > 0) {
-    panel = (
-      <ScreenFound
-        orgs={context.matchedOrgs}
+  let body: React.ReactNode;
+  if (step === "agent" && result) {
+    body = (
+      <ConnectAgentStep
+        workspaceId={result.id}
+        workspaceName={result.name}
+        invitedCount={result.invitedCount}
+        onFinish={openApp}
+      />
+    );
+  } else if (step === "team") {
+    body = (
+      <TeamStep
+        invites={invites}
+        onInvitesChange={setInvites}
+        allowDomain={allowDomain}
+        onAllowDomainChange={setAllowDomain}
+        domain={corporateDomain}
+        selfEmail={email}
+        busy={busy}
+        error={error}
+        onBack={() => goTo("workspace")}
+        onSubmit={(finalInvites) => void createWorkspace(finalInvites)}
+      />
+    );
+  } else {
+    body = (
+      <WorkspaceStep
+        mode={mode}
+        onModeChange={(next) => {
+          setError(null);
+          setMode(next);
+        }}
+        name={name}
+        onNameChange={setName}
+        workspaceName={workspaceName}
+        onWorkspaceNameChange={setWorkspaceName}
+        logoSrc={logoSrc}
+        domain={corporateDomain}
+        matchedOrgs={context.matchedOrgs}
         selectedOrgId={selectedOrgId}
-        setSelectedOrgId={setSelectedOrgId}
+        onSelectOrg={setSelectedOrgId}
         busy={busy}
-        onJoin={joinOrg}
-        onCreateInstead={seedCreateOrg}
-      />
-    );
-  } else if (screen === "create_org") {
-    panel = (
-      <ScreenCreateOrg
-        org={org}
-        setOrg={setOrg}
-        domainHint={corporateDomain}
-        onNext={() => setScreen("invite")}
-        onBack={() => (context.matchedOrgs.length ? setScreen("found") : setScreen("account"))}
-      />
-    );
-  } else if (screen === "invite") {
-    panel = (
-      <ScreenInvite
-        invites={invites}
-        setInvites={setInvites}
-        allowDomain={allowDomain}
-        setAllowDomain={setAllowDomain}
-        domain={org.domain || null}
-        onFinish={() => setScreen("welcome")}
-        onBack={() => setScreen("create_org")}
-      />
-    );
-  } else if (screen === "welcome") {
-    panel = (
-      <ScreenWelcome
-        path={path === "join" ? "join" : "create"}
-        org={org}
-        invites={invites}
-        allowDomain={allowDomain}
-        domain={org.domain || null}
-        joinedOrg={context.matchedOrgs.find((org) => org.id === selectedOrgId) ?? context.matchedOrgs[0] ?? null}
-        busy={busy}
-        onEnter={path === "join" ? openApp : finishCreate}
+        error={error}
+        focusHeading={movedOn}
+        onSubmit={() => void submitWorkspace()}
       />
     );
   }
 
   return (
-    <div className="ob">
-      {/* Full-page POST logout (mirrors the login form posting to /v1/auth/login-redirect). */}
-      <form ref={logoutForm} method="post" action="/v1/auth/logout" className="ob-logout-form" />
-      <Aside steps={steps} stepIndex={stepIndex} meName={name} meEmail={email} onLogout={logout} />
-      <main className="ob-main">
-        <div className="ob-main__top">
-          <div className="ob-main__topbrand">
-            <span className="ob-brand__mark" aria-hidden="true" />
-            <span className="ob-brand__wm">Skillpack</span>
-          </div>
-          <div className="ob-topright">
-            {showEmailChip && (
-              <span className="ob-emailchip">
-                <span
-                  className="ob-avatar"
-                  style={{ background: hashColor(name || "You"), width: 18, height: 18, fontSize: 9, borderRadius: 5 }}
-                >
-                  {initialsOf(name || "You")}
-                </span>
-                {email}
-              </span>
-            )}
-            <button className="ob-logout ob-topact" onClick={logout} aria-label="Log out" title="Log out">
-              <Icon name="log-out" size={16} />
-            </button>
-          </div>
-        </div>
-        <div className="ob-stage">{panel}</div>
-        {error && (
-          <div className="ob-stage" style={{ paddingTop: 0 }} role="alert">
-            <div className="ob-panel" style={{ paddingTop: 0, maxWidth: 452 }}>
-              <div className="ob-note ob-note--danger">
-                <Icon name="alert-triangle" size={15} />
-                <span>{error}</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+    <OnboardingShell step={step} teamSkipped={mode === "join" && step === "agent"} email={email}>
+      {body}
+    </OnboardingShell>
   );
 }

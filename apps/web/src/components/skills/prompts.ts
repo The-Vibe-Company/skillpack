@@ -29,3 +29,11 @@ export function fillPrompt(
     .split("<your assistant>")
     .join(agent);
 }
+
+/**
+ * The guided-setup prompt: install + connect + local and org review before the Skillpack skill is
+ * installed, then the shorter resume prompt that picks up the first unfinished step.
+ */
+export function gettingStartedTemplate(skill: LocalSkillRow, installed: boolean): string {
+  return installed ? skill.prompts.resume : skill.prompts.onboarding;
+}

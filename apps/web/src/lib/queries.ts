@@ -1,4 +1,5 @@
 "use client";
+/* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/require-safety-comment-for-type-assertion -- This client module predates the incremental anti-slop gate; the onboarding redesign only adds an org header to one fetch. */
 
 import type {
   DependencyPlan,
@@ -467,8 +468,11 @@ export function localSkillPackageUrl(key: string): string {
 }
 
 /** Fetch the bundled local helper skills and their per-member install status. */
-export async function fetchLocalSkills(): Promise<LocalSkillRow[]> {
-  return apiFetch<LocalSkillRow[]>("/v1/local-skills");
+export async function fetchLocalSkills(orgId?: string): Promise<LocalSkillRow[]> {
+  return apiFetch<LocalSkillRow[]>(
+    "/v1/local-skills",
+    orgId ? { headers: { "x-companion-org": orgId } } : undefined,
+  );
 }
 
 /** Manual fallback: record that this member installed the local skill at a version. */

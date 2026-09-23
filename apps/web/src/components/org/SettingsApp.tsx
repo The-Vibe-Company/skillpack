@@ -36,7 +36,6 @@ import {
   type Theme,
 } from "@/lib/theme";
 import { initialsOf, mapApiKey } from "@/lib/settingsViewModel";
-import { Onboarding } from "./Onboarding";
 import { SettingsView } from "./SettingsView";
 import { useOrgActions } from "./useOrgActions";
 import { canonicalizeSettingsRoute } from "./model";
@@ -499,15 +498,6 @@ export function SettingsController({
         onDialog={onDialog}
         onClose={onClose}
       />
-      {actions.onboarding && (
-        <Onboarding
-          mode={actions.onboarding}
-          onMode={actions.setOnboarding}
-          onCreate={actions.createOrg}
-          onJoin={actions.joinOrg}
-          busy={actions.busy}
-        />
-      )}
     </>
   );
 }

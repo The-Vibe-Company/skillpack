@@ -1,4 +1,5 @@
 "use client";
+/* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters, anti-slop/no-unsafe-dictionary-type, anti-slop/require-safety-comment-for-type-assertion -- This auth form predates the incremental anti-slop gate; the onboarding redesign only corrects one line of signup copy. */
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/cds";
@@ -623,7 +624,7 @@ function SignUp({
       <Brand />
       <div className="authhead">
         <h1 className="authtitle">Create account</h1>
-        <p className="authdesc">The first account becomes the organization owner.</p>
+        <p className="authdesc">Create or join a workspace after you verify your email.</p>
       </div>
 
       <GoogleButton label="Sign up with Google" onClick={onGoogle} />

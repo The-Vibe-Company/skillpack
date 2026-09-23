@@ -73,7 +73,7 @@ describe("SettingsController", () => {
           onClose: vi.fn(),
         }),
       );
-    expect(html).toContain("Resume onboarding");
+    expect(html).toContain("Show getting started");
   });
 
   it("renders the stored member timezone in personal preferences", () => {

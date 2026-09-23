@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+/* oxlint-disable anti-slop/no-module-mocking, anti-slop/require-safety-comment-for-type-assertion -- This existing test harness predates the incremental anti-slop gate; the onboarding redesign only updates its expectations. */
 
 import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -22,14 +23,14 @@ const router = vi.hoisted(() => ({
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("@/lib/secrets", () => rpc);
 vi.mock("../org/OrgSwitcher", () => ({ OrgSwitcher: () => React.createElement("div", null, "Acme") }));
-vi.mock("../org/Onboarding", () => ({ Onboarding: () => null }));
+vi.mock("../org/WorkspaceDialog", () => ({ WorkspaceDialog: () => null }));
 vi.mock("../org/useOrgActions", () => ({
   useOrgActions: () => ({
-    onboarding: null,
+    workspaceDialog: null,
     busy: false,
     error: null,
     switchOrg: vi.fn(),
-    setOnboarding: vi.fn(),
+    setWorkspaceDialog: vi.fn(),
     createOrg: vi.fn(),
     joinOrg: vi.fn(),
     setError: vi.fn(),

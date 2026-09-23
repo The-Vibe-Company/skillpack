@@ -185,8 +185,8 @@ The interface is product software, not marketing. It should feel calm, dense, pr
 This document describes the Skillpack theme as implemented in `apps/web`. Light is the default; a full dark
 theme and user-selectable accent presets are available (see Colors). CSS custom properties live in
 `apps/web/src/styles/tokens.css`; the `cds-*` component layer is in `cds.css`; feature-specific layout and
-styling extend those tokens in `auth.css`, `skills.css`, `onboarding.css`, `org.css`, `settings.css`, and
-`upload.css`.
+styling extend those tokens in `auth.css`, `skills.css`, `agents.css`, `onboarding.css`, `org.css`,
+`settings.css`, and `upload.css`.
 
 ## Colors
 
@@ -221,9 +221,10 @@ are unchanged in dark mode; only `accent-tint` is lifted per accent (`data-theme
 selected rows read against the darker surface. A one-frame `no-anim` class is toggled during a theme or accent
 swap so background colors don't interpolate across the variable change.
 
-During onboarding, org and team brand colors are chosen from a fixed six-color palette (`brand-blue`, `brand-teal`,
-`brand-violet`, `brand-amber`, `brand-terracotta`, `brand-slate`). These are cosmetic only and stored per org/team;
-they do not replace the product accent tokens.
+Org and team brand colors come from a fixed six-color palette (`brand-blue`, `brand-teal`, `brand-violet`,
+`brand-amber`, `brand-terracotta`, `brand-slate`). Onboarding derives the workspace color from its name, and the
+logo from the work email domain when one loads; both are editable in Settings. These are cosmetic only and stored
+per org/team; they do not replace the product accent tokens.
 
 Status colors are calm and slightly desaturated:
 
@@ -311,6 +312,18 @@ Selection uses a tinted row background plus an inset accent edge via box-shadow.
 **Sidebar** contains the Skillpack brand mark, wordmark, workspace context, primary navigation, counts where useful, and a quiet environment/footer indicator. Active nav uses `surface-raised` with foreground text; unread counts may use the accent fill. The brand mark tile uses the official transparent Skillpack mark on a tokenized `surface` tile with a `line` border, so it works across light, dark, and accent presets.
 
 **Skills workspace** is the product core. The shell opens directly on the skill library. Skill detail uses Overview, Dependencies, Files, Database, History, and Activity only when those sections apply. Upload, browser creation, publishing, installation, public release management, comments, labels, secrets, and hosted database workflows stay close to the selected skill. The Skills surface never executes package scripts or launches generic agents..
+
+**Onboarding** is three fixed steps under a 56px top bar: Workspace, Team, Agent. The bar carries the brand
+mark, a numbered progress list (current step filled with `fg`, never the accent), the signed-in email in mono, and
+log out. Content is one centered 480px column with no card around it; headings use `scale-xl`, and the step's
+single primary action uses `cds-btn--lg`. Nothing is created until the Team step's button says so, and joining an
+email-domain workspace marks Team as done rather than removing it. The Agent step reuses the shared agent picker
+and prompt panel, and flips to "Connected" from the member's install report. It never shows a spinner.
+
+**Agent picker and prompt panel** (`components/agents/`) is the one surface that hands Skillpack to an external
+coding agent: agent tiles, "Paste this into {agent}" with a copy button, and the full prompt behind a disclosure.
+A blocked clipboard opens the prompt for manual copy instead of claiming success. Onboarding and the local-skills
+install dialog both render it.
 
 **External agent access** is an account setting for delegated clients that consume the Skills Hub. Describe capabilities such as skill read/write, database read/write, and secret read/write. Never present a connected external client as a Skillpack-hosted or Skillpack-launched agent.
 

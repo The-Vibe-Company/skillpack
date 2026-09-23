@@ -17,7 +17,7 @@ import {
   updateSecret as updateSecretRpc,
 } from "@/lib/secrets";
 import { Icon } from "../Icon";
-import { Onboarding } from "../org/Onboarding";
+import { WorkspaceDialog } from "../org/WorkspaceDialog";
 import { useOrgActions } from "../org/useOrgActions";
 import { UserAvatar } from "../UserAvatar";
 import { useModalA11y } from "../skills/UploadDialog";
@@ -343,7 +343,7 @@ export function SecretsApp({
         orgs={orgs}
         currentOrg={currentOrg}
         onSwitchOrg={orgActions.switchOrg}
-        onOnboard={orgActions.setOnboarding}
+        onOnboard={orgActions.setWorkspaceDialog}
         onOpenSettings={() => router.push("/settings")}
         onWarmSettings={noop}
         mineTreeRows={navigation.mineTreeRows}
@@ -501,7 +501,7 @@ export function SecretsApp({
         </div>
       </aside>
 
-      {orgActions.onboarding && <Onboarding mode={orgActions.onboarding} onMode={orgActions.setOnboarding} onCreate={orgActions.createOrg} onJoin={orgActions.joinOrg} busy={orgActions.busy} />}
+      {orgActions.workspaceDialog && <WorkspaceDialog mode={orgActions.workspaceDialog} onClose={() => orgActions.setWorkspaceDialog(null)} onCreate={orgActions.createOrg} onJoin={orgActions.joinOrg} busy={orgActions.busy} />}
       {orgActions.error && <div className="og-toast" role="alert" onClick={() => orgActions.setError(null)}>{orgActions.error}</div>}
     </div>
   );

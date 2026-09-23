@@ -23,6 +23,8 @@
 }
 .cds-btn--sm { height: 28px; padding: 0 var(--space-3); font-size: var(--text-xs); }
 .cds-btn--md { height: 36px; padding: 0 var(--space-4); font-size: var(--text-sm); }
+/* 40px: reserved for onboarding and auth primary actions (DESIGN.md). */
+.cds-btn--lg { height: 40px; padding: 0 var(--space-4); font-size: var(--text-base); }
 .cds-btn--primary { background: var(--color-accent); color: var(--color-accent-fg); }
 .cds-btn--primary:hover { background: var(--color-accent-hover); }
 .cds-btn--secondary { background: var(--color-surface); border-color: var(--color-line); color: var(--color-fg); }

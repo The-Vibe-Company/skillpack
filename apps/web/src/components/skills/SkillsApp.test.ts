@@ -1,4 +1,5 @@
 // @vitest-environment happy-dom
+/* oxlint-disable anti-slop/no-module-mocking, anti-slop/no-unknown-parameters, anti-slop/require-safety-comment-for-type-assertion -- This existing test harness predates the incremental anti-slop gate; the onboarding redesign only updates its expectations. */
 
 import React from "react";
 import { act } from "react";
@@ -2054,7 +2055,7 @@ describe("Skillpack skills install gate", () => {
   const dismissKey = "companion:companion-skills:gate-dismissed:Acme:companion";
 
   function gateCopyButton(container: HTMLElement): HTMLButtonElement {
-    const btn = container.querySelector<HTMLButtonElement>(".ls-gate__foot .btn-primary");
+    const btn = container.querySelector<HTMLButtonElement>(".ls-gate .cap-prompt__head .cds-btn");
     if (!btn) throw new Error("gate Copy prompt button not found");
     return btn;
   }
@@ -2095,16 +2096,16 @@ describe("Skillpack skills install gate", () => {
     );
     await flushEffects();
 
-    expect(container.textContent).toContain("Connect Skillpack to your assistant");
-    expect(container.textContent).toContain("Which assistant do you use?");
+    expect(container.textContent).toContain("Connect your coding agent");
+    expect(container.textContent).toContain("Paste this into Claude Code");
     // Lazy mint: opening the gate must NOT create a credential.
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
 
     clickButton(container, "Maybe later");
     await flushEffects();
 
-    expect(container.textContent).not.toContain("Connect Skillpack to your assistant");
-    expect(container.textContent).toContain("Skillpack is not connected to your assistant");
+    expect(container.textContent).not.toContain("Connect your coding agent");
+    expect(container.textContent).toContain("Skillpack is not connected to a coding agent");
     // Dismissing never mints a token, and dismissal persists so the gate doesn't re-nag.
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
     expect(window.localStorage.getItem(dismissKey)).toBe("1");
@@ -2136,7 +2137,7 @@ describe("Skillpack skills install gate", () => {
     clickGateCopy(container);
     await flushEffects();
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
-    expect(container.textContent).toContain("delegated device flow");
+    expect(container.textContent).toContain("Approve access when it asks");
     expect(container.textContent).toContain("Copied");
   });
 
@@ -2167,7 +2168,7 @@ describe("Skillpack skills install gate", () => {
     clickGateCopy(container);
     await flushEffects();
     expect(queryMocks.issueToken).not.toHaveBeenCalled();
-    expect(container.textContent).toContain("Select the prompt above");
+    expect(container.textContent).toContain("Copy failed. Select the prompt and copy it manually.");
     expect(container.textContent).not.toContain("Copied");
   });
 
@@ -2179,8 +2180,8 @@ describe("Skillpack skills install gate", () => {
     );
     await flushEffects();
 
-    expect(container.textContent).not.toContain("Connect Skillpack to your assistant");
-    expect(container.textContent).toContain("Skillpack is not connected to your assistant");
+    expect(container.textContent).not.toContain("Connect your coding agent");
+    expect(container.textContent).toContain("Skillpack is not connected to a coding agent");
   });
 
   it("shows the update banner (and no gate) when an update is available", async () => {

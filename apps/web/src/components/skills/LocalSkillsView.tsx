@@ -5,6 +5,9 @@ import type { ReactNode } from "react";
 import type { LocalSkillRow, LocalSkillStatus } from "@skillpack/contracts";
 import { apiBase, fetchLocalSkills } from "@/lib/queries";
 import { REQUIRED_LOCAL_SKILL_KEY } from "@/lib/skillpackSkillGate";
+import { AGENT_IDS, AGENTS } from "@/lib/agents";
+import { ConnectAgentPanel } from "../agents/ConnectAgentPanel";
+import { StatusDot } from "../cds";
 import { Icon } from "../Icon";
 import { CodeBlock, useModalA11y } from "./UploadDialog";
 import { fillPrompt, promptFor } from "./prompts";
@@ -39,88 +42,6 @@ function versionLine(skill: LocalSkillRow): string {
 
 type PromptMode = "default" | "reinstall";
 type CopiedKind = "prompt" | "reinstall";
-
-/** The assistants the install dialog can target. Their display name is reported as the install agent. */
-type AssistantId = "claude-code" | "codex" | "opencode" | "grok-bot" | "openclaw" | "hermes";
-const ASSISTANTS = {
-  "claude-code": { name: "Claude Code", vendor: "anthropic", hint: "paste into Claude Code" },
-  codex: { name: "Codex", vendor: "openai", hint: "paste into Codex" },
-  opencode: { name: "OpenCode", vendor: "opencode", hint: "paste into OpenCode" },
-  "grok-bot": { name: "Grok Bot (Cursor)", vendor: "cursor", hint: "paste into Cursor's Grok Bot" },
-  openclaw: { name: "OpenClaw", vendor: "openclaw", hint: "paste into OpenClaw" },
-  hermes: { name: "Hermes", vendor: "nous-research", hint: "paste into Hermes" },
-} satisfies Record<AssistantId, { name: string; vendor: string; hint: string }>;
-// SAFETY: ASSISTANTS is the exact closed literal keyed by AssistantId above.
-const ASSISTANT_IDS = Object.keys(ASSISTANTS) as AssistantId[];
-
-/** Anthropic mark, shown on the Claude Code chooser tile (copied from the design). */
-function ClaudeLogo() {
-  return (
-    <span className="ls-tile__logo" style={{ background: "#D97757" }} aria-hidden="true">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="#fff">
-        <g>
-          <rect x="11.2" y="2" width="1.6" height="20" rx="0.8" />
-          <rect x="11.2" y="2" width="1.6" height="20" rx="0.8" transform="rotate(36 12 12)" />
-          <rect x="11.2" y="2" width="1.6" height="20" rx="0.8" transform="rotate(72 12 12)" />
-          <rect x="11.2" y="2" width="1.6" height="20" rx="0.8" transform="rotate(108 12 12)" />
-          <rect x="11.2" y="2" width="1.6" height="20" rx="0.8" transform="rotate(144 12 12)" />
-        </g>
-      </svg>
-    </span>
-  );
-}
-
-/** OpenAI mark, shown on the Codex chooser tile (copied from the design). */
-function CodexLogo() {
-  return (
-    <span className="ls-tile__logo" style={{ background: "#0b0b0d" }} aria-hidden="true">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.5">
-        <ellipse cx="12" cy="12" rx="9.2" ry="3.6" />
-        <ellipse cx="12" cy="12" rx="9.2" ry="3.6" transform="rotate(60 12 12)" />
-        <ellipse cx="12" cy="12" rx="9.2" ry="3.6" transform="rotate(120 12 12)" />
-      </svg>
-    </span>
-  );
-}
-
-function OpenCodeLogo() {
-  return (
-    <span className="ls-tile__logo" style={{ background: "#365c7d" }} aria-hidden="true">
-      <Icon name="terminal" size={18} style={{ color: "#fff" }} />
-    </span>
-  );
-}
-
-function OpenClawLogo() {
-  return (
-    <span className="ls-tile__logo" style={{ background: "#44546f" }} aria-hidden="true">
-      <Icon name="bot" size={18} style={{ color: "#fff" }} />
-    </span>
-  );
-}
-
-function HermesLogo() {
-  return (
-    <span className="ls-tile__logo" style={{ background: "#5b4b7f" }} aria-hidden="true">
-      <Icon name="bot" size={18} style={{ color: "#fff" }} />
-    </span>
-  );
-}
-
-function AssistantLogo({ id }: { id: AssistantId }) {
-  if (id === "claude-code") return <ClaudeLogo />;
-  if (id === "codex") return <CodexLogo />;
-  if (id === "opencode") return <OpenCodeLogo />;
-  if (id === "openclaw") return <OpenClawLogo />;
-  if (id === "grok-bot") {
-    return (
-      <span className="ls-tile__logo" style={{ background: "#2563eb" }} aria-hidden="true">
-        <Icon name="bot" size={18} style={{ color: "#fff" }} />
-      </span>
-    );
-  }
-  return <HermesLogo />;
-}
 
 function MarkdownNotes({ value }: { value: string }) {
   const blocks: ReactNode[] = [];
@@ -169,6 +90,12 @@ function MarkdownNotes({ value }: { value: string }) {
   flushList();
   return <div className="ls-md">{blocks}</div>;
 }
+
+/** "Claude Code, Codex, …, and Hermes": the agents the setup prompt supports, from the shared list. */
+const SUPPORTED_AGENTS = (() => {
+  const names = AGENT_IDS.map((id) => AGENTS[id].name);
+  return `${names.slice(0, -1).join(", ")}, and ${names[names.length - 1]}`;
+})();
 
 /** Per-(workspace, skill) dismissal key for the install gate, so it nags once, not on every visit. */
 function gateStorageKey(workspaceName: string, key: string): string {
@@ -291,8 +218,7 @@ export function LocalSkillsView({
         <div className="ls-banner ls-banner--ok" role="status">
           <Icon name="check-circle-2" size={16} className="ls-banner__ico" />
           <span className="ls-banner__text">
-            <strong>Connected.</strong> Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, Hermes, and your agents can manage the
-            skills on this machine.
+            <strong>Connected.</strong> {SUPPORTED_AGENTS} can manage the skills on this machine.
           </span>
         </div>
       )}
@@ -303,10 +229,9 @@ export function LocalSkillsView({
             <Icon name="plug-zap" size={19} />
           </span>
           <span className="ls-banner__stack">
-            <span className="ls-banner__title">Skillpack is not connected to your assistant</span>
+            <span className="ls-banner__title">Skillpack is not connected to a coding agent</span>
             <span className="ls-banner__sub">
-              Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, and Hermes can&rsquo;t manage the skills on this machine yet.
-              It takes about a minute.
+              {SUPPORTED_AGENTS} can&rsquo;t manage the skills on this machine yet.
             </span>
           </span>
           <button
@@ -315,7 +240,7 @@ export function LocalSkillsView({
             onClick={reopenGate}
           >
             <Icon name="arrow-right" size={15} />
-            Connect your assistant
+            Connect your agent
           </button>
         </div>
       )}
@@ -444,49 +369,7 @@ function InstallGate({
   onDismiss: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const copiedTimerRef = useRef<number | null>(null);
-  const mountedRef = useRef(false);
-  const [assistant, setAssistant] = useState<AssistantId>("claude-code");
-  const [copied, setCopied] = useState(false);
-  const [clipFailed, setClipFailed] = useState(false);
   useModalA11y(ref, onDismiss);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current);
-    };
-  }, []);
-
-  const base = apiBase();
-  const meta = ASSISTANTS[assistant];
-  // The chosen assistant fills the prompt's `agent` slot, so the report-back step names the assistant
-  // that actually runs the install.
-  const displayPrompt = useMemo(
-    () => fillPrompt(skill.prompts.install, base, workspaceId, meta.name),
-    [base, meta.name, skill.prompts.install, workspaceId],
-  );
-
-  const copyPrompt = useCallback(async () => {
-    setClipFailed(false);
-    if (!navigator.clipboard) {
-      setClipFailed(true);
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(displayPrompt);
-    } catch {
-      setClipFailed(true);
-      return;
-    }
-    if (!mountedRef.current) return;
-    setCopied(true);
-    if (copiedTimerRef.current !== null) window.clearTimeout(copiedTimerRef.current);
-    copiedTimerRef.current = window.setTimeout(() => {
-      copiedTimerRef.current = null;
-      setCopied(false);
-    }, 1800);
-  }, [displayPrompt]);
 
   return (
     <>
@@ -500,14 +383,14 @@ function InstallGate({
         tabIndex={-1}
       >
         <div className="ls-gate__head">
-          <span className="ls-gate__mark" aria-hidden="true">
-            C
-          </span>
+          <span className="ls-gate__mark" aria-hidden="true" />
           <div className="ls-gate__headtext">
-            <div className="ls-gate__eyebrow">Connect your assistant · about a minute</div>
             <h2 className="ls-gate__title" id="ls-gate-title">
-              Connect Skillpack to your assistant
+              Connect your coding agent
             </h2>
+            <p className="ls-gate__lede">
+              Your agent installs the Skillpack skill on this machine. Approve access when it asks.
+            </p>
           </div>
           <button type="button" className="ls-gate__close" aria-label="Close" onClick={onDismiss}>
             <Icon name="x" size={17} />
@@ -515,81 +398,14 @@ function InstallGate({
         </div>
 
         <div className="ls-gate__body">
-          <p className="ls-gate__lede">
-            Install the skill on this machine so Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, Hermes, and your
-            agents can manage the skills here. You give it a short prompt once. It only acts after
-            confirming changes with you.
-          </p>
-
-          <div className="ls-gate__feats">
-            <span className="ls-gate__feat">
-              <Icon name="link-2" size={14} className="ls-gate__feat-ico" />
-              Connects your assistant
-            </span>
-            <span className="ls-gate__feat">
-              <Icon name="layers" size={14} className="ls-gate__feat-ico" />
-              Runs every skill
-            </span>
-            <span className="ls-gate__feat">
-              <Icon name="shield-check" size={14} className="ls-gate__feat-ico" />
-              Confirms before publishing
-            </span>
-          </div>
-
-          <div className="ls-gate__chotitle">Which assistant do you use?</div>
-          <div className="ls-choose" role="group" aria-label="Choose your assistant">
-            {ASSISTANT_IDS.map((id) => {
-              const info = ASSISTANTS[id];
-              const on = assistant === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  className={"atile" + (on ? " atile--on" : "")}
-                  aria-pressed={on}
-                  onClick={() => setAssistant(id)}
-                >
-                  <AssistantLogo id={id} />
-                  <span className="ls-tile__text">
-                    <span className="ls-tile__name">{info.name}</span>
-                    <span className="ls-tile__vendor mono">{info.vendor}</span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="ls-gate__pastehint">
-            <span className="ls-gate__promptlabel">Give this to {meta.name}</span>
-            <span className="ls-gate__hint">{meta.hint}</span>
-          </div>
-          {/* Plain pre + a single copy path. Agent Auth approval happens after the prompt is handed off. */}
-          <pre className="ls-gate__prompt">{displayPrompt}</pre>
-          <p className="ls-prompt-hint">
-            The assistant starts a delegated device flow. Permissions are approved per workspace and requested only when needed.
-          </p>
-          {clipFailed && (
-            <div className="ls-copied ls-copied--warn" role="alert">
-              <Icon name="alert-triangle" size={14} />
-              Couldn&rsquo;t copy automatically. Select the prompt above and copy it.
-            </div>
-          )}
+          <ConnectAgentPanel template={skill.prompts.install} workspaceId={workspaceId} />
         </div>
 
         <div className="ls-gate__foot">
+          <StatusDot status="unknown" label="Waiting for your agent" />
+          <span className="ls-gate__footspace" />
           <button type="button" className="ls-textbtn" onClick={onDismiss}>
             Maybe later
-          </button>
-          <span className="ls-gate__footspace" />
-          {copied && (
-            <span className="ls-gate__copied" role="status">
-              <Icon name="check" size={13} />
-              Copied
-            </span>
-          )}
-          <button type="button" className="btn-primary" onClick={copyPrompt}>
-            <Icon name={copied ? "check" : "copy"} size={14} />
-            {copied ? "Copied" : "Copy prompt"}
           </button>
         </div>
       </div>
