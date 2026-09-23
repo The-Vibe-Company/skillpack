@@ -1,0 +1,24 @@
+apps/web/src/components/skills/GettingStartedCard.test.ts
+  s_727032765182a7::t_0339eb45cdda82 198-216
+  s_727032765182a7::t_e1507e154f7e00 116-118,138-139,187-188
+apps/web/src/components/skills/GettingStartedCard.tsx
+  s_727032765182a7::t_86ae5930cf816e 24,35,43,51,182-184,188,193-244,246-259
+apps/web/src/styles/skills.css
+  s_727032765182a7::t_efa7606159a4c9 304-310,313,315-323,326-327,329-344,346-349,1047,1049-1050
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "559555f7ea4ebda5968eb7efad42fab4be87c0da",
+  "prompts": {},
+  "sessions": {
+    "s_727032765182a7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ce26-5e12-7fd2-a182-33cb27bc1c6d",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
