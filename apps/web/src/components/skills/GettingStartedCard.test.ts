@@ -113,8 +113,9 @@ describe("GettingStartedCard", () => {
   it("renders all steps with text statuses and copies the selected agent onboarding prompt", async () => {
     const { container } = await mount();
     expect(container.textContent).toContain("Getting started");
-    expect(container.textContent?.match(/To do/g)).toHaveLength(3);
-    // One action, on the first unfinished step: every step copies the same resumable prompt.
+    expect(container.textContent).toContain("0 of 3 completed");
+    expect(container.querySelectorAll('[aria-current="step"]')).toHaveLength(1);
+    // One action for the first unfinished step: every step copies the same resumable prompt.
     expect(container.querySelectorAll(".gs-step__action")).toHaveLength(1);
     expect(container.querySelector(".gs-step__action")?.textContent).toBe("Copy setup prompt");
 
@@ -134,6 +135,8 @@ describe("GettingStartedCard", () => {
       "onboard https://companion.example/v1 org-1 in Codex as Codex [PAT intentionally omitted; use Agent Auth]",
     );
     expect(queryMocks.fetch).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("0 of 3 completed");
+    expect(container.textContent).toContain("Paste the prompt into Codex");
   });
 
   it("copies a Grok Bot onboarding prompt", async () => {
@@ -181,6 +184,8 @@ describe("GettingStartedCard", () => {
     expect(container.querySelectorAll(".gs-step__action")).toHaveLength(1);
     const action = container.querySelector<HTMLButtonElement>(".gs-step__action");
     expect(action?.textContent).toBe("Continue with my agent");
+    expect(container.textContent).toContain("1 of 3 completed");
+    expect(container.textContent).toContain("Bring your local skills into your library.");
     await act(async () => {
       action?.click();
       await Promise.resolve();
@@ -188,6 +193,25 @@ describe("GettingStartedCard", () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
       "resume https://companion.example/v1 org-1 in Claude Code",
     );
+  });
+
+  it("guides the organization review after both earlier steps are confirmed", async () => {
+    const { container } = await mount({
+      ...emptyState,
+      companion_installed_at: "2026-07-28T12:00:00.000Z",
+      local_reviewed_at: "2026-07-28T12:01:00.000Z",
+      first_incomplete_step: "org_review",
+    });
+    expect(container.textContent).toContain("2 of 3 completed");
+    expect(container.textContent).toContain("Discover what your organization shares.");
+    expect(container.querySelector('[aria-current="step"]')?.textContent).toContain("Explore organization skills");
+    await act(async () => {
+      container.querySelector<HTMLButtonElement>(".gs-step__action")?.click();
+    });
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      "resume https://companion.example/v1 org-1 in Claude Code",
+    );
+    expect(container.textContent).toContain("2 of 3 completed");
   });
 
   it("rolls back optimistic hiding when dismissal fails", async () => {
