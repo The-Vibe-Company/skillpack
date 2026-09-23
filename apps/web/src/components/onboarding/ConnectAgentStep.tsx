@@ -109,7 +109,7 @@ export function ConnectAgentStep({
   }, [attempt, workspaceId]);
 
   return (
-    <div className="ob-step">
+    <div>
       <StepHeading title="Connect your coding agent" focusOnMount>
         Your agent installs the Skillpack skill for <strong>{workspaceName}</strong>. Approve access when it asks.
       </StepHeading>

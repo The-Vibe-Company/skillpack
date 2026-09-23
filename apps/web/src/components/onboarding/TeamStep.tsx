@@ -143,7 +143,7 @@ export function TeamStep({
   const label = busy ? "Creating…" : count ? `Create and invite ${count}` : "Create workspace";
 
   return (
-    <form className="ob-step" onSubmit={submit} noValidate>
+    <form onSubmit={submit} noValidate>
       <StepHeading title="Invite your team" focusOnMount>
         Invitations are emailed when you create the workspace. Optional.
       </StepHeading>

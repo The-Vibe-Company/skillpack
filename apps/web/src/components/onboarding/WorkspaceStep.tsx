@@ -52,7 +52,7 @@ export function WorkspaceStep({
   };
 
   return (
-    <form className="ob-step" onSubmit={submit} noValidate>
+    <form onSubmit={submit} noValidate>
       {joining ? (
         <StepHeading title="Join a workspace" focusOnMount={focusHeading}>
           {matchedOrgs.length > 1 ? "These workspaces accept" : "This workspace accepts"} verified{" "}
