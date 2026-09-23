@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.event.merge_group.head_sha || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   DATABASE_URL: postgres://companion:companion@127.0.0.1:5432/companion
@@ -40,6 +40,8 @@ jobs:
       dependencies: ${{ steps.scope.outputs.dependencies }}
       skill: ${{ steps.scope.outputs.skill }}
       full: ${{ steps.scope.outputs.full }}
+      runtime: ${{ steps.scope.outputs.runtime }}
+      runtime_publish: ${{ steps.runtime-release.outputs.publish }}
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -59,6 +61,20 @@ jobs:
           --head "${HEAD_SHA:-$GITHUB_SHA}"
           --github-output "$GITHUB_OUTPUT"
 
+      - name: Detect a new runtime version
+        id: runtime-release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          current="$(cat runtime/VERSION)"
+          previous="$(git show "$BEFORE_SHA:runtime/VERSION" 2>/dev/null || true)"
+          if [ "$current" != "$previous" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          fi
+
   hygiene:
     name: Hygiene
     runs-on: ubuntu-latest
@@ -71,7 +87,7 @@ jobs:
           fetch-depth: 0
 
       - name: Test CI scope classifier and local verifier
-        run: node --test scripts/agent-browser-box-center.test.mjs scripts/railway-config.test.mjs scripts/ci-scope.test.mjs scripts/ci-playwright-policy.test.mjs scripts/ci-gate.test.mjs scripts/lint-anti-slop.test.mjs scripts/verify-change.test.mjs
+        run: node --test scripts/agent-browser-box-center.test.mjs scripts/railway-config.test.mjs scripts/ci-scope.test.mjs scripts/ci-playwright-policy.test.mjs scripts/ci-gate.test.mjs scripts/lint-anti-slop.test.mjs scripts/verify-change.test.mjs scripts/runtime-release.test.mjs
 
       - name: Validate GitHub Actions workflows
         run: >-
@@ -529,6 +545,7 @@ jobs:
       - database-integration
       - railway-containers
       - browser
+      - runtime-quality
     timeout-minutes: 5
     steps:
       - name: Checkout
@@ -538,3 +555,86 @@ jobs:
         env:
           JOB_RESULTS: ${{ toJSON(needs) }}
         run: node scripts/ci-gate.mjs
+
+  runtime-quality:
+    name: Runtime Quality (${{ matrix.target }})
+    needs: scope
+    if: needs.scope.outputs.runtime == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: linux_amd64, runner: ubuntu-24.04}
+          - {target: linux_arm64, runner: ubuntu-24.04-arm}
+          - {target: windows_amd64, runner: windows-2025}
+          - {target: windows_arm64, runner: windows-11-arm}
+          - {target: darwin_amd64, runner: macos-15-intel}
+          - {target: darwin_arm64, runner: macos-15}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    env:
+      RUNTIME_RUNNER: ${{ matrix.runner }}
+      PYTHONUTF8: "1"
+      RUNTIME_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || github.event.merge_group.base_sha }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: 1.25.6
+          cache-dependency-path: runtime/go.sum
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Native tests, executable, installer and archive
+        run: python scripts/runtime-build.py
+      - name: Preserve tested release archives
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: runtime-${{ matrix.target }}
+          path: .context/runtime-dist/*
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  runtime-publish:
+    name: Runtime Publish
+    needs: [scope, gate, runtime-quality]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      github.repository == 'The-Vibe-Company/skillpack' &&
+      needs.scope.outputs.runtime_publish == 'true' &&
+      needs.gate.result == 'success' && needs.runtime-quality.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    concurrency:
+      group: skillpack-runtime-publication
+      cancel-in-progress: false
+    steps:
+      - name: Checkout validated commit
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Download this run's six native archives
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          pattern: runtime-*
+          merge-multiple: true
+          path: .context/runtime-dist
+      - name: Sign, publish immutable release and verify anonymous downloads
+        run: node scripts/runtime-release.mjs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SKILLPACK_RUNTIME_SIGNING_KEY: ${{ secrets.SKILLPACK_RUNTIME_SIGNING_KEY }}

@@ -43,6 +43,7 @@ from companion_lib import (  # noqa: E402
     fail,
     find_project_root,
     load_json,
+    load_local_inventory,
     load_tool_config,
     load_tool_registry,
     lockfile_path,
@@ -65,6 +66,8 @@ from secrets_runtime import (  # noqa: E402
 )
 
 import urllib.parse  # noqa: E402
+
+from runtime_setup import setup_runtime  # noqa: E402
 
 
 def api_quote(value: str) -> str:
@@ -402,6 +405,7 @@ def skill_from_row(skill_row: dict[str, Any], version_override: str | None = Non
         "skillId": skill_row.get("id"),
         "companionSkillId": metadata.get("companionSkillId"),
         "version": version,
+        "pinned": version_override,
         "checksum": record_checksum,
     }
 
@@ -732,6 +736,23 @@ def report_install(api_url: str, token: str, slug: str, version: str, agent: str
     )
 
 
+def setup_runtime_after_install(
+    api_url: str,
+    workspace_id: str | None,
+    project_root: Path | None,
+    *,
+    installed_count: int,
+) -> dict[str, Any]:
+    """Register fresh installs immediately while keeping runtime distribution optional."""
+    if installed_count <= 0:
+        return {'status': 'not_run', 'runtimeRegistration': 'no_targets_installed'}
+    try:
+        _lock_path, rows = load_local_inventory(workspace_id, api_url)
+        return setup_runtime(Path(__file__).resolve().parents[1], api_url, rows, project_root=project_root)
+    except BaseException as exc:
+        return {'status': 'error', 'runtimeRegistration': 'error', 'reason': str(exc)[:256]}
+
+
 def resolve_tools(args_tools: str | None, registry: dict[str, Any]) -> list[str]:
     if args_tools:
         wanted = [tool.strip() for tool in args_tools.split(",") if tool.strip()]
@@ -880,6 +901,12 @@ def main() -> None:
     results = install_result["targets"]
     installed = [row for row in results if row["status"] == "installed"]
     root_results = [row for row in results if row.get("slug") == root["slug"]]
+    runtime_result = setup_runtime_after_install(
+        api_url,
+        workspace_id,
+        project_root,
+        installed_count=len(installed),
+    )
 
     # The workspace install report is a single aggregate row at this version. Only send it when EVERY
     # planned target for the root and its dependency closure installed; a partial fan-out must not mark
@@ -913,6 +940,7 @@ def main() -> None:
         "complete": complete,
         "report": report,
         "reportWithheld": report_withheld,
+        "runtime": runtime_result,
     }
 
     if args.json:
@@ -943,6 +971,8 @@ def main() -> None:
                   "skipped/failed targets (or pass --force), then report once all targets are current.")
         elif not args.report:
             print(f"Next: report the aggregate install with POST /skills/{root['slug']}/install (version {root['version']}).")
+        runtime_status = runtime_result.get("runtimeRegistration") or runtime_result.get("status")
+        print(f"Runtime: {runtime_status or 'unknown'}")
 
 
 if __name__ == "__main__":

@@ -23,7 +23,7 @@ bash -n scripts/dev-stack.sh scripts/setup-conductor.sh scripts/dev-conductor.sh
     exit 1
   fi
 
-  for command_name in sudo dnf brew corepack pnpm; do
+  for command_name in sudo dnf brew corepack pnpm python3; do
     # The shim must expand these variables when Conductor's setup invokes it.
     # shellcheck disable=SC2016
     printf '%s\n' '#!/usr/bin/env bash' \
@@ -38,7 +38,8 @@ bash -n scripts/dev-stack.sh scripts/setup-conductor.sh scripts/dev-conductor.sh
   if [ "$(cat "$cloud_calls")" != "$(printf '%s\n' \
     'sudo dnf install -y lsof postgresql17 postgresql17-server' \
     'corepack enable' \
-    'pnpm install')" ]; then
+    'pnpm install' \
+    'python3 .agents/skillpack/usage/setup.py')" ]; then
     printf '[dev-stack-check] unexpected cloud Conductor setup calls:\n%s\n' \
       "$(cat "$cloud_calls")" >&2
     exit 1
@@ -51,7 +52,8 @@ bash -n scripts/dev-stack.sh scripts/setup-conductor.sh scripts/dev-conductor.sh
     'brew install postgresql@17' \
     'brew install minio mailpit' \
     'corepack enable' \
-    'pnpm install')" ]; then
+    'pnpm install' \
+    'python3 .agents/skillpack/usage/setup.py')" ]; then
     printf '[dev-stack-check] unexpected local Conductor setup calls:\n%s\n' \
       "$(cat "$local_calls")" >&2
     exit 1

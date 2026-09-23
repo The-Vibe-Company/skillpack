@@ -8,6 +8,7 @@ const SCOPE_OUTPUTS = [
   "containers",
   "dependencies",
   "skill",
+  "runtime",
 ];
 
 function isTrue(value) {
@@ -29,6 +30,7 @@ export function rejectedJobs(jobs) {
   const required = {
     scope: true,
     hygiene: true,
+    "runtime-quality": isTrue(outputs.runtime),
     "apple-quality": isTrue(outputs.skill),
     quality: isTrue(outputs.quality),
     "application-build": isTrue(outputs.build),

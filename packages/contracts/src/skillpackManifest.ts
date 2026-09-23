@@ -84,6 +84,8 @@ export const skillpackEnvironmentDeclarationSchema = z
 
 export type SkillpackEnvironmentDeclaration = z.infer<typeof skillpackEnvironmentDeclarationSchema>;
 
+export type SkillpackSecretDeclaration = SkillpackEnvironmentDeclaration & { slotId?: string };
+
 export const skillpackSecretDeclarationSchema = z
   .object({
     slotId: z.string().uuid("secret slotId must be a UUID").optional(),
@@ -100,13 +102,14 @@ export const skillpackSecretDeclarationSchema = z
       });
     }
   })
-  .transform((value) => ({
-    ...(value.slotId ? { slotId: value.slotId } : {}),
-    required: value.required,
-    description: value.description,
-  }));
-
-export type SkillpackSecretDeclaration = z.infer<typeof skillpackSecretDeclarationSchema>;
+  .transform((value): SkillpackSecretDeclaration => {
+    const declaration: SkillpackSecretDeclaration = {
+      required: value.required,
+      description: value.description,
+    };
+    if (value.slotId) declaration.slotId = value.slotId;
+    return declaration;
+  });
 
 const envDeclarationRecordSchema = z
   .record(
@@ -142,9 +145,19 @@ export const skillpackChangelogEntrySchema = z
 
 export type SkillpackChangelogEntry = z.infer<typeof skillpackChangelogEntrySchema>;
 
+export const skillRuntimeUsageSchema = z.object({
+  schemaVersion: z.literal(1),
+  skillId: z.string().uuid(),
+  version: z.string().regex(SEMVER_RE),
+  origin: z.string().url().regex(/^https?:\/\/[^/?#@]+$/, "usage origin must be an HTTP(S) origin without credentials"),
+  migration: z.object({ parentVersion: z.string().regex(SEMVER_RE), parentChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/) }).optional(),
+}).strict();
+export type SkillRuntimeUsage = z.infer<typeof skillRuntimeUsageSchema>;
+
 export const skillpackMetadataSchema = z
   .object({
     companionSkillId: z.string().uuid("companionSkillId must be a UUID").optional(),
+    usage: skillRuntimeUsageSchema.optional(),
     changelog: z.array(skillpackChangelogEntrySchema).max(200, "at most 200 changelog entries are allowed").default([]),
   })
   .strip()
@@ -193,9 +206,8 @@ export type SkillpackChecks = z.infer<typeof skillpackChecksSchema>;
 const legacyDependencySchema = z
   .union([
     z.string().regex(SKILL_NAME_RE, "dependency slug must be kebab-case"),
-    z.object({ slug: z.string().regex(SKILL_NAME_RE, "dependency slug must be kebab-case") }).strip(),
-  ])
-  .transform((value) => (typeof value === "string" ? value : value.slug));
+    z.object({ slug: z.string().regex(SKILL_NAME_RE, "dependency slug must be kebab-case") }).strip().transform((value) => value.slug),
+  ]);
 
 const dependencyMapSchema = z
   .record(
@@ -234,14 +246,15 @@ export type SkillpackDependencies = Record<string, string>;
 
 function requirementsToEnvironment(requirements: SkillRequirement[] | undefined): SkillpackEnvironment {
   const env: Record<string, SkillpackEnvironmentDeclaration> = {};
-  const secrets: Record<string, SkillpackEnvironmentDeclaration> = {};
+  const secrets: Record<string, SkillpackSecretDeclaration> = {};
   for (const requirement of requirements ?? []) {
     const target = requirement.type === "env" ? env : secrets;
-    target[requirement.key] = {
-      ...(requirement.type === "secret" && requirement.slot_id ? { slotId: requirement.slot_id } : {}),
+    const declaration = {
+      slotId: requirement.type === "secret" ? requirement.slot_id : undefined,
       required: requirement.required,
       description: requirement.note,
     };
+    target[requirement.key] = declaration;
   }
   return skillpackEnvironmentSchema.parse({ env, secrets });
 }
@@ -341,13 +354,15 @@ export const skillpackManifestSchema = z
 
 export type SkillpackManifest = z.infer<typeof skillpackManifestSchema>;
 
-export function skillpackDependencySlugs(manifest: Pick<SkillpackManifest, "dependencies">): string[] {
-  const legacy = "legacyDependencySlugs" in manifest ? (manifest as Pick<SkillpackManifest, "legacyDependencySlugs">).legacyDependencySlugs : [];
+export function skillpackDependencySlugs(manifest: Pick<SkillpackManifest, "dependencies"> & Partial<Pick<SkillpackManifest, "legacyDependencySlugs">>): string[] {
+  const legacy = manifest.legacyDependencySlugs ?? [];
   return [...new Set([...Object.keys(manifest.dependencies), ...legacy])].sort((a, b) => a.localeCompare(b));
 }
 
-export function skillpackManifestJson(manifest: SkillpackManifest): Record<string, unknown> {
-  const out: Record<string, unknown> = {
+type SerializedSkillpackManifest = Partial<Pick<SkillpackManifest, "$schema" | "name" | "version" | "icon" | "title" | "description" | "notes" | "metadata" | "environment" | "database" | "dependencies" | "commands" | "checks">>;
+
+export function skillpackManifestJson(manifest: SkillpackManifest): SerializedSkillpackManifest {
+  const out: SerializedSkillpackManifest = {
     $schema: manifest.$schema ?? COMPANION_MANIFEST_SCHEMA_URL,
   };
   if (manifest.name) out.name = manifest.name;
@@ -374,6 +389,7 @@ export function fallbackSkillpackManifest(input: {
   version?: string;
   icon?: SkillIcon;
   companionSkillId?: string;
+  usage?: SkillRuntimeUsage;
   changelog?: SkillpackChangelogEntry[];
   environment?: SkillpackEnvironment;
   database?: SkillDatabaseDeclaration;
@@ -398,6 +414,7 @@ export function fallbackSkillpackManifest(input: {
     notes: input.notes ?? input.display?.description,
     metadata: {
       companionSkillId: input.companionSkillId,
+      usage: input.usage,
       changelog: input.changelog ?? [],
     },
     environment: input.environment ?? requirementsToEnvironment(input.requirements),

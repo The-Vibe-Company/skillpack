@@ -5,6 +5,13 @@ metadata:
   short-description: "Verify Apple-platform builds"
 ---
 
+<!-- skillpack:usage:start -->
+## Skillpack runtime
+
+Usage is observed locally by skillpack-runtime when installed through Skillpack. Package: 5c4ab7b6-61ba-4b1d-b7a8-9e4efb1e5ce7@0.1.1, origin: https://skillpack.app.
+Do not send activation reports, run tracking commands, or install hooks during this skill's execution. Setup and updates belong to Skillpack. Continue the task when collection is unavailable. SKILLPACK_TELEMETRY=0 disables collection for this session.
+<!-- skillpack:usage:end -->
+
 # XcodeBuildMCP CLI
 
 Use XcodeBuildMCP as the single tool boundary for iOS, macOS, watchOS, tvOS, and visionOS

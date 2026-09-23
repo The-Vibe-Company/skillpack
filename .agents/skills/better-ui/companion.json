@@ -1,13 +1,20 @@
 {
   "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
   "name": "better-ui",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "title": "UI polish",
   "description": "UI polish reference. Supplied mockups and repository decisions take precedence over aesthetic defaults; typography, accessibility and layout route to design-frontend-dev.",
   "notes": "## Portable edition\n\nUI polish reference. Supplied mockups and repository decisions take precedence over aesthetic defaults; typography, accessibility and layout route to design-frontend-dev.\n\nSee SOURCE.md and LICENSE for upstream provenance and modifications.",
   "metadata": {
     "companionSkillId": "282bcb0f-f596-4549-8444-aaa36dc0579a",
     "changelog": [
+      {
+        "version": "1.1.1",
+        "date": "2026-09-23",
+        "changes": [
+          "Replace model activation reporting with automatic Skillpack runtime collection."
+        ]
+      },
       {
         "version": "1.1.0",
         "date": "2026-09-23",
@@ -23,7 +30,17 @@
           "UI polish reference. Supplied mockups and repository decisions take precedence over aesthetic defaults; typography, accessibility and layout route to design-frontend-dev."
         ]
       }
-    ]
+    ],
+    "usage": {
+      "schemaVersion": 1,
+      "skillId": "282bcb0f-f596-4549-8444-aaa36dc0579a",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "migration": {
+        "parentVersion": "1.1.0",
+        "parentChecksum": "sha256:946775547904b0d3c23a2e004d371e8d909ab7dced1c5795f4b3526cb924b592"
+      }
+    }
   },
   "environment": {
     "env": {},

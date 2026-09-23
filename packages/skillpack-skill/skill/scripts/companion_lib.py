@@ -558,6 +558,15 @@ def _atomic_json_write(
             before_replace()
         os.replace(temp_path, path)
         os.chmod(path, 0o600)
+        try:
+            directory = os.open(path.parent, os.O_RDONLY)
+        except OSError:
+            directory = None
+        if directory is not None:
+            try:
+                os.fsync(directory)
+            finally:
+                os.close(directory)
     except BaseException:
         try:
             os.close(fd)
@@ -565,6 +574,38 @@ def _atomic_json_write(
             pass
         temp_path.unlink(missing_ok=True)
         raise
+
+
+@contextmanager
+def _json_write_lock(path: Path) -> Iterator[None]:
+    """Serialize lockfile read/modify/write cycles across installers and bootstrap processes."""
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    lock_path = path.parent / f'.{path.name}.lock'
+    if os.path.lexists(lock_path) and stat.S_ISLNK(os.lstat(lock_path).st_mode):
+        raise ValueError(f'refusing symlinked lockfile writer lock: {lock_path}')
+    flags = os.O_RDWR | os.O_CREAT | getattr(os, 'O_NOFOLLOW', 0)
+    descriptor = os.open(lock_path, flags, 0o600)
+    locked = False
+    try:
+        if os.name == 'nt':  # pragma: no cover - Windows
+            import msvcrt
+            os.lseek(descriptor, 0, os.SEEK_SET)
+            msvcrt.locking(descriptor, msvcrt.LK_LOCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(descriptor, fcntl.LOCK_EX)
+        locked = True
+        yield
+    finally:
+        if locked:
+            if os.name == 'nt':  # pragma: no cover - Windows
+                import msvcrt
+                os.lseek(descriptor, 0, os.SEEK_SET)
+                msvcrt.locking(descriptor, msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(descriptor, fcntl.LOCK_UN)
+        os.close(descriptor)
 
 
 @contextmanager
@@ -1008,7 +1049,7 @@ def existing_target_rows(record: dict[str, Any] | None) -> list[dict[str, Any]]:
     return rows
 
 
-def upsert_skill_lock_record(
+def _upsert_skill_lock_record_unlocked(
     path: Path,
     workspace_id: str | None,
     api_url: str,
@@ -1071,13 +1112,26 @@ def upsert_skill_lock_record(
         "version": oldest,
         "checksum": skill.get("checksum"),
         "targets": merged,
+        "pinned": skill.get("pinned", (entry["skills"].get(skill["name"]) or {}).get("pinned")),
         "addedAt": now_iso(),
     }
     if validate_project_path:
         _atomic_json_write(path, raw, before_replace=validate_project_path)
     else:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(raw, indent=2) + "\n", encoding="utf-8")
+        _atomic_json_write(path, raw)
+
+
+def upsert_skill_lock_record(
+    path: Path,
+    workspace_id: str | None,
+    api_url: str,
+    skill: dict[str, Any],
+    targets: list[dict[str, Any]],
+    relative_to: Path | None,
+) -> None:
+    """Atomically merge one lockfile record while serializing concurrent writers."""
+    with _json_write_lock(path):
+        _upsert_skill_lock_record_unlocked(path, workspace_id, api_url, skill, targets, relative_to)
 
 
 def workspace_lock_entry(raw: dict[str, Any], workspace_id: str | None, api_url: str) -> dict[str, Any] | None:
@@ -1120,6 +1174,7 @@ def skill_records_from_lock(entry: dict[str, Any] | None) -> list[dict[str, Any]
                 "slug": str(value.get("slug") or name),
                 "version": value.get("version") or value.get("resolved") or value.get("installedVersion"),
                 "checksum": value.get("checksum"),
+                "pinned": value.get("pinned"),
                 "path": value.get("installPath") or value.get("path"),
                 # Every install location for this skill at this scope level (multi-tool aware),
                 # with a legacy single-`installPath` lockfile folding into one user-scope target.

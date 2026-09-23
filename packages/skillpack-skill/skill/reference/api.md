@@ -815,8 +815,8 @@ the shared label hierarchy. Personal access tokens cannot call these browser-ses
 
 ## Versions & checksums
 
-Publication normally creates immutable versions. The authorized activation-reporting rollout is a
-one-time exception that rewrites existing content without changing version numbers. Compare checksums
+Publication creates immutable versions. Runtime rollout publishes a new patch of each active
+organization skill, without replacing historical archives or public pins. Compare checksums
 as well as versions for update detection. Each version row carries a `checksum` of the form `sha256:<64 hex>` over the
 canonical (uncompressed) tar. This is **not** the hash of the `.zip` the package endpoint serves, so
 use the bundled local `package-checksum.mjs` helper to compute it from the extracted package before
@@ -947,20 +947,28 @@ Content-Type: application/json
 `{ "ok": true, "status": "installed" | "update", "availableVersion": "1.13.0" }`.
 
 
-## Activation reporting (no authentication)
+## Runtime usage receipts (no authentication)
 
-Published `SKILL.md` files include the exact instance URL, skill ID, version, and reporting instructions.
-`POST /v1/skill-usage` accepts JSON with `event_id` (fresh UUID per activation), `skill_id` (UUID),
-and `version`. Optional `agent`: `claude-code`, `codex`, `opencode`, `pi`, `other`; optional
-`environment`: `conductor`, `ci`, `sandbox`, `local`, `other`.
+Only the installed runtime emits `POST /v1/skill-usage-events`. Skills and agents do not construct
+tracking requests. The old `/v1/skill-usage` route is retired.
 
-Optional `identity` contains `user_id` and/or `email`, plus `source`: `configured`, `skillpack-local`,
-`git-local`, or `git-global`. Use the first available source: `SKILLPACK_TELEMETRY_USER_ID` /
-`SKILLPACK_TELEMETRY_EMAIL`, non-secret `~/.skillpack/telemetry.json`, repository Git email, global
-Git email. Never obtain reporting metadata from credentials or Git history. Agent/environment may
-be configured with `SKILLPACK_TELEMETRY_AGENT` / `SKILLPACK_TELEMETRY_ENVIRONMENT`.
+The bounded 4 KB JSON contract requires `schema_version: 1`, a stable UUID `event_id`, UUID `skill_id`,
+`version`, ISO UTC `observed_at`, `kind` (`invocation`, `request`, `read`) and `adapter`
+(`claude-hook`, `claude-transcript`, `codex-hook`, `codex-transcript`, `opencode-plugin`). Optional agent/environment
+labels and declared identity have no authorization value. Never upload prompts, code, paths,
+transcript bodies or session IDs. Delivery uses only an origin verified during installation.
 
-Respect user opt-out and `SKILLPACK_TELEMETRY=0`; use a three-second request timeout, no automatic
-retry, and continue on failure. An empty 202 response does not confirm skill existence or acceptance.
-Reported identities are unverified; the endpoint never authorizes access to Skillpack data.
-The browser Usage tab reads session-authenticated `GET /v1/skills/:slug/usage` with normal scope privacy.
+The API commits an opaque receipt before returning `202 {"event_id":"<same UUID>"}`. Unknown skills
+receive the same receipt and are discarded during asynchronous processing. Capacity/rate pressure
+returns 429 with Retry-After; persistence failure returns 503, never a false receipt. Repeated IDs
+are idempotent. Clients retain the same event ID across bounded retries and expire unsent events
+in seven days. Receipt tombstones survive eight days; authorized usage statistics retain 90 days.
+
+Collection is local and optional. `SKILLPACK_TELEMETRY=0` excludes a session, including later log
+reconciliation. `skillpack-runtime telemetry disable` persistently disables capture/send and purges
+the queue. Configured `SKILLPACK_TELEMETRY_USER_ID` / `SKILLPACK_TELEMETRY_EMAIL` are optional,
+unverified identity declarations; collection never reads Agent Auth credentials.
+
+The browser reads session-authenticated `GET /v1/skills/:slug/usage` with existing tenant/personal
+privacy. `total` counts observed invocations only. `requests`, `reads`, `historical`, and `adapters`
+are separate counters; none establish that skill instructions were followed.

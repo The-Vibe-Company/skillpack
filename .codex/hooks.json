@@ -1,0 +1,69 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node \"$(git rev-parse --show-toplevel)/.agents/skillpack/usage/hook.mjs\" codex",
+            "commandWindows": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JAByAG8AbwB0ACAAPQAgACgAJgAgAGcAaQB0ACAAcgBlAHYALQBwAGEAcgBzAGUAIAAtAC0AcwBoAG8AdwAtAHQAbwBwAGwAZQB2AGUAbAApAC4AVAByAGkAbQAoACkAOwAgACYAIABuAG8AZABlACAAKABKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACcALgBhAGcAZQBuAHQAcwAvAHMAawBpAGwAbABwAGEAYwBrAC8AdQBzAGEAZwBlAC8AaABvAG8AawAuAG0AagBzACcAKQAgAGMAbwBkAGUAeAA7ACAAZQB4AGkAdAAgACQATABBAFMAVABFAFgASQBUAEMATwBEAEUA"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node \"$(git rev-parse --show-toplevel)/.agents/skillpack/usage/hook.mjs\" codex",
+            "commandWindows": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JAByAG8AbwB0ACAAPQAgACgAJgAgAGcAaQB0ACAAcgBlAHYALQBwAGEAcgBzAGUAIAAtAC0AcwBoAG8AdwAtAHQAbwBwAGwAZQB2AGUAbAApAC4AVAByAGkAbQAoACkAOwAgACYAIABuAG8AZABlACAAKABKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACcALgBhAGcAZQBuAHQAcwAvAHMAawBpAGwAbABwAGEAYwBrAC8AdQBzAGEAZwBlAC8AaABvAG8AawAuAG0AagBzACcAKQAgAGMAbwBkAGUAeAA7ACAAZQB4AGkAdAAgACQATABBAFMAVABFAFgASQBUAEMATwBEAEUA"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node \"$(git rev-parse --show-toplevel)/.agents/skillpack/usage/hook.mjs\" codex",
+            "commandWindows": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JAByAG8AbwB0ACAAPQAgACgAJgAgAGcAaQB0ACAAcgBlAHYALQBwAGEAcgBzAGUAIAAtAC0AcwBoAG8AdwAtAHQAbwBwAGwAZQB2AGUAbAApAC4AVAByAGkAbQAoACkAOwAgACYAIABuAG8AZABlACAAKABKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACcALgBhAGcAZQBuAHQAcwAvAHMAawBpAGwAbABwAGEAYwBrAC8AdQBzAGEAZwBlAC8AaABvAG8AawAuAG0AagBzACcAKQAgAGMAbwBkAGUAeAA7ACAAZQB4AGkAdAAgACQATABBAFMAVABFAFgASQBUAEMATwBEAEUA"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node \"$(git rev-parse --show-toplevel)/.agents/skillpack/usage/hook.mjs\" codex",
+            "commandWindows": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JAByAG8AbwB0ACAAPQAgACgAJgAgAGcAaQB0ACAAcgBlAHYALQBwAGEAcgBzAGUAIAAtAC0AcwBoAG8AdwAtAHQAbwBwAGwAZQB2AGUAbAApAC4AVAByAGkAbQAoACkAOwAgACYAIABuAG8AZABlACAAKABKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACcALgBhAGcAZQBuAHQAcwAvAHMAawBpAGwAbABwAGEAYwBrAC8AdQBzAGEAZwBlAC8AaABvAG8AawAuAG0AagBzACcAKQAgAGMAbwBkAGUAeAA7ACAAZQB4AGkAdAAgACQATABBAFMAVABFAFgASQBUAEMATwBEAEUA"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 3,
+            "statusMessage": "Skillpack runtime",
+            "command": "node \"$(git rev-parse --show-toplevel)/.agents/skillpack/usage/hook.mjs\" codex",
+            "commandWindows": "powershell.exe -NoProfile -NonInteractive -EncodedCommand JAByAG8AbwB0ACAAPQAgACgAJgAgAGcAaQB0ACAAcgBlAHYALQBwAGEAcgBzAGUAIAAtAC0AcwBoAG8AdwAtAHQAbwBwAGwAZQB2AGUAbAApAC4AVAByAGkAbQAoACkAOwAgACYAIABuAG8AZABlACAAKABKAG8AaQBuAC0AUABhAHQAaAAgACQAcgBvAG8AdAAgACcALgBhAGcAZQBuAHQAcwAvAHMAawBpAGwAbABwAGEAYwBrAC8AdQBzAGEAZwBlAC8AaABvAG8AawAuAG0AagBzACcAKQAgAGMAbwBkAGUAeAA7ACAAZQB4AGkAdAAgACQATABBAFMAVABFAFgASQBUAEMATwBEAEUA"
+          }
+        ]
+      }
+    ]
+  }
+}

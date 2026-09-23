@@ -1,7 +1,7 @@
 {
   "$schema": "https://thecompanion.sh/schemas/companion-manifest.v2.schema.json",
   "name": "ios-product-dev",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "title": "iOS product development",
   "description": "Own end-to-end native iOS product work in SwiftUI while preserving Companion's shared API, authorization, accessibility, and runtime boundaries.",
   "notes": "## What it does\n\nThis is the native iOS product owner for Companion. It shapes user-visible behavior, coordinates cross-platform design with design-frontend-dev, routes SwiftUI mechanics to swiftui-expert-dev, and verifies changes with xcodebuildmcp-cli.\n\n## Scope\n\nIt covers the SwiftUI app and its zero-dependency CompanionKit package. It preserves full /v1 product parity, role-aware durable state, native iOS 26 presentation, and accessibility. It does not own the cross-platform design register, replace SwiftUI implementation expertise, or run build tools directly.",
@@ -9,13 +9,30 @@
     "companionSkillId": "c74c6d15-7b11-4d95-9f55-7f62a5a579e4",
     "changelog": [
       {
+        "version": "0.1.1",
+        "date": "2026-09-23",
+        "changes": [
+          "Replace model activation reporting with automatic Skillpack runtime collection."
+        ]
+      },
+      {
         "version": "0.1.0",
         "date": "2026-08-24",
         "changes": [
           "Add the repo-local native iOS product owner for Agents and Claude."
         ]
       }
-    ]
+    ],
+    "usage": {
+      "schemaVersion": 1,
+      "skillId": "c74c6d15-7b11-4d95-9f55-7f62a5a579e4",
+      "version": "0.1.1",
+      "origin": "https://skillpack.app",
+      "migration": {
+        "parentVersion": "0.1.0",
+        "parentChecksum": "sha256:0cad30a8e19f3e1a9d1ad6e7f12eb813a987bba4fd42b072387e24dc30b0e33f"
+      }
+    }
   },
   "environment": {
     "env": {},

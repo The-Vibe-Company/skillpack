@@ -13,6 +13,7 @@ const OUTPUT_KEYS = [
   "containers",
   "dependencies",
   "skill",
+  "runtime",
   "full",
 ];
 
@@ -153,7 +154,10 @@ export function classifyFiles(files, { forceFull = false } = {}) {
           ])),
     );
 
-  return { docs, design, quality, build, database, browser, containers, dependencies, skill, full };
+  const runtime = full || uniqueFiles.some((file) => matchesAny(file, [
+    "runtime/", "scripts/runtime-", "scripts/test_runtime_project.py", ".gitattributes", ".agents/skills/", "packages/skillpack-skill/skill/", ".agents/skillpack/usage/", ".codex/hooks.json", ".claude/settings.json", ".opencode/plugins/",
+  ]));
+  return { docs, design, quality, build, database, browser, containers, dependencies, skill, runtime, full };
 }
 
 function readArguments(argv) {

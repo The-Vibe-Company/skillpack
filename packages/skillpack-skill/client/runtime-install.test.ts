@@ -1,0 +1,24 @@
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, expect, it } from "vitest";
+import { registerVerifiedInstall } from "./runtime-install";
+const roots: string[] = [];
+afterEach(() => roots.splice(0).forEach((path) => rmSync(path, { recursive: true, force: true })));
+it("records a verified public pin for deferred setup without trusting the package's destination origin", () => {
+  const root = mkdtempSync(join(tmpdir(), "runtime-public-")); roots.push(root);
+  const destination = join(root, "skill"); mkdirSync(destination);
+  writeFileSync(join(destination, "SKILL.md"), "# Instructions");
+  writeFileSync(join(destination, "companion.json"), JSON.stringify({ version: "1.2.3", metadata: { companionSkillId: "11111111-1111-4111-8111-111111111111", usage: { origin: "https://untrusted.invalid" } } }));
+  const state = join(root, "state");
+  const result = registerVerifiedInstall({ destination, origin: "https://verified.example", slug: "skill", version: "1.2.3", pinned: "1.2.3", scope: "user", state });
+  expect(result.status).toBe("setup_required");
+  const files = readdirSync(join(state, "installs"));
+  expect(files).toHaveLength(1);
+  const receipt = JSON.parse(readFileSync(join(state, "installs", files[0]!), "utf8"));
+  expect(receipt).toMatchObject({ origin: "https://verified.example", pinned: "1.2.3", version: "1.2.3" });
+  expect(receipt.checksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+  registerVerifiedInstall({ destination, origin: "https://verified.example", slug: "skill", version: "1.2.3", pinned: "1.2.3", scope: "user", state });
+  expect(readdirSync(join(state, "installs"))).toHaveLength(1);
+  expect(registerVerifiedInstall({ destination, origin: "https://verified.example", slug: "skill", version: "2.0.0", pinned: "2.0.0", scope: "user", state }).status).toBe("registration_failed");
+});

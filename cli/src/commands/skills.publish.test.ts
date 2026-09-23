@@ -47,7 +47,12 @@ describe("publication normalization compatibility", () => {
       expect((await loadLockfile(root)).skills.demo?.checksum).toBe(canonical.checksum);
       const text = await readFile(join(local, "SKILL.md"), "utf8");
       expect(text.includes("skillpack:usage:start")).toBe(Boolean(instanceUrl));
-      if (instanceUrl) expect(text).toContain(`${instanceUrl}/v1/skill-usage`);
+      if (instanceUrl) {
+        expect(text).toContain(`origin: ${instanceUrl}`);
+        expect(text).not.toContain("/v1/skill-usage");
+        const manifest = JSON.parse(await readFile(join(local, "companion.json"), "utf8"));
+        expect(manifest.metadata.usage).toMatchObject({ schemaVersion: 1, skillId, version: "1.0.0", origin: instanceUrl });
+      }
       expect(text).not.toContain(apiUrl);
     } finally {
       api.closeAllConnections();

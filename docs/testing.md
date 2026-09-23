@@ -12,8 +12,12 @@ providers and identities, not authorization, persistence, or tenant scoping.
 - Usage reports work without credentials, deduplicate per activation, expire after 90 days, and
   reveal neither skill existence nor private usage to unauthorized callers. Reported identities
   remain unverified and never grant account authority.
-- Historical reporting retrofits preserve authored files, scopes, version numbers and install baselines;
-  retries do not duplicate updates, and storage failures never expose mismatched public/private bytes.
+- Runtime migrations preserve authored files, scopes, public pins and historical archives while
+  publishing one patch per current active organization skill. Retries and concurrent publications
+  cannot overwrite newer versions; storage failures never expose mismatched public/private bytes.
+- Runtime native tests execute on six targets; signed install/update tests reject tampering, preserve
+  prior versions, and distinguish configured hooks from observed hooks. Opt-out, cursor recovery,
+  durable receipts and separate observation categories are observable behavior gates.
 - Public releases pin one exact version; GitHub mirrors stay deterministic and idempotent.
 - Secret grants cannot replay or leak plaintext through ordinary metadata, errors, logs, or audit.
 - Agent Auth and child PATs remain exact-workspace and capability constrained.

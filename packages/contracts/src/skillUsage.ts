@@ -2,6 +2,10 @@ import { z } from "zod";
 import { SEMVER_RE } from "./frontmatter";
 
 export const skillUsageEventSchema = z.object({
+  schema_version: z.literal(1),
+  kind: z.enum(["invocation", "request", "read"]),
+  adapter: z.enum(["claude-hook", "claude-transcript", "codex-hook", "codex-transcript", "opencode-plugin"]),
+  observed_at: z.string().datetime({ offset: true }),
   event_id: z.string().uuid(),
   skill_id: z.string().uuid(),
   version: z.string().max(128).regex(SEMVER_RE),
@@ -20,6 +24,10 @@ export interface SkillUsageSummary {
   retention_days: number;
   total: number;
   anonymous: number;
+  requests: number;
+  reads: number;
+  historical: number;
+  adapters: SkillUsageCount[];
   daily: SkillUsageCount[];
   agents: SkillUsageCount[];
   environments: SkillUsageCount[];

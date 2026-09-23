@@ -10,12 +10,14 @@ const scopeOutputs = {
   containers: "false",
   dependencies: "false",
   skill: "false",
+  runtime: "false",
 };
 
 function jobs(overrides = {}, outputs = scopeOutputs) {
   return {
     scope: { result: "success", outputs },
     hygiene: { result: "success" },
+    "runtime-quality": { result: "skipped" },
     "apple-quality": { result: "skipped" },
     quality: { result: "skipped" },
     "application-build": { result: "skipped" },
@@ -54,4 +56,8 @@ test("rejects failed, cancelled, and missing jobs even when scope disables them"
     "application-build=cancelled (expected success or intentional skip)",
     "database-integration=missing (expected success or intentional skip)",
   ]);
+});
+
+test("runtime checks cannot be skipped when a shipped runtime surface changed", () => {
+  assert.deepEqual(rejectedJobs(jobs({}, { ...scopeOutputs, runtime: "true" })), ["runtime-quality=skipped (required success)"]);
 });

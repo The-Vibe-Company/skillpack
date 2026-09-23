@@ -17,6 +17,7 @@ test("documentation-only changes avoid application jobs", () => {
     containers: false,
     dependencies: false,
     skill: false,
+    runtime: false,
     full: false,
   });
 });
@@ -178,4 +179,10 @@ test("code pull requests run the same full Node quality suite as main", () => {
   const workflow = readFileSync(new URL("../.github/workflows/ci.yml", import.meta.url), "utf8");
   assert.match(workflow, /- name: Run full quality checks\n\s+run: pnpm ci:quality --output-logs=errors-only/);
   assert.doesNotMatch(workflow, /Run affected quality checks|turbo run lint typecheck test --affected/);
+});
+
+test("runtime, installer and project hooks require native runtime checks", () => {
+  for (const file of ["runtime/internal/runtime/events.go", "runtime/go.sum", "scripts/runtime-release.mjs", "packages/skillpack-skill/skill/scripts/runtime_setup.py", ".agents/skillpack/usage/setup.py", ".codex/hooks.json", ".opencode/plugins/skillpack-runtime.js", "scripts/test_runtime_project.py", ".agents/skills/plan-pr/SKILL.md", ".gitattributes"]) {
+    assert.equal(classifyFiles([file]).runtime, true, file);
+  }
 });

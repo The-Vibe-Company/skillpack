@@ -1,13 +1,20 @@
 {
   "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
   "name": "emil-design-eng",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "title": "Emil design engineering",
   "description": "Design engineering reference with explicit precedence for supplied mockups, repository conventions and the calling owner’s consolidated output.",
   "notes": "## Portable edition\n\nDesign engineering reference with explicit precedence for supplied mockups, repository conventions and the calling owner’s consolidated output.\n\nSee SOURCE.md and LICENSE for upstream provenance and modifications.",
   "metadata": {
     "companionSkillId": "72009063-04f5-43db-bd45-76e7bb49c8e6",
     "changelog": [
+      {
+        "version": "1.1.1",
+        "date": "2026-09-23",
+        "changes": [
+          "Replace model activation reporting with automatic Skillpack runtime collection."
+        ]
+      },
       {
         "version": "1.1.0",
         "date": "2026-09-23",
@@ -23,7 +30,17 @@
           "Design engineering reference with explicit precedence for supplied mockups, repository conventions and the calling owner’s consolidated output."
         ]
       }
-    ]
+    ],
+    "usage": {
+      "schemaVersion": 1,
+      "skillId": "72009063-04f5-43db-bd45-76e7bb49c8e6",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "migration": {
+        "parentVersion": "1.1.0",
+        "parentChecksum": "sha256:fb7df15888d78b66551ed7b83d3191c13383de915b9d5f33a23580c3fc1cd56e"
+      }
+    }
   },
   "environment": {
     "env": {},

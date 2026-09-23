@@ -1,6 +1,6 @@
 /* oxlint-disable anti-slop/no-conditional-empty-object-spread, anti-slop/no-known-value-widening, anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns, anti-slop/no-unsafe-dictionary-type, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- This shared legacy service module predates the incremental anti-slop gate; the profile timezone path uses typed Drizzle fields and validated input. */
 import { createHash, randomBytes } from "node:crypto";
-import { and, asc, count, desc, eq, exists, gt, inArray, isNull, ne, not, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, inArray, isNull, ne, not, or, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import type {
   ApiTokenRow,
@@ -2782,6 +2782,7 @@ export async function publishSkillVersion(input: {
   archiveKey: string;
   dependencies?: SkillPublishDependencies;
   database?: Db;
+  expectedCurrentVersionId?: string;
 }): Promise<{ id: string; version: string }> {
   const database = input.database ?? db;
   const parsedPayload = publishSkillInputSchema.parse({ ...input.payload, storage_path: input.archiveKey });
@@ -2809,6 +2810,16 @@ export async function publishSkillVersion(input: {
   });
 
   return database.transaction(async (tx) => {
+    // Serialize all publishers for this slug, including the technical patch migration.
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${`${input.orgId}:${payload.slug}`}, 191))`);
+    if (input.expectedCurrentVersionId) {
+      const current = await tx.query.skills.findFirst({ where: and(
+        eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, payload.slug)) });
+      if (!current || current.archivedAt || current.currentVersionId !== input.expectedCurrentVersionId) {
+        throw new Error("skill changed during runtime migration; rerun against the current version");
+      }
+    }
+    await assertCanPublishSkillVersion({ actor: input.actor, orgId: input.orgId, payload, database: tx as unknown as Db });
     const publishPayload = publishSkillInputSchema.parse({ ...payload, storage_path: input.archiveKey });
     return writeSkillVersion({
       actor: input.actor,

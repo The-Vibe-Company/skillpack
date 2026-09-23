@@ -3,6 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { chmodSync, closeSync, fstatSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { spawn } from "node:child_process";
+import { z } from "zod";
 
 import {
   AgentAuthClient,
@@ -11,6 +12,7 @@ import {
 } from "@auth/agent";
 
 import { approvalBrowserCommand } from "./approval.js";
+import { registerVerifiedInstall } from "./runtime-install.js";
 import {
   loadCredentialsV3,
   PrivateFileStorage,
@@ -20,8 +22,6 @@ import {
 import { selectWorkspaceAuthentication, type WorkspaceAuthentication } from "./auth-mode.js";
 import {
   installPublicSkillZip,
-  type PublicInstallScope,
-  type PublicInstallTool,
 } from "./safe-install.js";
 import {
   skillpackGrantAllows,
@@ -31,71 +31,23 @@ import {
   type SkillpackHttpMethod,
 } from "./operations.js";
 
-type JsonObject = Record<string, unknown>;
-
-type ClientInput =
-  | {
-      action: "connect";
-      apiUrl: string;
-      workspaceId: string;
-      name?: string;
-    }
-  | {
-      action: "delegate";
-      workspaceId?: string;
-      name?: string;
-      ttlSeconds?: number;
-      targetWorkspaceId?: string;
-      /** Inherited owner-only FIFO descriptor. stdout/stderr, sockets, and regular files are refused. */
-      outputFd: number;
-    }
-  | {
-      action: "api";
-      workspaceId?: string;
-      method: SkillpackHttpMethod;
-      path: string;
-      body?: unknown;
-    }
-  | {
-      action: "upload";
-      workspaceId?: string;
-      method: "POST" | "PUT";
-      path: string;
-      inputPath: string;
-      contentType?: string;
-    }
-  | {
-      action: "download";
-      workspaceId?: string;
-      path: string;
-      outputPath: string;
-      checksum?: string;
-      sizeBytes?: number;
-    }
-  | {
-      action: "public-install";
-      workspaceId?: string;
-      token: string;
-      version: string;
-      checksum: string;
-      sizeBytes: number;
-      tool: PublicInstallTool;
-      scope: PublicInstallScope;
-      projectRoot?: string;
-      confirmInstall: boolean;
-      confirmReplace?: boolean;
-    }
-  | {
-      action: "secret-redeem";
-      workspaceId?: string;
-      planId: string;
-      /** Inherited owner-only FIFO descriptor. stdout/stderr, sockets, and regular files are refused. */
-      outputFd: number;
-    }
-  | {
-      action: "status";
-      workspaceId?: string;
-    };
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue | undefined };
+const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() => z.union([
+  z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(jsonValueSchema),
+]));
+const workspaceId = z.string().optional();
+const clientInputSchema = z.discriminatedUnion("action", [
+  z.object({ action: z.literal("connect"), apiUrl: z.string().url(), workspaceId: z.string(), name: z.string().optional() }),
+  z.object({ action: z.literal("delegate"), workspaceId, name: z.string().optional(), ttlSeconds: z.number().optional(), targetWorkspaceId: z.string().optional(), outputFd: z.number().int() }),
+  z.object({ action: z.literal("api"), workspaceId, method: z.enum(["GET", "POST", "PUT", "PATCH", "DELETE"]), path: z.string(), body: jsonValueSchema.optional() }),
+  z.object({ action: z.literal("upload"), workspaceId, method: z.enum(["POST", "PUT"]), path: z.string(), inputPath: z.string(), contentType: z.string().optional() }),
+  z.object({ action: z.literal("download"), workspaceId, path: z.string(), outputPath: z.string(), checksum: z.string().optional(), sizeBytes: z.number().optional() }),
+  z.object({ action: z.literal("public-install"), workspaceId, token: z.string(), version: z.string(), checksum: z.string(), sizeBytes: z.number(), tool: z.enum(["claude-code", "codex", "opencode", "grok-bot", "openclaw", "hermes"]), scope: z.enum(["global", "project"]), projectRoot: z.string().optional(), confirmInstall: z.boolean(), confirmReplace: z.boolean().optional() }),
+  z.object({ action: z.literal("secret-redeem"), workspaceId, planId: z.string(), outputFd: z.number().int() }),
+  z.object({ action: z.literal("status"), workspaceId }),
+]);
+type ClientInput = z.infer<typeof clientInputSchema>;
+const transferSchema = z.object({ ticket: z.string(), checksum: z.string().optional(), size_bytes: z.number().optional(), version: z.string().optional() });
 
 interface WorkspaceContext {
   workspaceId: string;
@@ -103,17 +55,10 @@ interface WorkspaceContext {
   authentication: WorkspaceAuthentication;
 }
 
-function isRecord(value: unknown): value is JsonObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function readInput(): ClientInput {
-  const raw = readFileSync(0, "utf8");
-  const value = JSON.parse(raw) as unknown;
-  if (!isRecord(value) || typeof value.action !== "string") {
-    throw new Error("expected one JSON request on stdin");
-  }
-  return value as ClientInput;
+  const parsed = clientInputSchema.safeParse(JSON.parse(readFileSync(0, "utf8")));
+  if (!parsed.success) throw new Error("expected one JSON request on stdin");
+  return parsed.data;
 }
 
 function redact(value: string): string {
@@ -124,11 +69,11 @@ function redact(value: string): string {
   return delegationToken ? redacted.replaceAll(delegationToken, "[REDACTED]") : redacted;
 }
 
-function writeResult(value: unknown): void {
+function writeResult<T>(value: T): void {
   process.stdout.write(`${JSON.stringify(value)}\n`);
 }
 
-function writeStatus(value: unknown): void {
+function writeStatus<T>(value: T): void {
   process.stderr.write(`${JSON.stringify(value)}\n`);
 }
 
@@ -204,8 +149,8 @@ function workspaceConstraint(workspaceId: string): CapabilityConstraints {
 
 function constraintMatches(value: CapabilityConstraints | null | undefined, workspaceId: string): boolean {
   const workspace = value?.workspaceId;
-  if (typeof workspace === "string") return workspace === workspaceId;
-  return isRecord(workspace) && workspace.eq === workspaceId;
+  const parsed = z.union([z.string(), z.object({ eq: z.string() }).transform((item) => item.eq)]).safeParse(workspace);
+  return parsed.success && parsed.data === workspaceId;
 }
 
 async function ensureCapability(
@@ -269,14 +214,10 @@ async function agentFetch(input: {
     capabilities: [grantedCapability],
     audience: agentReference(input.context).issuer,
   });
+  const headers = new Headers({ Authorization: `Bearer ${signed.token}`, "X-Companion-Workspace-Id": input.context.workspaceId });
+  if (input.contentType) headers.set("Content-Type", input.contentType);
   return fetch(url, {
-    method: input.method,
-    headers: {
-      Authorization: `Bearer ${signed.token}`,
-      "X-Companion-Workspace-Id": input.context.workspaceId,
-      ...(input.contentType ? { "Content-Type": input.contentType } : {}),
-    },
-    ...(input.body !== undefined ? { body: input.body } : {}),
+    method: input.method, headers, body: input.body,
     redirect: "error",
   });
 }
@@ -293,34 +234,20 @@ async function authenticatedRestFetch(input: {
     return agentFetch({ ...input, client: createClient() });
   }
   const url = `${input.context.workspace.apiUrl.replace(/\/$/, "")}${input.path}`;
-  return fetch(url, {
-    method: input.method,
-    headers: {
-      Authorization: `Bearer ${input.context.authentication.token}`,
-      "X-Companion-Workspace-Id": input.context.workspaceId,
-      ...(input.context.authentication.kind === "delegation-token"
-        && input.context.authentication.targetWorkspaceId
-        ? { "X-Companion-Delegation-Target": input.context.authentication.targetWorkspaceId }
-        : {}),
-      ...(input.contentType ? { "Content-Type": input.contentType } : {}),
-    },
-    ...(input.body !== undefined ? { body: input.body } : {}),
-    redirect: "error",
-  });
+  const headers = programmaticBearerHeaders(input.context);
+  if (input.contentType) headers.set("Content-Type", input.contentType);
+  return fetch(url, { method: input.method, headers, body: input.body, redirect: "error" });
 }
 
-function programmaticBearerHeaders(context: WorkspaceContext): Record<string, string> {
+function programmaticBearerHeaders(context: WorkspaceContext): Headers {
   if (context.authentication.kind === "agent") {
     throw new Error("a direct bearer route requires a PAT authentication mode");
   }
-  return {
-    Authorization: `Bearer ${context.authentication.token}`,
-    "X-Companion-Workspace-Id": context.workspaceId,
-    ...(context.authentication.kind === "delegation-token"
-      && context.authentication.targetWorkspaceId
-      ? { "X-Companion-Delegation-Target": context.authentication.targetWorkspaceId }
-      : {}),
-  };
+  const headers = new Headers({ Authorization: `Bearer ${context.authentication.token}`, "X-Companion-Workspace-Id": context.workspaceId });
+  if (context.authentication.kind === "delegation-token" && context.authentication.targetWorkspaceId) {
+    headers.set("X-Companion-Delegation-Target", context.authentication.targetWorkspaceId);
+  }
+  return headers;
 }
 
 async function responseError(response: Response, sensitive: boolean): Promise<never> {
@@ -328,28 +255,24 @@ async function responseError(response: Response, sensitive: boolean): Promise<ne
   throw new Error(`Skillpack API returned HTTP ${response.status}: ${detail}`);
 }
 
-function capabilityExecutionData(execution: unknown): JsonObject {
-  if (!isRecord(execution)) throw new Error("capability execution returned an invalid response");
-  const data = isRecord(execution.data) ? execution.data : isRecord(execution.result) ? execution.result : null;
-  if (!data) throw new Error("capability execution returned no transfer binding");
-  return data;
-}
-
 async function requestTransferTicket(input: {
   client: AgentAuthClient;
   context: WorkspaceContext;
   capability: "skills:read" | "skills:write" | "public-skills:install";
-  arguments: JsonObject;
-}): Promise<JsonObject> {
+  arguments: { [key: string]: JsonValue };
+}) {
   await ensureCapability(input.client, input.context, input.capability);
   const execution = await input.client.executeCapability({
     agentId: input.context.workspace.agentAuth!.agentId,
     capability: input.capability,
     arguments: input.arguments,
   });
-  const data = capabilityExecutionData(execution);
-  if (typeof data.ticket !== "string") throw new Error("capability execution did not return a transfer ticket");
-  return data;
+  const parsed = z.union([
+    z.object({ data: transferSchema }).transform((item) => item.data),
+    z.object({ result: transferSchema }).transform((item) => item.result),
+  ]).safeParse(execution);
+  if (!parsed.success) throw new Error("capability execution did not return a transfer ticket");
+  return parsed.data;
 }
 
 function validateChecksum(bytes: Uint8Array, expected: string): void {
@@ -370,7 +293,7 @@ function atomicWrite(path: string, bytes: Uint8Array): void {
   }
 }
 
-async function connect(input: Extract<ClientInput, { action: "connect" }>): Promise<unknown> {
+async function connect(input: Extract<ClientInput, { action: "connect" }>) {
   if (process.env.COMPANION_DELEGATION_TOKEN?.trim()) {
     throw new Error("connect is disabled while COMPANION_DELEGATION_TOKEN is active");
   }
@@ -401,7 +324,7 @@ async function connect(input: Extract<ClientInput, { action: "connect" }>): Prom
   };
 }
 
-async function apiRequest(input: Extract<ClientInput, { action: "api" }>): Promise<unknown> {
+async function apiRequest(input: Extract<ClientInput, { action: "api" }>) {
   const context = workspaceContext(input.workspaceId);
   const operation = resolveOperation(input.method, input.path);
   if (operation.binary) throw new Error(`use the ${operation.binary} action for binary operations`);
@@ -414,14 +337,15 @@ async function apiRequest(input: Extract<ClientInput, { action: "api" }>): Promi
     capability: operation.capability,
     method: input.method,
     path: input.path,
-    ...(input.body !== undefined ? { body: JSON.stringify(input.body), contentType: "application/json" } : {}),
+    body: input.body === undefined ? undefined : JSON.stringify(input.body),
+    contentType: input.body === undefined ? undefined : "application/json",
   });
   if (!response.ok) return responseError(response, operation.sensitive);
   if (response.status === 204) return { ok: true };
-  return (await response.json()) as unknown;
+  return jsonValueSchema.parse(await response.json());
 }
 
-async function upload(input: Extract<ClientInput, { action: "upload" }>): Promise<unknown> {
+async function upload(input: Extract<ClientInput, { action: "upload" }>) {
   const context = workspaceContext(input.workspaceId);
   const operation = resolveOperation(input.method, input.path);
   if (operation.binary !== "upload") throw new Error("operation is not a registered binary upload");
@@ -445,7 +369,7 @@ async function upload(input: Extract<ClientInput, { action: "upload" }>): Promis
       contentType: input.contentType || "application/zip",
     });
     if (!response.ok) return responseError(response, operation.sensitive);
-    return (await response.json()) as unknown;
+    return jsonValueSchema.parse(await response.json());
   }
   const client = createClient();
   const transfer = await requestTransferTicket({
@@ -463,17 +387,17 @@ async function upload(input: Extract<ClientInput, { action: "upload" }>): Promis
   const response = await fetch(`${context.workspace.apiUrl.replace(/\/$/, "")}${input.path}`, {
     method: input.method,
     headers: {
-      "X-Companion-Transfer-Ticket": transfer.ticket as string,
+      "X-Companion-Transfer-Ticket": transfer.ticket,
       "Content-Type": input.contentType || "application/zip",
     },
     body: bytes,
     redirect: "error",
   });
   if (!response.ok) return responseError(response, operation.sensitive);
-  return (await response.json()) as unknown;
+  return jsonValueSchema.parse(await response.json());
 }
 
-async function download(input: Extract<ClientInput, { action: "download" }>): Promise<unknown> {
+async function download(input: Extract<ClientInput, { action: "download" }>) {
   const context = workspaceContext(input.workspaceId);
   const operation = resolveOperation("GET", input.path);
   if (operation.binary !== "download") throw new Error("operation is not a registered binary download");
@@ -525,11 +449,11 @@ async function download(input: Extract<ClientInput, { action: "download" }>): Pr
       path: `/local-skills/${encodeURIComponent(slug)}`,
     });
     if (!metadata.ok) return responseError(metadata, false);
-    const row = (await metadata.json()) as unknown;
-    if (!isRecord(row) || typeof row.availableVersion !== "string") {
+    const row = z.object({ availableVersion: z.string() }).safeParse(await metadata.json());
+    if (!row.success) {
       throw new Error("local skill metadata did not include an available version");
     }
-    version = row.availableVersion;
+    version = row.data.availableVersion;
     transferAction = "download-local";
   }
   const transfer = await requestTransferTicket({
@@ -538,17 +462,17 @@ async function download(input: Extract<ClientInput, { action: "download" }>): Pr
     capability: "skills:read",
     arguments: {
       workspaceId: context.workspaceId,
-      transfer: { action: transferAction, slug, version, ...(filePath ? { path: filePath } : {}) },
+      transfer: { action: transferAction, slug, version, path: filePath },
     },
   });
   const response = await fetch(`${context.workspace.apiUrl.replace(/\/$/, "")}${input.path}`, {
-    headers: { "X-Companion-Transfer-Ticket": transfer.ticket as string },
+    headers: { "X-Companion-Transfer-Ticket": transfer.ticket },
     redirect: "error",
   });
   if (!response.ok) return responseError(response, operation.sensitive);
   const bytes = new Uint8Array(await response.arrayBuffer());
-  const expectedSize = input.sizeBytes ?? (typeof transfer.size_bytes === "number" ? transfer.size_bytes : undefined);
-  const expectedChecksum = input.checksum ?? (typeof transfer.checksum === "string" ? transfer.checksum : undefined);
+  const expectedSize = input.sizeBytes ?? transfer.size_bytes;
+  const expectedChecksum = input.checksum ?? transfer.checksum;
   if (expectedSize !== undefined && bytes.byteLength !== expectedSize) {
     throw new Error(`download size mismatch: expected ${expectedSize}, received ${bytes.byteLength}`);
   }
@@ -557,15 +481,16 @@ async function download(input: Extract<ClientInput, { action: "download" }>): Pr
   return { ok: true, outputPath: resolve(input.outputPath), sizeBytes: bytes.byteLength, checksum: expectedChecksum ?? null };
 }
 
-async function publicInstall(input: Extract<ClientInput, { action: "public-install" }>): Promise<unknown> {
+async function publicInstall(input: Extract<ClientInput, { action: "public-install" }>) {
   const context = workspaceContext(input.workspaceId);
   const previewUrl = `${context.workspace.apiUrl.replace(/\/$/, "")}/public/skills/${encodeURIComponent(input.token)}`;
   const previewResponse = await fetch(previewUrl, { redirect: "error" });
   if (!previewResponse.ok) return responseError(previewResponse, false);
-  const preview = (await previewResponse.json()) as unknown;
-  if (!isRecord(preview) || typeof preview.slug !== "string" || !isRecord(preview.public_release)) {
+  const parsedPreview = z.object({ slug: z.string(), public_release: z.object({ version: z.string(), checksum: z.string(), size_bytes: z.number() }) }).safeParse(await previewResponse.json());
+  if (!parsedPreview.success) {
     throw new Error("public skill preview has no installable release");
   }
+  const preview = parsedPreview.data;
   const release = preview.public_release;
   if (
     release.version !== input.version
@@ -589,7 +514,7 @@ async function publicInstall(input: Extract<ClientInput, { action: "public-insta
       throw new Error("public install transfer binding does not match the reviewed release");
     }
     response = await fetch(url, {
-      headers: { "X-Companion-Transfer-Ticket": transfer.ticket as string },
+      headers: { "X-Companion-Transfer-Ticket": transfer.ticket },
       redirect: "error",
     });
   } else {
@@ -613,12 +538,15 @@ async function publicInstall(input: Extract<ClientInput, { action: "public-insta
     slug: preview.slug,
     tool: input.tool,
     scope: input.scope,
-    ...(input.projectRoot ? { projectRoot: input.projectRoot } : {}),
+    projectRoot: input.projectRoot,
     confirmInstall: input.confirmInstall,
-    ...(input.confirmReplace !== undefined ? { confirmReplace: input.confirmReplace } : {}),
+    confirmReplace: input.confirmReplace,
   });
+  const runtime = registerVerifiedInstall({ destination: installed.destination, origin: context.workspace.apiUrl,
+    slug: preview.slug, version: input.version, pinned: input.version, scope: input.scope });
   return {
     ok: true,
+    runtime,
     destination: installed.destination,
     replaced: installed.replaced,
     prerequisites: installed.prerequisites,
@@ -634,14 +562,14 @@ function assertPrivateOutputDescriptor(outputFd: number, action: string): void {
     throw new Error(`${action} requires an inherited private pipe descriptor`);
   }
   const descriptor = fstatSync(outputFd);
-  const currentUid = typeof process.getuid === "function" ? process.getuid() : null;
+  const currentUid = process.getuid?.() ?? null;
   const ownerOnly = (descriptor.mode & 0o077) === 0;
   if (!descriptor.isFIFO() || !ownerOnly || (currentUid !== null && descriptor.uid !== currentUid)) {
     throw new Error(`${action} requires a private owner-only FIFO and refuses sockets or regular files`);
   }
 }
 
-async function delegate(input: Extract<ClientInput, { action: "delegate" }>): Promise<unknown> {
+async function delegate(input: Extract<ClientInput, { action: "delegate" }>) {
   assertPrivateOutputDescriptor(input.outputFd, "delegate");
   try {
     const context = workspaceContext(input.workspaceId);
@@ -654,41 +582,32 @@ async function delegate(input: Extract<ClientInput, { action: "delegate" }>): Pr
       path: "/tokens",
       body: JSON.stringify({
         inherit_agent_grants: true,
-        ...(input.name ? { name: input.name } : {}),
-        ...(input.ttlSeconds !== undefined ? { ttl_seconds: input.ttlSeconds } : {}),
-        ...(input.targetWorkspaceId ? { target_workspace_id: input.targetWorkspaceId } : {}),
+        name: input.name || undefined,
+        ttl_seconds: input.ttlSeconds,
+        target_workspace_id: input.targetWorkspaceId || undefined,
       }),
       contentType: "application/json",
       // Delegation can use only an already-active skills:read grant. Never start approval/device flow.
       allowApproval: false,
     });
     if (!response.ok) return responseError(response, true);
-    const issued = (await response.json()) as unknown;
-    if (
-      !isRecord(issued)
-      || typeof issued.token !== "string"
-      || typeof issued.id !== "string"
-      || typeof issued.expires_at !== "string"
-      || !Array.isArray(issued.scopes)
-    ) {
-      throw new Error("Skillpack returned invalid delegation metadata");
-    }
+    const parsed = z.object({ token: z.string(), id: z.string(), expires_at: z.string(), scopes: z.array(z.string()), prefix: z.string().nullish(), target_workspace_id: z.string().nullish() }).safeParse(await response.json());
+    if (!parsed.success) throw new Error("Skillpack returned invalid delegation metadata");
+    const issued = parsed.data;
     writeFileSync(input.outputFd, issued.token, { encoding: "utf8" });
     return {
       id: issued.id,
-      prefix: typeof issued.prefix === "string" ? issued.prefix : null,
+      prefix: issued.prefix ?? null,
       scopes: issued.scopes,
       expires_at: issued.expires_at,
-      target_workspace_id: typeof issued.target_workspace_id === "string"
-        ? issued.target_workspace_id
-        : null,
+      target_workspace_id: issued.target_workspace_id ?? null,
     };
   } finally {
     closeSync(input.outputFd);
   }
 }
 
-async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem" }>): Promise<unknown> {
+async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem" }>) {
   const context = workspaceContext(input.workspaceId);
   assertPrivateOutputDescriptor(input.outputFd, "secret-redeem");
   const planId = input.planId.trim();
@@ -702,8 +621,8 @@ async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem
     contentType: "application/json",
   });
   if (!grantResponse.ok) return responseError(grantResponse, true);
-  const grantPayload = (await grantResponse.json()) as unknown;
-  if (!isRecord(grantPayload) || typeof grantPayload.grant !== "string") {
+  const grantPayload = z.object({ grant: z.string() }).safeParse(await grantResponse.json());
+  if (!grantPayload.success) {
     throw new Error("Skillpack did not return a secret retrieval grant");
   }
   const redeemResponse = await authenticatedRestFetch({
@@ -711,12 +630,13 @@ async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem
     capability: "secrets:read",
     method: "POST",
     path: "/secret-grants/redeem",
-    body: JSON.stringify({ grant: grantPayload.grant }),
+    body: JSON.stringify({ grant: grantPayload.data.grant }),
     contentType: "application/json",
   });
   if (!redeemResponse.ok) return responseError(redeemResponse, true);
-  const redeemed = (await redeemResponse.json()) as unknown;
-  if (!isRecord(redeemed)) throw new Error("Skillpack returned an invalid secret redemption");
+  const parsedRedemption = z.record(jsonValueSchema).safeParse(await redeemResponse.json());
+  if (!parsedRedemption.success) throw new Error("Skillpack returned an invalid secret redemption");
+  const redeemed = parsedRedemption.data;
   try {
     writeFileSync(input.outputFd, JSON.stringify(redeemed), { encoding: "utf8" });
   } finally {
@@ -729,7 +649,7 @@ async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem
   };
 }
 
-async function status(input: Extract<ClientInput, { action: "status" }>): Promise<unknown> {
+async function status(input: Extract<ClientInput, { action: "status" }>) {
   const context = workspaceContext(input.workspaceId);
   if (context.authentication.kind !== "agent") {
     const response = await authenticatedRestFetch({
@@ -774,7 +694,7 @@ async function main(): Promise<void> {
   writeResult({ ok: true, data: result });
 }
 
-main().catch((error: unknown) => {
+main().catch((error) => {
   const message = redact(error instanceof Error ? error.message : String(error));
   writeResult({ ok: false, error: message });
   process.exitCode = 1;

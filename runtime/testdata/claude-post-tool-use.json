@@ -1,0 +1,13 @@
+{
+  "fixture_schema_version": 1,
+  "hook_event_name": "PostToolUse",
+  "session_id": "fixture-session-claude",
+  "tool_name": "Skill",
+  "tool_input": {
+    "skill": "/fixture/skills/example"
+  },
+  "tool_response": {
+    "is_error": false
+  },
+  "tool_use_id": "fixture-call-claude"
+}

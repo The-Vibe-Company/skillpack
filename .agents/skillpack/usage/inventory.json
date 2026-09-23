@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "origins": [
+    "https://skillpack.app"
+  ],
+  "skills": [
+    {
+      "path": ".agents/skills/better-ui",
+      "skillId": "282bcb0f-f596-4549-8444-aaa36dc0579a",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "ed1dfe988fc40511b4845ccd9050a143a2002fee3bedc8064c47fa342b5d8d4f",
+        "SKILL.md": "45bcc59e42d12d7c2276cbaf6f5607e2a1b983e3bb58036ab232e0ec78719f7e",
+        "SOURCE.md": "41d4d569e570516d0508713fcce4856f4a11596e889ffdec051b29f585be7de7",
+        "animations.md": "3639d6ba59ef714af1d85bf2cca8174f8c040cf3f39bff24071beca57a1870e9",
+        "companion.json": "c4ade6040009527b35329ab412eee99a320d574ec852f9cfa2ecce59935c9141",
+        "enter-exit.md": "67204cc65c67c916674b9d8b27abec7715f110ffcae137aecca8650ded485cbf",
+        "icon-transitions.md": "4cee1e74c2618ae68196bdb43fb7906532883f174426cf4a83b31de093cbadf7",
+        "icons.md": "ccfe1b77653c5997633f43d29c9919e5b97a2b70f7e0a9876719bf892ebb5865",
+        "performance.md": "e4bc3c90d6e0281d295e2e7e39d545fb9abd8a67667b0c10e589eda8115e5b1e",
+        "surfaces.md": "5508a7caf07ae8de616e7d83e282d4a08c026dd7a2d3cf54979609e4e0301048"
+      }
+    },
+    {
+      "path": ".agents/skills/capture-learning-tools",
+      "skillId": "2ef3ebe4-63bb-468a-acc0-a37360a65840",
+      "version": "0.2.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "SKILL.md": "9add450f1c97878ec6c58bc9b328e35ccfa6169856d230372f589153d5b85099",
+        "companion.json": "cf6f0688538fe35231a3718edd5e1d779142a48c90efbd781563e6281a37faa0",
+        "evals/evals.json": "58da767585295cdb779451a9c274da8b804f0addc3a711f34d0d3393aba6dd3f",
+        "references/agent-instructions.md": "354a8dcf2800529bdce14eb1c4df9fa048ddd9838d43020ed3ad25c57c40746a",
+        "references/ci-policy.md": "73cbd8acdc1e341efba245b3439ae4462c0b98e2f3680ce5d43d1559de37e249",
+        "references/conversation-analysis.md": "37170cac7a194f2023120b4a2cf64241d80f9f17d7ff52a0b03d13b3f3e2f8d9",
+        "references/cross-agent-linking.md": "52deee7f65cd00036b9e339c48e158fdf71337129a27f6673873ea18a111ab03",
+        "references/examples.md": "67734285ee377351a62936d811e347660a7d31768ddfa38d12bfb13553aba690",
+        "references/non-technical-mode.md": "403029ca8da42f77c69ef711ac799ad80f29cfb26de8715737c55e95c7e76f6e",
+        "references/project-memory.md": "20f11abaa66a50789ae2330dd1d281e3036d76930661e93b94803bb0feae8321",
+        "references/promotion-matrix.md": "04c23d60c62598f558f02325735028e6fdbf044f5b95edb0396467fd6713294f",
+        "references/testing-policy.md": "86cc6f421bf9991fb982518df2e8d4a104bd94dcd7f0c9b75d0ac7e85bf72edd",
+        "scripts/classify_learning.py": "37331976ccbd59ddc34445871a57c4c85c080128481664946e95674c6c9d873d",
+        "scripts/inspect_ci_surface.py": "64e059660151ac2a9ec777557d5a88ca9dccf6e4c52f948eb844b7ebad334bf3",
+        "scripts/inspect_project_guidance.py": "01f82b973af8c5994394e2876038a78aed5dc04b785469bd343493d647929502"
+      }
+    },
+    {
+      "path": ".agents/skills/design-frontend-dev",
+      "skillId": "02decff6-b4ac-4d06-a494-abeeb08db9f3",
+      "version": "3.2.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "02bb8c3b4e70190e3986c0404ad2fd8d639b4f534252d82379cc1b502b6d1812",
+        "SKILL.md": "b7e638d2c70179670c8d16ef3d0a965f3b2d88426ee484271bbe33396176aa2f",
+        "SOURCE.md": "adf5971ab32df3277008a18350eb5ec294d4f4377a57e520e1fdb2a6de97f64e",
+        "companion.json": "01db94c8b147a5f31127684ac3317aa259316844d482b167de8ec3da241f574b",
+        "evals/evals.json": "1abbfc6fe793d712f40401771050e1ac2db7f7f582b23d0c7b8b80838428fafc",
+        "reference/adapt.md": "893105e5d590cf1bbbfa29f2309ddea5bee6ca8e04d83526a42db4f42cf79076",
+        "reference/animate.md": "a27bee7916b057600598267aa40f8872d720a5b7294665be2bf1dac3385bfe74",
+        "reference/audit.md": "1474683ccf4704bc2d8852779c98c8002a2f7630455b60c93f2ee455a4e460b4",
+        "reference/bolder.md": "7dbaf34d083fd56b3074a946eedb947331a44a6e14781c880e5d124699c0036e",
+        "reference/brand.md": "0dbf72c2baa179edd469b21b960d5d9d8b1a9ca6fac897343e362751de641f7d",
+        "reference/clarify.md": "83ed5ee563a7e1af72c1e6a0ce43296fe963a51b8ed1182e138c2e2a0f9dbfb4",
+        "reference/colorize.md": "3494ee446d598e56aafbc84f1975bb0fdf8a5a3eb7080f57957415d4aa453231",
+        "reference/critique.md": "294cf40cf2b695aadbab4a9d95ae7d872ca3fc2741ed9644de5dbc0107061ffb",
+        "reference/delight.md": "01b511dd749c72a357a5b48cc46fc4bf8a7e91784b7671e3ffe3c8ba4b927c22",
+        "reference/distill.md": "17fed8d6bca1ea8e5f48ae9dd06a3090a0a5d4487b733e0d4dec0a1360c59bcc",
+        "reference/harden.md": "e4c3b3085fbf77ce30a70d1c55c8fe38c39f834b7a85d10694b25227cdd50073",
+        "reference/interaction-design.md": "ca0b4a91bd380095b6a53c66f524f53efe741e536938af65f9cc184075e83ed3",
+        "reference/layout.md": "a310eed5b9cf14f845743b24f1ad5fd29066df5b09f52bd955cc69b7add3aa68",
+        "reference/onboard.md": "eac57604434662cbf56cc38969c2f4b752cb68ebc426d93db67882601771bccd",
+        "reference/optimize.md": "c6f074c77ae2fa788661b391911b6a640373ea499ec3735541db5acd6b87d676",
+        "reference/overdrive.md": "05f9ceafc182a7778ee3580b0a2ffb24d4dd659c7a4aff46261b9b8322d8323f",
+        "reference/polish.md": "542bd19a7858587a3cb0336bbcb5ef4e1e8d7bacf9490e6f2c694b5b0f1426ed",
+        "reference/product.md": "b5b7c8ce297a6ae9b65b3efab4f0250a080972e73c962870d0a54407b630f3ec",
+        "reference/quieter.md": "3c4711defa57044db31a280c58ab91833fefa1f8b6166618be740d7cd2d341ef",
+        "reference/shape.md": "6986ecde3eb481baa3f8721a5a2c7c09ef483a84ce0cd1d3e1b72f69b97d693b",
+        "reference/typeset.md": "b99d076f4740cf6ac95dbbe3af1fb53e03e83aa4a2bebb422b3d8f036da6ad29"
+      }
+    },
+    {
+      "path": ".agents/skills/emil-design-eng",
+      "skillId": "72009063-04f5-43db-bd45-76e7bb49c8e6",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b",
+        "SKILL.md": "3dc8fd08aee01e484ac5ba0dbebd11741f0976c90e358bdfd36be77f0011467c",
+        "SOURCE.md": "97f185db61fa18d75946494a99fffa5ebd153eda724d6758e2051f0590d422e9",
+        "companion.json": "0db34cfbfc3c260fff2f4c246649ef8181aa66fb1950101358947c982341dfa5"
+      }
+    },
+    {
+      "path": ".agents/skills/grilling",
+      "skillId": "4232efaf-3767-4a3b-85e7-d138981436e0",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "SKILL.md": "52642270360435b196791c3633f7bee68014df280d3cd3ff2511401fb7bd882a",
+        "SOURCE.md": "1728fd0b41be6419569ad5d33ccfa2f83395a280307d230e053325a58a042dfb",
+        "companion.json": "c0425fa977bea20a262a8f07307934fdc76f9009a9b89fda1e873ea6893530fc"
+      }
+    },
+    {
+      "path": ".agents/skills/ios-product-dev",
+      "skillId": "c74c6d15-7b11-4d95-9f55-7f62a5a579e4",
+      "version": "0.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "SKILL.md": "5851ce65c02ee19809fd6874152fb3d6dbd228fe724e91cc61698f38df1f5dd3",
+        "SOURCE.md": "725c7a470326792aed06b8627a02c19958339d0d98758f56816676dac0562cf9",
+        "companion.json": "a2ed131636ec1dfb5391ce36c303ad6ff4f8bb1c1a34e6a4a8f912653e745fce",
+        "evals/evals.json": "91790b41022df1cc70da353b2425df1b7026ebc7515be8e49bc55caab56f3acc"
+      }
+    },
+    {
+      "path": ".agents/skills/plan-pr",
+      "skillId": "d38a38f6-3f19-4547-9db7-0daa729ac51c",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "SKILL.md": "e8e4d29ff71812d5651b9ef4e28aa90833ebba218bdb8e37358ccfeaa2ce0538",
+        "companion.json": "67860ee213fa87e1be5c862a7f0c573c2911408a69c3b0a7feddeff2ab22afd2",
+        "evals/evals.json": "4ed168c59530cdd13cf4215ef1e97726396b352416cc2b8df6bf22822983bffb",
+        "evals/fixtures/project/AGENTS.md": "3a50ddefa927573772f559358e1dae23c0369798f316f3b2f3c12fb6b066e98c",
+        "evals/fixtures/project/approved-plan.md": "e47e547bb6b78f96839f728ab7f26c0bb2067efb3c6203dfdb7f00e074d5abec",
+        "evals/fixtures/project/docs/agents/plan-pr-validation.md": "8cd1544b57c84c91db0cfa72065063f2d1404ebb3c4dc112c6e044aba7959a27",
+        "evals/fixtures/project/docs/agents/plan-pr.md": "aac9c59b9d8cdcff73ba0871543e80e46182991ab16cec489bc15d0355a3f897",
+        "evals/fixtures/project/package.json": "e552a95cfcfbf2617d8441acd87d890ed2e5cf90cd03b10a0c4f9ba0807ceac8",
+        "evals/fixtures/project/src/copy.js": "30a891ba9f1a29b05bcc9c38a3d1dc90b31551ab778c3ea4b1745e73ef607550",
+        "evals/fixtures/project/src/export.js": "6953236f4df81931166162020b117ac9511414b43468f61bb35ae90ff9430c32",
+        "evals/fixtures/project/src/export.test.js": "94df9e64db4a1440dbfb7278040e1b0a414325c8382c0b32ee70bf8616e04f1b",
+        "evals/fixtures/project/src/graph.js": "3b8a0ed9a341f8423d5a07847643e809a78415d5f8749d8ef49f6d1e3a8e09f2",
+        "evals/fixtures/project/tickets/APP-10.md": "557980de43e31d796d341eb42b14212348d3e67249e95a2dacbdee43db72f508",
+        "evals/fixtures/project/tickets/APP-42.md": "75c8162f0162807f92d85414274abb289cc9c3ef9a490dd7c99ecca1b2a2ae7a",
+        "evals/fixtures/project/tickets/APP-43.md": "4e628dddcefbbf3a937929572104f18dce56947354a45b512a95beab9c2f8127",
+        "evals/fixtures/project/tickets/APP-44.md": "4c25e38174183798199dcadc74f98fc343902f61266b62e4e3ddb29a392cb977",
+        "evals/fixtures/project/tickets/APP-9.md": "3efff67e4356e19792e926b1d32f356fc6f4ca24fdde0313dce3b8b104f7e28d",
+        "references/plan-contract.md": "28a263006fe9d82b71752020e1ec7cc10b5e05069ba42a9c02a83719dedb7ede",
+        "references/setup.md": "fc35308b92066ca0de2b809aff7c8d2d36bfb0478e0b175cb47d637d2035031b",
+        "references/ticket-intake.md": "9a30bacfd0918250a67271ccba9b8cedee6e2c678c349735f7f92cff69bd9b81"
+      }
+    },
+    {
+      "path": ".agents/skills/review-code-dev",
+      "skillId": "b0780a97-6972-4a2b-8e88-f41a528900c7",
+      "version": "2.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
+        "SKILL.md": "b3bef882a97e8638620422ed45c480ac44a10f2bb66ee0190cb5a2d78d58bbc7",
+        "UPSTREAM.md": "9019abf89219d39beddc3606c90ad2984cf333ea89595461484e0c2514206010",
+        "companion.json": "84e6cd2f40a1a79e0a0cc1ac73d8c00b4a7a06f26032817eec4b93b822fa6dc3",
+        "scripts/.gitignore": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793",
+        "scripts/ocr.py": "e67ec21a0e6c9926f64363ff33054af304ee9cc829bd916c0b1761632a8096f7",
+        "scripts/test_ocr.py": "5756a0faf924f493cb00e23b5125b0fe7883716e7e725017532ada25ff962e79"
+      }
+    },
+    {
+      "path": ".agents/skills/ship-pr-dev",
+      "skillId": "bccb0c35-71bf-4fe8-ad7c-7a931889fa84",
+      "version": "1.6.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "SKILL.md": "2db8a6018e4b4f355ab4f6647c7a1b044c84022b4bf046870231a4299560988b",
+        "companion.json": "35ddc2ec09a0b38c4f9230225636a04650fdbdf3085e225f7328d8ac41029207",
+        "evals/evals.json": "f7f726212a676c70bb5e95137f19374bbb12bb25c9aaf6bc011a90e009ac1519",
+        "references/agent-routing.md": "a9d45d21db3c868f17d626f2bb47e819d6bfd2041ad03362a5d2c9e3a351b1a9",
+        "references/pr-template.md": "41a2de2a78d70792b5b9929afe26d804588a272b7bb29f8170c59e98db11a165",
+        "references/readiness-gates.md": "a374db47897a458e48f4ed7703e6a4bc86173e12149e5604c9d5037bb3d9aed3",
+        "references/review-gate.md": "6dff7b5a98757276d345866a1fbf187427283e93b2f38aec593d08af3300e0e5",
+        "references/workflow.md": "7cb31dec7042324a5e3dd2c67c9aaeed683a2b03f39ed37d4d01159b5f77566d",
+        "scripts/.gitignore": "6feaded4e28ea86e001a6751b4e3d960e8b7c31b9616ff9936b79297086e809b",
+        "scripts/collect_ship_context.py": "f6d8e8f50f121637c6e019c77111d8cdfaf4a07dfcbdcee9a919a35e168b616b",
+        "scripts/prepare_ship_run.py": "fd25332d37ba4ecd2b4c996ccabe6ed84ebe114cffdc2cd3bb4496aeacaa0ac9",
+        "scripts/test_collect_ship_context.py": "b2a502de765e3d458a0ad3cd51cee1ac83164dc5e7e8ace24321ba0d383d5bcf"
+      }
+    },
+    {
+      "path": ".agents/skills/swiftui-expert-dev",
+      "skillId": "a0e3dc0e-4f95-461e-8f10-43a0658d5d6b",
+      "version": "0.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "SKILL.md": "93bf770e9b883de5ceb7c3ce2148b404bb3dff680e96f8bebcb561c30f83cdef",
+        "SOURCE.md": "20d0ec496a3b413d318c2be1c2628b4b2d493325d02a3ddd94cf96f1544d7846",
+        "companion.json": "ce12c829211c994600b0f21199a2900cd67572d3f8053e2c5277a7818f1893b2",
+        "evals/evals.json": "df8a274bde110203c9291a5d4cc5d14dc546e7a13edc62cce58faa9b66843b75"
+      }
+    },
+    {
+      "path": ".agents/skills/tdd",
+      "skillId": "cca3457b-8b63-41f9-b02a-b324cc02aecf",
+      "version": "1.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "0e7ac423bf2c6e223b7c5b156f8cf72da49d748e56a1641402c31f22ad07dbb5",
+        "SKILL.md": "1e2878d1e4c304299a5ff5d03ea52161cbc3384605a8d633b39fd25ccf589fad",
+        "SOURCE.md": "cbabb9cd1c022670c72282e852202683c8c9417e318369953cbdb04c86931e35",
+        "companion.json": "14d4511026d91b0e9a2e9b74a1ff9418dc3152e40a185ffa1bc21e36ce479114",
+        "mocking.md": "3ceb807fdf4a47d6a93d4d9a891e5ba6d362a6247bd08adc451feebfc17361ef",
+        "tests.md": "859f9e592c188fda4fc7277dd180e4ce9c7a2e13f6efe1f6f29eccc9d28c106a"
+      }
+    },
+    {
+      "path": ".agents/skills/xcodebuildmcp-cli",
+      "skillId": "5c4ab7b6-61ba-4b1d-b7a8-9e4efb1e5ce7",
+      "version": "0.1.1",
+      "origin": "https://skillpack.app",
+      "files": {
+        "LICENSE": "fef28fc4165c72b1f0e4ce94654ba44ad7ff7d5d2538b3d01e66e9cc5be3c4f6",
+        "SKILL.md": "a43cf6d0c63260eaa1f976dcb73cd8fe20c4c79b38d46d6b2d83d3ab5ded1168",
+        "SOURCE.md": "6a9e0727e908eb86f6109dd9870c87b50e4f19505b28a5efd92c8e035aebe303",
+        "companion.json": "3c98e9095fdb56198ee6b77446ef27fa44cc1c747127fffafbdcfb05bc4d6535",
+        "evals/evals.json": "df3c3ebb45f98703cf28a881f75309b9d6f07c134c109432aaf90c57a81b8d1e"
+      }
+    }
+  ]
+}

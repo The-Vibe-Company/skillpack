@@ -24,15 +24,29 @@ conversation, and always confirm a change with the user before anything is publi
 Skillpack is a Skills Hub. External agents use delegated Agent Auth to manage portable skill
 packages, secrets, and declared Skill Databases. The control plane never executes package scripts.
 
-## Activation reporting in published skills
+## Automatic usage collection
 
-New versions published through Skillpack receive a visible activation-reporting block before their
-checksum is computed. Preserve this generated block when editing; publication replaces it automatically.
-It works without Agent Auth and sends optional declared IDs/emails to the publishing instance.
-Respect `SKILLPACK_TELEMETRY=0` and user opt-out. Reporting failure never blocks the skill's task.
-The deployment also retrofits all historical published versions in place. Version numbers stay the
-same; use checksum changes to detect updates. Existing installed copies require a download to gain reporting. Usage statistics are best-effort and
-identities unverified; personal-skill statistics remain creator-only. See `reference/api.md` for the contract.
+The first Skillpack bootstrap installs or updates the signed `skillpack-runtime` binary for the local
+OS and architecture, registers verified installed skills, merges Codex/Claude hooks, and installs
+the OpenCode local plugin while preserving existing handlers and custom plugins. Review new Codex
+hook definitions through its official `/hooks` flow.
+A configured hook is not proof it has run: inspect `doctor --json` for observed coverage.
+
+Published packages contain runtime identity metadata and a short generated notice. Preserve that
+notice; publication replaces it automatically. Never send activation POSTs or install hooks while
+executing an ordinary skill. Setup and maintenance belong to Skillpack, not the model's task plan.
+If the public runtime release is not available yet, report `distribution_unavailable` and continue
+the user's task; keep a previous verified runtime active and retry setup at the next bootstrap.
+
+`bootstrap.py --auto-update-skillpack` also synchronizes clean user copies with published technical
+runtime migration patches. Pins, local customizations and Git-tracked copies stay unchanged and are
+reported. Repository copies are updated through PRs. Public-release pins and old archives remain immutable.
+
+The runtime keeps a private local queue and wakes briefly on activity; no login service is installed.
+`SKILLPACK_TELEMETRY=0` persistently excludes the calling session from later reconciliation. For a
+persistent global opt-out, run `python3 scripts/runtime_command.py telemetry disable`; this purges pending events.
+Collection failure never blocks the skill's task. Counts distinguish invocations, requests, reads
+and historical reports; identities are optional and unverified. See `reference/api.md`.
 
 ## Configuration
 
@@ -1380,7 +1394,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.118.0","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.118.1","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 

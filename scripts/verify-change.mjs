@@ -16,6 +16,7 @@ const HYGIENE_TESTS = [
   "scripts/ci-gate.test.mjs",
   "scripts/lint-anti-slop.test.mjs",
   "scripts/verify-change.test.mjs",
+  "scripts/runtime-release.test.mjs",
 ];
 
 function splitNullTerminated(output) {
@@ -196,6 +197,10 @@ export function createVerificationPlan(files, { workspaces = [], env = process.e
       // python3 exists on PATH.
       step("skill-guards", "bash", ["scripts/run-skill-guards.sh"]),
     );
+  }
+  if (scope.runtime) {
+    fastSteps.push(step("runtime", "python3", ["scripts/runtime-build.py", "--check-only"]));
+    deferredGates.push(deferredGate("runtime-native", "GitHub Actions: Runtime Quality (six targets)", "Every target must execute natively before distribution."));
   }
   if (scope.quality) {
     fastSteps.push(

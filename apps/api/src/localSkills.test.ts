@@ -48,7 +48,7 @@ describe("companion skill package + row", () => {
     const pkg = await getSkillpackSkillPackage();
     expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.118.0");
+    expect(pkg.version).toBe("1.118.1");
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -69,6 +69,7 @@ describe("companion skill package + row", () => {
       "SKILL.md",
       "companion.json",
       "evals/evals.json",
+      "runtime-release.json",
       "scripts/bootstrap.py",
       "scripts/bootstrap_integrity.py",
       "scripts/bootstrap_update.py",
@@ -78,14 +79,21 @@ describe("companion skill package + row", () => {
       "scripts/create_secret.py",
       "scripts/install_skill.py",
       "scripts/onboarding_scan.py",
+      "scripts/opencode-runtime.mjs",
       "scripts/package-checksum.mjs",
+      "scripts/runtime_command.py",
+      "scripts/runtime_lock.py",
+      "scripts/runtime_setup.py",
+      "scripts/runtime_skill_sync.py",
       "scripts/secrets_runtime.py",
       "scripts/skill_guard.py",
       "scripts/skillpack-agent-client.mjs",
+      "scripts/skillpack-runtime-launch.py",
       "scripts/sync_companion.py",
       "scripts/sync_secrets.py",
       "scripts/sync_skillpack.py",
       "scripts/tools.json",
+      "scripts/verify-runtime-release.mjs",
     ]);
     for (const [relPath, digest] of Object.entries(baseline.files ?? {})) {
       const bytes = await readFile(join(skillpackSkillDir(), relPath));
@@ -130,8 +138,8 @@ describe("companion skill package + row", () => {
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
     const changelog = row.changes.join("\n");
-    expect(changelog).toContain("Detect content updates at the same published version");
-    expect(changelog).toContain("canonical installed checksums for each dependency");
+    expect(changelog).toContain("signed portable runtime");
+    expect(changelog).toContain("preserving pins and customizations");
     // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
     const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
       metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };
