@@ -1,0 +1,10 @@
+{
+  "files": {
+    "SKILL.md": "---\nname: fixture\ndescription: Portable fixture\n---\n\nFixture.\n",
+    "empty.txt": "",
+    "scripts/run.sh": "#!/bin/sh\r\necho fixture\r\n",
+    "references/café.md": "Unicode: café, 日本語.\n",
+    "references/long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-long-.md": "Long name requiring PAX.\n"
+  },
+  "checksum": "sha256:ff776e1948b9f61aab2ab69177933abf0f53139f9da96c706c37bd5ef9d44d3a"
+}

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- this server-only marker has no runtime behavior in the parser test.
 vi.mock("server-only", () => ({}));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- navigation is replaced so redirect behavior is observable in isolation.
 vi.mock("next/navigation", () => ({
   redirect: vi.fn((path: string) => {
     throw new Error(`redirect:${path}`);
@@ -10,7 +12,9 @@ vi.mock("next/navigation", () => ({
 const serverApiFetch = vi.fn();
 const loadOrgContext = vi.fn();
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- server fetch is supplied by deterministic response fixtures.
 vi.mock("@/lib/apiServer", () => ({ serverApiFetch }));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- org loading is supplied by deterministic response fixtures.
 vi.mock("@/lib/currentOrg", () => ({ loadOrgContext }));
 
 const whoami = {
@@ -153,6 +157,35 @@ describe("parseOrgSettingsResponse", () => {
       revoked_at: null,
       created_at: "2026-07-13T00:00:00.000Z",
     }).scope).toBe("write");
+  });
+
+  it("labels an all-capability key as full and preserves limited historical keys", async () => {
+    const { mapApiKey } = await import("./settingsViewModel");
+    const base = {
+      id: "tok_full",
+      org_id: "org_1",
+      user_id: "user_1",
+      name: "Native CLI",
+      prefix: "cmp_pat_full",
+      expires_at: "2026-08-01T00:00:00.000Z",
+      last_used_at: null,
+      revoked_at: null,
+      created_at: "2026-07-13T00:00:00.000Z",
+    } as const;
+
+    expect(mapApiKey({
+      ...base,
+      scopes: [
+        "skills:read",
+        "skills:write",
+        "secrets:read",
+        "secrets:write",
+        "database:read",
+        "database:write",
+        "public-skills:install",
+      ],
+    }).access).toBe("full");
+    expect(mapApiKey({ ...base, id: "tok_limited", scopes: ["skills:read", "skills:write"] }).access).toBe("limited");
   });
 
   it("makes loadSettingsPageData return null for malformed settings data", async () => {

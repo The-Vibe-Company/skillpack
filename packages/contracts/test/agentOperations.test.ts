@@ -16,6 +16,10 @@ describe("closed Skillpack Agent Auth operation registry", () => {
       capability: "skills:read",
       transport: "rest",
     });
+    expect(matchSkillpackAgentOperation("GET", "/skills/demo/versions")).toMatchObject({
+      capability: "skills:read",
+      transport: "rest",
+    });
     expect(matchSkillpackAgentOperation("POST", "/skills/demo/install")).toMatchObject({
       capability: "skills:read",
       transport: "rest",

@@ -8,6 +8,7 @@ import { LocalSkillDrawer, LocalSkillsView } from "./LocalSkillsView";
 import { InstallDialog, UploadDialog } from "./UploadDialog";
 import { SKILL_ACTIONS } from "./skillActions";
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- the App Router seam is replaced while rendering the real update dialogs.
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     refresh: vi.fn(),
@@ -146,19 +147,22 @@ describe("skill update flow", () => {
     expect(html).toContain("Create in browser");
     expect(html).toContain("Publish new version");
     expect(html).not.toContain("Update skill");
-    expect(html).toContain("Validation endpoint");
-    expect(html).toContain("Publish endpoint");
+    expect(html).toContain("Browser reference validation endpoint");
+    expect(html).toContain("Browser reference publish endpoint");
     expect(html).toContain("action=validate");
     expect(html).toContain("action=publish");
     expect(html).toContain("expect_slug=research-agent");
     expect(html).toContain("expect_skill_id=skill-1");
     expect(html).toContain("version=1.2.4");
     expect(html).toContain("metadata.companion_skill_id");
-    expect(html).toContain("do not edit the package and do not publish");
-    expect(html).toContain("this appears to be a different skill");
+    expect(html).toContain("do not edit or publish the package");
+    expect(html).toContain("it appears to be a different skill");
     expect(html).toContain("Never publish after failed validation or ambiguous identity");
-    expect(html).toContain("delegated Agent Auth client");
-    expect(html).toContain("Never silently fall back to a PAT");
+    expect(html).toContain("native Skillpack CLI");
+    expect(html).toContain("skillpack skills validate FOLDER --json");
+    expect(html).toContain("SKILLPACK_API_KEY");
+    expect(html).not.toContain("Agent Auth");
+    expect(html).not.toContain("mint a PAT");
     expect(html).not.toContain("cmp_pat_");
     expect(html).not.toContain("Command line");
     expect(html).not.toContain("companion CLI");
@@ -208,12 +212,16 @@ describe("skill update flow", () => {
     expect(html).toContain("Use an AI assistant");
     expect(html).toContain("Download package");
     expect(html).not.toContain("Publish new version");
-    expect(html).toContain("scripts/companion-agent-client.mjs");
-    expect(html).toContain('&quot;workspaceId&quot;:&quot;org-1&quot;');
-    expect(html).toContain("skills:read");
-    expect(html).toContain("secrets:read");
-    expect(html).toContain("no PAT is included in this prompt");
-    expect(html).toContain("Agent Auth is mandatory for this prompt");
+    expect(html).toContain("skillpack install research-agent --version 1.2.3");
+    expect(html).toContain("Workspace ID: org-1");
+    expect(html).toContain("skillpack auth status --json");
+    expect(html).toContain("SKILLPACK_API_KEY");
+    expect(html).toContain("releases/download/runtime-v0.2.0/");
+    expect(html).toContain("install.sh");
+    expect(html).toContain("install.ps1");
+    expect(html).toContain("SHA256SUMS");
+    expect(html).not.toContain("secrets:read");
+    expect(html).not.toContain("Agent Auth");
     expect(html).not.toContain("COMPANION_AUTH_MODE");
     expect(html).not.toContain("legacy-pat");
     expect(html).not.toContain("cmp_pat_");
@@ -231,16 +239,16 @@ describe("skill update flow", () => {
       }),
     );
 
-    expect(html).toContain("Validation endpoint");
-    expect(html).toContain("Publish endpoint");
+    expect(html).toContain("Browser reference validation endpoint");
+    expect(html).toContain("Browser reference publish endpoint");
     expect(html).toContain("action=validate");
     expect(html).toContain("action=publish");
     expect(html).toContain("expect_slug=URL_ENCODED_SKILL_SLUG");
     expect(html).toContain("version=1.0.0");
     expect(html).toContain("replace URL_ENCODED_SKILL_SLUG in both endpoints");
     expect(html).toContain("Never send the placeholder");
-    expect(html).toContain("Validate first");
-    expect(html).toContain("Publish only after validation is accepted");
+    expect(html).toContain("skillpack skills validate FOLDER --json");
+    expect(html).toContain("Never publish after failed validation");
   });
 
   it("shows reinstall only beside the local skill update prompt", () => {

@@ -378,11 +378,10 @@ export function SettingsController({
         setBusy(false);
       }
     },
-    createApiKey: async (name, scope) => {
+    createApiKey: async (name) => {
       setBusy(true);
       try {
-        const scopes = scope === "write" ? (["skills:read", "skills:write"] as const) : (["skills:read"] as const);
-        const issued = await issueTokenRpc({ name: name.trim(), scopes: [...scopes] });
+        const issued = await issueTokenRpc({ name: name.trim() });
         // The one-time secret is the important result — return it as soon as the key exists.
         // Refresh the masked list best-effort; if it fails, fall back to a full resync rather
         // than throwing (which would hide the just-created key + its reveal dialog).

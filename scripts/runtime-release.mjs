@@ -18,7 +18,47 @@ export function canPublish(env) {
   return env.GITHUB_EVENT_NAME === "push" && env.GITHUB_REF === "refs/heads/main" && env.GITHUB_REPOSITORY === REPOSITORY;
 }
 
-export function prepareRelease({ dir, version, sha, privateKey, publicKey }) {
+function replaceInstallerMarker(source, marker, value, name) {
+  const occurrences = source.split(marker).length - 1;
+  if (occurrences !== 1) throw new Error(`${name} must contain exactly one ${marker} marker`);
+  return source.replace(marker, value);
+}
+
+function parseInstallerTemplates(value) {
+  if (value === null || Object.prototype.toString.call(value) !== "[object Object]") {
+    throw new Error("both native installer templates are required");
+  }
+  const { shell, powershell } = value;
+  if (Object.prototype.toString.call(shell) !== "[object String]" || Object.prototype.toString.call(powershell) !== "[object String]") {
+    throw new Error("both native installer templates are required");
+  }
+  return { shell, powershell };
+}
+
+export function renderInstallerTemplates({ version, hashes, shell, powershell }) {
+  if (!/^[0-9]+\.[0-9]+\.[0-9]+$/.test(version)) throw new Error("invalid installer version");
+  for (const target of TARGETS) {
+    if (!/^[a-f0-9]{64}$/.test(hashes[target] ?? "")) throw new Error(`invalid installer checksum for ${target}`);
+  }
+  const shellCases = TARGETS.map((target) => `    ${target}) printf '%s\\n' '${hashes[target]}' ;;`).join("\n");
+  const powershellCases = TARGETS.map((target) => `    "${target}" { return "${hashes[target]}" }`).join("\n");
+  return {
+    shell: replaceInstallerMarker(
+      replaceInstallerMarker(shell, "__SKILLPACK_RELEASE_VERSION__", version, "shell installer"),
+      "    # __SKILLPACK_PINNED_HASH_CASES__",
+      shellCases,
+      "shell installer",
+    ),
+    powershell: replaceInstallerMarker(
+      replaceInstallerMarker(powershell, "__SKILLPACK_RELEASE_VERSION__", version, "PowerShell installer"),
+      "    # __SKILLPACK_PINNED_HASH_SWITCH__",
+      powershellCases,
+      "PowerShell installer",
+    ),
+  };
+}
+
+export function prepareRelease({ dir, version, sha, privateKey, publicKey, installerTemplates }) {
   if (!/^\d+\.\d+\.\d+$/.test(version) || !/^[a-f0-9]{40}$/.test(sha)) throw new Error("invalid release identity");
   const tag = `runtime-v${version}`;
   const base = `https://github.com/${REPOSITORY}/releases/download/${tag}`;
@@ -32,6 +72,13 @@ export function prepareRelease({ dir, version, sha, privateKey, publicKey }) {
     files.set(name, bytes);
     return { target, name, url: `${base}/${name}`, size: bytes.length, sha256: record.sha256, testedOS: record.testedOS };
   });
+  if (installerTemplates) {
+    const templates = parseInstallerTemplates(installerTemplates);
+    const hashes = Object.fromEntries(assets.map((asset) => [asset.target, asset.sha256]));
+    const rendered = renderInstallerTemplates({ version, hashes, ...templates });
+    files.set("install.sh", Buffer.from(rendered.shell));
+    files.set("install.ps1", Buffer.from(rendered.powershell));
+  }
   const manifest = Buffer.from(JSON.stringify({ schemaVersion: 1, protocolVersion: 1, setupVersion: 1, version, sourceSha: sha, assets }, null, 2) + "\n");
   const signature = sign(null, manifest, privateKey);
   if (!verify(null, manifest, publicKey, signature)) throw new Error("CI signing key does not match pinned installer key");
@@ -115,7 +162,17 @@ class GitHubReleases {
 async function main() {
   if (!canPublish(process.env)) throw new Error("runtime publication requires a canonical main push");
   const config = JSON.parse(readFileSync("packages/skillpack-skill/skill/runtime-release.json", "utf8"));
-  const bundle = prepareRelease({ dir: resolve(".context/runtime-dist"), version: readFileSync("runtime/VERSION", "utf8").trim(), sha: process.env.GITHUB_SHA, privateKey: createPrivateKey(process.env.SKILLPACK_RUNTIME_SIGNING_KEY ?? ""), publicKey: createPublicKey(config.publicKey) });
+  const bundle = prepareRelease({
+    dir: resolve(".context/runtime-dist"),
+    version: readFileSync("runtime/VERSION", "utf8").trim(),
+    sha: process.env.GITHUB_SHA,
+    privateKey: createPrivateKey(process.env.SKILLPACK_RUNTIME_SIGNING_KEY ?? ""),
+    publicKey: createPublicKey(config.publicKey),
+    installerTemplates: {
+      shell: readFileSync("runtime/install.sh", "utf8"),
+      powershell: readFileSync("runtime/install.ps1", "utf8"),
+    },
+  });
   await publishRelease(bundle, new GitHubReleases());
   // No token: prove installers can fetch public bytes without GitHub credentials.
   for (const [name, bytes] of bundle.files) {
@@ -127,7 +184,7 @@ async function main() {
     }
     if (!matched) throw new Error(`anonymous download verification failed: ${name}`);
   }
-  console.log(`Published and verified ${bundle.tag}: six native archives and signed manifest.`);
+  console.log(`Published and verified ${bundle.tag}: six native archives, signed manifest, and native installers.`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

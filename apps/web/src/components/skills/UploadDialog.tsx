@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import type {
   DependencyPlan,
   SkillDependenciesResponse,
@@ -92,7 +91,7 @@ function CodeText({ text }: { text: string }) {
   );
 }
 
-/** Code block with a copy button. `resolveText` (optional) mints fresh content before copy. */
+/** Code block with a copy button. `resolveText` (optional) resolves fresh content before copy. */
 export function CodeBlock({
   text,
   scroll,
@@ -189,7 +188,8 @@ function LabelPicker({
   useEffect(() => {
     if (!open) return;
     const h = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target;
+      if (ref.current && target instanceof Node && !ref.current.contains(target)) setOpen(false);
     };
     document.addEventListener("click", h);
     return () => document.removeEventListener("click", h);
@@ -320,7 +320,8 @@ export function useModalA11y(
 ) {
   useEffect(() => {
     if (!active) return;
-    const opener = restoreFocusTo?.current ?? document.activeElement as HTMLElement | null;
+    const activeElement = document.activeElement;
+    const opener = restoreFocusTo?.current ?? (activeElement instanceof HTMLElement ? activeElement : null);
     const el = ref.current;
     const focusDialog = () => (el?.querySelector<HTMLElement>(FOCUSABLE) ?? el)?.focus();
     focusDialog();
@@ -371,7 +372,7 @@ const UP_METHODS = [
     icon: "sparkles",
     name: "Use an AI assistant",
     tag: "AI",
-    desc: "Hand a guided prompt to a delegated Skillpack agent.",
+    desc: "Hand a guided prompt to an agent using the native Skillpack CLI.",
   },
   {
     id: "zip",
@@ -417,8 +418,8 @@ function PromptPanel({
     : { slug: "URL_ENCODED_SKILL_SLUG", version: "1.0.0" };
   const validateQuery = skillUploadQuery(queryTarget, "validate");
   // New skills publish into the chosen library (`scope`); re-publish keeps the existing scope. Folders
-  // are appended as repeatable `label` params. Both URLs retain the exact slug/version binding required
-  // by the delegated transfer client; a new-skill assistant replaces the explicit slug placeholder.
+  // are appended as repeatable `label` params for the browser form. The copied prompt uses the native
+  // CLI, which performs the same slug/version binding before uploading.
   const publishParams = [
     skillUploadQuery(queryTarget, "publish"),
     ...(isUpdate ? [] : [`scope=${scope}`, ...labels.map((p) => `label=${encodeURIComponent(p)}`)]),
@@ -426,22 +427,30 @@ function PromptPanel({
   const publishQuery = publishParams.join("&");
   const validateUrl = `${base}/skills?${validateQuery}`;
   const publishUrl = `${base}/skills?${publishQuery}`;
-  const agentAuthContext = `Skillpack API URL: ${base}\nWorkspace ID: ${workspaceId}\nAuthentication: the installed Skillpack helper's bundled delegated Agent Auth client (JSON over stdin/stdout; no embedded PAT)`;
+  const nativeAuthContext = [
+    `Skillpack API URL: ${base}`,
+    `Workspace ID: ${workspaceId}`,
+    `Human authentication: skillpack auth login --api-url ${base} (the key is read through hidden terminal input).`,
+    "Automation authentication: set SKILLPACK_API_KEY and SKILLPACK_API_URL in the process environment.",
+    "Verify with skillpack auth status --json; require an active token for this workspace with skills:write.",
+    "Never put an API key in this prompt, chat, argv, source, or logs.",
+  ].join("\n");
+  const publishCommand = `skillpack skills publish FOLDER --scope ${scope} --api-url ${base} --json`;
   const buildPrompt = () =>
     target
-      ? `You are updating an existing Skillpack skill through the workspace API.
+      ? `You are updating an existing Skillpack skill through the native Skillpack CLI.
 
-${agentAuthContext}
+${nativeAuthContext}
 
 Target skill slug: ${target.slug}
 Target Skillpack skill id: ${target.skillId}
 Current version: ${target.currentVersion ?? "none"}
 Next version to publish: ${target.nextVersion}
 
-Validation endpoint:
+Browser reference validation endpoint (the CLI performs the authenticated request):
 ${validateUrl}
 
-Publish endpoint:
+Browser reference publish endpoint:
 ${publishUrl}
 
 Workflow:
@@ -449,30 +458,28 @@ Workflow:
 2. If metadata.companion_skill_id exists, verify it is exactly "${target.skillId}". If it is different, stop and tell the user this is not the same skill and they should review the package.
 3. Keep vendor data under metadata. Do not add top-level version, tools, scope, or visibility fields.
 4. Package SKILL.md with any referenced files once.
-5. Validate first: create a POST request to the validation endpoint with the archive as the body.
-6. Authenticate with the installed Skillpack helper's delegated Agent Auth client. Request skills:write constrained to this workspace if it is not already granted. Never silently fall back to a PAT. Send the archive as Content-Type: application/zip or application/gzip.
-7. Read the validation response. If it reports package name mismatch, target skill id mismatch, missing target skill, or metadata.companion_skill_id mismatch, do not edit the package and do not publish. Tell the user this appears to be a different skill.
-8. If result.ok is not true for any other reason, do not publish. Fix only the validation issue named by Skillpack, then validate once more.
-9. Publish only after validation is accepted: create a POST request to the publish endpoint with the same validated archive as the body.
-10. Report the published skill id and version from the response. Never publish after failed validation or ambiguous identity.${
+5. Run \`skillpack skills validate FOLDER --json\` and stop if validation fails. Fix only the named issue, then validate once more.
+6. Run \`${publishCommand}\` with the folder that contains SKILL.md. The CLI authenticates with the API key already verified above and validates the exact slug before publication.
+7. If validation reports package name mismatch, target skill id mismatch, missing target skill, or metadata.companion_skill_id mismatch, do not edit or publish the package. Tell the user it appears to be a different skill.
+8. Report the published skill id and version from the CLI response. Never publish after failed validation or ambiguous identity.${
           target.publicVersion
-            ? `\n11. This skill currently exposes public v${target.publicVersion}. After publication succeeds, ask whether v${target.nextVersion} should replace it, with "no" as the default. Only after an explicit yes, send PUT ${base}/skills/${encodeURIComponent(target.slug)}/public-version with JSON {"version":"${target.nextVersion}"} using the same authenticated Agent Auth session. If promotion fails, report that the new version is published but still private; never publish it again.`
+            ? `\n9. This skill currently exposes public v${target.publicVersion}. After publication succeeds, ask whether v${target.nextVersion} should replace it, with "no" as the default. Only after an explicit yes, run \`skillpack api PUT /v1/skills/${encodeURIComponent(target.slug)}/public-version --input FILE --api-url ${base}\` with {"version":"${target.nextVersion}"}. If promotion fails, report that the new version is published but still private; never publish it again.`
             : ""
         }`
-      : `You are publishing a Skillpack skill through the workspace API, into ${
+      : `You are publishing a Skillpack skill through the native Skillpack CLI, into ${
           scope === "org"
             ? "the ORGANIZATION library (visible to every member of the workspace)"
             : "the user's PRIVATE My Skills library (visible only to them until they share it)"
         }.
 
-${agentAuthContext}
+${nativeAuthContext}
 
 The package is a standard Agent Skill: SKILL.md at the root, with YAML frontmatter containing name and description.
 
-Validation endpoint:
+Browser reference validation endpoint (the CLI performs the authenticated request):
 ${validateUrl}
 
-Publish endpoint (note scope=${scope}, publishes into ${scope === "org" ? "the organization" : "My Skills"}):
+Browser reference publish endpoint (scope=${scope}):
 ${publishUrl}
 
 Workflow:
@@ -480,17 +487,15 @@ Workflow:
 2. URL-encode that exact frontmatter name and replace URL_ENCODED_SKILL_SLUG in both endpoints before making either request. Never send the placeholder. This first release is v1.0.0.
 3. Keep vendor data under metadata. Do not add top-level version, tools, scope, or visibility fields.
 4. Package SKILL.md with any referenced files once.
-5. Validate first: create a POST request to the validation endpoint with the archive as the body.
-6. Authenticate with the installed Skillpack helper's delegated Agent Auth client. Request skills:write constrained to this workspace if it is not already granted. Never silently fall back to a PAT. Send the archive as Content-Type: application/zip or application/gzip.
-7. Read the validation response. If result.ok is not true, or if the response is 422, do not publish. Fix only the validation issue named by Skillpack, then validate once more.
-8. Publish only after validation is accepted: create a POST request to the publish endpoint with the same validated archive as the body.
-9. Report the published skill id and Skillpack-assigned version from the response. Never publish after failed validation or ambiguous identity.`;
+5. Run \`skillpack skills validate FOLDER --json\` and stop if validation fails or returns 422. Fix only the named issue, then validate once more.
+6. Run \`${publishCommand}\` with the folder that contains SKILL.md. For a new package replace FOLDER after reading and URL-validating its exact frontmatter name; never send URL_ENCODED_SKILL_SLUG literally.
+7. Report the published skill id and Skillpack-assigned version from the CLI response. Never publish after failed validation or ambiguous identity.`;
   const displayPrompt = buildPrompt();
   return (
     <>
       <p className="up-panel__lede">
-        Hand this prompt to your assistant. The Skillpack helper requests a delegated <b>skills:write</b> grant
-        for this workspace, so the agent can validate and publish
+        Hand this prompt to your assistant. The native Skillpack CLI uses the API key authenticated through
+        hidden terminal input or SKILLPACK_API_KEY, then validates and publishes
         {scope === "org" ? " to the organization" : " into your private My Skills"} on your behalf.
       </p>
       {!isUpdate && (
@@ -1090,7 +1095,7 @@ export function UploadDialog({
   skill?: SkillVM | null;
   /** Library to publish into on create: 'personal' (My Skills) or 'org'. Ignored on update. */
   scope?: "personal" | "org";
-  /** Exact organization id used to constrain every delegated Agent Auth capability. */
+  /** Exact organization id used to verify the API key's workspace before publishing. */
   workspaceId: string;
   /** Every folder path in the target library (for the optional initial folder picker on create). */
   allLabels?: string[];
@@ -1266,10 +1271,13 @@ export function UploadDialog({
     setBusy(true);
     setError(null);
     try {
-      const next = await validateSkillPackage(file, {
-        ...(isUpdate ? { version: ver, expectSlug: skill!.id, expectSkillId: skill!.uuid } : {}),
+      const validationOptions = {
+        version: isUpdate ? ver : undefined,
+        expectSlug: isUpdate ? skill?.id : undefined,
+        expectSkillId: isUpdate ? skill?.uuid : undefined,
         dependencies: dependencyPlan?.declared ?? [],
-      });
+      } satisfies Parameters<typeof validateSkillPackage>[1];
+      const next = await validateSkillPackage(file, validationOptions);
       setValidation(next.result);
       setDependencyPlan(next.dependencyPlan);
       setShowPreflight(true);
@@ -1319,7 +1327,7 @@ export function UploadDialog({
     hint: [string, string];
     cta?: { label: string; icon: string; disabled: boolean; run: () => void };
   };
-  const FOOT: Record<UploadMethod, Foot> = {
+  const FOOT = {
     prompt: { hint: ["info", "The agent validates first, then publishes only if the package is accepted."] },
     zip: {
       hint: hasDepReview
@@ -1341,8 +1349,8 @@ export function UploadDialog({
         run: runCreate,
       },
     },
-  };
-  const foot = FOOT[method];
+  } satisfies Record<UploadMethod, Foot>;
+  const foot: Foot = FOOT[method];
 
   return (
     <div
@@ -1600,7 +1608,7 @@ const INSTALL_METHODS = [
     icon: "sparkles",
     name: "Use an AI assistant",
     tag: "AI",
-    desc: "Paste into an agent. It downloads and installs the skill for you.",
+    desc: "Paste into an agent. The native CLI downloads and installs the skill for you.",
   },
   {
     id: "manual",
@@ -1657,7 +1665,7 @@ function InstallDone({ result }: { result: { id: string; version: string; target
           <span className="up-done__k">Location</span>
           <span
             className="up-done__v"
-            style={{ flexWrap: "wrap", justifyContent: "flex-end", textAlign: "right" } as CSSProperties}
+            style={{ flexWrap: "wrap", justifyContent: "flex-end", textAlign: "right" }}
           >
             {result.path}
           </span>
@@ -1748,18 +1756,29 @@ export function InstallDialog({
 Version: ${version}
 Skillpack API URL: ${base}
 Workspace ID: ${workspaceId}
-Exact package operation: GET /skills/${encodeURIComponent(id)}/versions/${encodeURIComponent(version)}/package
 
-Use the installed Skillpack helper skill and its bundled scripts/companion-agent-client.mjs transport. All client requests use one JSON value on stdin and value-free JSON on stdout; do not construct Authorization headers yourself.
+Authenticate before reading or writing:
+1. Human setup: \`skillpack auth login --api-url ${base}\` (the API key is read through hidden terminal input).
+2. Automation: set SKILLPACK_API_KEY and SKILLPACK_API_URL=${base} in the process environment.
+3. Verify with \`skillpack auth status --json\`; require an active, unexpired key bound to workspace ${workspaceId}.
+   Never put a key in this prompt, chat, argv, source, or logs.
 
 Workflow:
-1. From the installed Skillpack helper root, connect with {"action":"connect","apiUrl":"${base}","workspaceId":"${workspaceId}","name":"<the agent you are>"}. The delegated device flow requests skills:read constrained to workspace ${workspaceId} and stores only the non-secret {issuer, agentId} reference in credentials.json.
-2. Use the helper's install_skill.py workflow to install exactly ${id}@${version}. Ask which tools before writing. For Claude Code, Codex, OpenCode, Grok Bot, and OpenClaw, also ask whether global, project, or both. Grok Bot uses ~/.cursor/skills globally and .cursor/skills in a project. Hermes is global-only at ~/.hermes/skills/<slug>; do not offer project scope for Hermes. The helper downloads through the bundled client's one-use skills:read transfer ticket, verifies the package, and performs the atomic install.
-3. Run the server secret preflight before downloading or mutating local files. The first secret operation must request secrets:read constrained to workspace ${workspaceId}; stop if required configuration is missing and report optional warnings.
-4. Show the metadata-only plan once and ask for one global confirmation. Redeem the one-time secret grant only after confirmation, through the helper's private pipe, and commit the package with its .env projection atomically. Never print, log, pass through argv, or persist a secret anywhere else.
-5. Confirm SKILL.md is at the package root and report the ${updating ? "updated" : "installed"} locations. Use install_skill.py --report (or the bundled client's registered POST /skills/${encodeURIComponent(id)}/install operation) with {"version":"${version}","agent":"<the agent you are>","source":"agent"} so Skillpack records the install.
+1. Use the requested supported tool(s) and destination scope; ask only for a missing choice before writing.
+2. Run \`skillpack install ${id} --version ${version} --scope <user|project> --tools <selected> --api-url ${base} --json\`.
+   The CLI downloads the exact version, verifies the server checksum, rejects unsafe archive entries, and
+   atomically installs the root package. Preserve an existing destination until replacement is confirmed.
+3. Run \`skillpack setup --tools <selected>\` when tool registration needs refresh.
+4. Use secret bindings declared by the package when they already exist. Never invent or create secret configuration
+   implicitly; stop and report missing prerequisites for the user to decide. The package is installed at the requested
+   root and its declared prerequisites remain visible in the result.
+5. Report the ${updating ? "updated" : "installed"} locations, version, and declared prerequisites from the
+   install command's structured result. Do not submit a second install report or include credentials in output.
 
-Agent Auth is mandatory for this prompt. Do not mint a PAT, inject a bearer token, or silently fall back if device approval fails. Stop and ask the user instead.`;
+If the native CLI is missing, use the official runtime-v0.2.0 HTTPS installers:
+- POSIX: download install.sh and the adjacent SHA256SUMS from https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.2.0/, verify install.sh against its SHA256SUMS entry, then run sh install.sh.
+- Windows PowerShell: download install.ps1 and the adjacent SHA256SUMS from that URL, compare Get-FileHash .\\install.ps1 -Algorithm SHA256 with its entry, then run the script.
+The installer independently verifies the pinned archive digest. Never run an installer or archive whose checksum differs from release metadata.`;
   const displayPrompt = buildPrompt();
 
   const download = async () => {
@@ -1768,6 +1787,7 @@ Agent Auth is mandatory for this prompt. Do not mint a PAT, inject a bearer toke
     try {
       const res = await fetch(versionPackageUrl(id, skill.version));
       if (!res.ok) {
+        // SAFETY: the download route's documented error envelope is a JSON object with an optional string error.
         const j = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(j.error || `Download failed (${res.status})`);
       }
@@ -1790,14 +1810,14 @@ Agent Auth is mandatory for this prompt. Do not mint a PAT, inject a bearer toke
     hint: [string, string];
     cta?: { label: string; icon: string; run: () => void; disabled?: boolean };
   };
-  const FOOT: Record<InstallMethod, Foot> = {
+  const FOOT = {
     prompt: { hint: ["info", "The agent downloads the skill and installs it wherever it keeps skills."] },
     manual: {
       hint: skill.version ? ["folder", "Download the package, then extract it into " + path + "."] : ["info", "No published version to download yet."],
       cta: { label: "Download package", icon: "download", run: download, disabled: !skill.version },
     },
-  };
-  const foot = FOOT[method];
+  } satisfies Record<InstallMethod, Foot>;
+  const foot: Foot = FOOT[method];
 
   return (
     <div
@@ -1938,15 +1958,22 @@ Agent Auth is mandatory for this prompt. Do not mint a PAT, inject a bearer toke
                       <span className="inline-code">{id}</span> and installs it in the right skills folder.
                     </p>
                     <div className="up-step">
-                      <StepLabel n="1">Secret configuration</StepLabel>
-                      <SkillSecretConfiguration slug={id} canSuggest={false} />
+                      <StepLabel n="1">API key authentication</StepLabel>
+                      <p className="up-seg-note">
+                        Run <span className="mono">skillpack auth login --api-url {base}</span> in a terminal;
+                        the key is read through hidden input. Automation may set{" "}
+                        <span className="mono">SKILLPACK_API_KEY</span> and{" "}
+                        <span className="mono">SKILLPACK_API_URL</span>. Verify{" "}
+                        <span className="mono">skillpack auth status --json</span> for workspace{" "}
+                        <span className="mono">{workspaceId}</span>. Never put the key in chat or argv.
+                      </p>
                     </div>
                     <div className="up-step">
-                      <StepLabel n="2">Delegated access</StepLabel>
+                      <StepLabel n="2">Declared prerequisites</StepLabel>
                       <p className="up-seg-note">
-                        The Skillpack helper requests <b>skills:read</b>, then <b>secrets:read</b> only when
-                        needed, both constrained to workspace <span className="mono">{workspaceId}</span>.
-                        Request JWTs last 60 seconds; no PAT is included in this prompt.
+                        The native CLI installs the selected root package and reports prerequisites declared by the
+                        package. It does not read secret values during this prompt; review any missing configuration
+                        before deciding whether to manage it separately.
                       </p>
                     </div>
                     <div className="up-step">

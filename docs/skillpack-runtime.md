@@ -6,27 +6,26 @@ short notice: they never ask the model to send a tracking request or repair hook
 
 ## Install and diagnose
 
-Run the normal Skillpack bootstrap from the installed management skill:
+Install the native CLI with the official release installer, then configure the selected hosts:
 
 ```sh
-python3 scripts/bootstrap.py --summary --auto-update-skillpack
-python3 scripts/runtime_command.py doctor --json
+skillpack setup --tools codex,claude-code,opencode
+skillpack usage doctor --json
 ```
 
-On Windows use `python` if that is the Python launcher installed on the machine. Node.js and Python
-are setup dependencies already used by the management skill; the installed Go collector is standalone.
-No PATH or shell-profile changes are required. The helper invokes the active verified binary.
+See [Native Skillpack CLI](skillpack-cli.md) for API-key setup, platform paths and signed binary
+updates. New installs require neither Python nor Node; the OpenCode plugin runs inside its host.
+Existing `skillpack-runtime` commands remain compatible. Python/MJS bootstrap files remain only for
+an already-running legacy migration and are not invoked by native setup.
 
-Setup detects the native target, downloads a pinned release, verifies its Ed25519 manifest and archive
-SHA-256, executes a version self-test, then atomically selects the new version. Existing hooks and
-unrelated settings survive. Windows updates leave an in-use executable intact in its version directory.
-Failed downloads, invalid signatures and unavailable release assets leave the previous version active.
-Before the first public release is published, setup explicitly reports `distribution_unavailable`.
+`skillpack self update` verifies the Ed25519 release manifest and archive SHA-256, self-tests the
+new native binary, and preserves old version slots. Failed downloads or invalid signatures leave
+the active version unchanged. The release installer embeds expected per-platform archive digests.
 
 Codex may require review of new definitions in `/hooks`. Setup never writes trust hashes or bypasses
 workspace trust. Restart the agent after setup where it loads hook configuration only at startup.
 A configuration file is not proof of collection: check doctor for an observed hook and last capture.
-Use the same helper with `sync` to retry pending delivery or `watch` for an explicit continuous worker.
+Use `skillpack usage sync` to retry pending delivery or `skillpack usage watch` for an explicit continuous worker.
 The default worker wakes on agent activity and exits after 120 seconds idle; no login daemon is installed.
 
 ## What counts
@@ -63,8 +62,8 @@ that location. SQLite holds the bounded queue, verified inventory, session polic
 Multiple copies/versions of one skill are distinct installations; symlink aliases resolve locally.
 
 ```sh
-python3 scripts/runtime_command.py telemetry disable
-python3 scripts/runtime_command.py telemetry enable
+skillpack usage telemetry disable
+skillpack usage telemetry enable
 ```
 
 Disable persists globally and purges queued events. `SKILLPACK_TELEMETRY=0` excludes the calling session
@@ -87,7 +86,9 @@ configuration, `.opencode/plugins/skillpack-runtime.js` and `.agents/skillpack/u
 python3 .agents/skillpack/usage/setup.py
 ```
 
-Other cloud images run that command before starting the agent. It verifies the committed inventory,
+This is the legacy compatibility setup used by existing images. New images with the native CLI run
+`skillpack setup --tools codex,claude-code,opencode --project .` before starting the agent. Native setup
+also verifies and registers the existing committed inventory. The legacy helper verifies the inventory,
 installs the signed binary inside that machine, and registers the project paths. The hook is offline
 and bounded; it never downloads a binary during a tool call. Re-run setup after a repository skill
 update. No machine-specific paths or credentials belong in Git; neither AGENTS.md nor CLAUDE.md changes.
@@ -124,7 +125,7 @@ patch records its parent version/checksum. Archives, authorship, dependencies, l
 are preserved. A source/storage mismatch aborts publication. A concurrent publish wins; retry rereads
 latest rather than overwriting it. Completed migrations are skipped on rerun.
 
-Skillpack bootstrap automatically applies these technical patches to clean user installs with matching
+The legacy Skillpack bootstrap automatically applies these technical patches to clean user installs with matching
 parents. Pinned public releases, customized copies and Git-tracked packages remain intact with explicit
 statuses. Public installs record their exact pin for runtime registration. Arbitrary CLI `skills pull`
 exports are not treated as agent installations. Repository packages are upgraded in a PR using

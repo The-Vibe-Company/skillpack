@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Db } from "@skillpack/db";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -105,7 +106,10 @@ const serviceMocks = vi.hoisted(() => {
 });
 
 const dbMocks = vi.hoisted(() => ({
-  withTenantContext: vi.fn(async (_ctx: unknown, fn: (database: unknown) => unknown) => fn({})),
+  withTenantContext: vi.fn(async <T>(_ctx: { orgId: string; userId: string }, fn: (database: Db) => Promise<T>): Promise<T> => {
+    // SAFETY: every database-facing service is mocked; no Drizzle method is reachable in this route proof.
+    return fn({} as Db);
+  }),
 }));
 
 const storageMocks = vi.hoisted(() => ({
@@ -115,29 +119,43 @@ const storageMocks = vi.hoisted(() => ({
 
 const skillsMocks = vi.hoisted(() => ({ validateSkillArchive: vi.fn() }));
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- server startup is outside this route behavior proof.
 vi.mock("@hono/node-server", () => ({ serve: vi.fn() }));
 
+type MockUser = { id: string; email: string; name: string; emailVerified?: boolean };
+type MockSession = { user: MockUser; session: { id: string; userId?: string } } | null;
+type MockAgentAuth = {
+  actor: MockUser;
+  workspaceId: string;
+  capability: string;
+  session: { agentId: string; agent: { capabilityGrants: never[] }; user: MockUser };
+};
 const authMocks = vi.hoisted(() => ({
-  getSession: vi.fn(async (): Promise<unknown | null> => null),
-  authenticateAgentRequest: vi.fn(async (): Promise<unknown | null> => null),
+  getSession: vi.fn(async (): Promise<MockSession> => null),
+  authenticateAgentRequest: vi.fn(async (): Promise<MockAgentAuth | null> => null),
 }));
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- authentication is supplied by the route harness.
 vi.mock("@skillpack/auth", () => ({
   auth: { api: { getSession: authMocks.getSession }, handler: vi.fn(), $Infer: {} },
   authenticateAgentRequest: authMocks.authenticateAgentRequest,
   registerAgentCapabilityExecutor: vi.fn(() => () => undefined),
 }));
 
+// oxlint-disable-next-line anti-slop/no-module-mocking -- the tenant callback is tested through a typed fake database.
 vi.mock("@skillpack/db", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@skillpack/db")>()),
   ...dbMocks,
 }));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- service behavior is isolated to package identity assertions.
 vi.mock("@skillpack/core/services", () => serviceMocks);
+// oxlint-disable-next-line anti-slop/no-module-mocking -- object storage is outside the route identity proof.
 vi.mock("@skillpack/storage", async (importActual) => ({
   ...await importActual<typeof import("@skillpack/storage")>(),
   putSkillArchive: storageMocks.putSkillArchive,
   deleteSkillArchive: storageMocks.deleteSkillArchive,
 }));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- archive validation is replaced with deterministic fixtures.
 vi.mock("@skillpack/skills", async (importActual) => {
   const actual = await importActual<typeof import("@skillpack/skills")>();
   return { ...actual, validateSkillArchive: skillsMocks.validateSkillArchive };
@@ -552,6 +570,35 @@ describe("POST /v1/tokens", () => {
     }));
   });
 
+  it("defaults a human name-only issuance to every current capability", async () => {
+    authMocks.getSession.mockResolvedValueOnce({
+      user: { ...actorA, emailVerified: true },
+      session: { id: "session-1", userId: actorA.id },
+    });
+    serviceMocks.listOrgs.mockResolvedValueOnce([{ org_id: "org-1" }]);
+    serviceMocks.issueApiToken.mockResolvedValueOnce({
+      id: "token-full",
+      token: "cmp_pat_synthetic_full",
+      prefix: "cmp_pat_synthe",
+      scopes: ["skills:read", "skills:write", "secrets:read", "secrets:write", "database:read", "database:write", "public-skills:install"],
+      expiresAt: new Date("2026-11-01T00:00:00.000Z"),
+      targetWorkspaceId: null,
+    });
+
+    const response = await app.request("/v1/tokens", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ name: "native CLI" }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(serviceMocks.issueApiToken).toHaveBeenCalledWith(expect.objectContaining({
+      orgId: "org-1",
+      name: "native CLI",
+      scopes: ["skills:read", "skills:write", "secrets:read", "secrets:write", "database:read", "database:write", "public-skills:install"],
+    }));
+  });
+
   it("issues the exact active Agent Auth snapshot with org, TTL, provenance, and target binding", async () => {
     const workspaceId = "00000000-0000-4000-8000-000000000001";
     authMocks.authenticateAgentRequest.mockResolvedValueOnce({
@@ -564,7 +611,7 @@ describe("POST /v1/tokens", () => {
       scopes: ["skills:read", "database:read", "database:write", "public-skills:install"],
       expiresAt: new Date(Date.now() + 10 * 60_000),
     });
-    serviceMocks.issueApiToken.mockImplementationOnce(async (input: Record<string, unknown>) => ({
+    serviceMocks.issueApiToken.mockImplementationOnce(async (input: { scopes: string[]; expiresAt: Date }) => ({
       id: "token-agent",
       token: "cmp_pat_synthetic_agent",
       prefix: "cmp_pat_synthe",
@@ -602,6 +649,7 @@ describe("POST /v1/tokens", () => {
         targetWorkspaceId: "conductor-workspace-1",
       },
     }));
+    // SAFETY: the preceding expect verifies the final issuance call contains a Date expiresAt field.
     const issuedCall = serviceMocks.issueApiToken.mock.calls.at(-1)?.[0] as { expiresAt: Date };
     expect(issuedCall.expiresAt.getTime()).toBeGreaterThan(Date.now());
     expect(issuedCall.expiresAt.getTime()).toBeLessThanOrEqual(Date.now() + 10 * 60_000);

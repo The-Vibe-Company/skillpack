@@ -48,7 +48,7 @@ describe("companion skill package + row", () => {
     const pkg = await getSkillpackSkillPackage();
     expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.118.2");
+    expect(pkg.version).toBe("1.119.0");
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -107,8 +107,8 @@ describe("companion skill package + row", () => {
     const row = await buildSkillpackSkillRow(null, workspaceId);
     expect(row.status).toBe("none");
     expect(row.workspaceId).toBe(workspaceId);
-    expect(row.description).toContain("SKILL.md");
-    expect(row.description).toContain("self-update");
+    expect(row.description).toContain("native CLI");
+    expect(row.description).toContain("API key");
     expect(row.notes).toContain("companion.json");
     expect(row.notes).toContain("skills.lock.json");
     expect(row.installedVersion).toBeNull();
@@ -119,11 +119,11 @@ describe("companion skill package + row", () => {
     expect(row.commands.length).toBeGreaterThan(0);
     expect(row.commands).toContainEqual({
       name: "Connect an agent",
-      desc: "Discover the instance and approve delegated, progressively requested Agent Auth capabilities for one workspace.",
+      desc: "Connect the native CLI with an API key and verify the selected workspace.",
     });
     expect(row.commands).toContainEqual({
-      name: "Bootstrap health check",
-      desc: "Gather workspace, self-update, local integrity, and installed-skill context in one fast pass.",
+      name: "Check CLI health",
+      desc: "Inspect credentials, package integrity, hook setup and observed usage with skillpack doctor.",
     });
     expect(row.commands).toContainEqual({
       name: "Publish a skill",
@@ -138,8 +138,8 @@ describe("companion skill package + row", () => {
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
     const changelog = row.changes.join("\n");
-    expect(changelog).toContain("deleted or incomplete legacy install targets");
-    expect(changelog).toContain("stale lockfile entries cannot block hook setup");
+    expect(changelog).toContain("native Skillpack CLI");
+    expect(changelog).toContain("Preserve legacy bootstrap payload");
     // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
     const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
       metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };
@@ -316,68 +316,42 @@ describe("companion skill package + row", () => {
     const billingChanges = manifest.metadata?.changelog?.find((entry) => entry.version === "1.19.0")?.changes?.join("\n") ?? "";
     expect(billingChanges).toContain("Documents the managed SaaS Free and Pro skill entitlements");
     expect(billingChanges).toContain("structured entitlement 403 responses");
-    // The install prompt drives the report-back call and leaves placeholders for the client.
-    expect(row.prompts.install).toContain("/local-skills/skillpack/package");
-    expect(row.prompts.install).toContain("/local-skills/skillpack/installed");
-    expect(row.prompts.install).toContain("python3 scripts/bootstrap.py --summary");
+    // The install prompt drives the native CLI and leaves non-secret placeholders for the client.
+    expect(row.prompts.install).toContain("skillpack install skillpack --version");
+    expect(row.prompts.install).toContain("skillpack auth login --api-url {base}");
+    expect(row.prompts.install).toContain("SKILLPACK_API_KEY");
+    expect(row.prompts.install).toContain("skillpack setup --tools");
     expect(row.prompts.install).toContain("{base}");
     expect(row.prompts.install).toContain("{workspaceId}");
     expect(row.prompts.install).not.toContain("{token}");
-    expect(row.prompts.install).toContain("@auth/agent-cli@0.5.1");
     expect(row.prompts.install).toContain("Claude Code, Codex, OpenCode, Grok Bot, OpenClaw, or Hermes");
     expect(row.prompts.install).toContain("~/.cursor/skills");
     expect(row.prompts.install).toContain(".cursor/skills");
-    expect(row.prompts.install).toContain("Cursor's desktop assistant");
     expect(row.prompts.install).toContain("Hermes is global-only");
-    expect(row.prompts.install).toContain("do not offer project scope for Hermes");
-    expect(row.prompts.install).toContain("~/.hermes/skills/<slug>");
     expect(row.prompts.install).toContain("OpenCode");
     expect(row.prompts.install).toContain("OpenClaw");
     expect(row.prompts.install).toContain(pkg.version);
   });
 
-  it("revalidates live Agent Auth state and requests or reconnects with real CLI 0.5.1 commands", () => {
+  it("keeps every generated management prompt on the native API-key CLI flow", () => {
     const prompts = buildSkillpackSkillPrompts("1.26.0");
-    const prompt = prompts.install;
-    const cli = "npx --yes @auth/agent-cli@0.5.1";
-    expect(prompt).toContain(`${cli} --storage-dir "$HOME/.companion/agent-auth" --url="$origin" discover "$origin"`);
-    expect(prompt).toContain(`${cli} --storage-dir "$HOME/.companion/agent-auth" --url="$origin" connection "$agent_id"`);
-    expect(prompt).toContain(`${cli} --storage-dir "$HOME/.companion/agent-auth" --url="$origin" status "$agent_id"`);
-    expect(prompt).toContain(`${cli} --storage-dir "$HOME/.companion/agent-auth" --url="$origin" request "$agent_id" --capabilities skills:read`);
-    expect(prompt).toContain(`${cli} --storage-dir "$HOME/.companion/agent-auth" --url="$origin" connect --provider "$origin"`);
-    expect(prompt).toContain('--constraints \'{"skills:read":{"workspaceId":{"eq":"{workspaceId}"}}}\'');
-    expect(prompt).toContain("agent_capability_grants contains an active skills:read grant");
-    expect(prompt).toContain("agent is active but that grant is absent or non-active");
-    expect(prompt).toContain("status is not active (including revoked, rejected, or expired)");
-    expect(prompt).toContain("agent_not_found");
-    expect(prompt).toContain("host_revoked");
-    expect(prompt).toContain("host_not_found");
-    expect(prompt).toContain("remove the revoked ~/.companion/agent-auth/host.json identity");
-    expect(prompt.split('status "$agent_id"')).toHaveLength(4);
-    expect(prompt.indexOf('connection "$agent_id"')).toBeLessThan(prompt.indexOf('status "$agent_id"'));
-    expect(prompt.indexOf('status "$agent_id"')).toBeLessThan(prompt.indexOf('request "$agent_id"'));
-    expect(prompt).not.toContain(" connections ");
-    expect(prompt).not.toContain("{token}");
-    expect(prompt).toContain("schema-v3 ~/.companion/credentials.json");
-    expect(prompt).toContain("Migrate a schema-v2 token to schema v3 under legacyPat without using it");
-    expect(prompts.update).toContain("python3 scripts/bootstrap.py --json --auto-update-skillpack");
-    expect(prompts.update).toContain("local_customizations");
-    expect(prompts.update).toContain("do not use it silently");
-    expect(prompts.use).toContain("Never fall back to a PAT unless I explicitly select legacy-pat mode");
-    expect(prompts.install).toContain("/local-skills/skillpack/installed");
-    expect(prompts.onboarding).toContain("Guided onboarding");
-    expect(prompts.onboarding).toContain("GET /getting-started");
+    const prompt = Object.values(prompts).join("\n");
+    expect(prompt).toContain("skillpack auth login --api-url {base}");
+    expect(prompt).toContain("skillpack auth status --json");
+    expect(prompt).toContain("SKILLPACK_API_KEY");
+    expect(prompt).toContain("skillpack update --all --dry-run");
+    expect(prompt).toContain("skillpack skills publish FOLDER --scope org");
+    expect(prompt).toContain("skillpack api METHOD /v1/path --input FILE");
+    expect(prompt).not.toMatch(/Agent Auth|agent-cli|npx\b|python(?:3)?\b|bootstrap\.py|mint a PAT|paste (?:the )?(?:API )?key/i);
+    expect(prompts.onboarding).toContain("getting started onboarding");
+    expect(prompts.onboarding).toContain("/v1/getting-started");
     expect(prompts.onboarding).toContain("new conversation in {tool}");
     expect(prompts.resume).toContain("first_incomplete_step");
     expect(prompts.resume).toContain("English or French");
   });
 
-  it("bundles mandatory self-update and explicit publish placement instructions", async () => {
+  it("bundles native management instructions and legacy in-flight compatibility payload", async () => {
     const skillMd = await readFile(join(skillpackSkillDir(), "SKILL.md"), "utf8");
-    // SAFETY: the bundled manifest is this repo's companion.json and always carries a semver version string.
-    const skillpackManifest = JSON.parse(
-      await readFile(join(skillpackSkillDir(), "companion.json"), "utf8"),
-    ) as { version: string };
     const apiRef = await readFile(join(skillpackSkillDir(), "reference", "api.md"), "utf8");
     const checkScript = await readFile(join(skillpackSkillDir(), "scripts", "check_updates.py"), "utf8");
     const bootstrapScript = await readFile(join(skillpackSkillDir(), "scripts", "bootstrap.py"), "utf8");
@@ -386,54 +360,21 @@ describe("companion skill package + row", () => {
     const guardScript = await readFile(join(skillpackSkillDir(), "scripts", "skill_guard.py"), "utf8");
     expect(skillMd).not.toContain("companion_version:");
     expect(skillMd).toContain("compatibility: claude-code codex opencode grok-bot");
-    expect(skillMd).toContain("companion.json.version");
-    expect(skillMd).toContain("https://skillpack.app/schemas/companion-manifest.v2.schema.json");
+    expect(skillMd).toContain("companion.json");
+    for (const command of [
+      "skillpack auth status --json", "skillpack auth login --api-url",
+      "skillpack skills validate", "skillpack skills publish", "skillpack install",
+      "skillpack update --all", "skillpack sync --frozen", "skillpack secrets sync",
+      "skillpack db query", "skillpack self update", "skillpack doctor --json",
+    ]) expect(skillMd).toContain(command);
     expect(skillMd).toContain("skills.lock.json");
-    expect(skillMd).toContain("GET /skills?installed=true");
-    expect(skillMd).toContain("GET /public/skills/{share_token}");
-    expect(skillMd).toContain("/s/{share_token}");
-    expect(skillMd).toContain("python3 scripts/bootstrap.py --json --auto-update-skillpack");
-    expect(skillMd).toContain("reason: \"local_customizations\"");
-    expect(skillMd).toContain("executes only on the user's machine");
-    expect(skillMd).toContain("skills.log.json");
-    expect(skillMd).toContain("COMPANION_WORKSPACE_ID");
-    expect(skillMd).toContain("Never write the token to this lockfile");
-    expect(skillMd).toContain("## Mandatory startup bootstrap");
-    expect(skillMd).toContain("only once per conversation");
-    expect(skillMd).toContain("do not repeat it on later Skillpack turns");
-    expect(skillMd).toContain("Do not validate, publish, update, archive, label, install");
-    expect(skillMd).toContain("GET /local-skills/skillpack");
-    expect(skillMd).toContain("POST /tokens/refresh");
-    expect(skillMd).toContain("no more than 30 days");
-    expect(skillMd).toContain("integrity");
-    expect(skillMd).toContain("POST /local-skills/skillpack/installed");
-    expect(skillMd).toContain(`"version":"${skillpackManifest.version}"`);
-    expect(skillMd).toContain("original preserved at <path>");
-    expect(skillMd).toContain("GET /v1/schemas/companion-manifest.v2.schema.json");
-    expect(skillMd).toContain("POST /skills/{slug}/install");
-    expect(skillMd).toContain("After a successful publish from this Skillpack skill");
-    expect(skillMd).toContain("After any successful publish or re-publish, include a skill link");
-    expect(skillMd).toContain("Skill link: ${webBase}/s/{share_token}");
-    expect(skillMd).toContain("GET /skills?lib=org");
-    expect(skillMd).toContain("`GET /skills/{slug}` is also token-readable with");
-    expect(skillMd).toContain("GET /orgs/current/skill-naming-policy");
-    expect(skillMd).toContain("returns `{ \"policy\": string | null }`. If");
-    expect(skillMd).toContain("`policy` is a string, apply that convention");
-    expect(skillMd).toContain("convention when naming the skill");
-    expect(skillMd).toContain("If `policy` is `null`, do not impose");
-    expect(skillMd).toContain("Before any real `POST /skills` upload for a brand-new skill");
-    expect(skillMd).toContain("Personal / My Skills");
-    expect(skillMd).toContain("Org / everyone");
-    expect(skillMd).toContain("Use an existing folder/label");
-    expect(skillMd).toContain("Create/use a new folder/label");
-    expect(skillMd).toContain("No folder/label");
-    expect(skillMd).toContain("Always include `scope=personal` or `scope=org` explicitly");
-    expect(skillMd).toContain("re-publish never changes the skill's existing labels");
-    expect(skillMd).toContain("If the library is not known from the");
-    expect(skillMd).toContain("workspace URL looks wrong");
-    expect(skillMd).toContain("Dependency preflight follows the workspace access model");
-    expect(skillMd).not.toContain("Publishing defaults to `org`");
-    expect(skillMd).not.toMatch(/owner_team[\s\S]{0,120}`scope`[\s\S]{0,120}parameters (?:is|are) rejected/);
+    expect(skillMd).toContain("Old limited keys stay limited");
+    expect(skillMd).toContain("same-slug, different-content");
+    expect(skillMd).toContain("Re-publishing preserves existing labels");
+    expect(skillMd).toContain("server remains authoritative");
+    expect(skillMd).toContain("compatibility payload");
+    expect(skillMd).not.toContain("python3 scripts/");
+    expect(skillMd).not.toContain("## Mandatory startup bootstrap");
     expect(apiRef).toContain("`expect_skill_id` / `scope` / `dependency` / `label` fields");
     expect(apiRef).toContain("The Skillpack skill must send `scope=personal` or `scope=org`");
     expect(apiRef).toContain(

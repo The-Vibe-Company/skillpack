@@ -3,7 +3,7 @@ package runtime
 import "time"
 
 const (
-	RuntimeVersion       = "0.1.0"
+	RuntimeVersion       = "0.2.0"
 	SchemaVersion        = 1
 	MaxEventBytes        = 4 * 1024
 	MaxQueueEvents       = 10_000

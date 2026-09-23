@@ -6,6 +6,7 @@ import {
   API_TOKEN_TTL_MS,
   addOrgAccessDomain,
   deriveAgentApiTokenGrantSnapshot,
+  getCurrentApiTokenMetadata,
   getSkillNamingPolicy,
   issueApiToken,
   listApiTokens,
@@ -14,6 +15,7 @@ import {
   updateUserProfile,
   type ActorContext,
 } from "../src/services";
+import { TOKEN_SCOPES } from "@skillpack/contracts";
 
 const ORG_A = "00000000-0000-0000-0000-00000000000a";
 const ORG_B = "00000000-0000-0000-0000-00000000000b";
@@ -461,6 +463,30 @@ describe("issueApiToken", () => {
     expect(issued.expiresAt).toBe(values.expiresAt);
   });
 
+  it("issues every current capability when human callers omit scopes", async () => {
+    const { database, calls } = fakeDb({ role: "developer" });
+
+    const issued = await issueApiToken({
+      actor: developer,
+      orgId: ORG_A,
+      database,
+    });
+
+    expect(tokenInsertValues(calls).scopes).toEqual(TOKEN_SCOPES);
+    expect(issued.scopes).toEqual(TOKEN_SCOPES);
+  });
+
+  it("does not default Agent Auth provenance to full capabilities", async () => {
+    const { database } = fakeDb({ role: "developer" });
+
+    await expect(issueApiToken({
+      actor: developer,
+      orgId: ORG_A,
+      source: { type: "agent_auth", agentId: "agent-1" },
+      database,
+    })).rejects.toThrow("Agent Auth token scopes are required");
+  });
+
   it("honors an explicit ttlMs override", async () => {
     const { database, calls } = fakeDb({ role: "developer" });
     const ttlMs = 1000 * 60 * 5;
@@ -634,6 +660,54 @@ describe("listApiTokens", () => {
 
     const rows = await listApiTokens({ actor: developer, orgId: ORG_A, database });
     expect(rows[0]?.scopes).toEqual(["database:read", "database:write"]);
+  });
+});
+
+describe("getCurrentApiTokenMetadata", () => {
+  it("returns only active metadata for the exact bearer token", async () => {
+    const database = {
+      query: {
+        apiTokens: {
+          findFirst: vi.fn(async () => ({
+            id: "tok-current",
+            tokenPrefix: "cmp_pat_abc123",
+            scopes: ["database:write"],
+            expiresAt: new Date("2026-12-22T00:00:00.000Z"),
+            revokedAt: null,
+          })),
+        },
+      },
+    } as unknown as Db;
+
+    await expect(getCurrentApiTokenMetadata({
+      rawToken: "cmp_pat_secret-value",
+      actor: developer,
+      orgId: ORG_A,
+      database,
+    })).resolves.toEqual({
+      id: "tok-current",
+      prefix: "cmp_pat_abc123",
+      scopes: ["database:read", "database:write"],
+      expires_at: "2026-12-22T00:00:00.000Z",
+    });
+    expect(JSON.stringify(await getCurrentApiTokenMetadata({
+      rawToken: "cmp_pat_secret-value",
+      actor: developer,
+      orgId: ORG_A,
+      database,
+    }))).not.toContain("secret-value");
+  });
+
+  it("fails closed when the token row is absent or revoked", async () => {
+    const findFirst = vi.fn(async () => undefined);
+    const database = { query: { apiTokens: { findFirst } } } as unknown as Db;
+
+    await expect(getCurrentApiTokenMetadata({
+      rawToken: "cmp_pat_missing",
+      actor: developer,
+      orgId: ORG_A,
+      database,
+    })).resolves.toBeNull();
   });
 });
 

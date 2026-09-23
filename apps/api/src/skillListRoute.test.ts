@@ -4,6 +4,13 @@ import type { Db } from "@skillpack/db";
 process.env.COMPANION_SECRETS_MASTER_KEY ??= Buffer.alloc(32, 7).toString("base64");
 
 const serviceMocks = vi.hoisted(() => {
+  type SkillVersionRow = {
+    id?: string;
+    version: string;
+    checksum?: string;
+    size_bytes?: number;
+    created_at?: string;
+  };
   const noop = vi.fn(async () => undefined);
   return {
     ApiTokenRefreshError: class ApiTokenRefreshError extends Error {},
@@ -46,7 +53,7 @@ const serviceMocks = vi.hoisted(() => {
     listOrgs: vi.fn(),
     listSkillComments: noop,
     listSkills: vi.fn(),
-    listSkillVersions: noop,
+    listSkillVersions: vi.fn(async (): Promise<SkillVersionRow[]> => []),
     publishSkillVersion: noop,
     assertCanPublishSkillVersion: noop,
     renameSkill: vi.fn(),
@@ -907,6 +914,54 @@ describe("GET /v1/skills/:slug", () => {
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual(row);
     expect(serviceMocks.getSkillBySlug).toHaveBeenCalledWith(
+      expect.objectContaining({ actor: actorA, orgId: "org-1", slug: "workspace-skill" }),
+    );
+  });
+});
+
+describe("GET /v1/skills/:slug/versions", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    authMocks.getSession.mockResolvedValue(null);
+    serviceMocks.resolveApiToken.mockImplementation(async (token: string) => tokenFor(token));
+    serviceMocks.listSkillVersions.mockResolvedValue([{ id: "version-1", version: "1.2.3" }]);
+  });
+
+  it("allows a skills:read PAT to list versions for the bound workspace", async () => {
+    const res = await app.request("/v1/skills/workspace-skill/versions", {
+      headers: { Authorization: "Bearer read-a", "x-companion-org": "other-org" },
+    });
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual([{ id: "version-1", version: "1.2.3" }]);
+    expect(serviceMocks.listSkillVersions).toHaveBeenCalledWith(
+      expect.objectContaining({ actor: actorA, orgId: "org-1", slug: "workspace-skill" }),
+    );
+  });
+
+  it("rejects a PAT without skills:read before resolving versions", async () => {
+    const res = await app.request("/v1/skills/workspace-skill/versions", {
+      headers: { Authorization: "Bearer write-only" },
+    });
+
+    expect(res.status).toBe(401);
+    await expect(res.json()).resolves.toMatchObject({ ok: false, error: expect.stringContaining("skills:read") });
+    expect(serviceMocks.listSkillVersions).not.toHaveBeenCalled();
+  });
+
+  it("keeps cookie-session version access unchanged", async () => {
+    authMocks.getSession.mockResolvedValue({
+      user: actorA,
+      session: { id: "session-1" },
+    });
+    serviceMocks.listOrgs.mockResolvedValue([{ org_id: "org-1" }]);
+
+    const res = await app.request("/v1/skills/workspace-skill/versions", {
+      headers: { cookie: "session=value" },
+    });
+
+    expect(res.status).toBe(200);
+    expect(serviceMocks.listSkillVersions).toHaveBeenCalledWith(
       expect.objectContaining({ actor: actorA, orgId: "org-1", slug: "workspace-skill" }),
     );
   });

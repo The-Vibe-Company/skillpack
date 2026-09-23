@@ -163,7 +163,7 @@ export async function listTokens(): Promise<ApiTokenRow[]> {
 }
 
 /** Issue a new personal access token. Returns the one-time plaintext `token`. */
-export async function issueToken(input: { name: string; scopes: TokenScope[] }): Promise<IssuedToken> {
+export async function issueToken(input: { name: string; scopes?: TokenScope[] }): Promise<IssuedToken> {
   return apiFetch("/v1/tokens", {
     method: "POST",
     body: JSON.stringify(input),

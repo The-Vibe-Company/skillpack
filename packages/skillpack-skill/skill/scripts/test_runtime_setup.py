@@ -13,7 +13,7 @@ from pathlib import Path
 
 import companion_lib
 from runtime_command import VISIBLE_COMMANDS
-from runtime_setup import (atomic_json, install_launcher, install_runtime, merge_hooks, runtime_target,
+from runtime_setup import (atomic_json, extract_runtime, install_launcher, install_runtime, merge_hooks, runtime_target,
                            install_opencode_plugin, windows_hook_command,
                            setup_runtime, verified_inventory, verify_manifest)
 
@@ -185,6 +185,39 @@ class RuntimeSetupTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'versions directory'):
                 install_runtime({'version': '0.1.0', 'baseUrl': 'https://example.test/runtime', 'publicKey': 'invalid'}, fresh,
                                 fetch=lambda _url, _limit: b'{}')
+
+    def test_native_archive_may_include_cli_without_changing_legacy_runtime_selection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runtime_binary = 'skillpack-runtime.exe' if runtime_target().startswith('windows_') else 'skillpack-runtime'
+            cli_binary = 'skillpack.exe' if runtime_target().startswith('windows_') else 'skillpack'
+            files = {
+                runtime_binary: b'legacy runtime',
+                cli_binary: b'native cli',
+                'LICENSE': b'license',
+                'NOTICE': b'notice',
+                'SOURCE.json': b'{}',
+            }
+            for zipped in (False, True):
+                stream = io.BytesIO()
+                if zipped:
+                    with zipfile.ZipFile(stream, 'w') as archive:
+                        for name, value in files.items():
+                            archive.writestr(name, value)
+                else:
+                    with tarfile.open(fileobj=stream, mode='w:gz') as archive:
+                        for name, value in files.items():
+                            member = tarfile.TarInfo(name)
+                            member.size = len(value)
+                            member.mode = 0o755 if name in (runtime_binary, cli_binary) else 0o644
+                            archive.addfile(member, io.BytesIO(value))
+                destination = root / ('zip' if zipped else 'tar')
+                destination.mkdir()
+                extract_runtime(stream.getvalue(), destination, runtime_binary, zipped)
+                self.assertEqual((destination / runtime_binary).read_bytes(), b'legacy runtime')
+                self.assertEqual((destination / cli_binary).read_bytes(), b'native cli')
+                self.assertTrue((destination / runtime_binary).stat().st_mode & 0o100)
+                self.assertTrue((destination / cli_binary).stat().st_mode & 0o100)
 
     def test_runtime_lockfile_write_is_atomic_and_launcher_install_is_race_safe(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -414,8 +447,8 @@ class RuntimeSetupTests(unittest.TestCase):
     def test_signed_native_binary_installs_and_corruption_cannot_replace_it(self):
         native = Path(os.environ['SKILLPACK_RUNTIME_TEST_BINARY']).resolve()
         binary = native.read_bytes()
-        version = '0.1.0'
-        base = 'https://example.test/runtime-v0.1.0'
+        version = '0.2.0'
+        base = 'https://example.test/runtime-v0.2.0'
         assets, responses = [], {}
         for target in ('darwin_amd64', 'darwin_arm64', 'linux_amd64', 'linux_arm64', 'windows_amd64', 'windows_arm64'):
             windows = target.startswith('windows_')
@@ -444,7 +477,7 @@ class RuntimeSetupTests(unittest.TestCase):
             root = Path(tmp)
             result = install_runtime(config, root, fetch=lambda url, limit: responses[url])
             self.assertEqual(result['status'], 'installed')
-            self.assertEqual(subprocess.check_output([str(root / result['binary']), '--version']).decode().strip(), 'skillpack-runtime 0.1.0')
+            self.assertEqual(subprocess.check_output([str(root / result['binary']), '--version']).decode().strip(), 'skillpack-runtime 0.2.0')
             self.assertEqual(install_runtime(config, root, fetch=lambda url, limit: responses[url])['status'], 'current')
             selected = next(asset for asset in assets if asset['target'] == runtime_target())
             responses[selected['url']] = b'corrupted'

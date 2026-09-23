@@ -40,9 +40,9 @@ const baseSkill: LocalSkillRow = {
   changes: [],
   integrity: { packageChecksum: `sha256:${"a".repeat(64)}`, files: { "SKILL.md": `sha256:${"b".repeat(64)}` } },
   prompts: {
-    install: 'install {base} {workspaceId} with Agent Auth agent=<your assistant>',
-    update: "update {base} {workspaceId} with Agent Auth",
-    use: "use {base} {workspaceId} with Agent Auth",
+    install: 'install {base} {workspaceId} with native skillpack agent=<your assistant> SKILLPACK_API_KEY',
+    update: "update {base} {workspaceId} with native skillpack",
+    use: "use {base} {workspaceId} with native skillpack",
     onboarding: "onboard {base} {workspaceId} in {tool}",
     resume: "resume {base} {workspaceId} in {tool}",
   },
@@ -137,7 +137,8 @@ describe("LocalSkillsView", () => {
     });
 
     expect(writeText).toHaveBeenCalledWith(expect.stringContaining("agent=OpenCode"));
-    expect(writeText).toHaveBeenCalledWith(expect.stringContaining("Agent Auth"));
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining("SKILLPACK_API_KEY"));
+    expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining("Agent Auth"));
     expect(writeText).not.toHaveBeenCalledWith(expect.stringContaining("cmp_pat_"));
   });
 

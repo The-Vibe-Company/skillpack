@@ -36,6 +36,7 @@ import {
   MAX_COMMENT_IMAGE_BYTES,
   skillpackManifestSchema,
   expandTokenScopes,
+  TOKEN_SCOPES,
   fallbackSkillpackManifest,
   parseAllowedTools,
   parseStoredSkillFrontmatter,
@@ -4322,7 +4323,8 @@ export function deriveAgentApiTokenGrantSnapshot(
 export async function issueApiToken(input: {
   actor: ActorContext;
   orgId: string;
-  scopes: TokenScope[];
+  /** Human callers may omit scopes for the full current capability set. */
+  scopes?: TokenScope[];
   name?: string;
   ttlMs?: number;
   expiresAt?: Date;
@@ -4341,14 +4343,18 @@ export async function issueApiToken(input: {
   targetWorkspaceId: string | null;
 }> {
   const database = input.database ?? db;
-  if (!input.scopes.length) throw new Error("at least one scope is required");
+  if (input.source?.type === "agent_auth" && input.scopes === undefined) {
+    throw new Error("Agent Auth token scopes are required");
+  }
+  const requestedScopes = input.scopes ?? [...TOKEN_SCOPES];
+  if (!requestedScopes.length) throw new Error("at least one scope is required");
   if (input.ttlMs !== undefined && input.expiresAt) {
     throw new Error("token lifetime must use either ttlMs or expiresAt");
   }
   if (input.ttlMs !== undefined && (!Number.isFinite(input.ttlMs) || input.ttlMs <= 0 || input.ttlMs > API_TOKEN_TTL_MS)) {
     throw new Error("token lifetime is outside the allowed range");
   }
-  const scopes = expandTokenScopes(input.scopes);
+  const scopes = expandTokenScopes(requestedScopes);
   const role = await getOrgRole(input.orgId, input.actor.id, database);
   if (!role) throw new Error("not a member of this organization");
   const secret = randomBytes(24).toString("hex");
@@ -4537,6 +4543,51 @@ export async function listApiTokens(input: {
     revoked_at: r.revokedAt ? r.revokedAt.toISOString() : null,
     created_at: r.createdAt.toISOString(),
   }));
+}
+
+/**
+ * Resolve metadata for one already-authenticated PAT inside its bound tenant.
+ *
+ * The caller must first use `resolveApiToken`, whose pre-tenant SECURITY DEFINER lookup proves the
+ * bearer is active and still belongs to a live member. This second lookup runs under tenant RLS,
+ * binds the hash to the resolved actor and organization, and deliberately omits every secret field.
+ */
+export async function getCurrentApiTokenMetadata(input: {
+  rawToken: string;
+  actor: ActorContext;
+  orgId: string;
+  database?: Db;
+}): Promise<{
+  id: string;
+  prefix: string;
+  scopes: TokenScope[];
+  expires_at: string;
+} | null> {
+  if (!input.rawToken.startsWith(API_TOKEN_PREFIX)) return null;
+  const database = input.database ?? db;
+  const row = await database.query.apiTokens.findFirst({
+    columns: {
+      id: true,
+      tokenPrefix: true,
+      scopes: true,
+      expiresAt: true,
+    },
+    where: and(
+      eq(schema.apiTokens.orgId, input.orgId),
+      eq(schema.apiTokens.userId, input.actor.id),
+      eq(schema.apiTokens.tokenHash, hashApiToken(input.rawToken)),
+      isNull(schema.apiTokens.revokedAt),
+    ),
+  });
+  if (!row || row.expiresAt.getTime() <= Date.now()) return null;
+  const parsedScopes = tokenScopesSchema.safeParse(row.scopes);
+  if (!parsedScopes.success) return null;
+  return {
+    id: row.id,
+    prefix: row.tokenPrefix,
+    scopes: expandTokenScopes(parsedScopes.data),
+    expires_at: row.expiresAt.toISOString(),
+  };
 }
 
 /**

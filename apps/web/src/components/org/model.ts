@@ -1,5 +1,5 @@
 /* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/require-safety-comment-for-type-assertion -- Existing settings route parser debt; the timezone field only extends the view model. */
-import type { BillingOverview, GettingStartedState, OrgRole } from "@skillpack/contracts";
+import type { BillingOverview, GettingStartedState, OrgRole, TokenScope } from "@skillpack/contracts";
 import type { MeVM } from "@/lib/types";
 
 /** Display fields for any user referenced by a membership. */
@@ -66,7 +66,11 @@ export interface Invite {
 export interface ApiKeyVM {
   id: string;
   name: string;
+  /** Legacy coarse capability label kept for existing settings consumers. */
   scope: "read" | "write";
+  /** Honest display classification: only the complete current scope set is full access. */
+  access: "full" | "limited";
+  scopes: TokenScope[];
   prefix: string; // e.g. "cmp_pat_…"
   last4: string; // last 4 visible chars (from the prefix; the secret is never stored)
   created: string; // formatted creation date
@@ -175,7 +179,7 @@ export interface OrgCtx {
   uploadWorkspaceLogo: (file: File) => Promise<void>;
   uploadUserAvatar: (file: File) => Promise<void>;
   removeUserAvatar: () => Promise<void>;
-  createApiKey: (name: string, scope: "read" | "write") => Promise<string>;
+  createApiKey: (name: string) => Promise<string>;
   revokeApiKey: (id: string) => void;
   setMemberRole: (orgId: string, userId: string, role: OrgRole) => void;
   removeMember: (orgId: string, userId: string) => void;

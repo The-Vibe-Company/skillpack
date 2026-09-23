@@ -1,5 +1,5 @@
-/* oxlint-disable anti-slop/no-module-mocking, anti-slop/require-safety-comment-for-type-assertion -- This existing route harness uses module seams and one inspected Request cast; the timezone assertion extends the same test boundary. */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Db } from "@skillpack/db";
 
 const serviceMocks = vi.hoisted(() => {
   const noop = vi.fn(async () => undefined);
@@ -7,6 +7,7 @@ const serviceMocks = vi.hoisted(() => {
     ApiTokenRefreshError: class ApiTokenRefreshError extends Error {},
     ensureUserBootstrap: noop,
     resolveApiToken: vi.fn(),
+    getCurrentApiTokenMetadata: vi.fn(),
     listOrgs: vi.fn(),
     getOnboardingState: vi.fn(),
     getMyAvatarUrl: vi.fn(),
@@ -17,6 +18,7 @@ const serviceMocks = vi.hoisted(() => {
 
 const authMocks = vi.hoisted(() => ({
   getSession: vi.fn(),
+  authenticateAgentRequest: vi.fn(async () => null),
   updateUser: vi.fn(),
   handler: vi.fn(),
   guardAgentAuthRemoteKeys: vi.fn<() => Promise<"allowed" | "remote-jwks" | "body-too-large">>(
@@ -24,7 +26,18 @@ const authMocks = vi.hoisted(() => ({
   ),
 }));
 
+const dbMocks = vi.hoisted(() => ({
+  withTenantContext: vi.fn(async <T>(_input: { orgId: string; userId: string }, fn: (database: Db) => Promise<T>): Promise<T> => {
+    // SAFETY: this route harness replaces every database-facing service; no Drizzle method is reachable.
+    const database = {} as Db;
+    Object.assign(database, { marker: "tenant-db" });
+    return fn(database);
+  }),
+}));
+
+// oxlint-disable-next-line anti-slop/no-module-mocking -- server startup is outside this route behavior proof.
 vi.mock("@hono/node-server", () => ({ serve: vi.fn() }));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- authentication is supplied by the route harness.
 vi.mock("@skillpack/auth", () => ({
   auth: {
     api: { getSession: authMocks.getSession, updateUser: authMocks.updateUser },
@@ -32,8 +45,15 @@ vi.mock("@skillpack/auth", () => ({
     $Infer: {},
   },
   guardAgentAuthRemoteKeys: authMocks.guardAgentAuthRemoteKeys,
+  authenticateAgentRequest: authMocks.authenticateAgentRequest,
   registerAgentCapabilityExecutor: vi.fn(() => () => undefined),
 }));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- the tenant callback is tested through a typed fake database.
+vi.mock("@skillpack/db", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@skillpack/db")>()),
+  ...dbMocks,
+}));
+// oxlint-disable-next-line anti-slop/no-module-mocking -- service behavior is isolated to test PAT and whoami branches.
 vi.mock("@skillpack/core/services", () => serviceMocks);
 
 import { app } from "./index";
@@ -42,6 +62,7 @@ describe("GET /v1/auth/whoami", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     authMocks.getSession.mockResolvedValue(null);
+    authMocks.authenticateAgentRequest.mockResolvedValue(null);
     authMocks.guardAgentAuthRemoteKeys.mockResolvedValue("allowed");
     serviceMocks.getUserTimezone.mockResolvedValue(null);
   });
@@ -81,6 +102,92 @@ describe("GET /v1/auth/whoami", () => {
       userId: "user-1",
       timezone: "Pacific/Auckland",
     });
+  });
+});
+
+describe("GET /v1/tokens/current", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    authMocks.getSession.mockResolvedValue(null);
+    serviceMocks.resolveApiToken.mockResolvedValue(null);
+    serviceMocks.getCurrentApiTokenMetadata.mockResolvedValue(null);
+    dbMocks.withTenantContext.mockImplementation(async (_input, fn) => {
+      // SAFETY: all database calls are mocked in this route harness; only the marker is observed by assertions.
+      const database = {} as Db;
+      Object.assign(database, { marker: "tenant-db" });
+      return fn(database);
+    });
+  });
+
+  it("returns the PAT identity, workspace, and metadata without exposing the secret", async () => {
+    const patActor = { id: "pat-user", email: "pat@example.test", name: "PAT User" };
+    serviceMocks.resolveApiToken.mockResolvedValue({
+      actor: patActor,
+      orgId: "org-pat",
+      scopes: ["skills:read", "skills:write", "secrets:read", "secrets:write", "database:read", "database:write", "public-skills:install"],
+      sourceType: "human",
+    });
+    serviceMocks.listOrgs.mockResolvedValue([{ org_id: "org-pat", name: "PAT Workspace", org_role: "developer" }]);
+    serviceMocks.getCurrentApiTokenMetadata.mockResolvedValue({
+      id: "token-pat",
+      prefix: "cmp_pat_abc123",
+      scopes: ["skills:read", "skills:write", "secrets:read", "secrets:write", "database:read", "database:write", "public-skills:install"],
+      expires_at: "2026-12-22T00:00:00.000Z",
+    });
+
+    const response = await app.request("/v1/tokens/current", {
+      headers: {
+        authorization: "Bearer cmp_pat_secret-value",
+        "x-companion-org": "org-cookie-hint",
+      },
+    });
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body).toEqual({
+      user: patActor,
+      workspace: { id: "org-pat", name: "PAT Workspace" },
+      token: {
+        id: "token-pat",
+        prefix: "cmp_pat_abc123",
+        scopes: ["skills:read", "skills:write", "secrets:read", "secrets:write", "database:read", "database:write", "public-skills:install"],
+        expires_at: "2026-12-22T00:00:00.000Z",
+      },
+    });
+    expect(JSON.stringify(body)).not.toContain("secret-value");
+    expect(serviceMocks.getCurrentApiTokenMetadata).toHaveBeenCalledWith(expect.objectContaining({
+      rawToken: "cmp_pat_secret-value",
+      actor: patActor,
+      orgId: "org-pat",
+      database: { marker: "tenant-db" },
+    }));
+    expect(dbMocks.withTenantContext).toHaveBeenCalledWith(
+      { orgId: "org-pat", userId: "pat-user" },
+      expect.any(Function),
+    );
+  });
+
+  it("requires a bearer PAT even when a browser cookie session exists", async () => {
+    authMocks.getSession.mockResolvedValue({
+      user: { id: "cookie-user", email: "cookie@example.test", name: "Cookie User" },
+      session: { id: "session-1" },
+    });
+
+    const response = await app.request("/v1/tokens/current");
+
+    expect(response.status).toBe(401);
+    expect(serviceMocks.resolveApiToken).not.toHaveBeenCalled();
+    expect(serviceMocks.getCurrentApiTokenMetadata).not.toHaveBeenCalled();
+  });
+
+  it("rejects revoked, expired, or unknown bearer tokens before querying metadata", async () => {
+    const response = await app.request("/v1/tokens/current", {
+      headers: { authorization: "Bearer cmp_pat_revoked" },
+    });
+
+    expect(response.status).toBe(401);
+    expect(serviceMocks.getCurrentApiTokenMetadata).not.toHaveBeenCalled();
+    expect(serviceMocks.listOrgs).not.toHaveBeenCalled();
   });
 });
 
@@ -199,6 +306,7 @@ describe("raw Agent Auth capability mutation routes", () => {
     });
     expect(allowed.status).toBe(200);
     expect(authMocks.handler).toHaveBeenCalledOnce();
+    // SAFETY: the route passes a Request to the Better Auth handler, and this test asserts that forwarded body.
     const forwarded = authMocks.handler.mock.calls[0]?.[0] as Request;
     expect(await forwarded.json()).toEqual({ host_id: "host-1", name: "Renamed host" });
   });

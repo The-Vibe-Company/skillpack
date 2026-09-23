@@ -155,7 +155,7 @@ export function classifyFiles(files, { forceFull = false } = {}) {
     );
 
   const runtime = full || uniqueFiles.some((file) => matchesAny(file, [
-    "runtime/", "scripts/runtime-", "scripts/test_runtime_project.py", ".gitattributes", ".agents/skills/", "packages/skillpack-skill/skill/", ".agents/skillpack/usage/", ".codex/hooks.json", ".claude/settings.json", ".opencode/plugins/",
+    "runtime/", "scripts/runtime-", "scripts/generate-native-contracts.ts", "scripts/test_runtime_project.py", ".gitattributes", ".agents/skills/", "packages/contracts/", "packages/skillpack-skill/skill/", ".agents/skillpack/usage/", ".codex/hooks.json", ".claude/settings.json", ".opencode/plugins/",
   ]));
   return { docs, design, quality, build, database, browser, containers, dependencies, skill, runtime, full };
 }
