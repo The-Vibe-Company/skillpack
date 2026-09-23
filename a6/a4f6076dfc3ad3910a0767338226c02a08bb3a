@@ -1,0 +1,340 @@
+runtime/internal/cli/cli_test.go
+  s_524f399a310bce::t_334f615f63a14b 1-9,11-30,36,43-47,117
+  s_524f399a310bce::t_a517bd5f2c0960 10,31-35,37-42,48-71,76,80,93
+  s_524f399a310bce::t_ac18438460176d 72-75,77-79,81-92,94-116
+  s_524f399a310bce::t_f4417f269a0574 118-144
+apps/web/src/components/skills/prompts.test.ts
+  s_524f399a310bce::t_7143517b0229ec 1-21
+packages/skillpack-skill/skill/scripts/runtime_setup.py
+  s_524f399a310bce::t_30d626f69de8ce 367-371,401-402
+.agents/skillpack/usage/runtime_setup.py
+  s_524f399a310bce::t_ae1275066d2528 367-371,401-402
+packages/skillpack-skill/src/package.test.ts
+  s_524f399a310bce::t_bbfc23665f8768 14-16,23-25
+  s_524f399a310bce::t_f7a3baf32dbbf3 1-13,17-19,26-28
+  s_524f399a310bce::t_7d1f86aa001536 20-22
+packages/skillpack-skill/src/package.ts
+  s_524f399a310bce::t_c4e9c523e59693 122-123
+  s_524f399a310bce::t_d76a339f99239a 142,167,179
+  s_524f399a310bce::t_e4346e6b271893 82,84-94,100-111,113-118,125-126,132,136,138-141,143-146,150-158,164,166,168-170,174-177,180-182
+  s_524f399a310bce::t_41ce86162192fa 95-99,119,129-130,165,178
+  s_524f399a310bce::t_af26616703f8fb 120-121,124,127-128
+apps/api/src/skillPublishRoute.test.ts
+  s_524f399a310bce::t_c5c589195eba7f 2,109-112
+  s_524f399a310bce::t_114127b601be33 573-601
+  s_524f399a310bce::t_3ba3879b4fe089 122,125-132,134-135,138,145,150,152,158
+  s_524f399a310bce::t_7fee38b213d561 614,652
+apps/web/src/components/org/ApiKeysPane.tsx
+  s_524f399a310bce::t_6d3cd302e13e3f 56
+  s_524f399a310bce::t_0f46411d02573f 93,110-111,124
+  s_524f399a310bce::t_00ff3a9b5df7e1 195-196
+  s_524f399a310bce::t_e3e3f4303ee3ab 49,59-61
+packages/contracts/test/agentOperations.test.ts
+  s_524f399a310bce::t_ea5dc06a6de415 19-22
+packages/contracts/src/agentOperations.ts
+  s_524f399a310bce::t_f217eed609d08f 58
+packages/contracts/test/token.test.ts
+  s_524f399a310bce::t_8f71777b9ac2dd 3,13-16
+  s_524f399a310bce::t_07faa9e8c110e2 17-19
+scripts/verify-change.mjs
+  s_524f399a310bce::t_e10458bc1b78be 20
+runtime/internal/runtime/cli.go
+  s_524f399a310bce::t_ca01cc5b10a2c5 85,97
+apps/web/src/app/s/[token]/PublicSkillActions.tsx
+  s_524f399a310bce::t_c03744e979655d 71-73
+  s_524f399a310bce::t_c0873b4963dd16 37-39,44-46
+  s_524f399a310bce::t_e12dddb0ce380f 19,22-26,28-32,35-36,40-43,48
+  s_524f399a310bce::t_7d542e08e83003 145
+scripts/ci-scope.test.mjs
+  s_524f399a310bce::t_2e21fa010033cf 181
+  s_524f399a310bce::t_472470eb30cbed 186
+apps/web/src/components/skills/SkillsApp.test.ts
+  s_524f399a310bce::t_1c4d380f034fbe 2140
+  s_524f399a310bce::t_229d93323c2a51 2082-2084,2114,2125
+runtime/internal/cli/private_unix.go
+  s_524f399a310bce::t_ece5e69b78698b 1-13
+  s_524f399a310bce::t_e294963d103bac 14-26
+runtime/internal/cli/client.go
+  s_524f399a310bce::t_19cb50627679fe 1-4,6-14,70,118,132-133,152-153
+  s_524f399a310bce::t_ece5e69b78698b 5,15-69,71-117,119-131,134-151,154-156
+  s_524f399a310bce::t_38be9c51ac37cb 157-178
+scripts/runtime-build.py
+  s_524f399a310bce::t_508aa051716e98 61-66,69-72,74,93,100,114
+apps/api/src/index.ts
+  s_524f399a310bce::t_12d40dfe5ebc2e 101,3911-3951
+  s_524f399a310bce::t_f217eed609d08f 2303-2305
+  s_524f399a310bce::t_f1ce5521b1e07c 78
+  s_524f399a310bce::t_e135dc34e3e050 2307
+  s_524f399a310bce::t_b1152224893b32 3952-3954
+runtime/internal/cli/package.go
+  s_524f399a310bce::t_5b206c5e370211 1-143,148
+  s_524f399a310bce::t_e712e8df201d8b 144-147,149-553
+runtime/cmd/skillpack/main.go
+  s_524f399a310bce::t_19cb50627679fe 1-7
+  s_524f399a310bce::t_564c43c59d325f 8
+runtime/internal/cli/lock.go
+  s_524f399a310bce::t_ece5e69b78698b 1-17
+  s_524f399a310bce::t_daec2fa7c8fc11 18-36
+apps/api/src/localSkills.test.ts
+  s_524f399a310bce::t_8f31eaf9e501a5 51,110,363
+  s_524f399a310bce::t_d3a101f8652f10 111,364
+  s_524f399a310bce::t_01566555a4972e 319-323,336,338-347
+  s_524f399a310bce::t_b75ccfad62a707 122,125-126,141-142,353,365-369,371-377
+apps/web/src/lib/org.ts
+  s_524f399a310bce::t_7b6f141dd23eea 166
+runtime/internal/cli/install.go
+  s_524f399a310bce::t_b5da05e9e85314 1-119,124
+  s_524f399a310bce::t_b0e8bb1c77bfba 120-123,125-856
+.github/workflows/ci.yml
+  s_524f399a310bce::t_153de9202fe36f 213
+  s_524f399a310bce::t_a070eaed336be2 90,212
+  s_524f399a310bce::t_4caae92057bf5a 214
+apps/web/src/components/skills/prompts.ts
+  s_524f399a310bce::t_494f6027daf7d0 9,25
+apps/web/src/app/s/[token]/PublicSkillActions.test.ts
+  s_524f399a310bce::t_9c424880a69a58 47-50
+  s_524f399a310bce::t_b0a2f8f244c7c5 9
+  s_524f399a310bce::t_7cd97508ce3d3a 20,27-34,40,42-45
+apps/web/src/components/skills/updateFlow.test.ts
+  s_524f399a310bce::t_9c424880a69a58 219-222
+  s_524f399a310bce::t_cc1d6157e7e553 150-151,215,242-243
+  s_524f399a310bce::t_06a7ca7ac0a051 11
+  s_524f399a310bce::t_a24a0a1e2d9d3e 159
+  s_524f399a310bce::t_85894e15ac6f7c 158,250-251
+  s_524f399a310bce::t_f9ebd625f5d99e 161-165,216-218,223-224
+scripts/runtime-install.test.mjs
+  s_524f399a310bce::t_4331d48ea0b61b 108-130
+  s_524f399a310bce::t_15e6fd284ff45c 32-33
+  s_524f399a310bce::t_25c46d84c7371a 1-2,4-19,22-25,27,29-31,34-47,106-107,131-137
+  s_524f399a310bce::t_cb9b3691864bf6 97
+  s_524f399a310bce::t_b68187b5d88155 20-21
+  s_524f399a310bce::t_f50467e611aef3 3,48-64,92-96,98-105
+  s_524f399a310bce::t_7eac901271b24e 65-91
+  s_524f399a310bce::t_d4301103359637 26,28
+packages/contracts/src/token.ts
+  s_524f399a310bce::t_5b7ca442c1258a 46
+  s_524f399a310bce::t_077968d1bacd41 45
+packages/core/test/settings.test.ts
+  s_524f399a310bce::t_93bb29950af4cb 9,477,666-711
+  s_524f399a310bce::t_62d6cb7277289f 18,466-476
+  s_524f399a310bce::t_9a591127531cdf 479-489
+  s_524f399a310bce::t_60c4caf8857b97 478
+  s_524f399a310bce::t_3fc4f6c005d241 712-713
+runtime/internal/cli/private_windows.go
+  s_524f399a310bce::t_ece5e69b78698b 1-20
+  s_524f399a310bce::t_51b66905e1a70e 21-44
+runtime/internal/cli/install_test.go
+  s_524f399a310bce::t_6872856dd9c5a2 1-41
+  s_524f399a310bce::t_74fed8a459ac21 42-196
+apps/web/src/lib/settingsData.test.ts
+  s_524f399a310bce::t_06a7ca7ac0a051 3,5,15,17
+  s_524f399a310bce::t_dba91420de5488 162-190
+scripts/ci-scope.mjs
+  s_524f399a310bce::t_0a0f2c266114af 158
+apps/web/src/components/skills/GettingStartedCard.test.ts
+  s_524f399a310bce::t_24c42cbcf29e5b 135,156
+apps/web/src/lib/settingsViewModel.ts
+  s_524f399a310bce::t_2accf360e668b4 29,44,55,88-89
+  s_524f399a310bce::t_6b51e74ecd4953 6,63,68-69
+apps/web/src/styles/settings.css
+  s_524f399a310bce::t_36e87c998945ba 392-393,401-410
+  s_524f399a310bce::t_c71c9a3711293f 411
+scripts/runtime-release.test.mjs
+  s_524f399a310bce::t_0244cc6211987f 2,54
+  s_524f399a310bce::t_788b9f0968d1b3 3,41-53,55-63
+  s_524f399a310bce::t_6572aab5a42e77 64-65
+apps/web/src/components/onboarding/ConnectAgentStep.test.ts
+  s_524f399a310bce::t_c0bdfded9acbb5 168
+apps/web/src/components/skills/UploadDialog.tsx
+  s_524f399a310bce::t_c0873b4963dd16 1767,1775-1776,1779-1781
+  s_524f399a310bce::t_b10e44b41337e5 1760-1764,1768-1771,1774,1778
+  s_524f399a310bce::t_30f7ec67b041fb 441,443,450,453,461-464,466,469,475,479,482,490-492,497-498
+  s_524f399a310bce::t_7d1f86aa001536 1353,1820
+  s_524f399a310bce::t_d82807113a81b8 1098
+  s_524f399a310bce::t_7c182f96659f49 375
+  s_524f399a310bce::t_10167bb5fb8878 1611,1961-1969,1972,1974-1976
+  s_524f399a310bce::t_af26616703f8fb 1772-1773
+  s_524f399a310bce::t_e5117806813038 191-192,323-324,1274-1277,1279-1280,1330,1352,1668,1790,1813,1819
+  s_524f399a310bce::t_cb72451c521557 94,421-422,430-438
+  s_524f399a310bce::t_ee331bef98ecaa 1777
+scripts/runtime-native-test.py
+  s_524f399a310bce::t_18d59f9f9c2e4e 13-128,136-172,177-182
+  s_524f399a310bce::t_e4c0967708e765 131-135
+  s_524f399a310bce::t_633854e280fd05 129-130,203-232
+apps/web/src/components/org/model.ts
+  s_524f399a310bce::t_b0cdc620b2bf4c 182
+  s_524f399a310bce::t_55f647d61623df 2,69,71-73
+runtime/VERSION
+  s_524f399a310bce::t_75f657f5400383 1
+apps/api/src/skillListRoute.test.ts
+  s_524f399a310bce::t_42fa215db2fcc7 8,10-12
+  s_524f399a310bce::t_05cd96e54f04fb 7,9,13,56
+  s_524f399a310bce::t_592e506b7eb7ca 957
+  s_524f399a310bce::t_e135dc34e3e050 922-956,958-969
+apps/api/src/whoamiRoute.test.ts
+  s_524f399a310bce::t_e8b128997017ed 21,48,65
+  s_524f399a310bce::t_7fe82ac387fba9 10,29,36-37,52-55,108-113,120-145,148-156,158-191
+  s_524f399a310bce::t_c4006c37ff4960 32-34,116-118
+  s_524f399a310bce::t_c4e6f4823deaaf 146-147,157
+  s_524f399a310bce::t_cab9d08b0b1df2 2,30-31,35,38,40,51,56,114,119,309
+  s_524f399a310bce::t_42fa215db2fcc7 115
+  s_524f399a310bce::t_b9285baca11ae7 192-193
+packages/core/src/services.ts
+  s_524f399a310bce::t_aa2ddefcdd83c8 39,4326-4327,4349-4350,4357
+  s_524f399a310bce::t_f217eed609d08f 4346-4348
+  s_524f399a310bce::t_64c80699325409 4549-4592
+  s_524f399a310bce::t_1b8acdb6b8ba16 4548
+scripts/runtime-release.mjs
+  s_524f399a310bce::t_7f30b10bb98ea8 27-37,44,76,78
+  s_524f399a310bce::t_94db6158e360f4 48,54
+  s_524f399a310bce::t_2137268088be3f 21-26,38-43,45-47,49-53,55-61,75,77,79-81,165-175,187
+runtime/internal/cli/cli.go
+  s_524f399a310bce::t_19cb50627679fe 1-8,10-13,53,57-58,92-93,116,122,128-131,150-151,175-176,200
+  s_524f399a310bce::t_b725ca80f68ad7 9,14-52,54-56,59-91,94-99,107-115,117-121,123-127,132-149,152-156,160-174,177-199
+  s_524f399a310bce::t_5b206c5e370211 100-103
+  s_524f399a310bce::t_b5da05e9e85314 104-106,157-159
+  s_524f399a310bce::t_5c7b79906bb1d0 201-227
+runtime/internal/runtime/cli_test.go
+  s_524f399a310bce::t_ca01cc5b10a2c5 17
+runtime/internal/runtime/types.go
+  s_524f399a310bce::t_75f657f5400383 6
+runtime/install.sh
+  s_524f399a310bce::t_f02eaaef7652cc 65-69
+  s_524f399a310bce::t_03eb414e5a618b 159-162
+  s_524f399a310bce::t_7c7a255e73a8d7 223
+  s_524f399a310bce::t_5bf8914a5e1ac3 204-210
+  s_524f399a310bce::t_f33a9a5cc3c4f9 1-13,15-48,50-64,70-72,74-75,112-156,163-166,169-181,184,224,233-239
+  s_524f399a310bce::t_1448f2787c4944 14,49
+  s_524f399a310bce::t_754ff91e83c230 215-222,225-232
+  s_524f399a310bce::t_6d510653d80625 73
+  s_524f399a310bce::t_f27f05760bcc37 157-158,167-168
+  s_524f399a310bce::t_80ad84f27ed98c 185-192,195-203,211-214
+  s_524f399a310bce::t_b906f5883fec0f 193-194
+  s_524f399a310bce::t_8ed293fdd9215d 182-183
+  s_524f399a310bce::t_3f3bf02225c2a5 76-111
+apps/web/src/components/org/SettingsApp.tsx
+  s_524f399a310bce::t_8966eda052ad2a 381,384
+runtime/internal/cli/auth.go
+  s_524f399a310bce::t_19cb50627679fe 1-4,7-12,24,131-132,187,204,246-248,281
+  s_524f399a310bce::t_ece5e69b78698b 5-6,13-23,25-130,133-186,188-203,205-245,249-280
+  s_524f399a310bce::t_a45cf65aa7cbbf 282-313
+packages/skillpack-skill/skill/scripts/test_runtime_setup.py
+  s_524f399a310bce::t_b3cb7a3eaa7005 450-451,480
+  s_524f399a310bce::t_5f980e0f8380e9 16,189-220
+  s_524f399a310bce::t_d7e63b3e9f4368 221
+packages/skillpack-skill/skill/runtime-release.json
+  s_524f399a310bce::t_75f657f5400383 2-3
+runtime/internal/cli/package_test.go
+  s_524f399a310bce::t_3e92960b5fb98d 1-23
+  s_524f399a310bce::t_96d4a384ffb7a1 24-62
+scripts/generate-native-contracts.ts
+  s_524f399a310bce::t_ece5e69b78698b 1-22
+packages/skillpack-skill/package.json
+  s_524f399a310bce::t_c9f202387cb53d 20
+apps/web/src/components/skills/LocalSkillsView.test.ts
+  s_524f399a310bce::t_63c3f784d6a87d 43-45,140-141
+apps/web/src/components/skills/LocalSkillsView.tsx
+  s_524f399a310bce::t_20cc4ce0e3a8f6 392
+  s_524f399a310bce::t_46afd6bad3e16e 589
+runtime/install.ps1
+  s_524f399a310bce::t_b906f5883fec0f 244-245
+  s_524f399a310bce::t_18d59f9f9c2e4e 50,54
+  s_524f399a310bce::t_21cfd0a0040e38 34-44,46-49,51-53,55-85
+  s_524f399a310bce::t_5d99e2b05812e2 162
+  s_524f399a310bce::t_6b613ace3cf97e 161,163-176,203
+  s_524f399a310bce::t_92b6962949d3ff 88-130,132-147
+  s_524f399a310bce::t_585f4d72148fab 236-238
+  s_524f399a310bce::t_cd8e271b416dbc 131,217,220-228,230-235,239-243,246-250,252,258,266,271,277-284,286-305
+  s_524f399a310bce::t_11919d22c26ff5 1-33,45,86-87,148-160,177-202,204-216,218-219,229,251,253-257,259-265,267-270,272-276,285,306-310
+runtime/internal/cli/transaction.go
+  s_524f399a310bce::t_b5da05e9e85314 1-50
+  s_524f399a310bce::t_79376dfcdbc8c3 51-213
+scripts/native-package-fixture.ts
+  s_524f399a310bce::t_3e92960b5fb98d 1-3,6-7,9-21,24
+  s_524f399a310bce::t_5b206c5e370211 4-5,8,22-23
+runtime/internal/cli/capabilities.go
+  s_524f399a310bce::t_b725ca80f68ad7 1-109
+  s_524f399a310bce::t_0cb27318c7e03f 110-411
+apps/api/test/integration/nativeCli.integration.test.ts
+  s_524f399a310bce::t_c7827b2b00faa5 1-156
+docs/skillpack-cli.md
+  s_524f399a310bce::t_b3fe0cbe3bb7c3 1-74
+docs/skillpack-runtime.md
+  s_524f399a310bce::t_731a10a33da448 9,12-13,16-19,21-23,28,65-66,89-91,128
+packages/skilldb/src/index.ts
+  s_524f399a310bce::t_43fa9f05deae0c 9,165,173,222-225
+packages/skilldb/test/runtime.test.ts
+  s_524f399a310bce::t_4cb7f600b1aa57 413-434
+packages/skillpack-skill/skill/SKILL.md
+  s_524f399a310bce::t_3b1120f7963775 3,11,13,15-18,20,22,24,26,29-35,38,40,42,44,47,50,52,54,56,59-61,64,66,68,71-72,75,77,79,82-86,89,91,94-97,100,102,104,107-111,114,116,118,120,122,124,126
+packages/skillpack-skill/skill/companion.integrity.json
+  s_524f399a310bce::t_d16d069792037e 3-6,11,17,20,33
+packages/skillpack-skill/skill/companion.json
+  s_524f399a310bce::t_ecb5f1dc787d80 4,7-8,42-49,1111,1274,1285-1286,1364
+packages/skillpack-skill/skill/evals/evals.json
+  s_524f399a310bce::t_3be64cd81db250 2,7,11-12,19,22-23,30,32-35,41-42,44-47,54,58,65,70-71,78,80,82,84-85,92,96-97,103-104,106-109,116,119-121,128,130-133,140,145-146,153,158-159,166,171-172,203,207-208,223-274
+runtime/go.mod
+  s_524f399a310bce::t_dccb95ec6cfebe 5-14
+runtime/go.sum
+  s_524f399a310bce::t_cb544ec80c5053 1-2,17-18,25-28,31-34
+runtime/internal/cli/activate_unix.go
+  s_524f399a310bce::t_c89a70df59c05d 1-98
+runtime/internal/cli/activate_unix_test.go
+  s_524f399a310bce::t_1e40e42d0268d6 1-54
+runtime/internal/cli/activate_windows.go
+  s_524f399a310bce::t_2d1848ae0e2cd1 1-100
+runtime/internal/cli/auth_private_unix_test.go
+  s_524f399a310bce::t_4acafefd870e8e 1-52
+runtime/internal/cli/contracts/manifest.schema.json
+  s_524f399a310bce::t_d19a730f5e8372 1-260
+runtime/internal/cli/contracts/opencode-runtime.mjs
+  s_524f399a310bce::t_765faae00db37c 1-163
+runtime/internal/cli/contracts/operations.json
+  s_524f399a310bce::t_35cdfb3a097dc1 1-398
+runtime/internal/cli/contracts/runtime-release.json
+  s_524f399a310bce::t_0e42e44c9e3248 1-5
+runtime/internal/cli/contracts/tools.json
+  s_524f399a310bce::t_59548b8c968cc0 1-49
+runtime/internal/cli/doctor_test.go
+  s_524f399a310bce::t_c23743c0a1ccb1 1-81
+runtime/internal/cli/import.go
+  s_524f399a310bce::t_e8905973a67e2c 1-167
+runtime/internal/cli/lock_json.go
+  s_524f399a310bce::t_6b070b28dce6c4 1-91
+runtime/internal/cli/migration_test.go
+  s_524f399a310bce::t_1739098116da6d 1-98
+runtime/internal/cli/public.go
+  s_524f399a310bce::t_1e538b79192788 1-63
+runtime/internal/cli/release.go
+  s_524f399a310bce::t_ad038e46511d1d 1-372
+runtime/internal/cli/release_test.go
+  s_524f399a310bce::t_9b3a0f2819c275 1-44
+runtime/internal/cli/schema_regex.go
+  s_524f399a310bce::t_6544c940406732 1-23
+runtime/internal/cli/setup.go
+  s_524f399a310bce::t_185a0ada3af77d 1-597
+runtime/internal/cli/setup_test.go
+  s_524f399a310bce::t_13e8115231f16d 1-40
+runtime/internal/cli/testdata/canonical-package.json
+  s_524f399a310bce::t_6f2ece3c48d39d 1-10
+runtime/internal/cli/transaction_test.go
+  s_524f399a310bce::t_f04906f242805d 1-82
+runtime/internal/cli/update.go
+  s_524f399a310bce::t_0a83fe962ff6a7 1-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a6a4f6076dfc3ad3910a0767338226c02a08bb3a",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
