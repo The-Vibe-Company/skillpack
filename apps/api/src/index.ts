@@ -1,3 +1,5 @@
+import { createSkillUsageRoutes } from "./skillUsageRoutes";
+import { getSkillUsage } from "@skillpack/core";
 /* oxlint-disable anti-slop/no-conditional-empty-object-spread, anti-slop/no-known-value-widening, anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns, anti-slop/no-unsafe-dictionary-type, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- This route module predates the incremental anti-slop gate; adding one profile field does not rewrite its unrelated boundary debt. */
 import "./sentry";
 import { captureServerError, Sentry } from "./sentry";
@@ -690,6 +692,8 @@ app.use(
   }),
 );
 
+// Public write-only telemetry must not require or resolve credentials.
+app.route("/", createSkillUsageRoutes());
 app.use("*", attachSession);
 
 registerAgentAuthRoutes(app);
@@ -2277,6 +2281,18 @@ app.get("/v1/skills/:slug", async (c) => {
     return c.json(row);
   } catch (error) {
     return jsonError(c, error, 401);
+  }
+});
+
+app.get("/v1/skills/:slug/usage", async (c) => {
+  c.header("Cache-Control", "no-store");
+  try {
+    const usage = await withTenant(c, ({ actor, orgId, database }) =>
+      getSkillUsage({ actor, orgId, database, slug: c.req.param("slug") }));
+    if (!usage) return jsonError(c, "skill not found", 404);
+    return c.json(usage);
+  } catch {
+    return c.json({ error: "usage is not accessible" }, 403);
   }
 });
 

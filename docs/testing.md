@@ -9,6 +9,9 @@ providers and identities, not authorization, persistence, or tenant scoping.
 - All tenant APIs reject non-members, cross-tenant access, and revoked authority.
 - Archives and transfers reject unsafe paths, links, oversized files, and checksum substitution.
 - Share is owner-only and includes its required private dependency closure atomically.
+- Usage reports work without credentials, deduplicate per activation, expire after 90 days, and
+  reveal neither skill existence nor private usage to unauthorized callers. Reported identities
+  remain unverified and never grant account authority.
 - Public releases pin one exact version; GitHub mirrors stay deterministic and idempotent.
 - Secret grants cannot replay or leak plaintext through ordinary metadata, errors, logs, or audit.
 - Agent Auth and child PATs remain exact-workspace and capability constrained.

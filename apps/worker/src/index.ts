@@ -1,9 +1,11 @@
 import "./sentry";
+import { startSkillUsageCleanup } from "./skillUsageCleanup";
 import { captureWorkerError, Sentry } from "./sentry";
 import { closeDb } from "@skillpack/db";
 import { keepWorkerProcessAliveWhenIdle, startWorkerSupervisors } from "./supervisors";
 
 async function main(): Promise<void> {
+  const usage = startSkillUsageCleanup();
   const { billing, github, skillDatabases } = await startWorkerSupervisors();
   if (!billing && !github && !skillDatabases) {
     console.info("worker idle: no supervisor is configured");
@@ -17,6 +19,7 @@ async function main(): Promise<void> {
       stopping = true;
       if (idleKeepAlive) clearInterval(idleKeepAlive);
       await Promise.allSettled([
+        usage.stop(),
         billing?.stop(),
         github?.stop(),
         skillDatabases?.stop(),

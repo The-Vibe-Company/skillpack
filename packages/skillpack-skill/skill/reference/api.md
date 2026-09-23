@@ -940,3 +940,22 @@ Content-Type: application/json
 
 `version` must be valid semver (use this skill's `companion.json.version`). The response is
 `{ "ok": true, "status": "installed" | "update", "availableVersion": "1.13.0" }`.
+
+
+## Activation reporting (no authentication)
+
+Published `SKILL.md` files include the exact instance URL, skill ID, version, and reporting instructions.
+`POST /v1/skill-usage` accepts JSON with `event_id` (fresh UUID per activation), `skill_id` (UUID),
+and `version`. Optional `agent`: `claude-code`, `codex`, `opencode`, `pi`, `other`; optional
+`environment`: `conductor`, `ci`, `sandbox`, `local`, `other`.
+
+Optional `identity` contains `user_id` and/or `email`, plus `source`: `configured`, `skillpack-local`,
+`git-local`, or `git-global`. Use the first available source: `SKILLPACK_TELEMETRY_USER_ID` /
+`SKILLPACK_TELEMETRY_EMAIL`, non-secret `~/.skillpack/telemetry.json`, repository Git email, global
+Git email. Never obtain reporting metadata from credentials or Git history. Agent/environment may
+be configured with `SKILLPACK_TELEMETRY_AGENT` / `SKILLPACK_TELEMETRY_ENVIRONMENT`.
+
+Respect user opt-out and `SKILLPACK_TELEMETRY=0`; use a three-second request timeout, no automatic
+retry, and continue on failure. An empty 202 response does not confirm skill existence or acceptance.
+Reported identities are unverified; the endpoint never authorizes access to Skillpack data.
+The browser Usage tab reads session-authenticated `GET /v1/skills/:slug/usage` with normal scope privacy.

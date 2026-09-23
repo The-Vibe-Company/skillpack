@@ -1722,3 +1722,29 @@ export const skillDatabaseObjectDeletions = pgTable(
     ),
   }),
 );
+
+/** Unverified, voluntarily reported activations; identities never grant account authority. */
+export const skillUsageEvents = pgTable("skill_usage_events", {
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  skillId: uuid("skill_id").notNull().references(() => skills.id, { onDelete: "cascade" }),
+  eventId: uuid("event_id").notNull(),
+  version: text("version").notNull(),
+  agent: text("agent"),
+  environment: text("environment"),
+  declaredUserId: text("declared_user_id"),
+  declaredEmail: text("declared_email"),
+  identitySource: text("identity_source"),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.orgId, t.skillId, t.eventId] }),
+  skillTime: index("skill_usage_events_skill_time_idx").on(t.orgId, t.skillId, t.receivedAt),
+  retention: index("skill_usage_events_retention_idx").on(t.receivedAt),
+  validVersion: check("skill_usage_events_version_check", sql`length(${t.version}) between 1 and 128`),
+  validAgent: check("skill_usage_events_agent_check", sql`${t.agent} in ('claude-code', 'codex', 'opencode', 'pi', 'other')`),
+  validEnvironment: check("skill_usage_events_environment_check", sql`${t.environment} in ('conductor', 'ci', 'sandbox', 'local', 'other')`),
+  validUserId: check("skill_usage_events_declared_user_id_check", sql`length(${t.declaredUserId}) between 1 and 128`),
+  validEmail: check("skill_usage_events_declared_email_check", sql`length(${t.declaredEmail}) between 3 and 254`),
+  validSource: check("skill_usage_events_identity_source_check", sql`${t.identitySource} in ('configured', 'skillpack-local', 'git-local', 'git-global')`),
+  validIdentity: check("skill_usage_events_check", sql`(${t.identitySource} is null and ${t.declaredUserId} is null and ${t.declaredEmail} is null)
+    or (${t.identitySource} is not null and (${t.declaredUserId} is not null or ${t.declaredEmail} is not null))`),
+}));

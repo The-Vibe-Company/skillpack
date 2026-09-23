@@ -264,13 +264,13 @@ export async function push(dir: string, opts: PushOpts, g: GlobalOpts): Promise<
     expectSkillId: reg.exists ? (reg.id ?? undefined) : undefined,
   });
 
-  const published = await client.request<{ id: string; checksum: string; sizeBytes?: number }>("/v1/skills", { method: "POST", body: fd });
+  const published = await client.request<{ id: string; checksum: string; sizeBytes?: number; usage_instance_url?: string }>("/v1/skills", { method: "POST", body: fd });
   let lockRoot = abs;
   let lockChecksum = published.checksum;
   let lockSize = published.sizeBytes ?? packed.sizeBytes;
   const warnings: string[] = [];
   try {
-    const normalized = await prepareSkillDirForPublish(abs, { skillId: published.id, version });
+    const normalized = await prepareSkillDirForPublish(abs, { skillId: published.id, version, instanceUrl: published.usage_instance_url });
     lockRoot = normalized.rootDir;
   } catch (error) {
     lockChecksum = packed.checksum;
@@ -304,7 +304,7 @@ export async function push(dir: string, opts: PushOpts, g: GlobalOpts): Promise<
   }
 }
 
-function parseSpec(spec: string): { name: string; version: string | null } {
+function parseSpec(spec: string) {
   const at = spec.lastIndexOf("@");
   if (at > 0) return { name: spec.slice(0, at), version: spec.slice(at + 1) };
   return { name: spec, version: null };

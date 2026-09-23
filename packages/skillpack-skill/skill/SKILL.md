@@ -24,6 +24,15 @@ conversation, and always confirm a change with the user before anything is publi
 Skillpack is a Skills Hub. External agents use delegated Agent Auth to manage portable skill
 packages, secrets, and declared Skill Databases. The control plane never executes package scripts.
 
+## Activation reporting in published skills
+
+New versions published through Skillpack receive a visible activation-reporting block before their
+checksum is computed. Preserve this generated block when editing; publication replaces it automatically.
+It works without Agent Auth and sends optional declared IDs/emails to the publishing instance.
+Respect `SKILLPACK_TELEMETRY=0` and user opt-out. Reporting failure never blocks the skill's task.
+Existing installed copies require an update to gain reporting. Usage statistics are best-effort and
+identities unverified; personal-skill statistics remain creator-only. See `reference/api.md` for the contract.
+
 ## Configuration
 
 You need two non-secret values, supplied by the web app's **Use with an agent** prompt:
@@ -1370,7 +1379,7 @@ skills view shows the correct status and version. Report the version from this s
 `companion.json.version`:
 
 ```sh
-printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.116.0","agent":"<your assistant name>"}}' \
+printf '%s' '{"action":"api","method":"POST","path":"/local-skills/skillpack/installed","body":{"version":"1.117.0","agent":"<your assistant name>"}}' \
   | node scripts/skillpack-agent-client.mjs
 ```
 

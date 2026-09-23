@@ -1,13 +1,13 @@
 {
   "files": {
-    "SKILL.md": "sha256:b85e84359671face6fa9ebe8d33d161460769bcc8a4eea48fee3b21dc60a5480",
-    "companion.json": "sha256:de09fa8bf2898f6be3fa6a75d2e7ef6a5ec3f0b767aff680bbc498fac4d153c2",
+    "SKILL.md": "sha256:e59ad602081786ea889e66ba469df37072f2ca75b2acf08f2da855a489dca8b3",
+    "companion.json": "sha256:958302ffeffd3e33743a74b296a1d611fbe4952b886659e5d92e8c15eb5ecf87",
     "evals/evals.json": "sha256:2ccbe0ef273ec71200410bdef434fcdc3e8efe58219b47a738694f330a318e7f",
     "scripts/bootstrap.py": "sha256:17be13b802db3ccbeefea63f29aa236e290a99c18ebfc8727e5b88e1cd1c195b",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",
     "scripts/check_updates.py": "sha256:d287638fe8dc12b44b913b2613371914f82d3a32cb2837bc02f042b7270efa70",
-    "scripts/companion-agent-client.mjs": "sha256:708dd986f53388517bbc081fad4cda22623f2f7c0dd2b1622ab1643b2f03ae71",
+    "scripts/companion-agent-client.mjs": "sha256:8419f62b0166f79e86328da892b069e7448ff996d3d79dc410900903e0b296e4",
     "scripts/companion_lib.py": "sha256:961142293393abe0eae62b6390b8f3e50cb6c8a9ed42102a3459b641c69e0f37",
     "scripts/create_secret.py": "sha256:88a5c46e499059ecd8d8712b978ace6de72389fd53f57db6ea760478fefd8c65",
     "scripts/install_skill.py": "sha256:28e1571d7256322132e900d98731b4de3e54c824cb17b0bda406b05eb6bfff04",
@@ -21,5 +21,5 @@
     "scripts/tools.json": "sha256:2b7701dd84397cb6dafe7b60667c7c6f198f46377ab48ef9107f9b22aead3c7d"
   },
   "schemaVersion": 1,
-  "version": "1.116.0"
+  "version": "1.117.0"
 }

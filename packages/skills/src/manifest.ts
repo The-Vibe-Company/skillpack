@@ -13,11 +13,13 @@ import {
   type SkillFrontmatter,
   type SkillLegacyFrontmatter,
 } from "@skillpack/contracts";
+import { withSkillUsageInstructions } from "./usageInstructions";
 import { scanDir } from "./archive";
 import { parseFrontmatter } from "./frontmatter";
 
 export interface SkillpackManifestMetadata {
   skillId?: string;
+  instanceUrl?: string;
   version: string;
 }
 
@@ -79,7 +81,7 @@ export function buildNormalizedSkillpackJson(manifest: SkillpackManifest): strin
 export function toStoredSkillVersionManifest(
   frontmatter: SkillFrontmatter,
   companion: SkillpackManifest,
-): ReturnType<typeof toStoredSkillFrontmatter> & { companion: Record<string, unknown> } {
+): ReturnType<typeof toStoredSkillFrontmatter> & { companion: ReturnType<typeof skillpackManifestJson> } {
   return {
     ...toStoredSkillFrontmatter(frontmatter),
     companion: skillpackManifestJson(companion),
@@ -190,7 +192,9 @@ export async function prepareSkillDirForPublish(
     notes: normalizedManifest.notes,
   });
   await writeFile(skillpackPath, buildNormalizedSkillpackJson(skillpackManifest), "utf8");
-  await writeFile(skillMdPath, buildNormalizedSkillMd(frontmatter, reparsed.body), "utf8");
+  await writeFile(skillMdPath, buildNormalizedSkillMd(frontmatter, companion.skillId && companion.instanceUrl
+    ? withSkillUsageInstructions(reparsed.body, { skillId: companion.skillId, version: companion.version, instanceUrl: companion.instanceUrl })
+    : reparsed.body), "utf8");
   return {
     rootDir,
     frontmatter,
