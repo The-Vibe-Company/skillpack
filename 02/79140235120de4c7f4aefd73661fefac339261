@@ -1,0 +1,125 @@
+packages/core/test/skillInstallChecksums.test.ts
+  s_2bb3914e08b958::t_48bda5ada6aa8c 1-18
+packages/skillpack-skill/skill/SKILL.md
+  s_2bb3914e08b958::t_5fb82ad296857f 33-34
+  s_2bb3914e08b958::t_665d4ecc1a43bc 1383
+packages/db/drizzle/0190_skill_usage_rewrite.sql
+  s_2bb3914e08b958::t_79b4cfb75efada 1-3
+apps/api/src/migrate.ts
+  s_2bb3914e08b958::t_79b4cfb75efada 11,90-93,109-111,303,376-381,415,429,499
+  s_2bb3914e08b958::t_571914f87578ec 10,501
+packages/skillpack-skill/skill/companion.json
+  s_2bb3914e08b958::t_4c9c81981012ec 30-31
+  s_2bb3914e08b958::t_665d4ecc1a43bc 4,34-40
+docs/testing.md
+  s_2bb3914e08b958::t_5fb82ad296857f 15-16
+packages/skillpack-skill/tsup.config.ts
+  s_2bb3914e08b958::t_b6df4bfd546c1f 4
+  s_2bb3914e08b958::t_bd36e0a4d626e1 10
+packages/skillpack-skill/skill/scripts/companion_lib.py
+  s_2bb3914e08b958::t_5a5b841e11e839 946,964,1004,1052,1181-1191
+  s_2bb3914e08b958::t_b6df4bfd546c1f 98-109
+  s_2bb3914e08b958::t_6a4f58f4319a53 96-97,110-112
+packages/skillpack-skill/skill/scripts/test_multitool.py
+  s_2bb3914e08b958::t_5a5b841e11e839 540
+  s_2bb3914e08b958::t_bd36e0a4d626e1 1345,1369,1389
+packages/db/src/schema.ts
+  s_2bb3914e08b958::t_79b4cfb75efada 582-583
+  s_2bb3914e08b958::t_2507a876a6b0d9 1116-1117
+  s_2bb3914e08b958::t_2717b52eda793c 1099
+docs/design.md
+  s_2bb3914e08b958::t_5fb82ad296857f 121-140
+apps/api/test/integration/skillInstallChecksums.integration.test.ts
+  s_2bb3914e08b958::t_b0ee6562ea6d9b 27-33
+  s_2bb3914e08b958::t_e2eeece3b09402 1-26,34-35,37-52
+  s_2bb3914e08b958::t_42df4065d034fd 36
+packages/skillpack-skill/skill/companion.integrity.json
+  s_2bb3914e08b958::t_4c9c81981012ec 4,15
+  s_2bb3914e08b958::t_5fb82ad296857f 3,10,25
+  s_2bb3914e08b958::t_f2cb7b2ccd4399 11,13,17
+packages/skillpack-skill/client/package-checksum.test.ts
+  s_2bb3914e08b958::t_2216aa8c85b793 1-23
+packages/skillpack-skill/skill/scripts/test_skill_guard.py
+  s_2bb3914e08b958::t_942382127fd8c8 14,141-147,413-461
+  s_2bb3914e08b958::t_1b1e219019fbb5 462-463
+docs/product.md
+  s_2bb3914e08b958::t_5fb82ad296857f 35-38
+cli/src/lib/registry.ts
+  s_2bb3914e08b958::t_2507a876a6b0d9 12,25,58-60,63,65
+packages/skillpack-skill/skill/scripts/skill_guard.py
+  s_2bb3914e08b958::t_5a5b841e11e839 260-261,275-276,290-291,690-691
+deploy/railway/README.md
+  s_2bb3914e08b958::t_5fb82ad296857f 19-39
+packages/db/drizzle/0189_skill_install_checksums.sql
+  s_2bb3914e08b958::t_2507a876a6b0d9 1-8
+docs/vision.md
+  s_2bb3914e08b958::t_5fb82ad296857f 16-18
+packages/core/src/services.ts
+  s_2bb3914e08b958::t_b0ee6562ea6d9b 4792-4796
+  s_2bb3914e08b958::t_2717b52eda793c 4692-4693,4835-4837
+  s_2bb3914e08b958::t_6b0b3d05ea0d15 3840
+  s_2bb3914e08b958::t_2507a876a6b0d9 1091,1096,1104,1114-1115,1194-1195,3240,3293,3312,4699-4700,4703-4704,4757,4788-4790,4798-4807,4815,4823,4841,4856,4869,4877,4883
+  s_2bb3914e08b958::t_a47ceabc9a42f0 4791,4797
+packages/contracts/src/skill.ts
+  s_2bb3914e08b958::t_b6df4bfd546c1f 336,342
+  s_2bb3914e08b958::t_74f55e2105f76a 353-354,356
+  s_2bb3914e08b958::t_2507a876a6b0d9 123-124
+  s_2bb3914e08b958::t_2717b52eda793c 125
+cli/src/commands/skills.ts
+  s_2bb3914e08b958::t_2507a876a6b0d9 405
+  s_2bb3914e08b958::t_cfd269536cb8bd 417
+cli/src/commands/skills.test.ts
+  s_2bb3914e08b958::t_b6df4bfd546c1f 111-113,238,245,264,270
+  s_2bb3914e08b958::t_48bda5ada6aa8c 257-263,265-269,271-275
+scripts/anti-slop-targets.mjs
+  s_2bb3914e08b958::t_09c7608da2feeb 22
+apps/api/test/integration/skillUsageRewrite.integration.test.ts
+  s_2bb3914e08b958::t_0d74e8728e97ae 1-6,8-10,12-56,59-82,84-88,90-100,102-106
+  s_2bb3914e08b958::t_dbcb34936744d7 7,11,57-58,83,89,101
+docs/PRD.md
+  s_2bb3914e08b958::t_5fb82ad296857f 22-23
+packages/skillpack-skill/skill/reference/api.md
+  s_2bb3914e08b958::t_5fb82ad296857f 579,818-820,822-825
+apps/api/src/skillUsageRewrite.ts
+  s_2bb3914e08b958::t_79b4cfb75efada 1-111,113-116,118-128
+  s_2bb3914e08b958::t_54f86a681b875f 112,117
+packages/skillpack-skill/skill/scripts/install_skill.py
+  s_2bb3914e08b958::t_6a4f58f4319a53 16,40,583,704,726,731,893-896
+  s_2bb3914e08b958::t_5a5b841e11e839 665-666
+apps/api/src/localSkills.test.ts
+  s_2bb3914e08b958::t_5fb82ad296857f 133-134
+  s_2bb3914e08b958::t_665d4ecc1a43bc 51
+  s_2bb3914e08b958::t_fb7a05273ae1bd 81
+packages/skillpack-skill/client/package-checksum.ts
+  s_2bb3914e08b958::t_65395353a54697 1-12
+apps/api/src/index.ts
+  s_2bb3914e08b958::t_f99877dc6a71e5 2495
+apps/api/src/mcp/server.ts
+  s_2bb3914e08b958::t_3f03606d0f1815 421,429
+packages/core/test/skillVersions.test.ts
+  s_2bb3914e08b958::t_07429151bfdc6a 20
+packages/db/drizzle/meta/_journal.json
+  s_2bb3914e08b958::t_52b466274a5a5a 1327-1340
+packages/skillpack-skill/skill/scripts/companion-agent-client.mjs
+  s_2bb3914e08b958::t_bd956133b0e239 142
+packages/skillpack-skill/skill/scripts/package-checksum.mjs
+  s_2bb3914e08b958::t_a533dc753ee8a4 1-143
+scripts/lint-anti-slop.test.mjs
+  s_2bb3914e08b958::t_53f6a223a3d23e 10,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0279140235120de4c7f4aefd73661fefac339261",
+  "prompts": {},
+  "sessions": {
+    "s_2bb3914e08b958": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd8c-dacf-70f1-be60-aed09190bbcb",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
