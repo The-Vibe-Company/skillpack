@@ -1,0 +1,108 @@
+apps/web/src/app/mcp/consent/McpConsentApproval.tsx
+  s_05c437513a4a4a::t_c25a369e2121ab 1-124,126-187
+  s_05c437513a4a4a::t_93d5a45f2d3be4 125
+apps/api/src/mcp/server.test.ts
+  s_05c437513a4a4a::t_080de690046750 1-148,152-183
+  s_05c437513a4a4a::t_a13562ff569961 149-151
+  s_05c437513a4a4a::t_16a7c776e65a27 184-188
+apps/api/test/integration/mcpConnection.integration.test.ts
+  s_05c437513a4a4a::t_ba673efe204b66 1-340,343
+  s_05c437513a4a4a::t_26bf1b1213499f 341-342,344-368
+packages/db/src/schema.ts
+  s_05c437513a4a4a::t_6a24fa0fd686b3 242-308
+  s_05c437513a4a4a::t_6708e3ee465669 698-720
+  s_acf6eb636d26ac::t_d95c66c23383a5 697
+packages/auth/src/index.ts
+  s_05c437513a4a4a::t_621a5c93dca919 89-125,128-136,467
+  s_05c437513a4a4a::t_04f3e80f6aa105 126-127
+  s_05c437513a4a4a::t_a9470e3a3e2b8a 395-402,405,412-414,417-418,420,422-425,433-443,446,468-472,476-478,482,485-487,489-491,496-510,514-515
+  s_05c437513a4a4a::t_277cfee82d2dfe 3
+  s_05c437513a4a4a::t_0c7f87ea7fa0a2 6
+  s_05c437513a4a4a::t_40d65f79ee92d6 236
+  s_05c437513a4a4a::t_693e2dd98dc3f1 197-204
+  s_acf6eb636d26ac::t_08b0e40405225e 7,403-404,406-411,415-416,419,421,426-432,444-445,447-466,473-475,479-481,483-484,488,492-495,511-513
+apps/api/src/mcp/auth.ts
+  s_05c437513a4a4a::t_d47cda9148fce9 3-5,20-21,23-25,27,33,35-40
+  s_05c437513a4a4a::t_e67b700239211a 2,6-19,22,26,28-32,34
+  s_05c437513a4a4a::t_d7cb7883ec3667 1,41-51
+apps/web/next.config.ts
+  s_05c437513a4a4a::t_7e51f91d5e3b4a 20-31
+docs/design.md
+  s_05c437513a4a4a::t_2625ee8721cf4b 54-76
+apps/api/src/skillPublish.ts
+  s_05c437513a4a4a::t_42581189aa3b03 1,3,5-6,10-11,13-18,21-23,25-36,38-39,42-198,204,209-211,219,225,230,236,251,255,258,260,266,275,278,280,285,288-291,296,298,305,318,322,327,331,343-344,349,357,360-361,363,369,371,380-381,383,387,402,415,421,425-426,440,451,463-466
+  s_05c437513a4a4a::t_0530df29198958 2,4,7-9,12,19-20,24,37,40-41
+  s_05c437513a4a4a::t_1f194b8d70db2d 199-203,205-208,212-218,220-224,226-229,231-235,237-250,252-254,256-257,259,261-265,267-274,276-277,279,281-284,286-287,292-295,297,299-304,306-317,319-321,323-326,328-330,332-342,345-348,350-356,358-359,362,364-368,370,372-379,382,384-386,388-401,403-414,416-420,422-424,427-439,441-450,452-462,467-476
+apps/web/src/app/mcp/login/route.ts
+  s_05c437513a4a4a::t_99524ae8407010 1-16,24-26
+  s_05c437513a4a4a::t_74aa6ff60436b2 17-23
+packages/db/drizzle/0187_mcp_oauth.sql
+  s_05c437513a4a4a::t_196386d7a324a5 1-58
+  s_05c437513a4a4a::t_7b8a5670a72141 59-141
+packages/auth/package.json
+  s_05c437513a4a4a::t_b94c5f85a485d9 21
+packages/db/runtime-role-grants.sql
+  s_05c437513a4a4a::t_a7276487ce1003 193-208
+docs/integrations/companions-build.md
+  s_05c437513a4a4a::t_8ec648b64e2cb9 1-76
+apps/api/package.json
+  s_05c437513a4a4a::t_3a656d4e2f4f90 34
+docs/testing.md
+  s_05c437513a4a4a::t_6d07fa5652bd39 15
+package.json
+  s_05c437513a4a4a::t_a7c2956820ce25 21
+packages/core/src/mcpConnections.ts
+  s_05c437513a4a4a::t_b78248c4acb20a 1-104
+apps/api/src/mcp/server.ts
+  s_05c437513a4a4a::t_62b5bde544009b 138-139,144,146
+  s_05c437513a4a4a::t_c5e12a6131e811 1-2,4-68,70-137,140-143,145,147-907
+  s_05c437513a4a4a::t_dd0a3fe8049da3 69
+  s_05c437513a4a4a::t_5437ea7c0711b5 3
+  s_05c437513a4a4a::t_6d55c0f018a200 908-918
+packages/core/src/services.ts
+  s_05c437513a4a4a::t_b4abae34c93ab7 126
+apps/web/src/app/mcp/consent/page.tsx
+  s_05c437513a4a4a::t_708bc6d0ae64b6 1-37
+  s_05c437513a4a4a::t_ad83fd7496f0c6 38-39
+apps/api/src/index.ts
+  s_05c437513a4a4a::t_baf8f8cfa270a5 20-22
+  s_05c437513a4a4a::t_03182e94baa02f 238-244
+  s_05c437513a4a4a::t_f505b12d0dbf4a 266-268
+  s_05c437513a4a4a::t_5185011cc46273 697-828
+  s_05c437513a4a4a::t_54a08178dca36b 259-265
+  s_05c437513a4a4a::t_1b897371bcca06 269
+apps/api/src/mcp/auth.test.ts
+  s_05c437513a4a4a::t_2848eef9244e08 1-70
+CLAUDE.md
+  s_05c437513a4a4a::t_3e80f2be7eff7f 14-15
+packages/core/src/preTenant.ts
+  s_05c437513a4a4a::t_17b64b18588c64 414-477
+packages/db/drizzle/meta/_journal.json
+  s_acf6eb636d26ac::t_d01f1d3f6351a0 1313-1319
+pnpm-lock.yaml
+  s_05c437513a4a4a::t_510898f84cc9ec 11,63-65,349-351,4036-4037,8832,9180
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "363d60118266b0eb6bbc90b25259ab1dcc8a9d14",
+  "prompts": {},
+  "sessions": {
+    "s_05c437513a4a4a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fa1261d-7250-4081-a171-e0ef985a0d61",
+        "model": "claude-opus-5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    },
+    "s_acf6eb636d26ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "89a6808d-b4ee-4a49-8017-88872141af09",
+        "model": "claude-opus-5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

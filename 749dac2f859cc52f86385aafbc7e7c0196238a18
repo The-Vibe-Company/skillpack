@@ -1,0 +1,19 @@
+runtime/install.sh
+  s_524f399a310bce::t_2655987131c6cd 89,98-100,105-107,149-151,177-179
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "749dac2f859cc52f86385aafbc7e7c0196238a18",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

@@ -1,0 +1,490 @@
+apps/api/test/integration/skillUsageMigration.integration.test.ts
+  s_524f399a310bce::t_ae8990ebaf0bdf 1-94,96-100
+  s_524f399a310bce::t_0fee072fcfd8f6 95
+runtime/testdata/claude-user-prompt-expansion.json
+  s_524f399a310bce::t_54685e5d2f0c4d 1-9
+runtime/testdata/codex-tool-event.json
+  s_524f399a310bce::t_0a759bd7e76d74 1-8
+runtime/internal/runtime/cli_test.go
+  s_524f399a310bce::t_f00a4083da3831 1-4,7-18,29-30
+  s_524f399a310bce::t_2c0bb21942f3af 5-6,19-28
+.github/workflows/ci.yml
+  s_524f399a310bce::t_913e0932ef7717 15,43-44,64-77,90,548,558-640
+packages/skillpack-skill/client/index.ts
+  s_524f399a310bce::t_0b576a526af2bc 15,34-50,59-61,72,76,152-153,217-218,220,237-239,242,246-250,262-263,270-275,296,327,340-341,345,348,372,390,397,400,452-453,456,465,469,474-475,484,489-490,493,517,541,543,545-546,549
+  s_524f399a310bce::t_74e6f21aa44c15 6,565,572,585-587,594-596,600,603,610,624-625,633,637-639,652,697
+packages/contracts/src/skillUsage.ts
+  s_524f399a310bce::t_004518a40227d0 5-8,27-30
+runtime/internal/runtime/hardening_test.go
+  s_524f399a310bce::t_8f43948789e2fd 175-258
+  s_524f399a310bce::t_65d1ea391fceec 14
+  s_524f399a310bce::t_6ce3dbf1f0cb73 1-3,5-13,15-149
+  s_524f399a310bce::t_0f3feafb51db16 150-174
+  s_524f399a310bce::t_562f838f990175 4
+runtime/testdata/claude-post-tool-use.json
+  s_524f399a310bce::t_0a759bd7e76d74 1-13
+runtime/internal/runtime/commands.go
+  s_524f399a310bce::t_26cb247e69bddf 154-157,166,175-177,179-182,184-195,197-208
+  s_524f399a310bce::t_a20ce3159503ae 1-10,14-15,17-71,75-148,158-165,167-169,171,173-174,209-211,213
+  s_524f399a310bce::t_40553ab9611f44 149-153,170,172
+  s_524f399a310bce::t_6ff046adbca52c 178,183,196
+  s_524f399a310bce::t_bfe406909dfb76 11
+  s_524f399a310bce::t_33c98a6019c5f6 12,16,212
+  s_524f399a310bce::t_80f2fcb8f54642 72-74
+  s_524f399a310bce::t_7c30a2bb41fe6d 13
+runtime/internal/runtime/transport_test.go
+  s_524f399a310bce::t_433eac380615f4 188-214
+  s_524f399a310bce::t_1f90a3bf5a7f96 32-33
+  s_524f399a310bce::t_d1f28ee635174a 1-4,7-8,10-21,23-31,34-70,72-108,186-187
+  s_524f399a310bce::t_ee10c40207fa18 5-6,109-185
+  s_524f399a310bce::t_9a662d7e148006 9,22,71
+runtime/internal/runtime/inventory_test.go
+  s_524f399a310bce::t_3beff8c01e4151 1-3,5-7,9-17,21-33,35-52,60-66,203-204
+  s_524f399a310bce::t_ff6785ceb625cd 121-122
+  s_524f399a310bce::t_343ad1c27f28a5 53-59,162-163
+  s_524f399a310bce::t_620cb9ebfb9bad 70-120,123-148
+  s_524f399a310bce::t_2f5d276acb68af 18-20
+  s_524f399a310bce::t_08c389057d2e0e 196
+  s_524f399a310bce::t_a0ec3a1fd927f1 4,8,34,67-69,149-161,164-195,197-202
+apps/api/src/skillUsageMigration.test.ts
+  s_524f399a310bce::t_debb2fab948c89 1-13
+runtime/internal/runtime/transcript.go
+  s_524f399a310bce::t_d744a33e783ea4 612-630
+  s_524f399a310bce::t_586779dcf09093 450
+  s_524f399a310bce::t_45a5e36186fe23 250-253,273-276,291,293-301,356-359
+  s_524f399a310bce::t_fa278a72781044 57,60-71,74-76,151-153,162
+  s_524f399a310bce::t_c0bf37e26f8cfc 194,197,254,361
+  s_524f399a310bce::t_ce9f56f996b9db 203-205,207,232-247
+  s_524f399a310bce::t_3660fdb387a542 210-218
+  s_524f399a310bce::t_91c016de26c551 219-223
+  s_524f399a310bce::t_13fd8e022cf9ab 11,504-565,595
+  s_524f399a310bce::t_9016b77b74d9d2 38-56,58-59,72-73,170-171
+  s_524f399a310bce::t_ba6eb21d83b8c5 145-149,154,157-158,160-161
+  s_524f399a310bce::t_b8524e6169e559 286-287,292
+  s_524f399a310bce::t_960adff820730c 304-312
+  s_524f399a310bce::t_7fb66891437573 429,442-443,451,472
+  s_524f399a310bce::t_7f0fc12557d709 337-341,353,360,362,364,370,373,377,380,387,454,482
+  s_524f399a310bce::t_0ef0590ab8befc 150,164-165
+  s_524f399a310bce::t_be9d33cece9f1d 193,195-196,198-202,206,208-209
+  s_524f399a310bce::t_0e2faa7692747f 394-420,502-503,566-594,596-601
+  s_524f399a310bce::t_d5478babe3fa9e 1-4,6,8-10,12-37,172-192,224-231,248-249,255-263,279,283,285,288-290,302-303,313-336,342-352,354-355,363,365-369,371-372,374-376,378-379,381-386,388-393,421-428,430-441,444-449,452-453,455-471,473-481,483-501,602-611,631-632
+  s_524f399a310bce::t_2b896e4f34db85 264-272,277-278,280-282,284
+  s_524f399a310bce::t_3f8a2f6f28b226 5,7,77-144,155-156,159,163,166-169
+packages/skillpack-skill/skill/scripts/companion_lib.py
+  s_524f399a310bce::t_87aa202e7a2d0b 561-569,579-610,1052,1115,1121-1134,1177
+apps/api/src/migrate.ts
+  s_524f399a310bce::t_debb2fab948c89 11-12,304,377-378,496
+packages/skillpack-skill/skill/scripts/runtime_command.py
+  s_524f399a310bce::t_98767393d1517e 17,29
+  s_524f399a310bce::t_abf1956b2f588d 1-16,18-28,30-43
+scripts/test_runtime_project.py
+  s_524f399a310bce::t_c91201a99f7ebf 1-54
+runtime/testdata/claude-transcript.jsonl
+  s_524f399a310bce::t_0a759bd7e76d74 1-2
+packages/skillpack-skill/skill/scripts/test_opencode_runtime.mjs
+  s_524f399a310bce::t_2dfe50082158e8 3,90
+  s_524f399a310bce::t_e9b39c13838c1a 57
+  s_524f399a310bce::t_f78fc48b4f53d8 2,4-5,72-89,91-121
+  s_524f399a310bce::t_e1e459884b1dd9 56
+  s_524f399a310bce::t_548f08a72a7d0e 1,6-55,58-71,122-129
+runtime/cmd/skillpack-runtime/main.go
+  s_524f399a310bce::t_76a10797b8ffc0 1-11
+packages/skillpack-skill/skill/scripts/runtime_lock.py
+  s_524f399a310bce::t_d8dfd1b3729c3c 1-37
+scripts/runtime-release.test.mjs
+  s_524f399a310bce::t_ccecc528e67d70 1-83
+packages/skillpack-skill/skill/scripts/runtime_setup.py
+  s_524f399a310bce::t_5f4c8c666d57cf 6,259,301
+  s_524f399a310bce::t_03e588e88e6e3b 113-124,596
+  s_524f399a310bce::t_b0d7cefdd8f4ec 12,25-28,608-616
+  s_524f399a310bce::t_a3f3815d29be00 14,473-474,493,527
+  s_524f399a310bce::t_741fe8869225b6 565-567,569-570
+  s_524f399a310bce::t_8e8e56add5e431 568
+  s_524f399a310bce::t_e4e515ec4c19e9 254-258,260-285,291-296,299-300,302-308,314,317-318
+  s_524f399a310bce::t_4b674028913aca 394-396
+  s_524f399a310bce::t_7c770be9496291 403-404,429-431
+  s_524f399a310bce::t_54d2a9fe998f26 1-5,7-11,13,15-24,29-78,125-151,153-227,324-393,397,399-400,405-428,432-454,456,470,475,477,502,507-525,540,545-550,552-564,571,573
+  s_524f399a310bce::t_503024dbb4b8e0 398,401-402,455,457-469,471-472,476,478-492,494-501,503-506,526,528-539,541-544,551,572,574-595,597-598,617-621,623
+  s_524f399a310bce::t_42b0da489c6059 79-112,228-253,286-290,297-298,309-313,315-316,319-323,599-607,622
+  s_524f399a310bce::t_4d395d1c7dfd56 152
+runtime/internal/runtime/transcript_test.go
+  s_524f399a310bce::t_ae4270076b54e9 1-3,5,7,9-10,12-83,85-94
+  s_524f399a310bce::t_aeaa7b9562e459 95,245-319
+  s_524f399a310bce::t_cac69d115f1ed4 400-414
+  s_524f399a310bce::t_18d0451f94305f 321-399
+  s_524f399a310bce::t_297f15280cf4ec 6,208-241
+  s_524f399a310bce::t_ab4915fdb9f35e 96-207,242-244
+  s_524f399a310bce::t_5cd84eab65404f 8,11
+  s_524f399a310bce::t_15dd2aca45f7e1 4
+  s_524f399a310bce::t_5a0aafa611033c 320,415-488
+  s_524f399a310bce::t_13d43855a410a4 548-578,581-696
+  s_524f399a310bce::t_896f38a11016b5 489-547
+  s_524f399a310bce::t_fc558e0e355758 84
+  s_524f399a310bce::t_33696393ff612b 579-580
+scripts/runtime-build.py
+  s_524f399a310bce::t_be484c3423b66b 5,67,96-99,101-108
+  s_524f399a310bce::t_f2eacf0885421c 1-4,6-66,69,72-95,100,109-115
+  s_524f399a310bce::t_c8ebb01da9f94c 68,70-71
+scripts/runtime-release.mjs
+  s_524f399a310bce::t_946e4acc2956a3 1-135
+packages/skillpack-skill/client/runtime-install.ts
+  s_524f399a310bce::t_0b576a526af2bc 1-30,32-49,51-59
+  s_524f399a310bce::t_8d5af2a920bfc4 31,50
+apps/api/src/localSkills.test.ts
+  s_524f399a310bce::t_fa6762175c59ee 51,72,84-87,91,96,141-142
+  s_524f399a310bce::t_c91201a99f7ebf 82
+apps/api/test/integration/skillUsage.integration.test.ts
+  s_524f399a310bce::t_5f5525a4e28225 9,28,56-62,70-71,83-100,107-108,112,120-122
+packages/contracts/src/skillpackManifest.ts
+  s_524f399a310bce::t_6390494568b678 87-88,105-112,148-156,160,209-210,249,252-253,257,357-358,362-365,392,417
+runtime/testdata/README.md
+  s_524f399a310bce::t_0a759bd7e76d74 1-14
+  s_524f399a310bce::t_54685e5d2f0c4d 15-23
+runtime/internal/runtime/events.go
+  s_524f399a310bce::t_e343e5006c3403 99-106
+  s_524f399a310bce::t_4121d9b6e5f7c1 252-262
+  s_524f399a310bce::t_4037bb3555fdb2 63,67-69,72-74,79
+  s_524f399a310bce::t_fc8657ee5e8a4a 16-28,227,270-272,275-276,280-291
+  s_524f399a310bce::t_74a1b286dd61fa 62,64-66,70-71,80
+  s_524f399a310bce::t_ca7a276f880a07 1-15,29-61,75-78,81-89,117-128,130-134,137-143,145-149,151-152,154-159,161-164,166-175,182-198,200-223,225-226,228-251,263-269,273-274,277-279,292-310
+  s_524f399a310bce::t_f22424f15a0d21 90-92
+  s_524f399a310bce::t_66c351bd6184c5 176-181
+  s_524f399a310bce::t_d73e1fa0742aca 93-98,107-116,129,135-136,144,150,153,160,165,199,224
+runtime/internal/runtime/worker.go
+  s_524f399a310bce::t_675a7080b416e2 51-53
+  s_524f399a310bce::t_a3ca8dbece6674 63-66,80-84,109-127
+  s_524f399a310bce::t_a20ce3159503ae 1-50,54-62,67-79,85-108,128-156
+packages/skillpack-skill/client/runtime-install.test.ts
+  s_524f399a310bce::t_ce924cbf8171d7 1-24
+packages/skillpack-skill/skill/scripts/opencode-runtime.mjs
+  s_524f399a310bce::t_9d83a024cebe09 1-107,110-113,116-163
+  s_524f399a310bce::t_e9b39c13838c1a 108-109,114
+  s_524f399a310bce::t_e1e459884b1dd9 115
+scripts/ci-scope.test.mjs
+  s_524f399a310bce::t_5f5525a4e28225 20,183-187
+  s_524f399a310bce::t_82ca449415d450 188
+runtime/go.mod
+  s_524f399a310bce::t_76a10797b8ffc0 1-3
+  s_524f399a310bce::t_3e2217f02e65fb 4-5
+  s_524f399a310bce::t_6b93a8ea1845cc 6-17
+runtime/internal/runtime/types.go
+  s_524f399a310bce::t_3e2217f02e65fb 1-28,30-40,42,46-51,55-113,121-123,134-161,163-177
+  s_524f399a310bce::t_6ff046adbca52c 29,45
+  s_524f399a310bce::t_959f74612e1ff9 41,43-44,52-54,114-120,124-133,162
+runtime/internal/runtime/config.go
+  s_524f399a310bce::t_f675f11f6e46c7 39-43
+  s_524f399a310bce::t_3e2217f02e65fb 1-38,44-86
+packages/skillpack-skill/skill/scripts/install_skill.py
+  s_524f399a310bce::t_afabedba3cafd8 904-909,943,974-975
+  s_524f399a310bce::t_adf3514cb9ef77 46,70-71,408,739-753
+  s_45176c78666d3e::t_509994338bd731 754-755
+docs/skillpack-runtime.md
+  s_524f399a310bce::t_76fdab2234a25b 46-49,84,94-95,150
+  s_524f399a310bce::t_a384c38ee33429 1-45,50-83,85-93,96-149,151
+runtime/internal/runtime/hook_test.go
+  s_524f399a310bce::t_d19753a1db404c 9
+  s_524f399a310bce::t_875c149c2586f9 195-221
+  s_524f399a310bce::t_d7d8695aca0e29 149-174,222-264
+  s_524f399a310bce::t_6084cb400757a7 23-24,72-113
+  s_524f399a310bce::t_9254453fdd2356 343-349
+  s_524f399a310bce::t_24fbe338d28a97 265-309,312-314,317-319,322-342,350-357
+  s_524f399a310bce::t_e5703a3bc84286 175-189,191-194
+  s_524f399a310bce::t_357d65860ff19e 190,310-311,315-316,320-321
+  s_524f399a310bce::t_c662c4f419b43e 1-8,10-22,25-71,114-115
+  s_524f399a310bce::t_4cae55bee39a6b 116-148
+runtime/internal/runtime/cli.go
+  s_524f399a310bce::t_e2efaa147fb8bf 4-7,10-11,18-22,24-28,30-133,135-138,140-149,151
+  s_524f399a310bce::t_30323301d4e7ec 134,139
+  s_524f399a310bce::t_76a10797b8ffc0 1-3,8-9,12-17,23,29,150,152
+apps/api/src/skillUsageMigration.ts
+  s_524f399a310bce::t_debb2fab948c89 1-24,26-118
+  s_524f399a310bce::t_4158bc22e12193 25
+.agents/skillpack/usage/hook.mjs
+  s_524f399a310bce::t_c59fb4889302b9 1,3-11,14-16
+  s_524f399a310bce::t_8d5af2a920bfc4 2,12-13
+scripts/runtime-native-test.py
+  s_524f399a310bce::t_be484c3423b66b 1-3,6-15,17-52,91-97
+  s_524f399a310bce::t_d077e1bba0af61 4-5,16,53-90
+packages/skillpack-skill/skill/scripts/test_runtime_setup.py
+  s_524f399a310bce::t_332c35dfd189c5 51-67,71-84
+  s_524f399a310bce::t_8e8e56add5e431 255
+  s_524f399a310bce::t_ed330b9e7494fc 1,3-14,16,19-21,109-133,136,142-162,187-214,217-221,259,296-302,311-375
+  s_524f399a310bce::t_98767393d1517e 15,22-24
+  s_524f399a310bce::t_621df8abf2c9d9 163-186
+  s_524f399a310bce::t_2740a35866069a 261-289,295
+  s_524f399a310bce::t_8b454eb17244e5 17,25-50,85-108
+  s_524f399a310bce::t_03e588e88e6e3b 2,134-135,137-141
+  s_524f399a310bce::t_f31db103edf44e 18,225-232,234-242,245-253,256-258
+  s_524f399a310bce::t_a668c23bc23e1f 254
+  s_524f399a310bce::t_42fa94cca4277a 68-70
+  s_524f399a310bce::t_831c168d8c456d 215-216,243-244
+  s_524f399a310bce::t_d9a5fa252a0f50 233
+  s_524f399a310bce::t_ead599562f62e8 222-224
+  s_524f399a310bce::t_c5854cd99f7200 303-310
+  s_524f399a310bce::t_cb1ca3f12aa1f2 260,290-294
+runtime/internal/runtime/transport.go
+  s_524f399a310bce::t_31c0f2d2e5075c 16-19,33,43-45,49,59,65-68,71-82,90,100,119,125-127,130-152
+  s_524f399a310bce::t_9d4c80827bf887 41
+  s_524f399a310bce::t_80034fe28ecd35 1-15,20-32,34-40,42,46-48,51-52,58,60-64,69-70,83-89,91-99,101-118,120-124,128-129,153-237
+  s_524f399a310bce::t_bcc414358341d1 50,53-57
+runtime/VERSION
+  s_524f399a310bce::t_76a10797b8ffc0 1
+runtime/internal/runtime/hook.go
+  s_524f399a310bce::t_74c9c393a0d23d 400
+  s_524f399a310bce::t_6ff046adbca52c 226-227,232,239-282,287-292,294-301,357-359,374-379,386,397,399,408
+  s_524f399a310bce::t_7def799dddcf45 18-26,163-167,217
+  s_524f399a310bce::t_675a7080b416e2 426-430,432-436,446
+  s_524f399a310bce::t_ff4bc39ab6e021 1-17,27-29,33-70,82,94-95,100,104-117,119-120,123-128,139-162,174,178-189,191-198,200-202,204-210,220-222,353-356,360-371,373,406-407,414-415,422-425,437-445,448-498
+  s_524f399a310bce::t_21d556875772d5 121-122
+  s_524f399a310bce::t_5e60b3e4090e52 211-216,218-219
+  s_524f399a310bce::t_8b611ec24a0e2e 118
+  s_524f399a310bce::t_e9b39c13838c1a 285-286,293
+  s_524f399a310bce::t_73294d7b3de56a 71-81,83-93,96-99,101-103,199,203
+  s_524f399a310bce::t_4f5816660d0c66 168-172
+  s_524f399a310bce::t_eaad66e911fbeb 223-225,228-231,233-238,302-352
+  s_524f399a310bce::t_3cbf7dd6bd40b2 129-138,173,175-177
+  s_524f399a310bce::t_8a5f5b2c236073 190
+  s_524f399a310bce::t_bf57822aea5e3c 372,380-385,387-396,401-405,409-413,416-421,431,447
+  s_524f399a310bce::t_8a07b7c0c03de3 398
+  s_524f399a310bce::t_e1e459884b1dd9 283-284
+  s_524f399a310bce::t_859c717b1ef633 30-32
+packages/db/drizzle/0191_skill_usage_runtime.sql
+  s_524f399a310bce::t_004518a40227d0 1-109
+runtime/internal/runtime/inventory.go
+  s_524f399a310bce::t_38285abf9d3fa1 1-17,19-76,80-82,84-101,111,113-127,131-133,135-152,157-161,167,179-180,182-183,185,189,227-229,231-239,243-245,247-261,295-317
+  s_524f399a310bce::t_b4048d4312493f 184,262-286
+  s_524f399a310bce::t_5f76c381fb9955 187-188,190-195,197-213,215-226,287-294
+  s_524f399a310bce::t_c8ec092df9ba05 162
+  s_524f399a310bce::t_3abcfc3b08a5ff 83,102,105-106,108-109,112
+  s_524f399a310bce::t_0978ab4d53c345 153-156,186,196,230
+  s_524f399a310bce::t_228434cb419917 18
+  s_524f399a310bce::t_b4e7577a76d624 77-79
+  s_524f399a310bce::t_7c9a752c5f9c3c 240-242
+  s_524f399a310bce::t_c0c80ede99ac14 103-104
+  s_524f399a310bce::t_cda9c892cabb8b 107,110,128-130,134,163-166,168-178,181,214,246
+scripts/ci-scope.mjs
+  s_524f399a310bce::t_5f5525a4e28225 16,157-160
+packages/skillpack-skill/skill/scripts/runtime_skill_sync.py
+  s_524f399a310bce::t_97bf68abca6991 1-34,42-48,50,52-126,131-138
+  s_524f399a310bce::t_9225c4e6b934aa 35-41,49,51,127-130
+runtime/internal/runtime/db.go
+  s_524f399a310bce::t_6132a012a53723 161
+  s_524f399a310bce::t_e8c7d58f53ca90 380-383
+  s_524f399a310bce::t_1ce54ab91dcb2d 79-88,244-375
+  s_524f399a310bce::t_e5cb8001bdb24d 5,7,98,110-112,114-160,162-201
+  s_524f399a310bce::t_4d007467992aa7 31-36,391-393,448,452,456-459,461,488-491,499,504-507,512,523-526
+  s_524f399a310bce::t_3e2217f02e65fb 1-4,6,8-30,37-56,62-78,89-96,99-106,113,376-379,384-390,449-451,453-455,460,462-476,478-479,483-487,492-498,500-503,508-511,513-522,527-529,531-557
+  s_524f399a310bce::t_33d5055672c0a8 399-403,410,413-414,417-419,421
+  s_524f399a310bce::t_55c9735895d1ec 424
+  s_524f399a310bce::t_9d4c80827bf887 477
+  s_524f399a310bce::t_855c48ba13d14c 480-482
+  s_524f399a310bce::t_b4e5c40fe84d8f 394-398,404-409,411-412,415-416,420,422-423,425-447,530
+  s_524f399a310bce::t_959f74612e1ff9 107-109,202-203,207-211,213-221,223,227-232
+  s_524f399a310bce::t_4fc80761f2f0a2 57-61
+  s_524f399a310bce::t_a70e551a851d10 97,204-206,212,222,224-226,233-243
+.agents/skillpack/usage/setup.py
+  s_524f399a310bce::t_c91201a99f7ebf 9-10,22-25,49-50
+  s_524f399a310bce::t_c59fb4889302b9 1-8,11-21,26-48,51-55
+runtime/testdata/codex-item-completed-read.json
+  s_524f399a310bce::t_54685e5d2f0c4d 1-22
+packages/skillpack-skill/skill/SKILL.md
+  s_524f399a310bce::t_76fdab2234a25b 27-49,1397
+docs/design.md
+  s_524f399a310bce::t_e65ac999fc311d 97-121
+scripts/runtime-project.ts
+  s_524f399a310bce::t_c59fb4889302b9 1-10,12-14,17-53
+  s_524f399a310bce::t_c91201a99f7ebf 11,15-16
+packages/db/src/schema.ts
+  s_524f399a310bce::t_004518a40227d0 1730,1736-1738,1749-1750,1760-1772
+  s_524f399a310bce::t_fb86490760b24c 1773
+packages/skillpack-skill/skill/scripts/test_runtime_skill_sync.py
+  s_524f399a310bce::t_b9bd93ecd40109 84-103
+  s_524f399a310bce::t_270f7a6a0393ba 1-36,55-83,104-106
+  s_524f399a310bce::t_06b84c29b6a5c2 37-54
+runtime/internal/runtime/worker_test.go
+  s_524f399a310bce::t_b7e3d59014789c 1-34
+packages/skillpack-skill/skill/reference/api.md
+  s_524f399a310bce::t_b63d0069dff40b 818-819,950,952-953,955-959,961-974
+.agents/skillpack/usage/inventory.json
+  s_524f399a310bce::t_bc154588b375c5 1-221
+.agents/skillpack/usage/runtime-release.json
+  s_524f399a310bce::t_e161134a4c0daf 1-5
+.agents/skillpack/usage/runtime_command.py
+  s_524f399a310bce::t_08b50cd2118bcd 1-43
+.agents/skillpack/usage/runtime_lock.py
+  s_524f399a310bce::t_32c342a2c948ac 1-37
+.agents/skillpack/usage/runtime_setup.py
+  s_524f399a310bce::t_0a5608a8e1ef32 1-623
+.agents/skillpack/usage/skillpack-runtime-launch.py
+  s_524f399a310bce::t_d46fd8ff33b7e0 1-26
+.agents/skillpack/usage/verify-runtime-release.mjs
+  s_524f399a310bce::t_3b89b411d811af 1-14
+.agents/skills/better-ui/SKILL.md
+  s_f4b7dcac173376::t_aa55a045d49c10 11,13-14
+.agents/skills/better-ui/companion.json
+  s_f4b7dcac173376::t_0c55c73b9f0ae2 4,11-17,33-43
+.agents/skills/capture-learning-tools/SKILL.md
+  s_f4b7dcac173376::t_7864e429e5b39f 16,18-19
+.agents/skills/capture-learning-tools/companion.json
+  s_f4b7dcac173376::t_3b940d95d32f57 4,11-17,39-49
+.agents/skills/design-frontend-dev/SKILL.md
+  s_524f399a310bce::t_103a2c92f17b87 16,18-19
+.agents/skills/design-frontend-dev/companion.json
+  s_524f399a310bce::t_671cd396edf61e 4,11-17,41-51
+.agents/skills/emil-design-eng/SKILL.md
+  s_524f399a310bce::t_f7afb89cfbb152 11,13-14
+.agents/skills/emil-design-eng/companion.json
+  s_524f399a310bce::t_943846187e34c3 4,11-17,33-43
+.agents/skills/grilling/SKILL.md
+  s_524f399a310bce::t_df8a84d7b6d81f 11,13-14
+.agents/skills/grilling/companion.json
+  s_524f399a310bce::t_a589ca168b757d 4,11-17,33-43
+.agents/skills/ios-product-dev/SKILL.md
+  s_524f399a310bce::t_416c3c5bde58e5 8-14
+.agents/skills/ios-product-dev/companion.json
+  s_524f399a310bce::t_72db81ecc78d16 4,11-17,25-35
+.agents/skills/plan-pr/SKILL.md
+  s_524f399a310bce::t_fc349ea5a0d8bf 15,17-18
+.agents/skills/plan-pr/companion.json
+  s_524f399a310bce::t_d907f96ce47954 4,12-18,35-45
+.agents/skills/review-code-dev/SKILL.md
+  s_524f399a310bce::t_0fc5f31068b0e2 21,23-24
+.agents/skills/review-code-dev/companion.json
+  s_524f399a310bce::t_416fec6a92cb90 4,11-17,89-99
+.agents/skills/ship-pr-dev/SKILL.md
+  s_524f399a310bce::t_d0d775304d2efb 17,19-20
+.agents/skills/ship-pr-dev/companion.json
+  s_524f399a310bce::t_15b3dcd6cc8bab 4,11-17,101-111
+.agents/skills/swiftui-expert-dev/SKILL.md
+  s_524f399a310bce::t_53a97c88d65266 8-14
+.agents/skills/swiftui-expert-dev/companion.json
+  s_524f399a310bce::t_95869c16af78cd 4,11-17,25-35
+.agents/skills/tdd/SKILL.md
+  s_524f399a310bce::t_a8ffb9142d71b2 11,13-14
+.agents/skills/tdd/companion.json
+  s_524f399a310bce::t_04632fbf3cea5c 4,11-17,33-43
+.agents/skills/xcodebuildmcp-cli/SKILL.md
+  s_524f399a310bce::t_cd7433b7beafbe 8-14
+.agents/skills/xcodebuildmcp-cli/companion.json
+  s_524f399a310bce::t_67c12b16aa7e99 4,11-17,25-35
+.claude/settings.json
+  s_bd8f985eff5a29::t_8129c0e204feee 1-116
+.codex/hooks.json
+  s_524f399a310bce::t_ab5d486c8a3786 1-69
+.gitattributes
+  s_524f399a310bce::t_7c980f0a95522e 3-9
+.opencode/plugins/skillpack-runtime.js
+  s_524f399a310bce::t_a928e2d151c87c 1-163
+apps/api/package.json
+  s_524f399a310bce::t_4972da0ca59d39 16-17
+apps/api/src/migrate-skill-usage-runtime.ts
+  s_524f399a310bce::t_b7447d30aa56dd 1-30
+apps/api/src/skillUsageRoutes.test.ts
+  s_524f399a310bce::t_1fde31d17ee1ee 5,7,10,15,41-47
+apps/api/src/skillUsageRoutes.ts
+  s_524f399a310bce::t_a75c93e557f7e1 4,8,10,14,27-31,36
+apps/api/tsup.config.ts
+  s_524f399a310bce::t_c79936d22b5e30 4
+apps/web/src/components/skills/SkillUsageTab.test.ts
+  s_524f399a310bce::t_e82a484ccf5700 6,10-11,22-34
+apps/web/src/components/skills/SkillUsageTab.tsx
+  s_524f399a310bce::t_e1e427e366a39e 7,11,19-22,30,32,40,42-53,71
+apps/web/src/styles/skills.css
+  s_524f399a310bce::t_c44472b5770799 1612
+apps/worker/src/skillUsageCleanup.ts
+  s_524f399a310bce::t_518c01552a3812 1,4,6,12-15,21
+cli/src/commands/skills.publish.test.ts
+  s_524f399a310bce::t_6e5747aa0cb05e 50-55
+docs/testing.md
+  s_524f399a310bce::t_e05110ae527606 15-20
+packages/contracts/schemas/companion-manifest.v2.schema.json
+  s_524f399a310bce::t_3b8b66d268e640 34-79
+packages/contracts/test/skillRuntimeUsage.test.ts
+  s_524f399a310bce::t_17a74894d9e3dc 1-15
+packages/core/src/services.ts
+  s_524f399a310bce::t_a38661e6028625 3,2785,2813-2822
+packages/core/src/skillUsage.ts
+  s_524f399a310bce::t_ae3f07b127751f 6,8-15,33-34,36-37,49-54
+packages/db/drizzle/meta/_journal.json
+  s_524f399a310bce::t_5797c2bbc5f5cb 1341-1347
+packages/db/runtime-role-grants.sql
+  s_524f399a310bce::t_9e51a40ed80046 218-220,224-229
+packages/skillpack-skill/skill/companion.integrity.json
+  s_524f399a310bce::t_17a0865690c22f 3-4,6-7,11-12,14,16-21,25,29-30,33
+packages/skillpack-skill/skill/companion.json
+  s_524f399a310bce::t_8927bdff319523 4,8,14-15,25-30,34-36,38-39,42-49,1096
+packages/skillpack-skill/skill/runtime-release.json
+  s_524f399a310bce::t_17c40707d8a9f8 1-5
+packages/skillpack-skill/skill/scripts/bootstrap.py
+  s_524f399a310bce::t_61466529f275c9 26-27,265-267,269-270
+packages/skillpack-skill/skill/scripts/companion-agent-client.mjs
+  s_524f399a310bce::t_5b9d3a0b23d570 3-5,7-8,10-14,17-19,22,27,29,31-37,39,44,46,49-50,53-54,56-57,59,64-71,73,86,90,92,94,96,100-101,104-105,107-108,111-112,114-116,118-120,124-125,127,132,134-135,137,139,141-145
+packages/skillpack-skill/skill/scripts/package-checksum.mjs
+  s_524f399a310bce::t_c90d9e737ecac6 2-3,6-7,11-12,34-36,45,48,52-53,55,58,63-66,68-70,85,100,103-104,106-107,110-111,113-115,117-118,134,136,138,140,143
+packages/skillpack-skill/skill/scripts/skillpack-runtime-launch.py
+  s_524f399a310bce::t_6f94ae58d5142e 1-26
+packages/skillpack-skill/skill/scripts/verify-runtime-release.mjs
+  s_524f399a310bce::t_9e19dad7493700 1-14
+packages/skillpack-skill/src/package.ts
+  s_524f399a310bce::t_e4a248a98677db 132-136
+packages/skills/src/manifest.ts
+  s_524f399a310bce::t_0c5a9f8254b78d 120,170,187
+packages/skills/src/usageInstructions.ts
+  s_524f399a310bce::t_7039113a02c9f5 1,6,12-15,23,25-26
+packages/skills/test/usageInstructions.test.ts
+  s_524f399a310bce::t_834bf0333ab132 8,15,19-22,42-43
+runtime/go.sum
+  s_524f399a310bce::t_67fbe53427a465 1-50
+scripts/ci-gate.mjs
+  s_524f399a310bce::t_df93cb14c3e7b5 11,33
+scripts/ci-gate.test.mjs
+  s_524f399a310bce::t_5588457ae088c9 13,20,60-63
+scripts/dev-stack-check.sh
+  s_524f399a310bce::t_8673d2ac9a2297 26,41-42,55-56
+scripts/setup-conductor.sh
+  s_bd8f985eff5a29::t_7c8fd51116f63a 21-23
+scripts/verify-change.mjs
+  s_524f399a310bce::t_6854fae87235d0 19,201-204
+scripts/verify-change.test.mjs
+  s_524f399a310bce::t_9f1c318d0a2dbe 239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "4f7718ca67c06f11700eb1ed17782cb94e08d9c3",
+  "prompts": {},
+  "sessions": {
+    "s_45176c78666d3e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e651a97b-eb68-4c7c-a793-f025de5c0913",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    },
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    },
+    "s_bd8f985eff5a29": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cec9-b1f1-7ab2-9e6b-2bf74487f34d",
+        "model": "gpt-5.5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    },
+    "s_f4b7dcac173376": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0ce73-295d-7521-9626-75c181e6eb3a",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

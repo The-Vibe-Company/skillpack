@@ -1,0 +1,23 @@
+apps/web/src/components/onboarding/TeamStep.tsx
+  s_d75a7804b79399::t_6649bfd25a4998 146
+apps/web/src/components/onboarding/WorkspaceStep.tsx
+  s_d75a7804b79399::t_6649bfd25a4998 55
+apps/web/src/components/onboarding/ConnectAgentStep.tsx
+  s_d75a7804b79399::t_6649bfd25a4998 112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1c72fa45e374595f8b18beded23d14a80162b475",
+  "prompts": {},
+  "sessions": {
+    "s_d75a7804b79399": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9c49f2f9-6111-4420-b8a6-33fa43e48152",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+apps/api/src/localSkills.test.ts
+  s_524f399a310bce::t_c5b9e2a3e98658 51,141-142
+.agents/skillpack/usage/runtime_setup.py
+  s_524f399a310bce::t_bd6feee11ebf30 535-538
+docs/skillpack-runtime.md
+  s_524f399a310bce::t_5eda2ad93d8c58 107-111
+packages/skillpack-skill/skill/SKILL.md
+  s_524f399a310bce::t_da2f951c89f2cb 237-238,1397
+packages/skillpack-skill/skill/companion.integrity.json
+  s_524f399a310bce::t_29a0c79865c57a 3-4,20,33
+packages/skillpack-skill/skill/companion.json
+  s_524f399a310bce::t_4ef4c0c74be94e 4,8,42-48,1103
+packages/skillpack-skill/skill/scripts/runtime_setup.py
+  s_524f399a310bce::t_8a2c1a0f1cea0e 535-538
+packages/skillpack-skill/skill/scripts/test_runtime_setup.py
+  s_524f399a310bce::t_e34f8626377692 319-342
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9469a0275bc95c83b8d7f19235642d1cc2962abc",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+.agents/skills/README.md
+  s_524f399a310bce::t_d2e2645d57d7a8 23,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9ee205c83123986da6432c56d09c2fb113abd21f",
+  "prompts": {},
+  "sessions": {
+    "s_524f399a310bce": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd75-810b-7b43-96ac-dc3eaa901d5f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

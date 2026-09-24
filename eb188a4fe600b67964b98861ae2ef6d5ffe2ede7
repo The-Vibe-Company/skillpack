@@ -1,0 +1,19 @@
+apps/web/next.config.ts
+  s_3181443b264428::t_a9494970d4d733 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "eb188a4fe600b67964b98861ae2ef6d5ffe2ede7",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

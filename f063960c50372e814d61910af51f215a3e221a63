@@ -1,0 +1,31 @@
+CLAUDE.md
+  s_3181443b264428::t_2bb43bcc292be1 14,44
+apps/api/tsup.config.ts
+  s_3181443b264428::t_ba729ddb712492 15
+apps/worker/tsup.config.ts
+  s_3181443b264428::t_d1dae993417667 9
+scripts/agent-browser-box-center.mjs
+  s_3181443b264428::t_5a77dedacb5a4b 6
+scripts/agent-browser-box-center.test.mjs
+  s_3181443b264428::t_3911b693eeac3d 24-30
+scripts/agent-browser-smoke.sh
+  s_3181443b264428::t_35e21d897be6c3 264-267,300-302
+scripts/railway-config.test.mjs
+  s_3181443b264428::t_989f9a223875d8 36-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f063960c50372e814d61910af51f215a3e221a63",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

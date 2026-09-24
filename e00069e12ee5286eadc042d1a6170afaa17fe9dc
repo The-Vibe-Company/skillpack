@@ -1,0 +1,23 @@
+apps/web/package.json
+  s_3181443b264428::t_968ef18e9eae63 23,36
+cli/tsup.config.ts
+  s_3181443b264428::t_ae8191b935c411 11
+package.json
+  s_3181443b264428::t_0e10516470d734 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e00069e12ee5286eadc042d1a6170afaa17fe9dc",
+  "prompts": {},
+  "sessions": {
+    "s_3181443b264428": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09f20-caa5-7aa2-90b2-076dad791047",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}

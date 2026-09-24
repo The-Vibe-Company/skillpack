@@ -1,0 +1,115 @@
+packages/skills/src/index.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 11
+packages/core/src/skillUsage.ts
+  s_2bb3914e08b958::t_06f800904a1937 1-23,59
+  s_2bb3914e08b958::t_dbc20b197ab8db 24-58
+packages/contracts/src/skillUsage.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 1-28
+packages/db/drizzle/0188_skill_usage.sql
+  s_2bb3914e08b958::t_06f800904a1937 1-85
+packages/contracts/src/index.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 22
+packages/db/runtime-role-grants.sql
+  s_2bb3914e08b958::t_06f800904a1937 216-221
+packages/skills/src/manifest.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 16,22,84,195-197
+apps/api/src/skillPublish.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 29,60,79,86,480-482
+  s_2bb3914e08b958::t_0e0dc76452fc66 128-129,189
+  s_2bb3914e08b958::t_ad92338160f08e 483
+docs/design.md
+  s_2bb3914e08b958::t_0e0dc76452fc66 100-101
+  s_2bb3914e08b958::t_5c35dc102b7651 35,96-99,102-120
+cli/src/commands/skills.ts
+  s_2bb3914e08b958::t_0e0dc76452fc66 267
+  s_2bb3914e08b958::t_b82fc3cd11a7c7 273
+  s_c320878ed6c940::t_20c93ef766ea91 307
+packages/core/src/index.ts
+  s_2bb3914e08b958::t_06f800904a1937 11
+cli/src/commands/skills.publish.test.ts
+  s_2bb3914e08b958::t_462b18792bb8b5 1-3,9-10,12-18,27-34,45-46,48-50,57-58
+  s_2bb3914e08b958::t_2590bbaf0a13db 23,26,35,38
+  s_2bb3914e08b958::t_f33a21ffee9524 47
+  s_2bb3914e08b958::t_a423f34a8ca57a 4-8,11,19-22,24-25,36-37,39-44,51-56
+packages/db/src/schema.ts
+  s_2bb3914e08b958::t_06f800904a1937 1725-1750
+packages/skills/src/usageInstructions.ts
+  s_2bb3914e08b958::t_2f1aaae97fb4b0 1-17,24-58
+  s_2bb3914e08b958::t_e4819f28964b6c 18-23
+apps/api/src/index.ts
+  s_2bb3914e08b958::t_622a7fdbc716b7 1-2,695-696,2287-2298
+apps/api/src/localSkills.test.ts
+  s_2bb3914e08b958::t_7081a4263cca60 51,132-133
+apps/api/src/skillUsageRoutes.test.ts
+  s_2bb3914e08b958::t_7370b6cb39e981 1-47
+apps/api/src/skillUsageRoutes.ts
+  s_2bb3914e08b958::t_24aa8607ffcb4c 1-35
+apps/api/test/integration/skillUsage.integration.test.ts
+  s_2bb3914e08b958::t_5e8f4207402d96 1-101
+apps/web/src/components/skills/DetailView.tsx
+  s_2bb3914e08b958::t_4152878bcda186 33,84,114,140,434,637-638
+apps/web/src/components/skills/SkillUsageTab.test.ts
+  s_2bb3914e08b958::t_c1931c3e79f201 1-21
+apps/web/src/components/skills/SkillUsageTab.tsx
+  s_2bb3914e08b958::t_cf352762d05c88 1-61
+apps/web/src/lib/queries.ts
+  s_2bb3914e08b958::t_d6d7156d9d95f3 5,53,444,458,487-490
+apps/web/src/styles/skills.css
+  s_2bb3914e08b958::t_accb6961b2cb13 1628-1642
+apps/worker/src/index.ts
+  s_2bb3914e08b958::t_847d247e849a19 2,8,22
+apps/worker/src/skillUsageCleanup.ts
+  s_2bb3914e08b958::t_0783f8776c0313 1-20
+cli/src/lib/session.ts
+  s_2bb3914e08b958::t_f86e030940bece 2,13,23,32-33
+cli/src/lib/telemetryIdentity.test.ts
+  s_2bb3914e08b958::t_908d7b96b60c67 1-24
+cli/src/lib/telemetryIdentity.ts
+  s_2bb3914e08b958::t_60488021278275 1-20
+docs/PRD.md
+  s_2bb3914e08b958::t_a6b5649200f1a3 20-21
+docs/product.md
+  s_2bb3914e08b958::t_c49b614b61500e 31-50
+docs/testing.md
+  s_2bb3914e08b958::t_391bfcab56c3b2 12-14
+docs/vision.md
+  s_2bb3914e08b958::t_62f07ac2c2559c 9-10
+packages/db/drizzle/meta/_journal.json
+  s_2bb3914e08b958::t_f73bb816c2a543 1320-1326
+packages/skillpack-skill/skill/SKILL.md
+  s_2bb3914e08b958::t_c0b15f45d4fd1e 27-35,1382
+packages/skillpack-skill/skill/companion.integrity.json
+  s_2bb3914e08b958::t_42b56135616257 3-4,10,24
+packages/skillpack-skill/skill/companion.json
+  s_2bb3914e08b958::t_89d7d60f412e0c 4,33-39
+packages/skillpack-skill/skill/reference/api.md
+  s_2bb3914e08b958::t_485c743c179fb5 943-961
+packages/skillpack-skill/skill/scripts/companion-agent-client.mjs
+  s_c320878ed6c940::t_6a103e2c2a0c6d 3-5,7-8,12-14,17,19,22,26-28,31-36,46,49-51,53-57,59-60,64-73,82,86,88-94,96,101,104-108,111-116,118-119,122-123,125-135,137,139,141-142,144
+packages/skills/test/usageInstructions.test.ts
+  s_2bb3914e08b958::t_d8c51fa6b524ca 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0bedc88b5b62793d202090b804b8d75f612fcfca",
+  "prompts": {},
+  "sessions": {
+    "s_2bb3914e08b958": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd8c-dacf-70f1-be60-aed09190bbcb",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    },
+    "s_c320878ed6c940": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0cd7f-7106-7211-ac31-cded2a12377a",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
