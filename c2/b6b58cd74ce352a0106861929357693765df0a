@@ -1,0 +1,31 @@
+packages/skillpack-skill/skill/companion.integrity.json
+  s_01f5e6caaf9a81::t_cb6c286b43f15e 6
+packages/skillpack-skill/skill/runtime-release.json
+  s_01f5e6caaf9a81::t_417feb35b9f2d4 2-3
+packages/skillpack-skill/src/package.test.ts
+  s_01f5e6caaf9a81::t_996416db309bd0 23
+packages/skillpack-skill/src/package.ts
+  s_01f5e6caaf9a81::t_334eca1f134a69 94-95
+runtime/VERSION
+  s_01f5e6caaf9a81::t_cabc7a6210f3d5 1
+runtime/internal/cli/contracts/runtime-release.json
+  s_01f5e6caaf9a81::t_176f28a626c2b2 2-3
+runtime/internal/runtime/types.go
+  s_01f5e6caaf9a81::t_9c6df4c2c6aa0a 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c2b6b58cd74ce352a0106861929357693765df0a",
+  "prompts": {},
+  "sessions": {
+    "s_01f5e6caaf9a81": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0d251-c4f4-79b1-9106-38cfd84bf223",
+        "model": "gpt-6-sol"
+      },
+      "human_author": "StanGirard <stan@quivr.app>"
+    }
+  }
+}
