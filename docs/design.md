@@ -36,6 +36,8 @@ conditional generation checks. The worker cleans queued database objects and exp
 
 ## Secrets and delegated Agent Auth
 
+The human CLI uses a separate browser approval flow for a normal workspace PAT. An unauthenticated CLI creates a five-minute request with a random public ID and the hash of a private verifier. A signed-in member sees the complete key authority and selects one current workspace. Approval stores only the decision and member/workspace identity; the browser never receives the PAT. The CLI proves possession of its verifier when polling. A single atomic consume precedes PAT issuance under the selected tenant context, which rechecks membership. This differs from Agent Auth's constrained child PATs. An environment API key bypasses browser login but retains the same server authorization checks.
+
 Secret plaintext is accepted only on write or rotation, envelope-encrypted, and never returned by
 ordinary CRUD. Skill bindings refer to stable slots. External clients retrieve authorized values
 only through preflight and short-lived, non-replayable grants. Logs and audit metadata remain

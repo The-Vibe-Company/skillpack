@@ -227,6 +227,10 @@
 .device-approval--error > .device-approval__mark { margin-bottom: 14px; color: var(--color-danger); }
 .device-approval--error .btn-sec { margin-top: 8px; }
 .device-approval__reauth { margin-top: 8px; }
+.cli-approval__workspace { display: block; margin-top: 20px; font-size: var(--text-sm); font-weight: 600; }
+.cli-approval__workspace + select { width: 100%; min-height: 40px; margin-top: 6px; border: 1px solid var(--color-line-strong); border-radius: var(--radius-md); background: var(--color-surface); padding: 0 12px; color: var(--color-fg); }
+.cli-approval__scope { border: 1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface-sunken); padding: 12px; font-size: var(--text-xs); }
+.cli-approval__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 
 @media (max-width: 560px) {
   .device-approval-page { place-items: stretch; padding: 0; }

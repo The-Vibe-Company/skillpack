@@ -83,7 +83,7 @@ async function buildPackage(): Promise<SkillpackSkillPackage> {
 export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
   const auth = [
     "Authentication (use the same API URL for every command):",
-    "- Human setup: `skillpack auth login --api-url {base}`. The CLI reads the API key through hidden terminal input.",
+    "- Human setup: `skillpack auth login --api-url {base}`. Open the printed URL, sign in, select the workspace and approve. The CLI stores the issued key privately.",
     "- Automation: provide `SKILLPACK_API_KEY` and `SKILLPACK_API_URL={base}` in the process environment.",
     "- Verify before any read or write: `skillpack auth status --json`. Require an active, unexpired token",
     "  whose workspace and scopes match this request. Stop if the workspace is wrong or the token is revoked.",
@@ -91,8 +91,8 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
   ].join("\n");
 
   const runtime = [
-    "If the native CLI is not installed, use the official Skillpack runtime installer for runtime-v0.2.0:",
-    "- POSIX: download `install.sh` and the adjacent `SHA256SUMS` from `https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.2.0/` over HTTPS,",
+    "If the native CLI is not installed, use the official Skillpack runtime installer for runtime-v0.3.0:",
+    "- POSIX: download `install.sh` and the adjacent `SHA256SUMS` from `https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.3.0/` over HTTPS,",
     "  verify the installer's SHA-256 against its `SHA256SUMS` entry before running `sh install.sh`. The installer then verifies the pinned archive digest.",
     "- Windows PowerShell: download `install.ps1` and the adjacent `SHA256SUMS` from that same release URL,",
     "  compare `(Get-FileHash .\\install.ps1 -Algorithm SHA256).Hash` with the `install.ps1` entry before running it. The installer then verifies the pinned archive digest.",

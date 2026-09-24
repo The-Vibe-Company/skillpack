@@ -48,7 +48,7 @@ describe("companion skill package + row", () => {
     const pkg = await getSkillpackSkillPackage();
     expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.119.0");
+    expect(pkg.version).toBe("1.120.0");
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -119,7 +119,7 @@ describe("companion skill package + row", () => {
     expect(row.commands.length).toBeGreaterThan(0);
     expect(row.commands).toContainEqual({
       name: "Connect an agent",
-      desc: "Connect the native CLI with an API key and verify the selected workspace.",
+      desc: "Connect the native CLI through browser approval or an API key and verify the selected workspace.",
     });
     expect(row.commands).toContainEqual({
       name: "Check CLI health",
@@ -138,8 +138,8 @@ describe("companion skill package + row", () => {
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
     const changelog = row.changes.join("\n");
-    expect(changelog).toContain("native Skillpack CLI");
-    expect(changelog).toContain("Preserve legacy bootstrap payload");
+    expect(changelog).toContain("browser approval");
+    expect(changelog).toContain("Cobra command help");
     // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
     const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
       metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };

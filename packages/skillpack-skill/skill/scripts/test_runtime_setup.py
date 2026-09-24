@@ -447,8 +447,8 @@ class RuntimeSetupTests(unittest.TestCase):
     def test_signed_native_binary_installs_and_corruption_cannot_replace_it(self):
         native = Path(os.environ['SKILLPACK_RUNTIME_TEST_BINARY']).resolve()
         binary = native.read_bytes()
-        version = '0.2.0'
-        base = 'https://example.test/runtime-v0.2.0'
+        version = subprocess.check_output([str(native), '--version'], text=True).strip().split()[-1]
+        base = f'https://example.test/runtime-v{version}'
         assets, responses = [], {}
         for target in ('darwin_amd64', 'darwin_arm64', 'linux_amd64', 'linux_arm64', 'windows_amd64', 'windows_arm64'):
             windows = target.startswith('windows_')
@@ -477,7 +477,7 @@ class RuntimeSetupTests(unittest.TestCase):
             root = Path(tmp)
             result = install_runtime(config, root, fetch=lambda url, limit: responses[url])
             self.assertEqual(result['status'], 'installed')
-            self.assertEqual(subprocess.check_output([str(root / result['binary']), '--version']).decode().strip(), 'skillpack-runtime 0.2.0')
+            self.assertEqual(subprocess.check_output([str(root / result['binary']), '--version']).decode().strip(), f'skillpack-runtime {version}')
             self.assertEqual(install_runtime(config, root, fetch=lambda url, limit: responses[url])['status'], 'current')
             selected = next(asset for asset in assets if asset['target'] == runtime_target())
             responses[selected['url']] = b'corrupted'

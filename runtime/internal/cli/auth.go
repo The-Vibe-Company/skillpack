@@ -23,10 +23,12 @@ type config struct {
 }
 type keyStatus struct {
 	User struct {
-		ID string `json:"id"`
+		ID    string `json:"id"`
+		Email string `json:"email"`
 	} `json:"user"`
 	Workspace struct {
-		ID string `json:"id"`
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	} `json:"workspace"`
 	Token struct {
 		ID        string   `json:"id"`
@@ -100,8 +102,11 @@ func (a *app) client() (*client, error) {
 	if base == "" {
 		base = os.Getenv("SKILLPACK_API_URL")
 	}
-	if base == "" {
+	if base == "" && os.Getenv("SKILLPACK_API_KEY") == "" {
 		base = p.API
+	}
+	if base == "" {
+		base = "https://skillpack.app/v1"
 	}
 	key := os.Getenv("SKILLPACK_API_KEY")
 	if key == "" {
@@ -117,7 +122,7 @@ func (a *app) client() (*client, error) {
 		}
 	}
 	if key == "" {
-		return nil, fail(3, "no API key; use auth login or SKILLPACK_API_KEY and SKILLPACK_API_URL")
+		return nil, fail(3, "no API key; use auth login or SKILLPACK_API_KEY")
 	}
 	return newClient(base, key)
 }
@@ -164,7 +169,11 @@ func (a *app) auth() (any, error) {
 		}
 		var key []byte
 		var err error
-		if a.options.flags["token-stdin"] {
+		if !a.options.flags["token-stdin"] && !a.options.flags["manual"] {
+			var browserKey string
+			browserKey, err = a.browserLogin(base)
+			key = []byte(browserKey)
+		} else if a.options.flags["token-stdin"] {
 			key, err = io.ReadAll(io.LimitReader(a.in, 4097))
 			if len(key) > 4096 {
 				return nil, fail(3, "invalid API key length")
@@ -179,7 +188,7 @@ func (a *app) auth() (any, error) {
 			fmt.Fprintln(a.diagnostic)
 		}
 		if err != nil {
-			return nil, fail(3, "could not read API key")
+			return nil, err
 		}
 		c, err := newClient(base, strings.TrimSpace(string(key)))
 		if err != nil {

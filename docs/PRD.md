@@ -6,6 +6,8 @@ Skillpack provides a self-hostable Skills Hub for members and external coding ag
 
 ### Identity and tenancy
 
+- Human CLI login opens a browser approval URL, shows the selected workspace and broad key access, then saves a one-time-redeemed PAT privately; `SKILLPACK_API_KEY` provides the non-interactive alternative.
+
 - Better Auth, organizations, memberships, Owner/Admin/Developer RBAC, invitations, and
   tenant-scoped queries.
 - Billing changes for runtime capacity are outside this program; existing Skills Hub entitlements
