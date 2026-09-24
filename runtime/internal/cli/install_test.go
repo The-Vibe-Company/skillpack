@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,6 +13,142 @@ import (
 	"strings"
 	"testing"
 )
+
+func TestManagementInstallAdoptsCleanUntrackedCopies(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("SKILLPACK_HOME", filepath.Join(home, "client"))
+	t.Setenv("SKILLPACK_LEGACY_HOME", filepath.Join(home, "legacy"))
+	t.Setenv("SKILLPACK_RUNTIME_HOME", filepath.Join(home, "runtime"))
+	t.Setenv("SKILLPACK_API_KEY", "cmp_pat_"+strings.Repeat("m", 48))
+	newFiles, err := scanPackage("../../../packages/skillpack-skill/skill")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, checksum, err := canonicalPackage(newFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	archive, err := packageZip(newFiles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/v1/tokens/current":
+			w.Write([]byte(`{"user":{"id":"user"},"workspace":{"id":"org"},"token":{"id":"key"}}`))
+		case "/v1/local-skills/skillpack":
+			json.NewEncoder(w).Encode(map[string]any{"availableVersion": "1.120.1", "integrity": map[string]string{"packageChecksum": checksum}})
+		case "/v1/local-skills/skillpack/package":
+			w.Write(archive)
+		case "/v1/local-skills/skillpack/installed":
+			w.Write([]byte(`{"ok":true}`))
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer server.Close()
+	t.Setenv("SKILLPACK_API_URL", server.URL)
+	oldFiles := map[string][]byte{
+		"SKILL.md":       []byte("---\nname: skillpack\ndescription: Legacy management skill\n---\nBody\n"),
+		"companion.json": []byte(`{"name":"skillpack","version":"1.119.0","metadata":{"companionSkillId":"b0780a97-6972-4a2b-8e88-f41a528900c7"}}`),
+	}
+	integrity := map[string]any{"version": "1.119.0", "files": map[string]string{}}
+	for name, body := range oldFiles {
+		digest := sha256.Sum256(body)
+		integrity["files"].(map[string]string)[name] = "sha256:" + hex.EncodeToString(digest[:])
+	}
+	oldFiles["companion.integrity.json"], _ = json.Marshal(integrity)
+	baselineHash := sha256.Sum256(oldFiles["companion.integrity.json"])
+	previousBaselines := legacyManagementBaselines
+	legacyManagementBaselines = map[string]string{"1.119.0": "sha256:" + hex.EncodeToString(baselineHash[:])}
+	defer func() { legacyManagementBaselines = previousBaselines }()
+	project := filepath.Join(home, "project")
+	for _, tool := range []string{"codex", "claude-code", "opencode"} {
+		root, err := toolRoot(tool, "user", project)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := writePackage(filepath.Join(root, "skillpack"), oldFiles); err != nil {
+			t.Fatal(err)
+		}
+	}
+	lockPath := filepath.Join(home, "legacy", "skills.lock.json")
+	if err := os.MkdirAll(filepath.Dir(lockPath), 0700); err != nil {
+		t.Fatal(err)
+	}
+	lock := installLock{Version: 2, Workspaces: map[string]workspaceLock{"org": {API: server.URL + "/v1", Skills: map[string]installedSkill{}}}}
+	before, _ := json.Marshal(lock)
+	if err := os.WriteFile(lockPath, before, 0600); err != nil {
+		t.Fatal(err)
+	}
+	args := []string{"install", "skillpack", "--scope", "user", "--tools", "codex,claude-code,opencode", "--json"}
+	code, out, diag := invoke(t, "", append(args, "--dry-run")...)
+	if code != 0 || !strings.Contains(out, `"dryRun":true`) {
+		t.Fatalf("migration preview: %d %s %s", code, out, diag)
+	}
+	stillOld, _ := os.ReadFile(lockPath)
+	if string(stillOld) != string(before) {
+		t.Fatal("dry-run rewrote legacy lock")
+	}
+	code, out, diag = invoke(t, "", args...)
+	if code != 0 || !strings.Contains(out, `"status":"installed"`) {
+		t.Fatalf("migration install: %d %s %s", code, out, diag)
+	}
+	updated, err := readLock(lockPath)
+	if err != nil || updated.Workspaces["org"].API != server.URL+"/v1" || updated.Workspaces["org"].Skills["skillpack"].Version != "1.120.1" {
+		t.Fatalf("migration lock: %v %#v", err, updated.Workspaces["org"])
+	}
+	for _, tool := range []string{"codex", "claude-code", "opencode"} {
+		root, _ := toolRoot(tool, "user", project)
+		got, _ := os.ReadFile(filepath.Join(root, "skillpack", "companion.json"))
+		var manifest struct {
+			Version string `json:"version"`
+		}
+		if json.Unmarshal(got, &manifest) != nil || manifest.Version != "1.120.1" {
+			t.Fatalf("%s was not updated", tool)
+		}
+	}
+}
+
+func TestLegacyManagementAdoptionRejectsModifiedOrUnknownFiles(t *testing.T) {
+	root := t.TempDir()
+	files := map[string][]byte{"SKILL.md": []byte("original"), "companion.json": []byte(`{"name":"skillpack","version":"1.119.0","metadata":{"companionSkillId":"b0780a97-6972-4a2b-8e88-f41a528900c7"}}`)}
+	integrity := map[string]any{"version": "1.119.0", "files": map[string]string{}}
+	for name, body := range files {
+		digest := sha256.Sum256(body)
+		integrity["files"].(map[string]string)[name] = "sha256:" + hex.EncodeToString(digest[:])
+	}
+	files["companion.integrity.json"], _ = json.Marshal(integrity)
+	baselineHash := sha256.Sum256(files["companion.integrity.json"])
+	previousBaselines := legacyManagementBaselines
+	legacyManagementBaselines = map[string]string{"1.119.0": "sha256:" + hex.EncodeToString(baselineHash[:])}
+	defer func() { legacyManagementBaselines = previousBaselines }()
+	if err := writePackage(root, files); err != nil || !cleanLegacyManagement(root) {
+		t.Fatalf("clean legacy management bundle rejected: %v", err)
+	}
+	legacyManagementBaselines = previousBaselines
+	if cleanLegacyManagement(root) {
+		t.Fatal("self-asserted baseline was adopted without a trusted digest")
+	}
+	legacyManagementBaselines = map[string]string{"1.119.0": "sha256:" + hex.EncodeToString(baselineHash[:])}
+	os.WriteFile(filepath.Join(root, "SKILL.md"), []byte("customized"), 0600)
+	if cleanLegacyManagement(root) {
+		t.Fatal("modified management bundle was adopted")
+	}
+	os.WriteFile(filepath.Join(root, "SKILL.md"), files["SKILL.md"], 0600)
+	os.WriteFile(filepath.Join(root, "extra.txt"), []byte("unknown"), 0600)
+	if cleanLegacyManagement(root) {
+		t.Fatal("unknown management file was adopted")
+	}
+	if !sameSkillpackInstance("https://thecompanion.sh/v1", "https://skillpack.app/v1") {
+		t.Fatal("known service move was rejected")
+	}
+	if sameSkillpackInstance("https://other.example/v1", "https://skillpack.app/v1") {
+		t.Fatal("unrelated API instance was migrated")
+	}
+}
 
 func TestConcurrentInstallChild(t *testing.T) {
 	raw := os.Getenv("SKILLPACK_INSTALL_CHILD_ARGS")

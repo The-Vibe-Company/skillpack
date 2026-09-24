@@ -272,6 +272,30 @@
         "New native flow needs no Python or Node."
       ],
       "files": []
+    },
+    {
+      "id": 24,
+      "prompt": "Mets à jour Skillpack. Le CLI répond « no API key » et affiche une URL après auth login. Je validerai dans le navigateur.",
+      "expected_output": "Launch browser approval immediately, keep the CLI session alive, resume after approval, verify the saved workspace, then finish the update and setup checks.",
+      "expectations": [
+        "Runs skillpack auth login instead of only suggesting it.",
+        "Waits for approval and confirms auth status before continuing.",
+        "Installs the management skill and checks doctor output for every requested target.",
+        "Never asks the human to paste an API key into chat."
+      ],
+      "files": []
+    },
+    {
+      "id": 25,
+      "prompt": "Mets à jour le skill Skillpack sur Codex, Claude Code et OpenCode. Le lock local pointe vers thecompanion.sh, et les trois anciennes copies sont non suivies.",
+      "expected_output": "Update the signed CLI, preview the installation, use its guarded legacy migration, complete installation and setup, then verify package versions and origins.",
+      "expectations": [
+        "Updates the CLI first and retries the preview without hand-editing the lock.",
+        "Allows automatic replacement only for intact official legacy management bundles.",
+        "Preserves modified or unknown files and avoids blind --force.",
+        "Verifies all three destinations and the migrated lock with doctor."
+      ],
+      "files": []
     }
   ]
 }

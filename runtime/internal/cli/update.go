@@ -58,7 +58,7 @@ func (a *app) update() (any, error) {
 	if !ok {
 		return nil, fail(4, "no installed skills for this organization and scope")
 	}
-	if workspace.API != c.base {
+	if !sameSkillpackInstance(workspace.API, c.base) {
 		return nil, fail(6, "locked API differs from active profile")
 	}
 	slugs := []string{}
