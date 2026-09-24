@@ -3,14 +3,17 @@ import { buildSkillpackSkillPrompts } from "./package";
 
 describe("native Skillpack management prompts", () => {
   it("uses the native CLI and API-key flow for every generated prompt", () => {
-    const prompts = buildSkillpackSkillPrompts("1.120.0");
+    const prompts = buildSkillpackSkillPrompts("1.120.1");
     const text = Object.values(prompts).join("\n");
 
     expect(text).toContain("skillpack auth login --api-url {base}");
+    expect(text).toContain("Keep it running while the human approves");
+    expect(text).toContain("skillpack doctor --json");
+    expect(text).toContain("historic thecompanion.sh origin");
     expect(text).toContain("SKILLPACK_API_KEY");
     expect(text).toContain("skillpack auth status --json");
     expect(text).toContain("skillpack setup --tools");
-    expect(text).toContain("skillpack install skillpack --version 1.120.0");
+    expect(text).toContain("skillpack install skillpack --version 1.120.1");
     expect(text).toContain("--scope <scope> --tools <selected>");
     expect(text).toContain("--scope <existing-scope> --tools <existing-tools>");
     expect(text).toContain("--dry-run --json");

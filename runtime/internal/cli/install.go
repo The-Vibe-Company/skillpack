@@ -245,6 +245,88 @@ func currentPackage(path string) (string, string, error) {
 	return pkg, "sha256:" + hex.EncodeToString(h.Sum(nil)), nil
 }
 
+// The hosted service moved domains without changing organization identities.
+// Keep every other origin change explicit so a lock cannot be silently retargeted.
+func sameSkillpackInstance(locked, active string) bool {
+	return locked == active || locked == "https://thecompanion.sh/v1" && active == "https://skillpack.app/v1"
+}
+
+// Official pre-native management baselines (1.119.0 from repository commit
+// 9fc3365). A local integrity file alone is self-asserted and cannot authorize
+// replacing an otherwise untracked folder.
+var legacyManagementBaselines = map[string]string{
+	"1.119.0": "sha256:ec61fddfc01357b86f84241c0ee6716ea395ad04687e33bc677f8cfb5ae9691a",
+}
+
+// Older management bundles predate the native lock entry. Adopt only an intact
+// bundle with the known management identity; never use this path for other skills.
+func cleanLegacyManagement(path string) bool {
+	baseline, err := os.ReadFile(filepath.Join(path, "companion.integrity.json"))
+	if err != nil {
+		return false
+	}
+	var integrity struct {
+		Version string            `json:"version"`
+		Files   map[string]string `json:"files"`
+	}
+	if json.Unmarshal(baseline, &integrity) != nil || integrity.Version == "" || len(integrity.Files) == 0 {
+		return false
+	}
+	baselineHash := sha256.Sum256(baseline)
+	if legacyManagementBaselines[integrity.Version] != "sha256:"+hex.EncodeToString(baselineHash[:]) {
+		return false
+	}
+	manifest, err := os.ReadFile(filepath.Join(path, "companion.json"))
+	if err != nil {
+		return false
+	}
+	var identity struct {
+		Name     string `json:"name"`
+		Version  string `json:"version"`
+		Metadata struct {
+			ID string `json:"companionSkillId"`
+		} `json:"metadata"`
+	}
+	if json.Unmarshal(manifest, &identity) != nil || identity.Name != "skillpack" || identity.Version != integrity.Version || identity.Metadata.ID != "b0780a97-6972-4a2b-8e88-f41a528900c7" {
+		return false
+	}
+	seen := map[string]bool{}
+	err = filepath.WalkDir(path, func(p string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if !d.Type().IsRegular() {
+			return fail(9, "legacy management skill contains an unsafe file")
+		}
+		rel, err := filepath.Rel(path, p)
+		if err != nil {
+			return err
+		}
+		rel = filepath.ToSlash(rel)
+		if rel == "companion.integrity.json" {
+			return nil
+		}
+		want, ok := integrity.Files[rel]
+		if !ok || seen[rel] {
+			return fail(9, "legacy management skill has untracked files")
+		}
+		body, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		hash := sha256.Sum256(body)
+		if want != "sha256:"+hex.EncodeToString(hash[:]) {
+			return fail(9, "legacy management skill was modified")
+		}
+		seen[rel] = true
+		return nil
+	})
+	return err == nil && len(seen) == len(integrity.Files) && seen["SKILL.md"] && seen["companion.json"]
+}
+
 func (c *client) installPlan(root, version string, existing workspaceLock) ([]installNode, error) {
 	var nodes []installNode
 	visited := map[string]bool{}
@@ -466,7 +548,7 @@ func (a *app) install() (any, error) {
 	}
 	workspace := status.Workspace.ID
 	entry := lock.Workspaces[workspace]
-	if entry.API != "" && entry.API != c.base {
+	if entry.API != "" && !sameSkillpackInstance(entry.API, c.base) {
 		return nil, fail(6, "lockfile organization belongs to another API instance")
 	}
 	entry.API = c.base
@@ -537,7 +619,7 @@ func (a *app) install() (any, error) {
 				}
 				if prior == nil {
 					pkg, dir, e := currentPackage(path)
-					if e != nil || pkg != n.Checksum {
+					if e != nil || pkg != n.Checksum && !(n.Local && n.Slug == "skillpack" && cleanLegacyManagement(path)) {
 						return nil, fail(6, "existing untracked skill; review before using --force")
 					}
 					prior = &installedTarget{PackageChecksum: pkg, Checksum: dir}

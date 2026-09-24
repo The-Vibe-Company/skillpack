@@ -1,7 +1,7 @@
 {
   "$schema": "https://skillpack.app/schemas/companion-manifest.v2.schema.json",
   "name": "skillpack",
-  "version": "1.120.0",
+  "version": "1.120.1",
   "icon": "boxes",
   "title": "Skillpack",
   "description": "Manage Skillpack packages, dependencies, secrets, hosted Skill Databases and usage hooks with a browser-connected native CLI or API key.",
@@ -39,6 +39,14 @@
       "scripts/verify-runtime-release.mjs"
     ],
     "changelog": [
+      {
+        "version": "1.120.1",
+        "date": "2026-09-24",
+        "changes": [
+          "Complete browser authentication, signed CLI updates, installation, setup, and doctor verification in one guided flow.",
+          "Recover known legacy API-origin locks and intact untracked management-skill copies without manual lock edits or blanket force."
+        ]
+      },
       {
         "version": "1.120.0",
         "date": "2026-09-24",
@@ -1116,7 +1124,7 @@
         "version": "1.14.0",
         "date": "2026-06-26",
         "changes": [
-          "Installs a skill into every tool the user works with (Claude Code, Codex, \u2026) in one fan-out, not just the tool in use at the moment.",
+          "Installs a skill into every tool the user works with (Claude Code, Codex, …) in one fan-out, not just the tool in use at the moment.",
           "Adds an extensible tool registry (scripts/tools.json) and records the machine's tool set in ~/.companion/config.json after auto-detecting present tools and confirming with the user.",
           "Tracks each install location per tool and scope through a lockfile targets[] array: user-scope in ~/.companion/skills.lock.json and project-scope in a per-project <repo>/.companion/skills.lock.json.",
           "Keeps the workspace install report aggregate (a single POST /skills/{slug}/install across all tools and projects) and leaves locally customized targets untouched unless forced."
