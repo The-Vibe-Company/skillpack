@@ -91,8 +91,8 @@ export function buildSkillpackSkillPrompts(version: string): LocalSkillPrompts {
   ].join("\n");
 
   const runtime = [
-    "If the native CLI is not installed, use the official Skillpack runtime installer for runtime-v0.3.0:",
-    "- POSIX: download `install.sh` and the adjacent `SHA256SUMS` from `https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.3.0/` over HTTPS,",
+    "If the native CLI is not installed, use the official Skillpack runtime installer for runtime-v0.3.1:",
+    "- POSIX: download `install.sh` and the adjacent `SHA256SUMS` from `https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.3.1/` over HTTPS,",
     "  verify the installer's SHA-256 against its `SHA256SUMS` entry before running `sh install.sh`. The installer then verifies the pinned archive digest.",
     "- Windows PowerShell: download `install.ps1` and the adjacent `SHA256SUMS` from that same release URL,",
     "  compare `(Get-FileHash .\\install.ps1 -Algorithm SHA256).Hash` with the `install.ps1` entry before running it. The installer then verifies the pinned archive digest.",

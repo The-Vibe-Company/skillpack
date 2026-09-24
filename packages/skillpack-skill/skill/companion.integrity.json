@@ -3,7 +3,7 @@
     "SKILL.md": "sha256:3e2a737cfa1431abce33bf28511074b7eb54577bf812396b3b2365879a7e14c7",
     "companion.json": "sha256:673e94df184ce3bbfeec3b9d0ba05e71bab72d48a8f73bedff7015603a1a04b3",
     "evals/evals.json": "sha256:1f982c55ef761723ffaa3b669973fca9a262852c32fc07e6d9decf28037a59ce",
-    "runtime-release.json": "sha256:5ee0ccb3b53af79e247cce7f60f4ea1897db38fd26f998a0146b103a6c171334",
+    "runtime-release.json": "sha256:0e30f93bdbf2677f6ca2fb1eb6f57a7a7359a6c1c39de2fffe58f6945b6ea8e9",
     "scripts/bootstrap.py": "sha256:f4f4cad2ab05b2ef97e1119430bb272a4012d2bd8fc8db7ddd5bec7b0e57e0f5",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",

@@ -20,7 +20,7 @@ describe("native Skillpack management prompts", () => {
     expect(text).toContain("skillpack update --all --dry-run");
     expect(text).toContain("skillpack skills publish FOLDER --scope org");
     expect(text).toContain("skillpack api METHOD /v1/path --input FILE");
-    expect(text).toContain("releases/download/runtime-v0.3.0/");
+    expect(text).toContain("releases/download/runtime-v0.3.1/");
     expect(text).toContain("install.sh");
     expect(text).toContain("install.ps1");
     expect(text).toContain("SHA256SUMS");
