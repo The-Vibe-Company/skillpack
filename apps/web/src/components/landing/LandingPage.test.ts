@@ -95,8 +95,8 @@ describe("LandingPage portal preview", () => {
     await act(async () => navButton(capture, "My Skills").click());
 
     expect(capture.querySelectorAll(".v5-portal__crow")).toHaveLength(1);
-    expect(row(capture, "weekly-report").getAttribute("aria-pressed")).toBe("true");
-    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("weekly-report");
+    expect(row(capture, "incident-notes").getAttribute("aria-pressed")).toBe("true");
+    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("incident-notes");
 
     const clearLibrary = capture.querySelector<HTMLButtonElement>('[aria-label="Clear library filter"]');
     if (!clearLibrary) throw new Error("Clear library filter button not found");
@@ -115,22 +115,22 @@ describe("LandingPage portal preview", () => {
   it("supports mouse and keyboard selection and keeps installation feedback in the focused control", async () => {
     const container = await renderLanding();
     const capture = portal(container);
-    const debug = row(capture, "debug-my-setup");
+    const triage = row(capture, "triage");
 
-    await act(async () => debug.click());
-    expect(debug.getAttribute("aria-pressed")).toBe("true");
-    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("debug-my-setup");
+    await act(async () => triage.click());
+    expect(triage.getAttribute("aria-pressed")).toBe("true");
+    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("triage");
 
-    const sales = row(capture, "sales-research");
+    const releaseNotes = row(capture, "release-notes");
 
-    sales.focus();
+    releaseNotes.focus();
     await act(async () => {
-      sales.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      releaseNotes.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     });
-    expect(sales.getAttribute("aria-pressed")).toBe("true");
-    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("sales-research");
+    expect(releaseNotes.getAttribute("aria-pressed")).toBe("true");
+    expect(capture.querySelector(".v6-pdrawer__title")?.textContent).toBe("release-notes");
 
-    const install = button(capture, "Use this skill");
+    const install = button(capture, "Install");
     install.focus();
     await act(async () => install.click());
 
@@ -138,13 +138,13 @@ describe("LandingPage portal preview", () => {
     expect(install.disabled).toBe(false);
     expect(install.getAttribute("aria-disabled")).toBe("true");
     expect(install.getAttribute("aria-pressed")).toBe("true");
-    expect(install.textContent?.trim()).toBe("Added");
+    expect(install.textContent?.trim()).toBe("Installed");
 
-    const brandVoice = row(capture, "brand-voice");
+    const migrateDb = row(capture, "migrate-db");
     await act(async () => {
-      brandVoice.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+      migrateDb.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
     });
-    expect(brandVoice.getAttribute("aria-pressed")).toBe("true");
+    expect(migrateDb.getAttribute("aria-pressed")).toBe("true");
   });
 
   it("uses native links for navigation and avoids absolute data-residency promises", async () => {
