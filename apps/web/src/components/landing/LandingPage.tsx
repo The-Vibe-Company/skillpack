@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/cds";
 import { Icon } from "@/components/Icon";
+import { HOME_STRUCTURED_DATA, serializeJsonLd } from "@/lib/structuredData";
 
 const GITHUB_URL = "https://github.com/The-Vibe-Company/skillpack";
 const SKILL_MD_URL = "https://github.com/anthropics/skills";
@@ -779,6 +780,7 @@ export function LandingPage() {
 
   return (
     <div className="v10-landing lp">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(HOME_STRUCTURED_DATA) }} />
       <a className="v10-skip" href="#main-content">
         Skip to content
       </a>

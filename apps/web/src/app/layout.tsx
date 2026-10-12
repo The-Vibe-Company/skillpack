@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import { resolveSiteUrl } from "@/lib/siteUrl";
 import { PostHogProvider } from "./PostHogProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.COMPANION_WEB_URL ?? "http://localhost:3000"),
+  metadataBase: resolveSiteUrl(),
   title: "Skillpack · Skills",
   description: "A versioned registry of SKILL.md packages.",
   authors: [{ name: "The Vibe Company", url: "https://thevibecompany.co" }],
+  // "./" resolves against each request's pathname, so every page gets its own canonical URL.
+  alternates: { canonical: "./" },
   openGraph: {
+    url: "./",
     title: "Skillpack · Skills",
     description: "A versioned registry of SKILL.md packages.",
     siteName: "Skillpack",

@@ -176,4 +176,18 @@ describe("LandingPage portal preview", () => {
     expect(container.textContent).toContain("governance stays on infrastructure you control");
     expect(container.textContent).not.toContain("your data never leave the building");
   });
+
+  it("publishes SoftwareApplication and Organization JSON-LD for search engines", async () => {
+    const container = await renderLanding();
+    const scripts = container.querySelectorAll('script[type="application/ld+json"]');
+
+    expect(scripts).toHaveLength(1);
+    expect(JSON.parse(scripts[0]?.textContent ?? "null")).toMatchObject({
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "SoftwareApplication", name: "Skillpack", applicationCategory: "DeveloperApplication" },
+        { "@type": "Organization", name: "Skillpack", url: "https://skillpack.app" },
+      ],
+    });
+  });
 });
