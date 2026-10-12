@@ -25,7 +25,7 @@ afterEach(() => {
 });
 
 describe("blog post parsing", () => {
-  it("reads frontmatter and keeps the unquoted date as the calendar day", () => {
+  it("reads frontmatter and keeps the plain date as the calendar day", () => {
     const post = parseBlogPost(postSource(VALID_FRONTMATTER), "a-post.md");
 
     expect(post).toEqual({
@@ -45,6 +45,32 @@ describe("blog post parsing", () => {
     ["an uppercase slug", 'title: "t"\ndescription: "d"\nslug: A-Post\ndate: 2026-10-13', /kebab-case/],
   ])("rejects %s and names the file", (_label, frontmatter, reason) => {
     expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(/^a-post\.md: invalid frontmatter/);
+    expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(reason);
+  });
+
+  it("accepts double-quoted, single-quoted and plain values", () => {
+    const frontmatter = [
+      'title: "Say \\"hi\\" — it\'s fine"',
+      "description: 'It''s plain: really'",
+      "slug: a-post",
+      "date: 2026-10-13",
+    ].join("\n");
+
+    expect(parseBlogPost(postSource(frontmatter), "a-post.md")).toMatchObject({
+      title: 'Say "hi" — it\'s fine',
+      description: "It's plain: really",
+    });
+  });
+
+  it.each([
+    ["a list", `${VALID_FRONTMATTER}\ntags:\n  - a`, /unsupported frontmatter line: tags:/],
+    ["a block scalar", 'title: >\n  folded\ndescription: "d"\nslug: a-post\ndate: 2026-10-13', /unsupported frontmatter line: title: >/],
+    ["a trailing comment", `${VALID_FRONTMATTER} # note`, /unsupported frontmatter line: date/],
+    ["an unterminated quote", 'title: "open\ndescription: "d"\nslug: a-post\ndate: 2026-10-13', /unsupported frontmatter line: title/],
+    ["an empty value", 'title:\ndescription: "d"\nslug: a-post\ndate: 2026-10-13', /unsupported frontmatter line: title:/],
+    ["a duplicate key", `${VALID_FRONTMATTER}\nslug: a-post`, /duplicate frontmatter key: slug/],
+  ])("rejects %s instead of half-parsing it", (_label, frontmatter, reason) => {
+    expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(/^a-post\.md: /);
     expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(reason);
   });
 

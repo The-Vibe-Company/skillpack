@@ -1,6 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 
 /** Markdown posts live beside the app, not in `src/`, so editors can add one without touching code. */
@@ -9,6 +8,42 @@ export const BLOG_CONTENT_DIR = join(process.cwd(), "content", "blog");
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n/;
+
+// Post frontmatter is flat `key: value` lines. Values may be double-quoted (JSON escapes),
+// single-quoted ('' escapes a quote) or plain. Anything richer (lists, maps, block scalars,
+// comments) is rejected rather than half-parsed, so no YAML dependency is needed.
+const FRONTMATTER_LINE_RE = /^([a-z][a-z0-9_-]*):[ \t]*(.*?)[ \t]*$/;
+const PLAIN_SCALAR_RE = /^[^\s"'[\]{}>|&*!%@`#,-](?:(?!: | #).)*$/;
+
+function parseFrontmatterValue(raw: string): string | null {
+  if (raw.startsWith('"')) {
+    try {
+      const value = z.string().safeParse(JSON.parse(raw));
+      return value.success ? value.data : null;
+    } catch {
+      return null;
+    }
+  }
+  if (raw.startsWith("'")) {
+    return /^'(?:[^']|'')*'$/.test(raw) ? raw.slice(1, -1).replace(/''/g, "'") : null;
+  }
+  return PLAIN_SCALAR_RE.test(raw) ? raw : null;
+}
+
+/** Reads the flat frontmatter block into a string map; schema validation happens afterwards. */
+function parseFlatFrontmatter(raw: string, fileName: string): Map<string, string> {
+  const fields = new Map<string, string>();
+  for (const line of raw.split("\n")) {
+    if (line.trim() === "") continue;
+    const match = FRONTMATTER_LINE_RE.exec(line);
+    const key = match?.[1];
+    const value = match ? parseFrontmatterValue(match[2] ?? "") : null;
+    if (!key || value === null) throw new Error(`${fileName}: unsupported frontmatter line: ${line}`);
+    if (fields.has(key)) throw new Error(`${fileName}: duplicate frontmatter key: ${key}`);
+    fields.set(key, value);
+  }
+  return fields;
+}
 
 function isCalendarDay(day: string): boolean {
   const parsed = new Date(`${day}T00:00:00Z`);
@@ -20,7 +55,6 @@ const blogFrontmatterSchema = z
     title: z.string().trim().min(1),
     description: z.string().trim().min(1),
     slug: z.string().regex(SLUG_RE, "slug must be lowercase kebab-case"),
-    // YAML 1.2 (the `yaml` default) keeps an unquoted 2026-10-13 as a string, so no Date coercion.
     date: z.string().regex(ISO_DAY_RE, "date must be YYYY-MM-DD").refine(isCalendarDay, "date must be a real day"),
   })
   .strict();
@@ -34,7 +68,8 @@ export type BlogPost = z.infer<typeof blogFrontmatterSchema> & {
 export function parseBlogPost(source: string, fileName: string): BlogPost {
   const match = FRONTMATTER_RE.exec(source);
   if (!match) throw new Error(`${fileName}: missing --- frontmatter block`);
-  const frontmatter = blogFrontmatterSchema.safeParse(parseYaml(match[1] ?? ""));
+  const fields = parseFlatFrontmatter(match[1] ?? "", fileName);
+  const frontmatter = blogFrontmatterSchema.safeParse(Object.fromEntries(fields));
   if (!frontmatter.success) {
     const issues = frontmatter.error.issues.map((issue) => `${issue.path.join(".") || "frontmatter"}: ${issue.message}`);
     throw new Error(`${fileName}: invalid frontmatter (${issues.join("; ")})`);
