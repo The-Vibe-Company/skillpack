@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
+import { HOME_DESCRIPTION, HOME_TITLE } from "@/lib/siteMetadata";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 import { PostHogProvider } from "./PostHogProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: resolveSiteUrl(),
-  title: "Skillpack · Skills",
-  description: "A versioned registry of SKILL.md packages.",
+  // Pages set a bare title (e.g. "Privacy Policy"); the template appends the brand once.
+  title: { default: HOME_TITLE, template: "%s · Skillpack" },
+  description: HOME_DESCRIPTION,
   authors: [{ name: "The Vibe Company", url: "https://thevibecompany.co" }],
   // "./" resolves against each request's pathname, so every page gets its own canonical URL.
   alternates: { canonical: "./" },
   openGraph: {
     url: "./",
-    title: "Skillpack · Skills",
-    description: "A versioned registry of SKILL.md packages.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     siteName: "Skillpack",
     type: "website",
     images: [
@@ -27,8 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Skillpack · Skills",
-    description: "A versioned registry of SKILL.md packages.",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
     images: [{ url: "/brand/og.png", alt: "Skillpack — Share skills with your whole team." }],
   },
   icons: {

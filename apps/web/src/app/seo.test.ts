@@ -31,8 +31,18 @@ describe("technical SEO routes", () => {
     expect(metadata.openGraph?.url).toBe("./");
   });
 
+  it("titles the home page and appends the brand once to every other page title", () => {
+    expect(metadata.title).toEqual({
+      default: "Skillpack: Open-Source Skills Hub for Claude Code & Codex",
+      template: "%s · Skillpack",
+    });
+    expect(metadata.openGraph?.title).toBe("Skillpack: Open-Source Skills Hub for Claude Code & Codex");
+    expect(metadata.twitter?.title).toBe("Skillpack: Open-Source Skills Hub for Claude Code & Codex");
+  });
+
   it("titles the 404 page itself and does not canonicalize the missing URL", () => {
-    expect(notFoundMetadata.title).toBe("Page not found · Skillpack");
+    // The layout template adds " · Skillpack"; a suffixed page title would render it twice.
+    expect(notFoundMetadata.title).toBe("Page not found");
     expect(notFoundMetadata.alternates?.canonical).toBeNull();
   });
 });

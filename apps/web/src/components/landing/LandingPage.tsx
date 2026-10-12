@@ -26,10 +26,11 @@ const COPY = {
   github: "GitHub",
   navCta: "Get started",
   heroBadge: "Open source · Self-hostable Skills Hub",
-  heroTitlePre: "Your AI agents are only as good as their ",
-  heroTitleMark: "skills.",
+  heroTitlePre: "The open-source ",
+  heroTitleMark: "Skills Hub",
+  heroTitlePost: " for Claude Code, Codex & OpenCode",
   heroSub:
-    "Skillpack is where your team writes, versions and shares SKILL.md packages, then installs them into Claude Code, Codex, OpenCode or any MCP client with one command.",
+    "A private, versioned skills registry for your team. Write and validate SKILL.md packages, share them across your organization, then install an exact version into Claude Code, Codex and OpenCode with one command. Self-host it or use skillpack.app.",
   ctaPrimary: "Start your library",
   ctaSecondary: "See how it works",
   heroCommand: "skillpack install code-review",
@@ -258,6 +259,7 @@ function Hero({ c }: { c: Copy }) {
         <h1 className="lp-h1 lp-rise lp-rise--2">
           {c.heroTitlePre}
           <Em>{c.heroTitleMark}</Em>
+          {c.heroTitlePost}
         </h1>
         <p className="lp-hero__sub lp-rise lp-rise--3">{c.heroSub}</p>
         <div className="lp-hero__ctas lp-rise lp-rise--4">

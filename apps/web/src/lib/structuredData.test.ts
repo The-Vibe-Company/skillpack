@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { metadata } from "@/app/layout";
 import { HOME_STRUCTURED_DATA, serializeJsonLd } from "./structuredData";
 
 describe("home structured data", () => {
@@ -18,6 +19,12 @@ describe("home structured data", () => {
         url: "https://skillpack.app",
       }),
     ]);
+  });
+
+  it("describes the application with the same text as the home meta description", () => {
+    expect(HOME_STRUCTURED_DATA["@graph"][0]).toMatchObject({ description: metadata.description });
+    expect(metadata.openGraph?.description).toBe(metadata.description);
+    expect(metadata.twitter?.description).toBe(metadata.description);
   });
 
   it("claims no ratings, prices, or social profiles the product cannot back up", () => {

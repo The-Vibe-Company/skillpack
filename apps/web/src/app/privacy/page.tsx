@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy · Skillpack",
+  title: "Privacy Policy",
   description: "How Skillpack handles your information and protects your privacy.",
 };
 

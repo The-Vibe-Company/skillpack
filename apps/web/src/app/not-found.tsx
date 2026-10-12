@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/cds";
 // Owning the 404 metadata replaces Next's built-in fallback, which rendered its own <title>
 // next to the root layout title and left the page with two.
 export const metadata: Metadata = {
-  title: "Page not found · Skillpack",
+  title: "Page not found",
   alternates: { canonical: null },
 };
 
