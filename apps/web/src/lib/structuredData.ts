@@ -33,3 +33,22 @@ export const HOME_STRUCTURED_DATA: JsonLdDocument = {
 export function serializeJsonLd(data: JsonLdValue): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
+
+export type BlogPostingFacts = { headline: string; description: string; datePublished: string; url: string };
+
+/** A BlogPosting stating only what the post's frontmatter says; no invented author or images. */
+export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        headline: facts.headline,
+        description: facts.description,
+        datePublished: facts.datePublished,
+        url: facts.url,
+        mainEntityOfPage: facts.url,
+      },
+    ],
+  };
+}

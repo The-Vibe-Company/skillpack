@@ -762,6 +762,7 @@ function Footer({ c }: { c: Copy }) {
           <a href={SKILL_MD_URL} target="_blank" rel="noreferrer">
             SKILL.md ↗
           </a>
+          <Link href="/blog">Blog</Link>
           <Link href="/privacy">Privacy</Link>
           <a href={GITHUB_URL} target="_blank" rel="noreferrer">
             {c.footerDocs} ↗
