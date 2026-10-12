@@ -14,6 +14,7 @@
   font-weight: var(--weight-medium);
   line-height: 1;
   white-space: nowrap;
+  text-decoration: none;
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
