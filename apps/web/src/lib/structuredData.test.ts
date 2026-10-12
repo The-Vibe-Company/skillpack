@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { metadata } from "@/app/layout";
-import { HOME_STRUCTURED_DATA, serializeJsonLd } from "./structuredData";
+import { HOME_STRUCTURED_DATA, blogPostingStructuredData, serializeJsonLd } from "./structuredData";
 
 describe("home structured data", () => {
   it("describes Skillpack as a developer application published by the Skillpack organization", () => {
@@ -38,5 +38,30 @@ describe("home structured data", () => {
     const serialized = serializeJsonLd({ name: "</script><script>alert(1)</script>" });
     expect(serialized).not.toContain("<");
     expect(JSON.parse(serialized)).toEqual({ name: "</script><script>alert(1)</script>" });
+  });
+});
+
+describe("blog post structured data", () => {
+  it("states only the post's frontmatter facts and its URL", () => {
+    const data = blogPostingStructuredData({
+      headline: "A post",
+      description: "What it covers.",
+      datePublished: "2026-10-13",
+      url: "https://skillpack.app/blog/a-post",
+    });
+
+    expect(data).toEqual({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          headline: "A post",
+          description: "What it covers.",
+          datePublished: "2026-10-13",
+          url: "https://skillpack.app/blog/a-post",
+          mainEntityOfPage: "https://skillpack.app/blog/a-post",
+        },
+      ],
+    });
   });
 });
