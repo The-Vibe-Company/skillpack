@@ -3,7 +3,10 @@ import Link from "next/link";
 import { BlogShell } from "@/components/blog/BlogChrome";
 import { BLOG_SHARE_IMAGE, blogPostPath, formatBlogDate, loadBlogPosts } from "@/lib/blog";
 
-const TITLE = "Blog · Skillpack";
+// The root layout template turns the page title into "Blog · Skillpack"; social titles are not
+// templated, so they carry the suffix themselves.
+const TITLE = "Blog";
+const SOCIAL_TITLE = "Blog · Skillpack";
 const DESCRIPTION = "Guides on SKILL.md, Agent Skills, and running a shared skill library for your team's coding agents.";
 
 export const metadata: Metadata = {
@@ -12,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
   openGraph: {
     url: "/blog",
-    title: TITLE,
+    title: SOCIAL_TITLE,
     description: DESCRIPTION,
     siteName: "Skillpack",
     type: "website",
@@ -20,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: TITLE,
+    title: SOCIAL_TITLE,
     description: DESCRIPTION,
     images: [{ url: BLOG_SHARE_IMAGE.url, alt: BLOG_SHARE_IMAGE.alt }],
   },

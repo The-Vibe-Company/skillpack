@@ -94,7 +94,7 @@ describe("public blog post page", () => {
   it("gives each post its own title, description, canonical and article Open Graph data", async () => {
     const metadata = await generateMetadata(routeProps(SLUG));
 
-    expect(metadata.title).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
+    expect(metadata.title).toEqual({ absolute: "What is SKILL.md? The complete guide to Agent Skills (2026)" });
     expect(metadata.description).toMatch(/^SKILL\.md explained/);
     expect(metadata.alternates?.canonical).toBe("/blog/what-is-skill-md");
     expect(metadata.openGraph).toMatchObject({

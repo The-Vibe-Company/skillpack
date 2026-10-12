@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: ShareParams): Promise<Metadat
   const preview = await fetchPublicSkillPreview(token);
   if (!preview) {
     return {
-      title: "Skill not found · Skillpack",
+      title: "Skill not found",
       description: "This Skillpack skill preview is unavailable.",
       robots: { index: false, follow: false },
     };

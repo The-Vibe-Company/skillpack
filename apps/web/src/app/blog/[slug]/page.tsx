@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   if (!post) notFound();
   const path = blogPostPath(post.slug);
   return {
-    // The frontmatter title is written as the search title, so it is used as-is (no suffix).
-    title: post.title,
+    // The frontmatter title is written as the search title, so it bypasses the layout's suffix.
+    title: { absolute: post.title },
     description: post.description,
     alternates: { canonical: path },
     openGraph: {

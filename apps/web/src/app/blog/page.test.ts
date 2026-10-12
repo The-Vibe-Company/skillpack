@@ -46,7 +46,9 @@ describe("public blog index", () => {
   });
 
   it("titles itself Blog and canonicalizes to /blog", () => {
-    expect(metadata.title).toBe("Blog · Skillpack");
+    // The root layout template appends " · Skillpack", so the page title must stay bare.
+    expect(metadata.title).toBe("Blog");
+    expect(metadata.openGraph?.title).toBe("Blog · Skillpack");
     expect(metadata.description).toBeTruthy();
     expect(metadata.alternates?.canonical).toBe("/blog");
     expect(metadata.openGraph?.url).toBe("/blog");

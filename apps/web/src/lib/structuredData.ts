@@ -1,3 +1,4 @@
+import { HOME_DESCRIPTION } from "./siteMetadata";
 import { PRODUCTION_SITE_URL } from "./siteUrl";
 
 export type JsonLdValue = string | JsonLdValue[] | JsonLdNode;
@@ -14,7 +15,7 @@ export const HOME_STRUCTURED_DATA: JsonLdDocument = {
     {
       "@type": "SoftwareApplication",
       name: "Skillpack",
-      description: "A versioned registry of SKILL.md packages.",
+      description: HOME_DESCRIPTION,
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Web",
       url: PRODUCTION_SITE_URL,
