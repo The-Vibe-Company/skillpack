@@ -10,6 +10,13 @@ const config: NextConfig = {
   outputFileTracingRoot: repoRoot,
   // Internal workspace packages ship TypeScript source; transpile them.
   transpilePackages: ["@skillpack/contracts", "@skillpack/skills", "@skillpack/core"],
+  // Blog posts are read from content/blog at build time; keep them beside standalone output too in
+  // case a route renders on demand.
+  outputFileTracingIncludes: {
+    "/blog": ["./content/blog/**/*"],
+    "/blog/[slug]": ["./content/blog/**/*"],
+    "/sitemap.xml": ["./content/blog/**/*"],
+  },
   async rewrites() {
     const api = process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";
     return [
