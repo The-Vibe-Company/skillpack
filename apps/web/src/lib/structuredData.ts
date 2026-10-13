@@ -53,3 +53,22 @@ export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocume
     ],
   };
 }
+
+export type FaqEntry = { question: string; answer: string };
+
+/** A FAQPage built from the entries the page renders, so it cannot drift from the visible text. */
+export function faqPageStructuredData(entries: readonly FaqEntry[]): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "FAQPage",
+        mainEntity: entries.map((entry) => ({
+          "@type": "Question",
+          name: entry.question,
+          acceptedAnswer: { "@type": "Answer", text: entry.answer },
+        })),
+      },
+    ],
+  };
+}
