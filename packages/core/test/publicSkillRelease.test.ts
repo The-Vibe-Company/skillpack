@@ -1,3 +1,5 @@
+/* oxlint-disable anti-slop/no-unsafe-dictionary-type, anti-slop/no-known-value-widening, anti-slop/no-unknown-returns, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- This test's hand-written Drizzle fixture intentionally exposes an open mock surface to exercise service CAS/error paths without a database. */
+
 import { describe, expect, it, vi } from "vitest";
 import type { Db } from "@skillpack/db";
 import type { SQL } from "drizzle-orm";
@@ -107,11 +109,11 @@ describe("public skill release lifecycle", () => {
       .rejects.toBeInstanceOf(SkillPublicReleaseForbiddenError);
   });
 
-  it("requires a personal skill to be shared before promotion", async () => {
+  it("allows the personal creator to promote without sharing the skill with the organization", async () => {
     const fake = publicReleaseDb({ role: "owner", scope: "personal", creatorId: actor.id });
 
     await expect(setSkillPublicVersion({ actor, orgId: "org-1", slug: "review", version: "2.0.0", ...transport, database: fake.database }))
-      .rejects.toThrow("share this personal skill");
+      .resolves.toMatchObject({ ok: true, public_version: "2.0.0", changed: true });
   });
 
   it("requires the immutable current version identity to match the renamed skill", async () => {

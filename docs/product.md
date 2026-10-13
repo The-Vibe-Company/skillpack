@@ -50,3 +50,7 @@ and Git history are excluded. This sends declared email addresses to the package
 CLI login writes only the declared ID/email to `~/.skillpack/telemetry.json`, separate from session
 cookies. Logout removes that file when it still belongs to that account. Telemetry opt-out skips
 writing it; reporting agents must also check opt-out before reading any identity.
+
+Public catalog discovery requires explicit listing consent in addition to a pinned public release.
+Organization listing is Owner/Admin-only; personal listing is creator-only. Existing releases stay
+unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).

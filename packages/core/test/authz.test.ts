@@ -104,7 +104,9 @@ describe("canManagePublicSkill — exhaustive member × role × creator × scope
       // The pure capability intentionally assumes membership; combine the tenant gate here so the
       // table proves a role in another org can never authorize the mutation.
       const allowed = member && capability;
-      expect(allowed).toBe(member && scope === "org" && (creator || role === "owner" || role === "admin"));
+      expect(allowed).toBe(
+        member && (scope === "personal" ? creator : creator || role === "owner" || role === "admin"),
+      );
     },
   );
 });

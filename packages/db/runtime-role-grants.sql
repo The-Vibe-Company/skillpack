@@ -227,6 +227,15 @@ BEGIN
     api_functions := api_functions || ARRAY['public.skillpack_receive_skill_usage(jsonb)'::regprocedure];
     worker_functions := worker_functions || ARRAY['public.skillpack_process_skill_usage()'::regprocedure];
   END IF;
+  -- Public catalog reads are pre-tenant, but remain a narrow API-only capability. Resolve the
+  -- signatures conditionally so replaying this grants pass before migration 0192 stays valid.
+  IF pg_catalog.to_regprocedure('public.skillpack_list_public_catalog(integer,integer,text)') IS NOT NULL
+     AND pg_catalog.to_regprocedure('public.skillpack_get_public_catalog_skill(text,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_list_public_catalog(integer,integer,text)'::regprocedure,
+      'public.skillpack_get_public_catalog_skill(text,text)'::regprocedure
+    ];
+  END IF;
   IF api_role IS NULL OR worker_role IS NULL OR companion_runtime_role IS NULL THEN
     RAISE EXCEPTION 'companion API, worker, and runtime roles are required';
   END IF;

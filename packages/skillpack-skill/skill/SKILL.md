@@ -79,6 +79,8 @@ skillpack api PUT /v1/skills/<slug>/public-version --input <private-json-file>
 skillpack api DELETE /v1/skills/<slug>/public-version
 ```
 
+Public promotion alone does not authorize catalog discovery. Catalog listing requires separate explicit consent: Owner/Admin for organization skills, or the creator for personal skills. The anonymous catalog is disabled by default. Unlisting preserves the public release and share link.
+
 The PUT body is `{"version":"<version>"}`. Report publication and public promotion separately. After publishing, include the returned skill link and version; a share page does not itself authorize public package access.
 
 ## Secrets and Skill Databases

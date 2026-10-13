@@ -88,15 +88,29 @@ export function canManagePersonalSkill(actorId: string, skill: SkillScopeRef): b
 }
 
 /**
- * Public releases are narrower than normal org-skill editing: only the original creator or an org
- * Owner/Admin may pin, promote, or withdraw one. Membership is intentionally not inferred here and
- * must be established by the caller before this capability gate runs.
+ * Public releases are narrower than normal org-skill editing: an org skill may be managed by its
+ * original creator or an org Owner/Admin, while a personal skill may only be managed by its
+ * creator. Membership is intentionally not inferred here and must be established by the caller
+ * before this capability gate runs. A separate catalog-listing gate keeps org discovery consent
+ * Owner/Admin-only even when a Developer created the org skill.
  */
 export function canManagePublicSkill(
   actor: { id: string; orgRole: OrgRole },
   skill: SkillScopeRef,
 ): boolean {
-  return skill.scope === "org" && (skill.creatorId === actor.id || isOrgAdmin(actor.orgRole));
+  return skill.scope === "personal"
+    ? skill.creatorId === actor.id
+    : skill.creatorId === actor.id || isOrgAdmin(actor.orgRole);
+}
+
+/** Public catalog discovery is governance-controlled for shared skills, owner-controlled for private ones. */
+export function canManagePublicListing(
+  actor: { id: string; orgRole: OrgRole },
+  skill: SkillScopeRef,
+): boolean {
+  return skill.scope === "personal"
+    ? skill.creatorId === actor.id
+    : isOrgAdmin(actor.orgRole);
 }
 
 export interface SecretAccessRef {
