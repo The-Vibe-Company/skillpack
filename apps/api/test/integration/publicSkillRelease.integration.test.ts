@@ -415,7 +415,7 @@ describe("authenticated public skill releases", () => {
     expect((await getSkillPublicPreviewByShareToken({ token, database: integrationDb }))?.public_release?.version).toBe("2.0.0");
   });
 
-  it("allows a personal creator to pin a release while token preview remains organization-only", async () => {
+  it("requires personal skills to be shared before any public pointer can be set", async () => {
     const personal = await seedSkill({
       orgId: fixture.orgA,
       creator: fixture.owner,
@@ -429,12 +429,7 @@ describe("authenticated public skill releases", () => {
       version: "1.0.0",
       ...v1Transport,
       database: integrationDb,
-    })).resolves.toMatchObject({ public_version: "1.0.0", changed: true });
-    const personalRow = await integrationDb.query.skills.findFirst({
-      where: and(eq(schema.skills.orgId, fixture.orgA), eq(schema.skills.id, personal.id)),
-    });
-    if (!personalRow) throw new Error("personal skill missing");
-    expect(await getSkillPublicPreviewByShareToken({ token: personalRow.shareToken, database: integrationDb })).toBeNull();
+    })).rejects.toThrow("share this personal skill");
   });
 
   it("keeps the pinned identity stable across the explicit withdraw, rename, republish flow", async () => {

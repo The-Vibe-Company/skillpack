@@ -1,5 +1,12 @@
-import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { packDir, tarGzToZip } from "@skillpack/skills";
+import { createSkillpackMcpServer } from "../../src/mcp/server";
+import { createHash, randomUUID } from "node:crypto";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { and, eq, sql } from "drizzle-orm";
 import { schema } from "@skillpack/db";
 import {
@@ -13,6 +20,7 @@ import {
 import {
   getPublicCatalogSkill,
   listPublicCatalog,
+  prepareSkillPublicListing,
   setSkillPublicListing,
 } from "@skillpack/core";
 import {
@@ -214,14 +222,13 @@ describe("public catalog", () => {
     }
   });
 
-  it("permits a personal creator to list without exposing personal labels or identity", async () => {
+  it("rejects personal listing for every member and keeps it out of anonymous discovery", async () => {
     const skill = await seedSkill({
       orgId: fixture.orgA,
       creator: fixture.developer,
       slug: `catalog-personal-${fixture.suffix.slice(0, 8)}`,
       scope: "personal",
     });
-    await promote(skill, fixture.developer);
     await seedPersonalLabel({
       orgId: fixture.orgA,
       owner: fixture.developer,
@@ -229,35 +236,56 @@ describe("public catalog", () => {
       path: `private-${fixture.suffix.slice(0, 8)}`,
     });
 
-    await expect(setSkillPublicListing({
-      actor: fixture.admin,
-      orgId: fixture.orgA,
-      slug: skill.slug,
-      listed: true,
-      database: integrationDb,
-    })).rejects.toBeInstanceOf(SkillPublicReleaseNotFoundError);
-    await expect(setSkillPublicListing({
-      actor: fixture.developer,
-      orgId: fixture.orgA,
-      slug: skill.slug,
-      listed: true,
-      database: integrationDb,
-    })).resolves.toMatchObject({ listed_publicly: true });
+    for (const actor of [fixture.owner, fixture.admin, fixture.developer]) {
+      const error = actor.id === fixture.developer.id
+        ? SkillPublicReleaseForbiddenError
+        : SkillPublicReleaseNotFoundError;
+      for (const listed of [true, false]) {
+        await expect(setSkillPublicListing({
+          actor, orgId: fixture.orgA, slug: skill.slug, listed, database: integrationDb,
+        })).rejects.toBeInstanceOf(error);
+      }
+      await expect(prepareSkillPublicListing({
+        actor, orgId: fixture.orgA, slug: skill.slug, database: integrationDb,
+      })).rejects.toBeInstanceOf(error);
+    }
 
-    const catalog = await getPublicCatalogSkill({
-      orgSlug: `integration-a-${fixture.suffix}`,
-      skillSlug: skill.slug,
-      database: integrationDb,
-    });
-    expect(catalog).toBeTruthy();
-    expect(catalog).not.toHaveProperty("creator_id");
-    expect(catalog).not.toHaveProperty("creator_name");
-    await expect(listPublicCatalog({
-      limit: 50,
-      offset: 0,
-      label: `private-${fixture.suffix.slice(0, 8)}`,
-      database: integrationDb,
-    })).resolves.not.toContainEqual(expect.objectContaining({ skill_slug: skill.slug }));
+    // Complete release metadata isolates the scope check from the completeness check.
+    await integrationDb.update(schema.skills).set({
+      publicVersionId: skill.versionId,
+      publicPackageChecksum: `sha256:${"a".repeat(64)}`,
+      publicPackageSizeBytes: 1_024,
+      publicReleasedAt: new Date(),
+      publicPackageFiles: FILES,
+    }).where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id)));
+    await expect(integrationDb.update(schema.skills)
+      .set({ listedPublicly: true, listedAt: new Date() })
+      .where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id))))
+      .rejects.toThrow();
+
+    // Prove both SQL projections reject even inconsistent personal listing rows. All DDL and
+    // fixture changes here roll back, leaving the production constraint in place for other tests.
+    await expect(integrationSql.begin(async (connection) => {
+      await connection`alter table public.skills drop constraint skills_public_listing_complete_check`;
+      await connection`update public.skills set listed_publicly = true, listed_at = now()
+        where org_id = ${skill.orgId} and id = ${skill.id}`;
+      await connection`set local role companion_api`;
+      const rows = await connection`select * from public.skillpack_list_public_catalog(50, 0, null)`;
+      expect(rows).not.toContainEqual(expect.objectContaining({ skill_slug: skill.slug }));
+      const detail = await connection`select * from public.skillpack_get_public_catalog_skill(
+        ${`integration-a-${fixture.suffix}`}, ${skill.slug})`;
+      expect(detail).toHaveLength(0);
+      throw new Error("roll back inconsistent personal fixture");
+    })).rejects.toThrow("roll back inconsistent personal fixture");
+
+    expect(await getPublicCatalogSkill({
+      orgSlug: `integration-a-${fixture.suffix}`, skillSlug: skill.slug, database: integrationDb,
+    })).toBeNull();
+    for (const label of [undefined, `private-${fixture.suffix.slice(0, 8)}`]) {
+      await expect(listPublicCatalog({ limit: 50, offset: 0, label, database: integrationDb }))
+        .resolves.not.toContainEqual(expect.objectContaining({ skill_slug: skill.slug }));
+    }
+    expect((await skillRow(skill)).listedPublicly).toBe(false);
   });
 
   it("reads only the pinned version and exact shared label assignment", async () => {
@@ -311,6 +339,76 @@ describe("public catalog", () => {
     });
     expect(pinned?.description).not.toBe("Private draft metadata");
     expect(pinned?.body).not.toContain("Private draft");
+  });
+
+  it("preserves catalog consent when MCP promotes a verified release and rejects tampered bytes", async () => {
+    const skill = await seedSkill({
+      orgId: fixture.orgA, creator: fixture.owner,
+      slug: `catalog-mcp-${fixture.suffix.slice(0, 8)}`, scope: "org",
+    });
+    await promote(skill, fixture.owner);
+    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA,
+      slug: skill.slug, listed: true, database: integrationDb });
+    const directory = await mkdtemp(join(tmpdir(), "catalog-mcp-"));
+    const client = new Client({ name: "catalog-integration", version: "1" });
+    try {
+      const markdown = `---\nname: ${skill.slug}\ndescription: MCP release\n---\n\nNew public instructions.\n`;
+      await writeFile(join(directory, "SKILL.md"), markdown);
+      await mkdir(join(directory, "scripts"));
+      await writeFile(join(directory, "scripts/helper.sh"), "echo release\n");
+      const packed = await packDir(directory);
+      const versionId = randomUUID();
+      await integrationDb.insert(schema.skillVersions).values({
+        id: versionId, orgId: skill.orgId, skillId: skill.id, version: "2.0.0",
+        frontmatter: JSON.stringify({ name: skill.slug, description: "MCP release", metadata: {} }),
+        body: "New public instructions.", sizeBytes: packed.sizeBytes, checksum: packed.checksum,
+        storagePath: `integration/${skill.orgId}/${skill.slug}/2.0.0.tar.gz`, createdBy: fixture.owner.id,
+      });
+      await integrationDb.update(schema.skills).set({ currentVersionId: versionId })
+        .where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id)));
+      const storageMocks = {
+        getSkillArchive: vi.fn().mockResolvedValue(packed.archive),
+        putPublicSkillReleaseSnapshot: vi.fn().mockResolvedValue(undefined),
+      };
+      const server = createSkillpackMcpServer({
+        connection: { actor: fixture.owner, orgId: fixture.orgA, clientId: "catalog-test" },
+        publicReleaseStorage: storageMocks,
+        skillDatabaseRuntime: { execute: async () => { throw new Error("unused database runtime"); } },
+        skillDatabaseStorage: {
+          get: async () => { throw new Error("unused database storage"); },
+          put: async () => { throw new Error("unused database storage"); },
+          delete: async () => { throw new Error("unused database storage"); },
+        },
+      });
+      const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+      await Promise.all([server.connect(serverTransport), client.connect(clientTransport)]);
+      const result = await client.callTool({ name: "skill_set_public_version",
+        arguments: { slug: skill.slug, version: "2.0.0" } });
+      expect(result.isError).not.toBe(true);
+      const zip = await tarGzToZip(packed.archive);
+      const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
+      expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`,
+        skillSlug: skill.slug, database: integrationDb })).toMatchObject({
+        version: "2.0.0", body: "New public instructions.", checksum,
+        files: [
+          { path: "SKILL.md", size_bytes: Buffer.byteLength(markdown) },
+          { path: "scripts/helper.sh", size_bytes: Buffer.byteLength("echo release\n") },
+        ],
+      });
+      expect((await skillRow(skill)).listedPublicly).toBe(true);
+      expect(storageMocks.putPublicSkillReleaseSnapshot).toHaveBeenCalledWith({
+        orgId: fixture.orgA, checksum, body: zip,
+      });
+      storageMocks.getSkillArchive.mockResolvedValue(Buffer.from("tampered archive"));
+      const tampered = await client.callTool({ name: "skill_set_public_version",
+        arguments: { slug: skill.slug, version: "2.0.0" } });
+      expect(tampered.isError).toBe(true);
+      expect(storageMocks.putPublicSkillReleaseSnapshot).toHaveBeenCalledTimes(1);
+      expect((await skillRow(skill)).listedPublicly).toBe(true);
+    } finally {
+      await client.close();
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 
   it("unlists without withdrawing the release, while clearing a release also clears consent", async () => {

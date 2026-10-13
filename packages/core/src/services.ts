@@ -1004,20 +1004,14 @@ export async function listSkills(input: {
       current_version: schema.skillVersions.version,
       public_version: publicVersion.version,
       can_manage_public: sql<boolean>`(
-        (
-          ${schema.skills.scope} = 'personal'
-          and ${schema.skills.creatorId} = ${input.actor.id}
-        )
-        or (
-          ${schema.skills.scope} = 'org'
-          and (
-            ${schema.skills.creatorId} = ${input.actor.id}
-            or exists (
-              select 1 from ${schema.memberships} public_manager
-              where public_manager.org_id = ${input.orgId}
-                and public_manager.user_id = ${input.actor.id}
-                and public_manager.org_role in ('owner', 'admin')
-            )
+        ${schema.skills.scope} = 'org'
+        and (
+          ${schema.skills.creatorId} = ${input.actor.id}
+          or exists (
+            select 1 from ${schema.memberships} public_manager
+            where public_manager.org_id = ${input.orgId}
+              and public_manager.user_id = ${input.actor.id}
+              and public_manager.org_role in ('owner', 'admin')
           )
         )
       )`,
@@ -1370,6 +1364,9 @@ async function publicReleaseSkillForActor(input: {
   if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
     throw new SkillPublicReleaseNotFoundError("skill not found");
   }
+  if (skill.scope !== "org") {
+    throw new SkillPublicReleaseConflictError("share this personal skill with the organization before making it public");
+  }
   if (!canManagePublicSkill({ id: input.actor.id, orgRole: role }, skill)) {
     throw new SkillPublicReleaseForbiddenError();
   }
@@ -1491,6 +1488,7 @@ export async function setSkillPublicVersion(input: {
         eq(schema.skills.orgId, input.orgId),
         eq(schema.skills.id, skill.id),
         eq(schema.skills.slug, skill.slug),
+        eq(schema.skills.scope, "org"),
         isNull(schema.skills.archivedAt),
         eq(schema.skills.currentVersionId, version.id),
         eq(schema.skills.listedPublicly, skill.listedPublicly),
@@ -1599,6 +1597,7 @@ export async function clearSkillPublicVersion(input: {
       .where(and(
         eq(schema.skills.orgId, input.orgId),
         eq(schema.skills.id, skill.id),
+        eq(schema.skills.scope, "org"),
         expectedPointer,
         expectedChecksum,
         expectedSize,

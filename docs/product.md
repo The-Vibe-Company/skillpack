@@ -52,5 +52,5 @@ cookies. Logout removes that file when it still belongs to that account. Telemet
 writing it; reporting agents must also check opt-out before reading any identity.
 
 Public catalog discovery requires explicit listing consent in addition to a pinned public release.
-Organization listing is Owner/Admin-only; personal listing is creator-only. Existing releases stay
+Only organization skills can be listed, with Owner/Admin consent. Existing releases stay
 unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).

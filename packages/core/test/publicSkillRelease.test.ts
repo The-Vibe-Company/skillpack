@@ -109,11 +109,11 @@ describe("public skill release lifecycle", () => {
       .rejects.toBeInstanceOf(SkillPublicReleaseForbiddenError);
   });
 
-  it("allows the personal creator to promote without sharing the skill with the organization", async () => {
+  it("requires the personal creator to share before promoting a public release", async () => {
     const fake = publicReleaseDb({ role: "owner", scope: "personal", creatorId: actor.id });
 
     await expect(setSkillPublicVersion({ actor, orgId: "org-1", slug: "review", version: "2.0.0", ...transport, database: fake.database }))
-      .resolves.toMatchObject({ ok: true, public_version: "2.0.0", changed: true });
+      .rejects.toThrow("share this personal skill with the organization");
   });
 
   it("requires the immutable current version identity to match the renamed skill", async () => {

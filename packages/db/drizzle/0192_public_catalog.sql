@@ -1,5 +1,5 @@
 -- Public catalog discovery is a separate, explicit consent bit from the stable share link.
--- Existing public releases stay unlisted until an org Owner/Admin or personal creator opts them in;
+-- Existing public releases stay unlisted until an org Owner/Admin opts them in;
 -- there is no backfill.
 ALTER TABLE "skills" ADD COLUMN "listed_publicly" boolean NOT NULL DEFAULT false;--> statement-breakpoint
 ALTER TABLE "skills" ADD COLUMN "listed_at" timestamp with time zone;--> statement-breakpoint
@@ -9,6 +9,7 @@ ALTER TABLE "skills" ADD CONSTRAINT "skills_public_listing_complete_check" CHECK
     "listed_publicly" = false AND "listed_at" IS NULL
   ) OR (
     "listed_publicly" = true
+    AND "scope" = 'org'
     AND "listed_at" IS NOT NULL
     AND "public_version_id" IS NOT NULL
     AND "public_package_checksum" IS NOT NULL
@@ -105,7 +106,9 @@ BEGIN
    AND version."skill_id" = skill."id"
    AND version."id" = skill."public_version_id"
   CROSS JOIN LATERAL public.skillpack_public_catalog_manifest(version."frontmatter") AS manifest("value")
-  WHERE skill."listed_publicly" = true
+  WHERE skill."scope" = 'org'
+    AND skill."listed_publicly" = true
+    AND "scope" = 'org'
     AND skill."archived_at" IS NULL
     AND skill."public_version_id" IS NOT NULL
     AND skill."public_package_checksum" IS NOT NULL
@@ -177,7 +180,9 @@ AS $$
   CROSS JOIN LATERAL public.skillpack_public_catalog_manifest(version."frontmatter") AS manifest("value")
   WHERE organization."slug" = p_org_slug
     AND skill."slug" = p_skill_slug
+    AND skill."scope" = 'org'
     AND skill."listed_publicly" = true
+    AND "scope" = 'org'
     AND skill."archived_at" IS NULL
     AND skill."public_version_id" IS NOT NULL
     AND skill."public_package_checksum" IS NOT NULL

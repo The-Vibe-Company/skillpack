@@ -1,3 +1,4 @@
+import { publicReleaseFileList } from "./publicReleaseFiles";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 import { prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
 import { setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
@@ -241,7 +242,6 @@ import {
   buildNormalizedSkillpackJson,
   packDir,
   tarGzToZip,
-  zipToTar,
   toTar,
   validateSkillArchive,
 } from "@skillpack/skills";
@@ -2701,15 +2701,6 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
     return publicReleaseRouteError(c, error);
   }
 });
-
-/** Extract only paths and byte lengths from a safe, pinned public ZIP. */
-async function publicReleaseFileList(zip: Buffer): Promise<Array<{ path: string; size_bytes: number }>> {
-  const extracted = await extractArchiveFiles(await zipToTar(zip));
-  if (extracted.violations.length > 0) {
-    throw new SkillPublicReleaseValidationError("the public release file list is invalid");
-  }
-  return extracted.files.map((file) => ({ path: file.path, size_bytes: file.size }));
-}
 
 /** Explicit discovery consent, independent of the public share-link release. */
 app.put("/v1/skills/:slug/public-listing", async (c) => {

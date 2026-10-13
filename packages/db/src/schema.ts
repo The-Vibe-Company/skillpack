@@ -568,13 +568,14 @@ export const skills = pgTable(
       "skills_public_package_size_check",
       sql`${t.publicPackageSizeBytes} is null or ${t.publicPackageSizeBytes} >= 0`,
     ),
-    /** A catalog entry can only expose a complete immutable public release. */
+    /** A catalog entry can only expose a complete immutable organization public release. */
     publicListingComplete: check(
       "skills_public_listing_complete_check",
       sql`(
         ${t.listedPublicly} = false and ${t.listedAt} is null
       ) or (
         ${t.listedPublicly} = true
+        and ${t.scope} = 'org'
         and ${t.listedAt} is not null
         and ${t.publicVersionId} is not null
         and ${t.publicPackageChecksum} is not null

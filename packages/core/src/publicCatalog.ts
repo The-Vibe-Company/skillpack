@@ -90,7 +90,7 @@ function resultRows<T>(result: Iterable<T>): T[] {
 /**
  * Set explicit public discovery consent for one immutable public release. This is a tenant
  * mutation, so membership and scope authorization are checked before the conditional update. Org
- * catalog consent is Owner/Admin-only; personal consent remains creator-only with no admin override.
+ * catalog consent is Owner/Admin-only; personal skills cannot be listed.
  */
 export async function setSkillPublicListing(
   input: SetSkillPublicListingInput,
