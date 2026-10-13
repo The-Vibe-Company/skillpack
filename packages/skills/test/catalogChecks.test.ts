@@ -85,7 +85,8 @@ describe("checkCatalogPackage", () => {
     const bytes = packageBytes("catalog-skill", { "assets/data.bin": data });
     const result = checkCatalogPackage(input(bytes));
     expect(result.passed).toBe(true);
-  });
+    // Compressing and scanning a real 10 MiB boundary fixture takes longer on shared CI CPUs.
+  }, 20_000);
   it("rejects understated ZIP sizes without truncating trailing secret content", () => {
     const hidden = ["ghp_", randomBytes(20).toString("hex")].join("");
     const base = packageBytes("catalog-skill", { "nested/data.txt": Buffer.from(`safe\n${hidden}`) });
