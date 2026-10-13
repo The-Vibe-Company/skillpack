@@ -98,23 +98,25 @@ export default async function CatalogSkillPage({ params }: CatalogSkillProps) {
           </header>
 
           <div className="v10-wrap v10-catskill__layout">
-            <section className="v10-catskill__main" aria-labelledby="catalog-skill-md">
-              <h2 id="catalog-skill-md" className="v10-section-label mono">SKILL.md</h2>
-              <div className="v10-catskill__body">
-                <PublishedSkillMarkdown body={skill.body} />
-              </div>
-            </section>
-
-            <aside className="v10-catskill__aside">
-              <section className="v10-catskill__panel" aria-labelledby="catalog-install">
+            <div className="v10-catskill__main">
+              <section className="v10-catskill__panel v10-catskill__install" aria-labelledby="catalog-install">
                 <h2 id="catalog-install" className="v10-section-label">Install</h2>
-                <p>With access to this skill in the {skill.org_name} workspace, install this release with the Skillpack CLI:</p>
+                <p>Members of {skill.org_name} can install this release with the Skillpack CLI:</p>
                 <CodeBlock language="sh">
                   <code>{catalogInstallCommands({ siteUrl, skillSlug: skill.skill_slug, version: skill.version })}</code>
                 </CodeBlock>
                 <p>The catalog does not publish share links. To install from another workspace, ask {skill.org_name} for the skill&apos;s share link.</p>
               </section>
 
+              <section aria-labelledby="catalog-skill-md">
+                <h2 id="catalog-skill-md" className="v10-section-label">SKILL.md</h2>
+                <div className="v10-catskill__body">
+                  <PublishedSkillMarkdown body={skill.body} />
+                </div>
+              </section>
+            </div>
+
+            <aside className="v10-catskill__aside">
               <section className="v10-catskill__panel" aria-labelledby="catalog-release">
                 <h2 id="catalog-release" className="v10-section-label">Release</h2>
                 <dl className="v10-catskill__facts">

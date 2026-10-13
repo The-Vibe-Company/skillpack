@@ -93,7 +93,8 @@
   align-items: start;
   padding-block: clamp(36px, 5vw, 64px) clamp(72px, 10vw, 120px);
 }
-.v10-catskill__main { min-width: 0; }
+.v10-catskill__main { display: flex; flex-direction: column; gap: clamp(36px, 5vw, 56px); min-width: 0; }
+.v10-catskill__install > p { max-width: 68ch; }
 .v10-catskill__body {
   padding: clamp(20px, 3vw, 36px);
   border: 1px solid var(--v10-line);
@@ -130,10 +131,10 @@
 .v10-catskill__files li > .mono { min-width: 0; color: var(--v10-ink); overflow-wrap: anywhere; }
 .v10-catskill__files li > span:last-child { flex: none; color: var(--v10-ink-faint); }
 
-/* On narrower screens the install panel comes first, then the SKILL.md body. */
+/* On narrower screens the release facts and files follow the install section and SKILL.md. */
 @media (max-width: 1023px) {
   .v10-catskill__layout { grid-template-columns: minmax(0, 1fr); row-gap: clamp(36px, 6vw, 56px); }
-  .v10-catskill__aside { position: static; order: -1; }
+  .v10-catskill__aside { position: static; }
 }
 @media (max-width: 560px) {
   .v10-catalog .v10-wrap { padding-inline: var(--space-4); }
