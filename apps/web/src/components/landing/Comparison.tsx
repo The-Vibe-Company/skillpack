@@ -2,6 +2,8 @@
    Every Skillpack cell maps to repository behavior; category cells stay generic and use
    "Varies" whenever a statement would not hold for every product or setup. */
 
+import { Fragment } from "react";
+
 type ComparisonRow = { feature: string; skillpack: React.ReactNode; directories: string; gists: string };
 
 const COMPARISON_COPY = {
@@ -12,6 +14,20 @@ const COMPARISON_COPY = {
   caption: "Skillpack compared with public skills directories and with sharing skills through gists or Slack. “Varies” means it depends on the product or setup.",
   columns: { feature: "Capability", skillpack: "Skillpack", directories: "Public skills directories", gists: "Gists & Slack" },
 };
+
+/* Commands wrap only between arguments, so flags like --frozen never split at their hyphens. */
+function Cmd({ children }: { children: string }) {
+  return (
+    <code>
+      {children.split(" ").map((arg, i) => (
+        <Fragment key={i}>
+          {i > 0 && " "}
+          <span>{arg}</span>
+        </Fragment>
+      ))}
+    </code>
+  );
+}
 
 const COMPARISON_ROWS: ComparisonRow[] = [
   {
@@ -30,7 +46,7 @@ const COMPARISON_ROWS: ComparisonRow[] = [
     feature: "Lockfile with sha256 checksums",
     skillpack: (
       <>
-        Installs are recorded in a lockfile; <code>skillpack sync --frozen</code> verifies them
+        Installs are recorded in a lockfile; <Cmd>skillpack sync --frozen</Cmd> verifies them
       </>
     ),
     directories: "Varies",
@@ -44,11 +60,7 @@ const COMPARISON_ROWS: ComparisonRow[] = [
   },
   {
     feature: "Install into several agents in one command",
-    skillpack: (
-      <>
-        <code>skillpack install &lt;slug&gt; --tools codex,claude-code,opencode</code>
-      </>
-    ),
+    skillpack: <Cmd>skillpack install &lt;slug&gt; --tools codex,claude-code,opencode</Cmd>,
     directories: "Varies",
     gists: "Manual copy",
   },
@@ -62,7 +74,7 @@ const COMPARISON_ROWS: ComparisonRow[] = [
     feature: "Validation before publish",
     skillpack: (
       <>
-        <code>skillpack skills validate</code> checks the package; publishing validates SKILL.md, manifest, dependencies and
+        <Cmd>skillpack skills validate</Cmd> checks the package; publishing validates SKILL.md, manifest, dependencies and
         secrets
       </>
     ),

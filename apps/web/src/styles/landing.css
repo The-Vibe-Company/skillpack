@@ -525,7 +525,8 @@
 .lp-compare__table tbody tr { border-top: 1px solid var(--v10-line); }
 .lp-compare__table .lp-compare__us { width: 34%; color: var(--v10-ink); }
 .lp-compare__table thead .lp-compare__us { color: var(--color-accent-ink); }
-.lp-compare__table code { font-family: var(--font-mono); font-size: 0.8125rem; color: #b45309; overflow-wrap: anywhere; }
+.lp-compare__table code { font-family: var(--font-mono); font-size: 0.8125rem; color: #b45309; }
+.lp-compare__table code span { white-space: nowrap; }
 
 /* --- finale ------------------------------------------------------------------------------------ */
 .lp-finale { position: relative; overflow: clip; padding-block: clamp(96px, 12vw, 160px); border-top: 1px solid var(--v10-line); text-align: center; }
