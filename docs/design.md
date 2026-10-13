@@ -128,3 +128,5 @@ The [catalog backend](public-catalog.md) adds separate listing consent to comple
 Owner/Admin submissions and Developer requests freeze release metadata; validation enables discovery.
 Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
 PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.
+The web reads the same flag server-side and renders publishing controls in the public release
+dialog only when it is on.

@@ -55,3 +55,5 @@ Public catalog discovery requires explicit listing consent in addition to a pinn
 Only organization skills can be submitted, with Owner/Admin consent; Developers can request
 admin submission. Validation enables discovery of a frozen version. Existing releases stay
 unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).
+The public release dialog shows the submission status and frozen version, and offers Owner/Admin
+Publish/Unpublish or a Developer's Request publication. It is absent while the catalog is off.

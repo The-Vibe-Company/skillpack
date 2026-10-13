@@ -44,6 +44,21 @@ promoted or proposed. Validation of a newer submission replaces that catalog ver
 The catalog reads the latest validated submission's frozen version, checksum, size and files, never
 the mutable public release pin or a later private draft. There is no submission backfill.
 
+## Publishing UI
+
+When the web also has `SKILLPACK_PUBLIC_CATALOG=true`, the public release dialog adds a Public
+catalog section; otherwise it renders nothing and makes no catalog request. It reads
+`GET /v1/skills/:slug/public-listing` and shows one phase: not published, requested, proposed,
+published, rejected (with the reason), or removed (unpublished or withdrawn). Owner/Admin see
+Publish to catalog (`PUT` true, also converting an open Developer request) and Unpublish, Withdraw
+submission or Decline request (`PUT` false). Developers see Request publication (`POST .../request`)
+and no withdrawal. Personal skills get an explanation instead of controls. A public release is
+required, and the section states that only MIT or Apache-2.0 licensed skills are accepted.
+
+The status names no version, so a published skill's frozen version is read from the anonymous
+catalog entry with credentials omitted. A proposal shows its version only when it was submitted from
+the open dialog. Publish is offered again only when the public release differs from the frozen one.
+
 ## Anonymous catalog API
 
 - `GET /v1/public/catalog/skills?limit=20&offset=0&label=engineering` is anonymous.
@@ -70,7 +85,8 @@ pre-tenant PostgreSQL functions are executable by the API role only.
 ## Later publishing PRs
 
 PR 2/9 adds submissions and frozen validated versions, stacked on PR #26's org-only catalog API.
-It contains no checks engine, moderator API, catalog install command, or frontend. Later PRs add
+It contains no checks engine, moderator API, catalog install command, or frontend; PR 5/9 adds the
+publishing UI above. Later PRs add
 MIT/Apache-2.0 enforcement, validation and moderation, and anonymous installs by slug. Share tokens
 remain separate and excluded from every listing and catalog response. Self-hosted deployments
 remain disabled by default; enabling the catalog on managed hosting remains a deployment decision.

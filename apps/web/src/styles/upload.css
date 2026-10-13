@@ -36,6 +36,21 @@
 .public-release__note > svg { flex: none; margin-top: 2px; color: var(--color-faint); }
 .public-release__note b { color: var(--color-fg); font-weight: 500; }
 .public-release__remove { color: var(--color-danger); }
+.catalog-pub { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--color-line); }
+.catalog-pub__head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.catalog-pub__head h3 { margin: 0; color: var(--color-fg); font-size: var(--text-sm); font-weight: 600; }
+.catalog-pub__head .badge { flex: none; }
+.catalog-pub__badge--danger { color: var(--color-danger); border-color: var(--color-danger-line); background: var(--color-danger-tint); }
+.catalog-pub__text { margin: 0; color: var(--color-muted); font-size: var(--text-xs); line-height: 1.5; }
+.catalog-pub__loading { display: flex; align-items: center; gap: 8px; }
+.catalog-pub .public-release__note { margin-top: 0; }
+.catalog-pub__state[data-phase="rejected"] > svg { color: var(--color-danger); }
+.catalog-pub__reason { color: var(--color-fg); overflow-wrap: anywhere; }
+.catalog-pub__license { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--color-muted); font-size: var(--text-xs); line-height: 1.5; }
+.catalog-pub__license > svg { flex: none; margin-top: 2px; color: var(--color-faint); }
+.catalog-pub__license b { color: var(--color-fg); font-weight: 500; }
+.catalog-pub__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.catalog-pub__alert { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--color-danger); font-size: var(--text-xs); }
 
 .up-public-choice { margin: 16px 0 0; border: 1px solid var(--color-line); border-radius: var(--radius-md); padding: 14px; }
 .up-public-choice legend { padding: 0 5px; color: var(--color-fg); font-size: var(--text-sm); font-weight: 600; }
@@ -56,6 +71,7 @@
   .public-release .up__foot { flex-wrap: wrap; }
   .public-release .up__footspacer { display: none; }
   .public-release .up__foot > button { min-height: 44px; flex: 1 1 auto; }
+  .catalog-pub__actions > button { min-height: 44px; flex: 1 1 auto; }
 }
 
 /* body grid -------------------------------------------------------------- */
