@@ -460,8 +460,7 @@ function How({ c }: { c: Copy }) {
 const HUB_NODES = [
   { ...AGENTS[0], pos: "tl", d: "M 262 122 C 262 92, 123 98, 123 64" },
   { ...AGENTS[2], pos: "tr", d: "M 298 122 C 298 92, 437 98, 437 64" },
-  { ...AGENTS[1], pos: "bl", d: "M 262 218 C 262 248, 123 242, 123 276" },
-  { name: "Any MCP client", mono: "M", tone: "violet", pos: "br", d: "M 298 218 C 298 248, 437 242, 437 276" },
+  { ...AGENTS[1], pos: "b", d: "M 280 218 C 280 240, 280 254, 280 276" },
 ] as const;
 
 function HubDiagram() {

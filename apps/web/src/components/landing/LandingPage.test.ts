@@ -192,6 +192,12 @@ describe("LandingPage portal preview", () => {
     );
 
     expect(agents).toEqual(["Claude Code", "Codex", "OpenCode"]);
+    expect(container.textContent).not.toContain("Any MCP client");
+    expect(Array.from(container.querySelectorAll(".lp-hub__node strong")).map((node) => node.textContent)).toEqual([
+      "Claude Code",
+      "OpenCode",
+      "Codex",
+    ]);
     expect(container.textContent).not.toContain("12,480");
     expect(container.textContent).not.toContain("last 30 days");
     expect(installStep?.textContent).toContain("--tools");
