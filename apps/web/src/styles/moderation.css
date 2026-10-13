@@ -1,0 +1,59 @@
+/* Platform catalog moderation (/platform/catalog). Builds on the og- settings surface in org.css
+   and the dialog/field vocabulary in settings.css; class prefix mod-. */
+
+.mod-back { text-decoration: none; }
+.mod-pane { flex: 1; min-height: 0; }
+.mod-inner { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+.mod-inner .og-pane__head { margin-bottom: 0; }
+
+.mod-tabs { align-self: flex-start; max-width: 100%; flex-wrap: wrap; }
+.mod-tabs .og-seg__btn { flex: none; text-decoration: none; }
+.mod-tabs .og-seg__btn:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 1px; }
+
+.mod-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+
+.mod-card { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--color-line); border-radius: var(--radius-lg);
+  background: var(--color-surface); }
+.mod-card__head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.mod-card__date { font-size: var(--text-xs); color: var(--color-faint); font-variant-numeric: tabular-nums; }
+
+.mod-check { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
+.mod-check__reason { font-size: var(--text-sm); color: var(--color-muted); min-width: 0; overflow-wrap: anywhere; }
+
+.mod-card__meta,
+.mod-dialog__target { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 0; }
+.mod-card__meta div,
+.mod-dialog__target div { display: contents; }
+.mod-card__meta dt,
+.mod-dialog__target dt { font-size: var(--text-xs); color: var(--color-faint); line-height: 1.6; }
+.mod-card__meta dd,
+.mod-dialog__target dd { margin: 0; min-width: 0; font-family: var(--font-mono); font-size: var(--text-xs); line-height: 1.6; color: var(--color-fg);
+  overflow-wrap: anywhere; user-select: all; }
+.mod-dialog__target { margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface-sunken); }
+
+.mod-card__reason { margin: 0; padding: 10px 12px; border-radius: var(--radius-md); background: var(--color-surface-sunken); font-size: var(--text-sm);
+  color: var(--color-fg); overflow-wrap: anywhere; white-space: pre-wrap; }
+.mod-card__reason b { display: block; margin-bottom: 2px; font-size: var(--text-xs); font-weight: 500; color: var(--color-muted); }
+
+.mod-card__actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 12px; border-top: 1px solid var(--color-line); }
+.mod-card__spacer { flex: 1; }
+.mod-card__ban, .mod-card__ban:hover { color: var(--color-danger); }
+.mod-card__ban:hover { background: var(--color-danger-tint); }
+.mod-card__hint { margin: -4px 0 0; font-size: var(--text-xs); color: var(--color-faint); }
+
+.mod-dialog__reason { min-height: 96px; }
+
+.mod-pager { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+.mod-pager > :first-child { justify-self: start; }
+.mod-pager > :last-child { justify-self: end; }
+.mod-pager a { text-decoration: none; }
+.mod-pager__range { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-faint); }
+
+@media (max-width: 820px) {
+  .mod-pane { padding: 20px 16px 32px; }
+  .mod-card { padding: 14px; }
+  .mod-card__meta { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .mod-card__meta dd { margin-bottom: 6px; }
+  .mod-card__spacer { display: none; }
+  .mod-card__actions .cds-btn { min-height: 36px; }
+}

@@ -34,7 +34,7 @@ export const publicCatalogPathSchema = z.object({
 });
 
 export const setSkillPublicListingInputSchema = z.object({ listed: z.boolean() }).strict();
-export const catalogSubmissionStatusSchema = z.enum(["proposed", "validated", "rejected", "withdrawn"]);
+export const catalogSubmissionStatusSchema = z.enum(["proposed", "validated", "rejected", "withdrawn", "removed"]);
 export const catalogSubmissionKindSchema = z.enum(["publish_request", "submission"]);
 
 /** Value-free findings: never include source excerpts or parser error messages. */

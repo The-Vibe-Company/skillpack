@@ -126,7 +126,15 @@ and repository copies remain explicit exceptions; repository updates are reviewa
 
 The [catalog backend](public-catalog.md) adds separate listing consent to complete public releases.
 Owner/Admin submissions and Developer requests freeze release metadata; validation enables discovery.
+Platform moderation is separate from organization roles; API-only security definers provide the
+cross-organization queue and audited decisions, surfaced at the session-only `/platform/catalog` screen, which 404s for non-moderators. Operator-managed moderator grants and org publishing
+policies cannot be changed through tenant writes. A check-report reader consumes PR 3 reports for the
+exact frozen identity; absent reports remain pending, and auto-approval also requires an allowlist.
 Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
 PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.
 The web reads the same flag server-side and renders publishing controls in the public release
 dialog only when it is on.
+
+Anonymous catalog reports use API-only security definers for durable rate-limited writes and
+platform-moderator-only reads. Report text and abuse hashes have no tenant read policy; see
+[public catalog reporting](public-catalog.md#anonymous-reporting-pr-79).

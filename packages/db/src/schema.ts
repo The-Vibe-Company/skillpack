@@ -70,6 +70,7 @@ export const catalogSubmissionStatusEnum = pgEnum("catalog_submission_status", [
   "validated",
   "rejected",
   "withdrawn",
+  "removed",
 ]);
 export const catalogSubmissionKindEnum = pgEnum("catalog_submission_kind", [
   "publish_request",
@@ -86,6 +87,13 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Global operator-managed catalog moderators. This table has no organization scope. */
+export const platformModerators = pgTable("platform_moderators", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const session = pgTable("session", {
@@ -380,6 +388,15 @@ export const organizations = pgTable(
     updatedAt: updatedAt(),
   },
 );
+
+/** Operator-managed catalog publication policy, one row per organization when configured. */
+export const catalogPublishingPolicies = pgTable("catalog_publishing_policies", {
+  orgId: uuid("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  banned: boolean("banned").notNull().default(false),
+  autoApprove: boolean("auto_approve").notNull().default(false),
+});
 
 export const organizationDomains = pgTable(
   "organization_domains",
@@ -718,10 +735,10 @@ export const catalogSubmissions = pgTable(
     ),
     decisionCheck: check(
       "catalog_submissions_decision_check",
-      sql`(${t.status} = 'proposed' and ${t.decidedBy} is null and ${t.decidedAt} is null)
-        or (${t.status} in ('validated', 'rejected')
+      sql`(${t.status}::text = 'proposed' and ${t.decidedBy} is null and ${t.decidedAt} is null)
+        or (${t.status}::text in ('validated', 'rejected', 'removed')
           and ${t.decidedBy} is not null and ${t.decidedAt} is not null)
-        or ${t.status} = 'withdrawn'`,
+        or ${t.status}::text = 'withdrawn'`,
     ),
   }),
 );
@@ -1897,4 +1914,25 @@ export const skillUsageInbox = pgTable("skill_usage_inbox", {
   pending: index("skill_usage_inbox_pending_idx").on(t.receivedAt).where(sql`${t.processedAt} is null`),
   admission: index("skill_usage_inbox_admission_idx").on(t.declaredSkillId, t.receivedAt),
   expiry: index("skill_usage_inbox_expiry_idx").on(t.processedAt).where(sql`${t.processedAt} is not null`),
+}));
+
+/** Anonymous catalog reports are private to platform moderation, never organization members. */
+export const catalogReports = pgTable("catalog_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  skillId: uuid("skill_id").notNull(),
+  submissionId: uuid("submission_id").notNull().references(() => catalogSubmissions.id, { onDelete: "cascade" }),
+  orgSlug: text("org_slug").notNull(),
+  skillSlug: text("skill_slug").notNull(),
+  reason: text("reason").$type<"secret_exposure" | "malicious" | "license" | "spam">().notNull(),
+  details: text("details"),
+  reporterHash: text("reporter_hash").notNull(),
+  createdAt: now(),
+}, t => ({
+  skillOrgFk: foreignKey({ columns: [t.orgId, t.skillId], foreignColumns: [skills.orgId, skills.id], name: "catalog_reports_skill_org_fk" }).onDelete("cascade"),
+  bySourceTime: index("catalog_reports_source_time_idx").on(t.reporterHash, t.createdAt),
+  byQueue: index("catalog_reports_queue_idx").on(t.createdAt, t.id),
+  reasonCheck: check("catalog_reports_reason_check", sql`${t.reason} in ('secret_exposure', 'malicious', 'license', 'spam')`),
+  detailsCheck: check("catalog_reports_details_check", sql`char_length(${t.details}) <= 2000`),
+  hashCheck: check("catalog_reports_reporter_hash_check", sql`${t.reporterHash} ~ '^[0-9a-f]{64}$'`),
 }));
