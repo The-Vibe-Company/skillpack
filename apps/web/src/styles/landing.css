@@ -386,6 +386,7 @@
 .lp-step__n { font-family: var(--font-mono); font-size: var(--text-xs); font-weight: var(--weight-semibold); color: #c2410c; letter-spacing: 0.08em; }
 .lp-step h3 { margin: var(--space-2) 0 0; font-family: var(--lp-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.025em; }
 .lp-step p { margin: var(--space-2) 0 0; font-size: var(--text-base); line-height: 1.55; color: var(--v10-ink-muted); max-width: 46ch; text-wrap: pretty; }
+.lp-step p code { font-family: var(--font-mono); font-size: 0.875em; color: var(--v10-ink); white-space: nowrap; }
 
 .lp-vis { margin-top: auto; border-radius: 12px; min-height: 168px; }
 .lp-vis--code, .lp-vis--share, .lp-vis--usage {
@@ -441,8 +442,6 @@
 @media (max-width: 480px) { .lp-term__dim { display: none; } }
 
 .lp-vis--usage { display: flex; flex-direction: column; gap: var(--space-3); }
-.lp-usage__head { font-size: var(--text-sm); color: var(--v10-ink-muted); }
-.lp-usage__head strong { font-family: var(--lp-display); font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em; color: var(--v10-ink); margin-right: 6px; }
 .lp-bars { flex: 1; min-height: 90px; display: flex; align-items: flex-end; gap: 5px; }
 .lp-bar { flex: 1; border-radius: 4px 4px 2px 2px; background: oklch(0.81 0.166 70 / 0.35); }
 .lp-bar--now { background: var(--lp-grad-bright); }
@@ -478,7 +477,6 @@
   .lp-hub__pulse { animation: lp-pulse 2.6s linear infinite; }
   .lp-hub g:nth-of-type(2) .lp-hub__pulse { animation-delay: -0.6s; }
   .lp-hub g:nth-of-type(3) .lp-hub__pulse { animation-delay: -1.3s; }
-  .lp-hub g:nth-of-type(4) .lp-hub__pulse { animation-delay: -1.9s; }
 }
 @media (prefers-reduced-motion: reduce) { .lp-hub__pulse { stroke-dasharray: none; opacity: 0.6; } }
 @keyframes lp-pulse { to { stroke-dashoffset: 0; } }
@@ -502,8 +500,7 @@
 }
 .lp-hub__node--tl { top: 0; left: 0; }
 .lp-hub__node--tr { top: 0; right: 0; }
-.lp-hub__node--bl { bottom: 0; left: 0; }
-.lp-hub__node--br { bottom: 0; right: 0; }
+.lp-hub__node--b { bottom: 0; left: 50%; transform: translateX(-50%); }
 .lp-hub__node > span:nth-child(2) { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .lp-hub__node strong { font-weight: var(--weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lp-hub__node code { font-family: var(--font-mono); font-size: 11px; color: #b45309; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
