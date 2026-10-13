@@ -37,6 +37,19 @@ export const setSkillPublicListingInputSchema = z.object({ listed: z.boolean() }
 export const catalogSubmissionStatusSchema = z.enum(["proposed", "validated", "rejected", "withdrawn"]);
 export const catalogSubmissionKindSchema = z.enum(["publish_request", "submission"]);
 
+/** Value-free findings: never include source excerpts or parser error messages. */
+export const catalogCheckReportSchema = z.object({
+  version: z.literal(1),
+  passed: z.boolean(),
+  findings: z.array(z.object({
+    rule_id: z.string(),
+    severity: z.enum(["blocking", "warning"]),
+    path: z.string().optional(),
+    line: z.number().int().positive().optional(),
+  }).strict()),
+}).strict();
+export type CatalogCheckReport = z.infer<typeof catalogCheckReportSchema>;
+
 export const skillPublicListingStatusSchema = z.object({
   listed_publicly: z.boolean(),
   listed_at: z.string().datetime().nullable(),
@@ -46,6 +59,7 @@ export const skillPublicListingStatusSchema = z.object({
     kind: catalogSubmissionKindSchema,
   }).strip().nullable(),
   rejection_reason: z.string().nullable(),
+  check_report: catalogCheckReportSchema.nullable(),
   can_manage_listing: z.boolean(),
 }).strip();
 export type SkillPublicListingStatus = z.infer<typeof skillPublicListingStatusSchema>;

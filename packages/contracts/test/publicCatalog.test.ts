@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { publicCatalogSkillSchema, skillPublicListingStatusSchema, requestSkillPublicListingInputSchema, setSkillPublicListingInputSchema } from "../src/publicCatalog";
+import { catalogCheckReportSchema, publicCatalogSkillSchema, skillPublicListingStatusSchema, requestSkillPublicListingInputSchema, setSkillPublicListingInputSchema } from "../src/publicCatalog";
 
 describe("catalog privacy contract", () => {
+  it("rejects source excerpts and matched values in reports", () => {
+    const finding = { rule_id: "secret_github", severity: "blocking", path: "nested/config.txt", line: 1 };
+    expect(catalogCheckReportSchema.safeParse({ version: 1, passed: false, findings: [finding] }).success).toBe(true);
+    for (const field of ["value", "message", "excerpt"]) {
+      expect(catalogCheckReportSchema.safeParse({ version: 1, passed: false, findings: [{ ...finding, [field]: "sensitive" }] }).success).toBe(false);
+    }
+  });
   it("projects only released presentation content, including nested file entries", () => {
     const parsed = publicCatalogSkillSchema.parse({
       org_name: "Example", org_slug: "example", skill_slug: "release", name: "release",
@@ -29,7 +36,7 @@ it("strips internal identity and token fields from listing status", () => {
   const value = skillPublicListingStatusSchema.parse({
     listed_publicly: false, listed_at: null, latest_submission: {
       id: "11111111-1111-4111-8111-111111111111", status: "rejected", kind: "submission", share_token: "private",
-    }, rejection_reason: "Unsupported package", can_manage_listing: true, share_token: "private", submitted_by: "private",
+    }, rejection_reason: "Unsupported package", check_report: null, can_manage_listing: true, share_token: "private", submitted_by: "private",
   });
   expect(JSON.stringify(value)).not.toContain("private");
   expect(value.rejection_reason).toBe("Unsupported package");

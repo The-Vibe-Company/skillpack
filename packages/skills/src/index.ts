@@ -9,3 +9,4 @@ export * from "./zip";
 export * from "./validateSkill";
 export * from "./manifest";
 export * from "./usageInstructions";
+export * from "./catalogChecks";

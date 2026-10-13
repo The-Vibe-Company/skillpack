@@ -1063,7 +1063,7 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
       checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0", sizeBytes: 10 });
     coreMocks.setSkillPublicListing.mockResolvedValue({ listed_publicly: false,
       listed_at: null, latest_submission: { id: "11111111-1111-4111-8111-111111111111", status: "proposed", kind: "submission" },
-      rejection_reason: null, can_manage_listing: true, changed: true, share_token: "private-token" });
+      rejection_reason: null, check_report: null, can_manage_listing: true, changed: true, share_token: "private-token" });
   });
 
   it("requires authentication and write authority before recording consent", async () => {
@@ -1084,22 +1084,22 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
     });
     expect(response.status).toBe(200);
     expect(coreMocks.setSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({
-      actor: actorA, orgId: "org-1", slug: "review", listed: true,
+      actor: actorA, orgId: "org-1", slug: "review", listed: true, packageBytes: expect.any(Buffer),
     }));
-    expect(await response.json()).toEqual({ listed_publicly: false, listed_at: null, latest_submission: { id: "11111111-1111-4111-8111-111111111111", status: "proposed", kind: "submission" }, rejection_reason: null, can_manage_listing: true, changed: true });
+    expect(await response.json()).toEqual({ listed_publicly: false, listed_at: null, latest_submission: { id: "11111111-1111-4111-8111-111111111111", status: "proposed", kind: "submission" }, rejection_reason: null, check_report: null, can_manage_listing: true, changed: true });
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 
-  it("rejects changed public bytes before recording consent and never mutates the release on unlisting", async () => {
+  it("passes changed bytes to core for a persisted rejection and never mutates the release on unlisting", async () => {
     storageMocks.getSkillArchive.mockResolvedValueOnce(Buffer.from("tampered-release"));
     const rejected = await app.request("/v1/skills/review/public-listing", {
       method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
       body: JSON.stringify({ listed: true }),
     });
-    expect(rejected.status).toBe(409);
-    expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
+    expect(rejected.status).toBe(200);
+    expect(coreMocks.setSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ packageBytes: Buffer.from("tampered-release") }));
     vi.clearAllMocks();
-    coreMocks.setSkillPublicListing.mockResolvedValueOnce({ listed_publicly: false, listed_at: null, latest_submission: null, rejection_reason: null, can_manage_listing: true, changed: true });
+    coreMocks.setSkillPublicListing.mockResolvedValueOnce({ listed_publicly: false, listed_at: null, latest_submission: null, rejection_reason: null, check_report: null, can_manage_listing: true, changed: true });
     const unlisted = await app.request("/v1/skills/review/public-listing", {
       method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
       body: JSON.stringify({ listed: false }),
@@ -1124,7 +1124,7 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
 
 describe("public listing status and Developer requests", () => {
   const state = { listed_publicly: false, listed_at: null, latest_submission: null,
-    rejection_reason: null, can_manage_listing: false };
+    rejection_reason: null, check_report: null, can_manage_listing: false };
   beforeEach(() => {
     vi.clearAllMocks();
     authMocks.getSession.mockResolvedValue(null);
@@ -1140,6 +1140,15 @@ describe("public listing status and Developer requests", () => {
     expect(await response.json()).toEqual(state);
     expect(coreMocks.getSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ actor: actorA, orgId: "org-1" }));
     expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+  it("exposes only structured value-free findings on authenticated status", async () => {
+    const report = { version: 1, passed: false, findings: [
+      { rule_id: "secret_github", severity: "blocking", path: "nested/config.txt", line: 2 },
+    ] };
+    coreMocks.getSkillPublicListing.mockResolvedValueOnce({ ...state, check_report: report });
+    const response = await app.request("/v1/skills/review/public-listing", { headers: { authorization: "Bearer read-a" } });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ check_report: report });
   });
   it("authenticates status and requires write scope for requests", async () => {
     expect((await app.request("/v1/skills/review/public-listing")).status).toBeGreaterThanOrEqual(400);

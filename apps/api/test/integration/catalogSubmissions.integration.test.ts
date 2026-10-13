@@ -1,4 +1,5 @@
-import { randomUUID } from "node:crypto";
+import { zipSync } from "fflate";
+import { createHash, randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { createDatabase, schema, type Db } from "@skillpack/db";
@@ -11,22 +12,29 @@ import { archiveSkill, clearSkillPublicVersion, setSkillPublicVersion } from "@s
 import { createIntegrationFixture, integrationDb, integrationSql, seedSkill, type IntegrationFixture, type SeededSkill } from "./testDatabase";
 
 process.env.COMPANION_BILLING_MODE = "off";
-const checksum = `sha256:${"a".repeat(64)}`;
-const files = [{ path: "SKILL.md", size_bytes: 128 }];
+function packageFixture(slug: string, license = "MIT", extra: Record<string, Uint8Array> = {}) {
+  const md = Buffer.from(`---\nname: ${slug}\ndescription: Catalog integration fixture\nlicense: ${license}\n---\n${"Useful instructions. ".repeat(10)}`);
+  const bytes = Buffer.from(zipSync({ "SKILL.md": md, ...extra }));
+  return { bytes, checksum: `sha256:${createHash("sha256").update(bytes).digest("hex")}`,
+    files: [{ path: "SKILL.md", size_bytes: md.length }, ...Object.entries(extra).map(([path, data]) => ({ path, size_bytes: data.length }))] };
+}
 
 describe("catalog submissions", () => {
   let fixture: IntegrationFixture;
   beforeAll(async () => { fixture = await createIntegrationFixture(); });
   afterAll(async () => { await fixture.cleanup(); });
 
+  const packages = new Map<string, ReturnType<typeof packageFixture>>();
   async function release() {
     const skill = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner,
       slug: `submission-${randomUUID().slice(0, 8)}`, scope: "org" });
+    const pkg = packageFixture(skill.slug);
+    packages.set(skill.slug, pkg);
     await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug,
-      version: "1.0.0", packageChecksum: checksum, packageSizeBytes: 256, packageFiles: files, database: integrationDb });
-    return skill;
+      version: "1.0.0", packageChecksum: pkg.checksum, packageSizeBytes: pkg.bytes.length, packageFiles: pkg.files, database: integrationDb });
+    return { ...skill, checksum: pkg.checksum, files: pkg.files, size: pkg.bytes.length };
   }
-  const input = (skill: SeededSkill, actor = fixture.owner) => ({ actor, orgId: skill.orgId, slug: skill.slug, database: integrationDb });
+  const input = (skill: SeededSkill, actor = fixture.owner) => ({ actor, orgId: skill.orgId, slug: skill.slug, packageBytes: packages.get(skill.slug)?.bytes, database: integrationDb });
   async function submission(id: string) {
     return integrationDb.query.catalogSubmissions.findFirst({ where: and(eq(schema.catalogSubmissions.orgId, fixture.orgA), eq(schema.catalogSubmissions.id, id)) });
   }
@@ -37,17 +45,74 @@ describe("catalog submissions", () => {
     await applyValidatedSubmission({ orgId: fixture.orgA, submissionId: id, decidedBy: fixture.owner.id, database: integrationDb });
   }
 
+  it("persists automated rejections, value-free reports and audits for the frozen ZIP", async () => {
+    for (const cause of ["license", "secret", "checksum", "missing"]) {
+      const skill = await release();
+      const secret = ["ghp", "_", "aB3dE5fG7hI9jK1lM3nO5pQ7rS9tU1vW3xY5"].join("");
+      const pkg = packageFixture(skill.slug, cause === "license" ? "UNLICENSED" : "MIT",
+        cause === "secret" ? { "nested/reference.txt": Buffer.from(`credential: ${secret}\n`) } : {});
+      await integrationDb.update(schema.skills).set({ publicPackageChecksum: pkg.checksum,
+        publicPackageSizeBytes: pkg.bytes.length, publicPackageFiles: pkg.files })
+        .where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id)));
+      const result = await setSkillPublicListing({ ...input(skill), listed: true,
+        packageBytes: cause === "missing" ? undefined : cause === "checksum" ? Buffer.from("changed bytes") : pkg.bytes });
+      expect(result.latest_submission?.status).toBe("rejected");
+      expect(result.check_report?.passed).toBe(false);
+      expect(result.check_report?.findings.some(finding => finding.severity === "blocking")).toBe(true);
+      if (cause === "secret") expect(result.check_report?.findings).toContainEqual(expect.objectContaining({ path: "nested/reference.txt", line: 1 }));
+      const persisted = await submission(result.latest_submission!.id);
+      expect(persisted?.checkReport).toEqual(result.check_report);
+      expect(persisted?.packageChecksum).toBe(pkg.checksum);
+      expect(await getSkillPublicListing(input(skill, fixture.developer))).toMatchObject({ check_report: result.check_report });
+      await expect(validate(result.latest_submission!.id)).rejects.toThrow("active proposed submission");
+      expect(await catalog(skill)).toBeNull();
+      const audit = await integrationDb.select().from(schema.auditLog).where(and(eq(schema.auditLog.orgId, skill.orgId), eq(schema.auditLog.targetId, result.latest_submission!.id)));
+      expect(audit.map(row => row.action)).toContain("catalog_submission.rejected");
+      expect(JSON.stringify({ result, persisted, audit })).not.toContain(secret);
+    }
+  });
+
+  it("rechecks admin conversion and cannot validate a legacy unchecked proposal", async () => {
+    const skill = await release();
+    const requested = await requestSkillPublicListing(input(skill, fixture.developer));
+    expect(requested.check_report?.passed).toBe(true);
+    const bad = packageFixture(skill.slug, "MIT OR GPL");
+    await integrationDb.update(schema.skills).set({ publicPackageChecksum: bad.checksum,
+      publicPackageSizeBytes: bad.bytes.length, publicPackageFiles: bad.files })
+      .where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id)));
+    const converted = await setSkillPublicListing({ ...input(skill, fixture.admin), listed: true, packageBytes: bad.bytes });
+    expect(converted.latest_submission).toMatchObject({ id: requested.latest_submission!.id, status: "rejected", kind: "submission" });
+    const fresh = await release();
+    const proposed = await setSkillPublicListing({ ...input(fresh), listed: true });
+    await integrationDb.update(schema.catalogSubmissions).set({ checkReport: null }).where(and(eq(schema.catalogSubmissions.orgId, fresh.orgId), eq(schema.catalogSubmissions.id, proposed.latest_submission!.id)));
+    await expect(validate(proposed.latest_submission!.id)).rejects.toThrow("active proposed submission");
+  });
+
+  it("keeps thin content proposed with a persisted nonblocking warning", async () => {
+    const skill = await release();
+    const md = Buffer.from(`---\nname: ${skill.slug}\ndescription: Thin fixture\nlicense: Apache-2.0\n---\nShort.`);
+    const bytes = Buffer.from(zipSync({ "SKILL.md": md }));
+    const checksum = `sha256:${createHash("sha256").update(bytes).digest("hex")}`;
+    await integrationDb.update(schema.skills).set({ publicPackageChecksum: checksum,
+      publicPackageSizeBytes: bytes.length, publicPackageFiles: [{ path: "SKILL.md", size_bytes: md.length }] })
+      .where(and(eq(schema.skills.orgId, skill.orgId), eq(schema.skills.id, skill.id)));
+    const result = await setSkillPublicListing({ ...input(skill), listed: true, packageBytes: bytes });
+    expect(result.latest_submission?.status).toBe("proposed");
+    expect(result.check_report).toMatchObject({ passed: true, findings: [{ rule_id: "body_thin", severity: "warning", path: "SKILL.md" }] });
+    expect((await submission(result.latest_submission!.id))?.checkReport).toEqual(result.check_report);
+  });
+
   it("Owner/Admin proposals freeze release metadata and become visible only through validation", async () => {
     for (const actor of [fixture.owner, fixture.admin]) {
       const skill = await release();
       const result = await setSkillPublicListing({ ...input(skill, actor), listed: true });
       expect(result).toMatchObject({ listed_publicly: false, listed_at: null, latest_submission: { status: "proposed", kind: "submission" }, can_manage_listing: true });
       const id = result.latest_submission!.id;
-      expect(await submission(id)).toMatchObject({ skillVersionId: skill.versionId, packageChecksum: checksum, packageSizeBytes: 256, packageFiles: files, submittedBy: actor.id, requestedBy: null });
+      expect(await submission(id)).toMatchObject({ skillVersionId: skill.versionId, packageChecksum: skill.checksum, packageSizeBytes: skill.size, packageFiles: skill.files, submittedBy: actor.id, requestedBy: null });
       expect(await catalog(skill)).toBeNull();
       expect(await setSkillPublicListing({ ...input(skill, actor), listed: true })).toMatchObject({ changed: false, latest_submission: { id } });
       await validate(id);
-      expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum, files });
+      expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum: skill.checksum, files: skill.files });
       expect(await submission(id)).toMatchObject({ status: "validated", decidedBy: fixture.owner.id, decidedAt: expect.any(Date) });
       expect(JSON.stringify(await getSkillPublicListing(input(skill, fixture.developer)))).not.toContain("share_token");
     }
@@ -111,15 +176,17 @@ describe("catalog submissions", () => {
       version: "2.0.0", frontmatter: JSON.stringify({ name: skill.slug, description: "New release" }), body: "New body",
       sizeBytes: 150, checksum: `sha256:${"b".repeat(64)}`, storagePath: "integration/new.tar.gz", createdBy: fixture.owner.id });
     await integrationDb.update(schema.skills).set({ currentVersionId: nextVersionId }).where(and(eq(schema.skills.orgId, fixture.orgA), eq(schema.skills.id, skill.id)));
-    const nextChecksum = `sha256:${"b".repeat(64)}`;
+    const nextPackage = packageFixture(skill.slug, "Apache-2.0");
+    packages.set(skill.slug, nextPackage);
+    const nextChecksum = nextPackage.checksum;
     // Even promotion without file metadata must preserve the frozen catalog version.
-    await setSkillPublicVersion({ ...input(skill), version: "2.0.0", packageChecksum: nextChecksum, packageSizeBytes: 300 });
-    expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum, files });
-    const second = await setSkillPublicListing({ ...input(skill), listed: true, packageFiles: [{ path: "SKILL.md", size_bytes: 150 }] });
+    await setSkillPublicVersion({ ...input(skill), version: "2.0.0", packageChecksum: nextChecksum, packageSizeBytes: nextPackage.bytes.length });
+    expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum: skill.checksum, files: skill.files });
+    const second = await setSkillPublicListing({ ...input(skill), listed: true, packageFiles: nextPackage.files });
     expect(second).toMatchObject({ listed_publicly: true, latest_submission: { status: "proposed" } });
-    expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum, files });
+    expect(await catalog(skill)).toMatchObject({ version: "1.0.0", checksum: skill.checksum, files: skill.files });
     await validate(second.latest_submission!.id);
-    expect(await catalog(skill)).toMatchObject({ version: "2.0.0", checksum: nextChecksum, body: "New body", files: [{ path: "SKILL.md", size_bytes: 150 }] });
+    expect(await catalog(skill)).toMatchObject({ version: "2.0.0", checksum: nextChecksum, body: "New body", files: nextPackage.files });
     await expect(validate(first.latest_submission!.id)).rejects.toThrow("active proposed submission");
   });
 
@@ -193,8 +260,8 @@ describe("catalog submissions", () => {
     const skill = await release();
     const results = await Promise.all([fixture.owner, fixture.admin].map(actor => setSkillPublicListing({ ...input(skill, actor), listed: true })));
     expect(new Set(results.map(result => result.latest_submission!.id)).size).toBe(1);
-    const snapshot = { orgId: fixture.orgA, skillId: skill.id, skillVersionId: skill.versionId, packageChecksum: checksum,
-      packageSizeBytes: 256, packageFiles: files, kind: "submission" as const, submittedBy: fixture.owner.id };
+    const snapshot = { orgId: fixture.orgA, skillId: skill.id, skillVersionId: skill.versionId, packageChecksum: skill.checksum,
+      packageSizeBytes: skill.size, packageFiles: skill.files, kind: "submission" as const, submittedBy: fixture.owner.id };
     await expect(integrationDb.insert(schema.catalogSubmissions).values(snapshot)).rejects.toThrow();
     const other = await seedSkill({ orgId: fixture.orgB, creator: fixture.outsider, slug: `foreign-${randomUUID().slice(0, 8)}`, scope: "org" });
     await expect(integrationDb.insert(schema.catalogSubmissions).values({ ...snapshot, status: "withdrawn", skillVersionId: other.versionId })).rejects.toThrow();
@@ -207,7 +274,7 @@ describe("catalog submissions", () => {
       await tx`set local role companion_api`;
       await tx`select set_config('app.org_id', ${fixture.orgB}, true), set_config('app.user_id', ${fixture.outsider.id}, true)`;
       await tx`insert into public.catalog_submissions (org_id, skill_id, skill_version_id, package_checksum, package_size_bytes, package_files, kind, submitted_by)
-        values (${fixture.orgA}, ${skill.id}, ${skill.versionId}, ${checksum}, 256, '[]'::jsonb, 'submission', ${fixture.owner.id})`;
+        values (${fixture.orgA}, ${skill.id}, ${skill.versionId}, ${skill.checksum}, ${skill.size}, '[]'::jsonb, 'submission', ${fixture.owner.id})`;
     })).rejects.toThrow("row-level security");
     await integrationSql.begin(async tx => {
       await tx`set local role companion_api`;

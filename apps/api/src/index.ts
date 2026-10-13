@@ -2706,11 +2706,16 @@ async function publicListingSnapshot(c: Context, slug: string, request: boolean)
   const release = await withTenant(c, ({ actor, orgId, database }) =>
     prepareSkillPublicListing({ actor, orgId, slug, database, request }), true);
   const zip = await getSkillArchive({ key: publicSkillReleaseKey({ orgId: release.orgId, checksum: release.checksum }) });
-  const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
-  if (checksum !== release.checksum || zip.length !== release.sizeBytes) {
-    throw new SkillPublicReleaseConflictError("the public release bytes do not match the pinned checksum and size");
+  let packageFiles = release.packageFiles ?? undefined;
+  if (!packageFiles) {
+    // Legacy releases lack file metadata. Do not parse unverified bytes or surface archive errors.
+    packageFiles = [];
+    if (`sha256:${createHash("sha256").update(zip).digest("hex")}` === release.checksum && zip.length === release.sizeBytes) {
+      try { packageFiles = await publicReleaseFileList(zip); } catch { /* Core records archive rejection. */ }
+    }
   }
-  return { packageFiles: await publicReleaseFileList(zip), expectedPublicVersionId: release.publicVersionId, expectedChecksum: release.checksum };
+  // Core verifies the frozen checksum before unpacking and persists failures as rejected reports.
+  return { packageBytes: zip, packageFiles, expectedPublicVersionId: release.publicVersionId, expectedChecksum: release.checksum };
 }
 
 /** Read submission state with the member's selected workspace authority. */

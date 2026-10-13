@@ -28,6 +28,12 @@ type PublicPackageFile = {
   size_bytes: number;
 };
 
+type CatalogCheckReport = {
+  version: 1;
+  passed: boolean;
+  findings: { rule_id: string; severity: "blocking" | "warning"; path?: string; line?: number }[];
+};
+
 export const orgRoleEnum = pgEnum("org_role", ["owner", "admin", "developer"]);
 export const validationStateEnum = pgEnum("validation_state", ["valid", "validating", "invalid"]);
 // A skill's library scope. 'org' = the flat org-wide library (default; visible to every member).
@@ -649,6 +655,7 @@ export const catalogSubmissions = pgTable(
     packageChecksum: text("package_checksum").notNull(),
     packageSizeBytes: integer("package_size_bytes").notNull(),
     packageFiles: jsonb("package_files").$type<PublicPackageFile[]>().notNull(),
+    checkReport: jsonb("check_report").$type<CatalogCheckReport>(),
     status: catalogSubmissionStatusEnum("status").notNull().default("proposed"),
     kind: catalogSubmissionKindEnum("kind").notNull(),
     /** Developer request actor; direct admin submissions leave this null. */
@@ -695,6 +702,13 @@ export const catalogSubmissions = pgTable(
     packageFilesCheck: check(
       "catalog_submissions_package_files_check",
       sql`jsonb_typeof(${t.packageFiles}) = 'array'`,
+    ),
+    checkReportCheck: check(
+      "catalog_submissions_check_report_check",
+      sql`${t.checkReport} is null or coalesce((jsonb_typeof(${t.checkReport}) = 'object'
+        and ${t.checkReport}->>'version' = '1'
+        and jsonb_typeof(${t.checkReport}->'passed') = 'boolean'
+        and jsonb_typeof(${t.checkReport}->'findings') = 'array'), false)`,
     ),
     requestActorCheck: check(
       "catalog_submissions_request_actor_check",
