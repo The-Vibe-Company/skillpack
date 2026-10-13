@@ -125,5 +125,6 @@ and repository copies remain explicit exceptions; repository updates are reviewa
 ## Opt-in public catalog
 
 The [catalog backend](public-catalog.md) adds separate listing consent to complete public releases.
-Its anonymous read API exposes only pinned release content through narrowly scoped pre-tenant
+Owner/Admin submissions and Developer requests freeze release metadata; validation enables discovery.
+Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
 PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.

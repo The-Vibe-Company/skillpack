@@ -1352,6 +1352,13 @@
       "when": 1793423200000,
       "tag": "0192_public_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1793426800000,
+      "tag": "0193_catalog_submissions",
+      "breakpoints": true
     }
   ]
 }

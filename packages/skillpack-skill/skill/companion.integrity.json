@@ -1,20 +1,20 @@
 {
   "files": {
-    "SKILL.md": "sha256:82b0500c2c9369e876dc5c32ebe7c4bfc93256206cc3db98ebb584a242935e24",
-    "companion.json": "sha256:9c13b868b0822c279fd816d4c520f8e217642fafd834f8e605dc0ac600d9fb54",
+    "SKILL.md": "sha256:ebcf21e563dd0983a34e94307e809635a92746422e63796d3cdc77800a173f3b",
+    "companion.json": "sha256:f9e6604e99731585a83a8f45e5037899142b317665e5fcfd8229dcca28877a25",
     "evals/evals.json": "sha256:1f982c55ef761723ffaa3b669973fca9a262852c32fc07e6d9decf28037a59ce",
     "runtime-release.json": "sha256:0e30f93bdbf2677f6ca2fb1eb6f57a7a7359a6c1c39de2fffe58f6945b6ea8e9",
     "scripts/bootstrap.py": "sha256:f4f4cad2ab05b2ef97e1119430bb272a4012d2bd8fc8db7ddd5bec7b0e57e0f5",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",
     "scripts/check_updates.py": "sha256:d287638fe8dc12b44b913b2613371914f82d3a32cb2837bc02f042b7270efa70",
-    "scripts/companion-agent-client.mjs": "sha256:7741c1e069ec0e37a9a3d7fb1c4618df1f179e8de370f1aceb8cd4c2232aae6f",
+    "scripts/companion-agent-client.mjs": "sha256:dc48a25c0b6fad27873e9eca15e6d037df019e2cd7eefb0e8299a90462075b40",
     "scripts/companion_lib.py": "sha256:44ceda2cbd4d066ea5abf7c1a64c9adebcac15a29d4d90dc5fcceec659a05e33",
     "scripts/create_secret.py": "sha256:88a5c46e499059ecd8d8712b978ace6de72389fd53f57db6ea760478fefd8c65",
     "scripts/install_skill.py": "sha256:2ef768c8b855c43c26c30e1385fd92b052bc5cebf894ce71cb6e917e2c357af4",
     "scripts/onboarding_scan.py": "sha256:bd84fd9922799c5c87e8d9176969fe36d92a797ea5ddec55b02a53d1c081c16c",
     "scripts/opencode-runtime.mjs": "sha256:c079f1ff961b77aac9a42968e68e76a302b3430cf40ac70c38c0f4f3e5605972",
-    "scripts/package-checksum.mjs": "sha256:282f55d13f38efa9b32c185f51149e46f228ec9d3d40ee6b4d157da0ee34ea1a",
+    "scripts/package-checksum.mjs": "sha256:27c5923ad29ce24bf3e458d8d6026714f79a7acef1dfe3b127b0a3e24e2721f6",
     "scripts/runtime_command.py": "sha256:e5dab65cc2688537172b824ca24d98946abe2ff1c63ac866f0585dd9595dedf8",
     "scripts/runtime_lock.py": "sha256:0437ff789501bc74fc1fe1f814adae9b5fbc842f6c8819c203166e2b389e56f2",
     "scripts/runtime_setup.py": "sha256:d7b1f81c4b10e174ca361a70aaaa75aba7a0cefb97e6d8e1756d22686a99c7a7",
@@ -30,5 +30,5 @@
     "scripts/verify-runtime-release.mjs": "sha256:b43631b99763441bf2a5b1a72a268ff29d1bc31ac71caa6b538b1d4faeddc93e"
   },
   "schemaVersion": 1,
-  "version": "1.120.3"
+  "version": "1.120.4"
 }

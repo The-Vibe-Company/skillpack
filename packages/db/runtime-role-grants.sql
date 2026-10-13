@@ -236,6 +236,13 @@ BEGIN
       'public.skillpack_get_public_catalog_skill(text,text)'::regprocedure
     ];
   END IF;
+  -- Catalog submissions are API-owned review state. The worker receives no direct tenant-table
+  -- access, while the API gets the ordinary forced-RLS grants from the generic table pass below.
+  IF pg_catalog.to_regclass('public.catalog_submissions') IS NOT NULL THEN
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY[
+      'public.catalog_submissions'::regclass
+    ];
+  END IF;
   IF api_role IS NULL OR worker_role IS NULL OR companion_runtime_role IS NULL THEN
     RAISE EXCEPTION 'companion API, worker, and runtime roles are required';
   END IF;
