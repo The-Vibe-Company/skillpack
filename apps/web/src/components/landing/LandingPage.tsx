@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Button } from "@/components/cds";
 import { Icon } from "@/components/Icon";
 import { HOME_STRUCTURED_DATA, serializeJsonLd } from "@/lib/structuredData";
+import { Comparison } from "./Comparison";
 import { FaqSection } from "./FaqSection";
 import { UseCases } from "./UseCases";
 
@@ -802,6 +803,7 @@ export function LandingPage() {
         <UseCases />
         <Agents c={c} />
         <Trust c={c} />
+        <Comparison />
         <FaqSection />
         <Finale c={c} />
       </main>

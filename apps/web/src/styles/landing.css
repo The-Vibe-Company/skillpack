@@ -518,6 +518,35 @@
 .lp-fact h3 { margin: var(--space-4) 0 0; font-family: var(--lp-display); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; }
 .lp-fact p { margin: var(--space-1) 0 0; font-size: var(--text-sm); line-height: 1.5; color: var(--v10-ink-muted); text-wrap: pretty; }
 
+/* --- comparison ------------------------------------------------------------------------------- */
+.lp-compare {
+  margin-top: clamp(48px, 6vw, 72px);
+  overflow-x: auto;
+  background: var(--lp-card);
+  border: 1px solid var(--v10-line);
+  border-radius: 14px;
+}
+.lp-compare:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
+/* Below ~760px the table scrolls inside its wrapper rather than squeezing columns to a word each. */
+.lp-compare__table { width: 100%; min-width: 760px; border-collapse: collapse; font-size: var(--text-sm); line-height: 1.5; }
+.lp-compare__table caption {
+  caption-side: bottom;
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--v10-line);
+  text-align: left;
+  font-size: var(--text-xs);
+  color: var(--v10-ink-faint);
+}
+.lp-compare__table th,
+.lp-compare__table td { padding: var(--space-3) var(--space-4); text-align: left; vertical-align: top; color: var(--v10-ink-muted); }
+.lp-compare__table thead th { background: var(--v10-bg-dim); color: var(--v10-ink); font-weight: var(--weight-semibold); white-space: nowrap; }
+.lp-compare__table tbody th { width: 24%; color: var(--v10-ink); font-weight: var(--weight-semibold); }
+.lp-compare__table tbody tr { border-top: 1px solid var(--v10-line); }
+.lp-compare__table .lp-compare__us { width: 34%; color: var(--v10-ink); }
+.lp-compare__table thead .lp-compare__us { color: var(--color-accent-ink); }
+.lp-compare__table code { font-family: var(--font-mono); font-size: 0.8125rem; color: #b45309; }
+.lp-compare__table code span { white-space: nowrap; }
+
 /* --- faq ----------------------------------------------------------------------------------------- */
 .lp-faq { max-width: 760px; margin: clamp(40px, 5vw, 64px) auto 0; border-top: 1px solid var(--v10-line); }
 .lp-faq__item { border-bottom: 1px solid var(--v10-line); }
