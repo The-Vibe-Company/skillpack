@@ -226,7 +226,7 @@ describe("LandingPage portal preview", () => {
     const container = await renderLanding();
     const scripts = container.querySelectorAll('script[type="application/ld+json"]');
 
-    expect(scripts).toHaveLength(1);
+    expect(scripts).toHaveLength(2);
     expect(JSON.parse(scripts[0]?.textContent ?? "null")).toMatchObject({
       "@context": "https://schema.org",
       "@graph": [

@@ -12,6 +12,7 @@ import Link from "next/link";
 import { Button } from "@/components/cds";
 import { Icon } from "@/components/Icon";
 import { HOME_STRUCTURED_DATA, serializeJsonLd } from "@/lib/structuredData";
+import { FaqSection } from "./FaqSection";
 
 const GITHUB_URL = "https://github.com/The-Vibe-Company/skillpack";
 const SKILL_MD_URL = "https://github.com/anthropics/skills";
@@ -799,6 +800,7 @@ export function LandingPage() {
         <How c={c} />
         <Agents c={c} />
         <Trust c={c} />
+        <FaqSection />
         <Finale c={c} />
       </main>
       <Footer c={c} />
