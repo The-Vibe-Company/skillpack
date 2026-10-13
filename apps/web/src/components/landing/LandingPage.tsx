@@ -232,6 +232,9 @@ function Nav({ c }: { c: Copy }) {
           <a className="v10-nav__link" href="#open-source">
             {c.nav.openSource}
           </a>
+          <Link className="v10-nav__link" href="/blog">
+            Blog
+          </Link>
         </nav>
         <span className="v10-nav__spacer"></span>
         <div className="v10-nav__actions">
