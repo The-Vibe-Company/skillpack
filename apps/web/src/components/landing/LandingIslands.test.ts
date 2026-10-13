@@ -12,6 +12,7 @@ describe("LandingPage server rendering", () => {
     expect(source).not.toMatch(/\buse(State|Effect|Ref|Reducer|LayoutEffect)\b/);
     expect(readFileSync(new URL("./PortalDemo.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
     expect(readFileSync(new URL("./LandingReveal.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
+    expect(readFileSync(new URL("./FaqSection.tsx", import.meta.url), "utf8")).not.toMatch(/^\s*["']use client["']/);
   });
 
   it("server-renders the static copy with a hidden placeholder in place of the lazy demo", () => {
@@ -20,6 +21,8 @@ describe("LandingPage server rendering", () => {
     expect(html).toContain('<h1 class="lp-h1 lp-rise lp-rise--2">The open-source <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
     expect(html).toContain('id="problem"');
     expect(html).toContain('id="start"');
+    expect(html).toContain('id="faq"');
+    expect(html).toContain('"@type":"FAQPage"');
     expect(html).toContain('<div class="v10-libframe v6-pframe lp-portal-placeholder" aria-hidden="true">');
     expect(html).not.toContain('data-screen-label="portal-capture"');
     expect(html).not.toContain("Share a skill");
