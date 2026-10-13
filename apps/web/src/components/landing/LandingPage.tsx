@@ -59,7 +59,13 @@ const COPY = {
     {
       n: "03",
       title: "Install everywhere",
-      desc: "One command installs an exact version into the agents you pick with --tools, and a lockfile records its version and sha256. Add --pin to hold a version; skillpack update --all --dry-run previews updates, and skillpack sync --frozen verifies locked project packages and restores missing ones.",
+      desc: (
+        <>
+          One command installs an exact version into the agents you pick with <code>--tools</code>, and a lockfile records its
+          version and sha256. Add <code>--pin</code> to hold a version; <code>skillpack update --all --dry-run</code> previews
+          updates, and <code>skillpack sync --frozen</code> verifies locked project packages and restores missing ones.
+        </>
+      ),
     },
     {
       n: "04",
