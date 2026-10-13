@@ -171,7 +171,13 @@ describe("LandingPage portal preview", () => {
     expect(github?.getAttribute("target")).toBe("_blank");
     expect(vibeCompany?.getAttribute("href")).toBe("https://thevibecompany.co");
     expect(vibeCompany?.getAttribute("target")).toBe("_blank");
+    const navBlog = container.querySelector<HTMLAnchorElement>('nav[aria-label="Sections"] a[href="/blog"]');
+    const footerBlog = container.querySelector<HTMLAnchorElement>('.v10-footer__links a[href="/blog"]');
+
     expect(privacy?.getAttribute("href")).toBe("/privacy");
+    expect(navBlog?.textContent?.trim()).toBe("Blog");
+    expect(navBlog?.className).toBe("v10-nav__link");
+    expect(footerBlog?.textContent?.trim()).toBe("Blog");
     expect(container.textContent).toContain("an open source tool by The Vibe Company");
     expect(container.textContent).toContain("governance stays on infrastructure you control");
     expect(container.textContent).not.toContain("your data never leave the building");
