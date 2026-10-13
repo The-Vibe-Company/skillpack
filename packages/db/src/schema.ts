@@ -22,6 +22,12 @@ import { sql } from "drizzle-orm";
 /** JSON object payloads retain their existing open contract at the database boundary. */
 interface SchemaJsonObject {}
 
+/** File metadata snapshotted with a public immutable release for anonymous catalog reads. */
+type PublicPackageFile = {
+  path: string;
+  size_bytes: number;
+};
+
 export const orgRoleEnum = pgEnum("org_role", ["owner", "admin", "developer"]);
 export const validationStateEnum = pgEnum("validation_state", ["valid", "validating", "invalid"]);
 // A skill's library scope. 'org' = the flat org-wide library (default; visible to every member).
@@ -516,8 +522,14 @@ export const skills = pgTable(
     publicPackageChecksum: text("public_package_checksum"),
     /** Byte length of those exact ZIP transport bytes (not the stored tar.gz size). */
     publicPackageSizeBytes: integer("public_package_size_bytes"),
+    /** File list for the exact public ZIP; null for releases created before catalog snapshots. */
+    publicPackageFiles: jsonb("public_package_files").$type<PublicPackageFile[]>(),
     /** Time this version/ZIP tuple was explicitly promoted. */
     publicReleasedAt: timestamp("public_released_at", { withTimezone: true }),
+    /** Explicit discovery consent for the immutable public release. */
+    listedPublicly: boolean("listed_publicly").notNull().default(false),
+    /** Time the owner/admin opted this pinned release into the public catalog. */
+    listedAt: timestamp("listed_at", { withTimezone: true }),
     validation: validationStateEnum("validation").notNull().default("valid"),
     validationError: text("validation_error"),
     // Archive (soft-hide) lifecycle: archived skills drop out of the normal lists but stay
@@ -556,6 +568,23 @@ export const skills = pgTable(
       "skills_public_package_size_check",
       sql`${t.publicPackageSizeBytes} is null or ${t.publicPackageSizeBytes} >= 0`,
     ),
+    /** A catalog entry can only expose a complete immutable organization public release. */
+    publicListingComplete: check(
+      "skills_public_listing_complete_check",
+      sql`(
+        ${t.listedPublicly} = false and ${t.listedAt} is null
+      ) or (
+        ${t.listedPublicly} = true
+        and ${t.scope} = 'org'
+        and ${t.listedAt} is not null
+        and ${t.publicVersionId} is not null
+        and ${t.publicPackageChecksum} is not null
+        and ${t.publicPackageSizeBytes} is not null
+        and ${t.publicReleasedAt} is not null
+        and ${t.publicPackageFiles} is not null
+      )`,
+    ),
+    byPublicCatalog: index("skills_public_catalog_idx").on(t.listedPublicly, t.archivedAt, t.slug),
   }),
 );
 

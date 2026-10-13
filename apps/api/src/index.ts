@@ -1,3 +1,7 @@
+import { publicReleaseFileList } from "./publicReleaseFiles";
+import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
+import { prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
+import { setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
 import { createSkillUsageRoutes } from "./skillUsageRoutes";
 import { registerCliLoginRoutes } from "./cliLoginRoutes";
 import { getSkillUsage } from "@skillpack/core";
@@ -232,6 +236,7 @@ import {
 import { SqliteWasmSkillDatabaseRuntime } from "@skillpack/skilldb";
 import {
   compareSemver,
+  skillChecksum,
   extractArchiveFileContent,
   extractArchiveFiles,
   buildNormalizedSkillpackJson,
@@ -697,6 +702,7 @@ app.use(
 
 // Public write-only telemetry must not require or resolve credentials.
 app.route("/", createSkillUsageRoutes());
+app.route("/", createPublicCatalogRoutes());
 app.use("*", attachSession);
 
 registerAgentAuthRoutes(app);
@@ -2657,6 +2663,9 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
     const storedArchive = await getSkillArchive({ key: packageVersion.storagePath });
     let publicZip: Buffer;
     try {
+      if (skillChecksum(toTar(storedArchive)) !== packageVersion.checksum) {
+        throw new SkillPublicReleaseValidationError("the stored archive does not match the immutable version checksum");
+      }
       publicZip = await tarGzToZip(storedArchive);
     } catch {
       throw new SkillPublicReleaseValidationError(
@@ -2664,6 +2673,7 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
       );
     }
     const packageChecksum = `sha256:${createHash("sha256").update(publicZip).digest("hex")}`;
+    const packageFiles = await publicReleaseFileList(publicZip);
     await putPublicSkillReleaseSnapshot({
       orgId: packageVersion.orgId,
       checksum: packageChecksum,
@@ -2680,12 +2690,41 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
             version: body.version,
             packageChecksum,
             packageSizeBytes: publicZip.length,
+            packageFiles,
             expectedCurrentVersionId: packageVersion.versionId,
             database,
           }),
         true,
       ),
     );
+  } catch (error) {
+    return publicReleaseRouteError(c, error);
+  }
+});
+
+/** Explicit discovery consent, independent of the public share-link release. */
+app.put("/v1/skills/:slug/public-listing", async (c) => {
+  try {
+    actorFromContext(c, true);
+    await requireScope(c, "skills:write");
+    const body = setSkillPublicListingInputSchema.parse(await c.req.json());
+    const slug = c.req.param("slug");
+    let snapshot: { packageFiles: Array<{ path: string; size_bytes: number }>; expectedPublicVersionId: string; expectedChecksum: string } | undefined;
+    if (body.listed) {
+      const release = await withTenant(c, ({ actor, orgId, database }) =>
+        prepareSkillPublicListing({ actor, orgId, slug, database }), true);
+      const zip = await getSkillArchive({ key: publicSkillReleaseKey({ orgId: release.orgId, checksum: release.checksum }) });
+      const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
+      if (checksum !== release.checksum || zip.length !== release.sizeBytes) {
+        throw new SkillPublicReleaseConflictError("the public release bytes do not match the pinned checksum and size");
+      }
+      snapshot = { packageFiles: await publicReleaseFileList(zip),
+        expectedPublicVersionId: release.publicVersionId, expectedChecksum: release.checksum };
+    }
+    const result = await withTenant(c, ({ actor, orgId, database }) =>
+      setSkillPublicListing({ actor, orgId, slug, listed: body.listed, database, ...snapshot }), true);
+    c.header("Cache-Control", "no-store");
+    return c.json(skillPublicListingResultSchema.parse(result));
   } catch (error) {
     return publicReleaseRouteError(c, error);
   }

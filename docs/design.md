@@ -121,3 +121,9 @@ using a latest-version guard and immutable content-addressed archives. Public pi
 versions are preserved. A rerun skips committed runtime migrations and replans a concurrent publish.
 Skillpack bootstrap updates clean user installs for this exact technical patch. Pins, customizations
 and repository copies remain explicit exceptions; repository updates are reviewable PR changes.
+
+## Opt-in public catalog
+
+The [catalog backend](public-catalog.md) adds separate listing consent to complete public releases.
+Its anonymous read API exposes only pinned release content through narrowly scoped pre-tenant
+PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.

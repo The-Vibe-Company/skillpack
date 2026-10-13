@@ -133,6 +133,8 @@ const dbMocks = vi.hoisted(() => ({
 }));
 
 const coreMocks = vi.hoisted(() => ({
+  setSkillPublicListing: vi.fn(),
+  prepareSkillPublicListing: vi.fn(),
 }));
 
 type MockSession = {
@@ -149,7 +151,11 @@ const storageMocks = vi.hoisted(() => ({
   getSkillArchive: vi.fn(async () => Buffer.from("stored-tar")),
   putPublicSkillReleaseSnapshot: vi.fn(async () => "org-1/public-releases/sha256/snapshot.zip"),
 }));
-const skillsMocks = vi.hoisted(() => ({ tarGzToZip: vi.fn(async () => Buffer.from("public-zip-bytes")) }));
+const skillsMocks = vi.hoisted(() => ({
+  tarGzToZip: vi.fn(async () => Buffer.from("public-zip-bytes")),
+  zipToTar: vi.fn(async () => Buffer.from("public-tar")),
+  extractArchiveFiles: vi.fn(async () => ({ files: [{ path: "SKILL.md", size: 42 }], violations: [] })),
+}));
 
 // oxlint-disable-next-line anti-slop/no-module-mocking -- API registry isolation prevents binding a real server.
 vi.mock("@hono/node-server", () => ({
@@ -192,6 +198,8 @@ vi.mock("@skillpack/storage", async (importActual) => ({
 vi.mock("@skillpack/skills", async (importActual) => ({
   ...(await importActual<typeof import("@skillpack/skills")>()),
   tarGzToZip: skillsMocks.tarGzToZip,
+  zipToTar: skillsMocks.zipToTar,
+  extractArchiveFiles: skillsMocks.extractArchiveFiles,
 }));
 
 import { app } from "./index";
@@ -230,6 +238,7 @@ describe("Secrets PAT boundary and retrieval protocol", () => {
       isCurrent: true,
       version: "2.0.0",
       storagePath: "skills/review/2.0.0.tar.gz",
+      checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0",
     });
   });
 
@@ -467,7 +476,20 @@ describe("PUT/DELETE /v1/skills/:slug/public-version", () => {
       isCurrent: true,
       version: "2.0.0",
       storagePath: "skills/review/2.0.0.tar.gz",
+      checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0",
     });
+  });
+
+  it("rejects substituted stored bytes before writing a public snapshot or release", async () => {
+    storageMocks.getSkillArchive.mockResolvedValueOnce(Buffer.from("substituted-archive"));
+    const response = await app.request("/v1/skills/review/public-version", {
+      method: "PUT", headers: { authorization: "Bearer write-only", "content-type": "application/json" },
+      body: JSON.stringify({ version: "2.0.0" }),
+    });
+    expect(response.status).toBe(400);
+    expect(skillsMocks.tarGzToZip).not.toHaveBeenCalled();
+    expect(storageMocks.putPublicSkillReleaseSnapshot).not.toHaveBeenCalled();
+    expect(serviceMocks.setSkillPublicVersion).not.toHaveBeenCalled();
   });
 
   it("promotes the exact current version with skills:write", async () => {
@@ -1026,5 +1048,72 @@ describe("GET /v1/skills", () => {
       2,
       expect.objectContaining({ actor: actorB, orgId: "org-1", library: "org", installedOnly: true }),
     );
+  });
+});
+
+
+describe("PUT /v1/skills/:slug/public-listing", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    authMocks.getSession.mockResolvedValue(null);
+    serviceMocks.resolveApiToken.mockImplementation(async (token: string) => tokenFor(token));
+    coreMocks.prepareSkillPublicListing.mockResolvedValue({ orgId: "org-1", publicVersionId: "version-1",
+      checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0", sizeBytes: 10 });
+    coreMocks.setSkillPublicListing.mockResolvedValue({ listed_publicly: true,
+      listed_at: "2026-10-13T00:00:00.000Z", changed: true, share_token: "private-token" });
+  });
+
+  it("requires authentication and write authority before recording consent", async () => {
+    for (const token of [null, "read-a"]) {
+      const response = await app.request("/v1/skills/review/public-listing", {
+        method: "PUT", headers: token ? { "content-type": "application/json", authorization: `Bearer ${token}` } : { "content-type": "application/json" },
+        body: JSON.stringify({ listed: true }),
+      });
+      expect(response.status).toBeGreaterThanOrEqual(400);
+    }
+    expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
+  });
+
+  it("uses the selected tenant and returns only listing state", async () => {
+    const response = await app.request("/v1/skills/review/public-listing", {
+      method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
+      body: JSON.stringify({ listed: true }),
+    });
+    expect(response.status).toBe(200);
+    expect(coreMocks.setSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({
+      actor: actorA, orgId: "org-1", slug: "review", listed: true,
+    }));
+    expect(await response.json()).toEqual({ listed_publicly: true, listed_at: "2026-10-13T00:00:00.000Z", changed: true });
+    expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+
+  it("rejects changed public bytes before recording consent and never mutates the release on unlisting", async () => {
+    storageMocks.getSkillArchive.mockResolvedValueOnce(Buffer.from("tampered-release"));
+    const rejected = await app.request("/v1/skills/review/public-listing", {
+      method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
+      body: JSON.stringify({ listed: true }),
+    });
+    expect(rejected.status).toBe(409);
+    expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
+    vi.clearAllMocks();
+    coreMocks.setSkillPublicListing.mockResolvedValueOnce({ listed_publicly: false, listed_at: null, changed: true });
+    const unlisted = await app.request("/v1/skills/review/public-listing", {
+      method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
+      body: JSON.stringify({ listed: false }),
+    });
+    expect(unlisted.status).toBe(200);
+    expect(coreMocks.prepareSkillPublicListing).not.toHaveBeenCalled();
+    expect(storageMocks.getSkillArchive).not.toHaveBeenCalled();
+    expect(serviceMocks.clearSkillPublicVersion).not.toHaveBeenCalled();
+    expect(coreMocks.setSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ listed: false }));
+  });
+
+  it("rejects tenant and release overrides instead of treating them as consent", async () => {
+    const response = await app.request("/v1/skills/review/public-listing", {
+      method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
+      body: JSON.stringify({ listed: true, org_id: "org-2", public_version: "2.0.0" }),
+    });
+    expect(response.status).toBe(400);
+    expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
   });
 });

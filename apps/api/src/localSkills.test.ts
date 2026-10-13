@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { skillpackSkillDir } from "@skillpack/skillpack-skill";
-import { reportLocalSkillInstallInputSchema } from "@skillpack/contracts";
+import { reportLocalSkillInstallInputSchema, skillpackManifestSchema } from "@skillpack/contracts";
 import { computeLocalSkillStatus } from "@skillpack/core/services";
 import {
   buildSkillpackSkillPrompts,
@@ -48,7 +48,8 @@ describe("companion skill package + row", () => {
     const pkg = await getSkillpackSkillPackage();
     expect(pkg.key).toBe("skillpack");
     expect(pkg.checksum).toMatch(/^sha256:[0-9a-f]{64}$/);
-    expect(pkg.version).toBe("1.120.1");
+    const manifest = skillpackManifestSchema.parse(JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")));
+    expect(pkg.version).toBe(manifest.version);
     expect(pkg.sizeBytes).toBeGreaterThan(0);
     expect(pkg.integrity.packageChecksum).toBe(pkg.checksum);
     expect(pkg.integrity.files["SKILL.md"]).toMatch(/^sha256:[0-9a-f]{64}$/);
@@ -137,13 +138,11 @@ describe("companion skill package + row", () => {
       name: "Sync companion.json",
       desc: "Create or repair manifest v2 with identity, env/secrets, dependency ids, notes, commands, and changelog.",
     });
-    const changelog = row.changes.join("\n");
-    expect(changelog).toContain("browser authentication");
-    expect(changelog).toContain("legacy API-origin locks");
-    // SAFETY: the bundled manifest is the repo's own companion.json, whose metadata.changelog shape the manifest schema fixes.
-    const manifest = JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")) as {
-      metadata?: { changelog?: Array<{ version?: string; changes?: string[] }> };
-    };
+    const manifest = skillpackManifestSchema.parse(JSON.parse(await readFile(join(skillpackSkillDir(), "companion.json"), "utf8")));
+    expect(row.changes).toEqual(manifest.metadata.changelog.find((entry) => entry.version === pkg.version)?.changes);
+    const loginChanges = manifest.metadata.changelog.find((entry) => entry.version === "1.120.1")?.changes.join("\n");
+    expect(loginChanges).toContain("browser authentication");
+    expect(loginChanges).toContain("legacy API-origin locks");
     const scheduledRoutineChanges = manifest.metadata?.changelog
       ?.find((entry) => entry.version === "1.109.0")
       ?.changes?.join("\n") ?? "";
