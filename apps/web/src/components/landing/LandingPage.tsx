@@ -60,7 +60,13 @@ const COPY = {
     {
       n: "03",
       title: "Install everywhere",
-      desc: "One command installs the pinned version into each coding agent. Installed copies see updates when the checksum changes.",
+      desc: (
+        <>
+          One command installs an exact version into the agents you pick with <code>--tools</code>, and a lockfile records its
+          version and sha256. Add <code>--pin</code> to hold a version; <code>skillpack update --all --dry-run</code> previews
+          updates, and <code>skillpack sync --frozen</code> verifies locked project packages and restores missing ones.
+        </>
+      ),
     },
     {
       n: "04",
@@ -118,7 +124,6 @@ const AGENTS = [
   { name: "Claude Code", mono: "CC", tone: "terracotta" },
   { name: "Codex", mono: "Cx", tone: "slate" },
   { name: "OpenCode", mono: "OC", tone: "blue" },
-  { name: "Any MCP client", mono: "M", tone: "violet" },
 ] as const;
 
 const SHARE_AVATARS = [
@@ -418,9 +423,6 @@ function StepVisual({ n }: { n: string }) {
   const bars = [18, 24, 21, 33, 30, 42, 38, 51, 47, 60, 57, 71, 68, 84];
   return (
     <div className="lp-vis lp-vis--usage" aria-hidden="true">
-      <div className="lp-usage__head">
-        <strong>12,480</strong> activations · last 30 days
-      </div>
       <div className="lp-bars">
         {bars.map((b, i) => (
           <span key={i} style={{ height: `${b}%` }} className={i === bars.length - 1 ? "lp-bar lp-bar--now" : "lp-bar"} />
@@ -459,8 +461,7 @@ function How({ c }: { c: Copy }) {
 const HUB_NODES = [
   { ...AGENTS[0], pos: "tl", d: "M 262 122 C 262 92, 123 98, 123 64" },
   { ...AGENTS[2], pos: "tr", d: "M 298 122 C 298 92, 437 98, 437 64" },
-  { ...AGENTS[1], pos: "bl", d: "M 262 218 C 262 248, 123 242, 123 276" },
-  { ...AGENTS[3], pos: "br", d: "M 298 218 C 298 248, 437 242, 437 276" },
+  { ...AGENTS[1], pos: "b", d: "M 280 218 C 280 240, 280 254, 280 276" },
 ] as const;
 
 function HubDiagram() {
