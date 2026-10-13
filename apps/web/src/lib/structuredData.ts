@@ -126,7 +126,10 @@ export type CatalogSkillFacts = {
   catalogUrl: string;
 };
 
-/** A listed skill and its breadcrumb trail, using only facts returned by the catalog API. */
+/**
+ * A listed skill and its breadcrumb trail, stating only fields the catalog API returns for the
+ * validated release. Workspace identity is not asserted as an author.
+ */
 export function catalogSkillStructuredData(facts: CatalogSkillFacts): JsonLdDocument {
   const trail = [
     { name: "Home", url: facts.homeUrl },
@@ -153,6 +156,34 @@ export function catalogSkillStructuredData(facts: CatalogSkillFacts): JsonLdDocu
           name: crumb.name,
           item: crumb.url,
         })),
+      },
+    ],
+  };
+}
+
+/** One catalog index page and the skills listed on it; positions continue across pages. */
+export function catalogIndexStructuredData(input: {
+  name: string;
+  url: string;
+  firstPosition: number;
+  items: { name: string; url: string }[];
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: input.name,
+        url: input.url,
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: input.items.map((item, index) => ({
+            "@type": "ListItem",
+            position: input.firstPosition + index,
+            name: item.name,
+            url: item.url,
+          })),
+        },
       },
     ],
   };

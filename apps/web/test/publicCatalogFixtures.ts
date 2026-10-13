@@ -17,3 +17,9 @@ export function catalogSkill(overrides: Partial<PublicCatalogSkill> = {}): Publi
     ...overrides,
   };
 }
+
+export function catalogSkills(count: number, offset = 0): PublicCatalogSkill[] {
+  return Array.from({ length: count }, (_, index) =>
+    catalogSkill({ skill_slug: `skill-${offset + index}`, name: `Skill ${offset + index}` }),
+  );
+}

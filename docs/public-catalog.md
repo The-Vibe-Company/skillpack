@@ -93,6 +93,27 @@ The status names no version, so a published skill's frozen version is read from 
 catalog entry with credentials omitted. A proposal shows its version only when it was submitted from
 the open dialog. Publish is offered again only when the public release differs from the frozen one.
 
+## Catalog pages
+
+The web serves `/catalog` (paginated with `?page=`, 20 skills per page) and
+`/catalog/:orgSlug/:skillSlug` only when its own `SKILLPACK_PUBLIC_CATALOG=true`; otherwise both
+return 404 without calling the API. Pages render on every request from the anonymous API, so
+unlisting, withdrawal and archiving take effect immediately; an API 404 is a page 404.
+
+A skill page shows only API fields: name, description, workspace name, frozen version, validation
+date, checksum, size, file list and the rendered `SKILL.md`. Raw HTML in the body is dropped and
+authored links carry `rel="nofollow ugc"`. The install section shows `skillpack auth login` and
+`skillpack install <slug> --version <version>`, which resolve only for members of the listing
+workspace; share tokens are never shown. JSON-LD states only API fields (`SoftwareSourceCode` plus
+breadcrumbs on skill pages, a `CollectionPage` item list on the index).
+
+`sitemap.xml` lists `/catalog` and every skill the anonymous API returns, which means validated and
+listed only. A disabled or failing API leaves the rest of the sitemap intact.
+
+The earlier build-time catalog served official skills at `/catalog/:slug`. Those URLs redirect with
+301 to `/catalog/the-vibe-company/:slug`; official skills are published through the same submission
+flow as any other organization skill.
+
 ## Anonymous catalog API
 
 - `GET /v1/public/catalog/skills?limit=20&offset=0&label=engineering` is anonymous.

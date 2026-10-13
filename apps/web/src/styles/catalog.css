@@ -1,5 +1,81 @@
-/* Public catalog detail pages build on the blog surface and stay outside the authenticated app. */
-.v10-catskill__title { overflow-wrap: anywhere; }
+/* ============================================================================
+   Public skills catalog: index cards and the skill page. Builds on the blog
+   surface in blog.css (hero, crumbs, meta line, prose, code blocks) and the
+   marketing tokens in landing.css; like the blog, it stays out of the app.
+   ============================================================================ */
+
+/* The CSS pipeline drops the first rule of an @imported file (see landing.css), so this one is a
+   harmless repeat of the rule below. */
+.v10-catalog__list { padding-block: clamp(40px, 6vw, 72px) clamp(72px, 10vw, 128px); }
+.v10-catalog__list { padding-block: clamp(40px, 6vw, 72px) clamp(72px, 10vw, 128px); }
+
+/* --- index ------------------------------------------------------------------------- */
+.v10-catgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  margin: 0; padding: 0; list-style: none;
+}
+.v10-catgrid > li { display: flex; }
+.v10-catcard {
+  position: relative;
+  display: flex; flex-direction: column; gap: var(--space-2);
+  width: 100%; min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--v10-line);
+  border-radius: var(--lp-radius);
+  background: var(--lp-card);
+  box-shadow: var(--lp-shadow);
+}
+.v10-catcard .v10-postmeta .mono { letter-spacing: 0; }
+.v10-catcard__org { color: var(--v10-ink-muted); font-weight: var(--weight-medium); }
+.v10-catcard__title {
+  margin: var(--space-1) 0 0;
+  color: var(--v10-ink);
+  font-family: var(--lp-display);
+  font-size: 1.3125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.v10-catcard__title a { color: inherit; text-decoration: none; }
+/* The title link covers the whole card, so the card has one target and one tab stop. */
+.v10-catcard__title a::after { content: ""; position: absolute; inset: 0; border-radius: var(--lp-radius); }
+.v10-catcard__title a:focus-visible { outline: none; }
+.v10-catcard__title a:focus-visible::after { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
+.v10-catcard:hover .v10-catcard__title a {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-edge);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.v10-catcard__desc {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--v10-ink-muted);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+.v10-catcard__slug { margin: auto 0 0; padding-top: var(--space-2); color: var(--v10-ink-faint); font-size: var(--text-xs); overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) {
+  .v10-catcard { transition: transform 320ms var(--ease-out-quint), box-shadow 320ms var(--ease-out-quint); }
+  .v10-catcard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 2px oklch(0.27 0.021 265 / 0.05), 0 20px 40px -16px oklch(0.27 0.021 265 / 0.22);
+  }
+}
+
+.v10-catalog__pages { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: clamp(32px, 5vw, 56px); }
+.v10-catalog__pagenum { color: var(--v10-ink-faint); font-size: var(--text-xs); letter-spacing: var(--tracking-wide); text-transform: uppercase; }
+
+/* --- skill page -------------------------------------------------------------------- */
 .v10-catskill__title { overflow-wrap: anywhere; }
 .v10-catskill__desc {
   max-width: 62ch;
@@ -122,6 +198,7 @@
 .v10-catskill__report-error { margin: 0; color: var(--lp-danger); font-size: var(--text-sm); line-height: 1.5; }
 .v10-catskill__report-success { margin: 0; color: var(--lp-ok); font-size: var(--text-sm); line-height: 1.5; }
 
+/* On narrower screens the release facts and files follow the install section and SKILL.md. */
 @media (max-width: 1023px) {
   .v10-catskill__layout { grid-template-columns: minmax(0, 1fr); row-gap: clamp(36px, 6vw, 56px); }
   .v10-catskill__aside { position: static; }
@@ -131,4 +208,5 @@
   .v10-catskill__body { padding: var(--space-4); }
   .v10-catskill__report-actions { align-items: stretch; flex-direction: column; }
   .v10-catskill__report-submit { width: 100%; }
+  .v10-catcard { padding: var(--space-4); }
 }

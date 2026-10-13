@@ -65,11 +65,29 @@ export function legacyRuntimeRedirect(request: NextRequest): URL | null {
   return destination;
 }
 
+/** The workspace that publishes the official skills the build-time catalog once served. */
+const LEGACY_CATALOG_ORG_SLUG = "the-vibe-company";
+
+/**
+ * The build-time catalog served official skills at `/catalog/:slug`. The live catalog is keyed by
+ * workspace slug, so those one-segment URLs move permanently under the official workspace.
+ */
+export function legacyCatalogRedirect(request: NextRequest): URL | null {
+  const match = /^\/catalog\/([^/]+)\/?$/.exec(request.nextUrl.pathname);
+  if (!match?.[1]) return null;
+  const destination = request.nextUrl.clone();
+  destination.pathname = `/catalog/${LEGACY_CATALOG_ORG_SLUG}/${match[1]}`;
+  destination.search = "";
+  return destination;
+}
+
 export function middleware(request: NextRequest) {
   const destination = canonicalAliasRedirect(request);
   if (destination) return NextResponse.redirect(destination, 308);
   const skillsDestination = legacyRuntimeRedirect(request);
   if (skillsDestination) return NextResponse.redirect(skillsDestination, 308);
+  const catalogDestination = legacyCatalogRedirect(request);
+  if (catalogDestination) return NextResponse.redirect(catalogDestination, 301);
   const headers = agentAuthProxyHeaders(request);
   return headers ? NextResponse.next({ request: { headers } }) : NextResponse.next();
 }

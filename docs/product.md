@@ -62,3 +62,4 @@ Publish/Unpublish or a Developer's Request publication. It is absent while the c
 
 Visitors can anonymously report published catalog skills for secret exposure, malicious content,
 license concerns or spam. Reports are private to platform moderators; Stan responds within 48 hours.
+Validated skills appear at `/catalog/<workspace>/<skill>` and in the sitemap; see the catalog pages.
