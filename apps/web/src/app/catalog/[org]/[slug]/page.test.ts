@@ -30,7 +30,7 @@ async function renderSkill(): Promise<HTMLElement> {
 }
 
 const listed = catalogSkill({
-  body: "# Release helper\n\nSee [the guide](https://example.com/guide).\n\n<script>alert(1)</script>\n\n## Steps\n\n1. Tag",
+  body: "<!-- managed:start -->\n# Release helper\n\nSee [the guide](https://example.com/guide).\n\n<script>alert(1)</script>\n\n## Steps\n\n1. Tag",
   files: [
     { path: "SKILL.md", size_bytes: 512 },
     { path: "scripts/release.sh", size_bytes: 3072 },
@@ -90,6 +90,8 @@ describe("public catalog skill page", () => {
     expect(prose?.querySelector("h2")?.textContent).toBe("Release helper");
     expect(prose?.querySelector("a")?.getAttribute("rel")).toBe("nofollow ugc noopener noreferrer");
     expect(prose?.querySelector("script")).toBeNull();
+    expect(prose?.textContent).not.toContain("<script>");
+    expect(prose?.textContent).not.toContain("<!--");
   });
 
   it("offers a real slug install command and never a share-token install", async () => {

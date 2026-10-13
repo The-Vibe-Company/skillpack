@@ -85,11 +85,14 @@ const PUBLISHED_SKILL_COMPONENTS: Components = {
   },
 };
 
-/** Renders a listed skill's SKILL.md with the article styles. Raw HTML in Markdown is not rendered. */
+/**
+ * Renders a listed skill's SKILL.md with the article styles. Raw HTML (including the HTML comments
+ * that mark managed sections) is dropped rather than shown as escaped text.
+ */
 export function PublishedSkillMarkdown({ body }: { body: string }) {
   return (
     <div className="v10-blog__prose">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={PUBLISHED_SKILL_COMPONENTS}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={PUBLISHED_SKILL_COMPONENTS} skipHtml>
         {body}
       </ReactMarkdown>
     </div>
