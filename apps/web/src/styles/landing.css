@@ -441,8 +441,6 @@
 @media (max-width: 480px) { .lp-term__dim { display: none; } }
 
 .lp-vis--usage { display: flex; flex-direction: column; gap: var(--space-3); }
-.lp-usage__head { font-size: var(--text-sm); color: var(--v10-ink-muted); }
-.lp-usage__head strong { font-family: var(--lp-display); font-size: 1.75rem; font-weight: 600; letter-spacing: -0.03em; color: var(--v10-ink); margin-right: 6px; }
 .lp-bars { flex: 1; min-height: 90px; display: flex; align-items: flex-end; gap: 5px; }
 .lp-bar { flex: 1; border-radius: 4px 4px 2px 2px; background: oklch(0.81 0.166 70 / 0.35); }
 .lp-bar--now { background: var(--lp-grad-bright); }
