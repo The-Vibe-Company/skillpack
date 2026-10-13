@@ -208,6 +208,7 @@ export function SkillsApp({
   currentOrg,
   initialRoute,
   initialRouteSource,
+  publicCatalogEnabled = false,
 }: {
   initialMineSkills: SkillVM[];
   initialOrgSkills: SkillVM[];
@@ -222,6 +223,8 @@ export function SkillsApp({
   currentOrg: OrgVM;
   initialRoute: SkillsRoute;
   initialRouteSource: SkillsRouteSource;
+  /** Server-read `SKILLPACK_PUBLIC_CATALOG`; catalog publishing is hidden while it is off. */
+  publicCatalogEnabled?: boolean;
 }) {
   const router = useRouter();
   const orgActions = useOrgActions();
@@ -1924,6 +1927,7 @@ export function SkillsApp({
       {publicReleaseSkill && (
         <PublicReleaseDialog
           skill={publicReleaseSkill}
+          catalog={publicCatalogEnabled ? { orgSlug: currentOrg.slug } : null}
           onClose={() => setPublicReleaseSkill(null)}
           onChanged={(publicVersion) => {
             const updateRows = (rows: SkillVM[]) =>
