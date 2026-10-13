@@ -974,3 +974,15 @@
 .v6-pdrawer__actions { display: flex; align-items: center; gap: var(--space-2); margin-top: auto; }
 .v6-pdrawer__actions [aria-disabled="true"] { cursor: default; opacity: 0.72; }
 .v6-pdrawer--empty { justify-content: center; }
+
+/* --- lazy portal placeholder ------------------------------------------------ */
+/* Holds the hero demo's place until its client chunk loads. Heights match the
+   loaded demo's initial state (Organization, All skills, code-review open) at
+   each layout breakpoint and drawer text wrap; re-measure if portal styles change. */
+.lp-portal-placeholder { height: 418px; }
+@media (max-width: 860px) { .lp-portal-placeholder { height: 660.5px; } }
+@media (max-width: 640px) { .lp-portal-placeholder { height: 766.5px; } }
+@media (max-width: 585px) { .lp-portal-placeholder { height: 786px; } }
+@media (max-width: 342px) { .lp-portal-placeholder { height: 805.5px; } }
+@media (max-width: 334px) { .lp-portal-placeholder { height: 823.5px; } }
+@media (max-width: 327px) { .lp-portal-placeholder { height: 847.5px; } }
