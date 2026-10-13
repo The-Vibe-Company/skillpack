@@ -12,8 +12,12 @@ export const catalogModerationReasonSchema = z.object({
   reason: z.string().trim().min(1).max(2000),
 }).strict();
 
-/** PR 3 owns production/report storage. A pass includes org scope and MIT/Apache-2.0 checks. */
-export const catalogCheckReportSchema = z.object({
+/**
+ * Moderation's persisted-check adapter result. The checks engine stores the value-free
+ * `{ version, passed, findings }` report from `publicCatalog.ts`; moderation adds the frozen
+ * identity and a small status/reason projection when it reads that report.
+ */
+export const catalogModerationCheckReportSchema = z.object({
   orgId: z.string().uuid(),
   submissionId: z.string().uuid(),
   skillVersionId: z.string().uuid(),
@@ -21,4 +25,4 @@ export const catalogCheckReportSchema = z.object({
   status: z.enum(["pending", "passed", "failed"]),
   reason: z.string().max(2000).nullable(),
 }).strict();
-export type CatalogCheckReport = z.infer<typeof catalogCheckReportSchema>;
+export type CatalogModerationCheckReport = z.infer<typeof catalogModerationCheckReportSchema>;

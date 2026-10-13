@@ -102,11 +102,11 @@ export default async function CatalogSkillPage({ params }: CatalogSkillProps) {
             <div className="v10-catskill__main">
               <section className="v10-catskill__panel v10-catskill__install" aria-labelledby="catalog-install">
                 <h2 id="catalog-install" className="v10-section-label">Install</h2>
-                <p>Members of {skill.org_name} can install this release with the Skillpack CLI:</p>
+                <p>Install this validated release with the Skillpack CLI:</p>
                 <CodeBlock language="sh">
-                  <code>{catalogInstallCommands({ siteUrl, skillSlug: skill.skill_slug, version: skill.version })}</code>
+                  <code>{catalogInstallCommands({ siteUrl, orgSlug: skill.org_slug, skillSlug: skill.skill_slug, version: skill.version })}</code>
                 </CodeBlock>
-                <p>The catalog does not publish share links. To install from another workspace, ask {skill.org_name} for the skill&apos;s share link.</p>
+                <p>No account is required. The CLI verifies the package checksum before installation.</p>
               </section>
 
               <CatalogReportForm orgSlug={skill.org_slug} skillSlug={skill.skill_slug} />

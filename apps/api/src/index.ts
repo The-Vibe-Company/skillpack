@@ -2,7 +2,7 @@ import { publicReleaseFileList } from "./publicReleaseFiles";
 import { createCatalogReportingRoutes } from "./catalogReportingRoutes";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
-import { getSkillPublicListing, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
+import { configureCatalogCheckReader, getSkillPublicListing, readPersistedCatalogCheckReport, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
 import { requestSkillPublicListingInputSchema, skillPublicListingStatusSchema, setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
 import { createSkillUsageRoutes } from "./skillUsageRoutes";
 import { registerCliLoginRoutes } from "./cliLoginRoutes";
@@ -304,6 +304,10 @@ import {
 } from "@skillpack/core";
 
 const app = new Hono<{ Variables: ApiVariables }>();
+
+// API startup is the only production wiring point; callers that do not install a reader fail
+// closed through the default null reader in core.
+configureCatalogCheckReader(readPersistedCatalogCheckReport);
 
 app.onError((err, c) => {
   captureServerError(err, {

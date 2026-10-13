@@ -66,6 +66,7 @@ function listing(overrides: Partial<SkillPublicListingStatus> = {}): SkillPublic
     listed_at: null,
     latest_submission: null,
     rejection_reason: null,
+    check_report: null,
     can_manage_listing: true,
     ...overrides,
   };

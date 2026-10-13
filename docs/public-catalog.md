@@ -1,4 +1,4 @@
-# Public catalog backend
+# Public catalog
 
 The anonymous catalog is disabled unless `SKILLPACK_PUBLIC_CATALOG=true`. Existing releases remain
 unlisted. Catalog publication is a separate explicit decision from public release promotion and
@@ -13,8 +13,8 @@ rejected. Responses and audit metadata never include share tokens. Listing respo
 - `PUT /v1/skills/:slug/public-listing` requires `skills:write` and Owner/Admin.
   `{ "listed": true }` creates a `proposed` submission containing the current public version ID,
   exact ZIP checksum, byte size and file snapshot. It requires a complete, unarchived organization
-  public release and verifies release bytes before recording the proposal. It does **not** enable
-  discovery. If a Developer request is open, the PUT converts it to a submission, preserves its
+  public release and verifies release bytes before recording the proposal. Blocking checks reject unsafe proposals; matching passing checks permit moderation or allowlisted
+  auto-approval. If a Developer request is open, the PUT converts it to a submission, preserves its
   requester, records the submitting admin and freezes the release current at approval time.
 - `POST /v1/skills/:slug/public-listing/request` with `{}` requires `skills:write` and Developer.
   It creates an inert `proposed` row of kind `publish_request`, awaiting Owner/Admin submission.
@@ -22,7 +22,7 @@ rejected. Responses and audit metadata never include share tokens. Listing respo
   current release. Owner/Admin submit directly with PUT.
 - `GET /v1/skills/:slug/public-listing` requires `skills:read` and organization membership.
   It returns `listed_publicly`, `listed_at`, `latest_submission` (nullable `{ id, status, kind }`),
-  `rejection_reason` and `can_manage_listing`. Mutation responses add `changed`.
+  `rejection_reason`, `check_report` and `can_manage_listing`. Mutation responses add `changed`.
 - `{ "listed": false }` on PUT immediately unpublishes and withdraws any open request/submission.
   The public release and share token stay intact. Archiving or withdrawing the public release also
   clears discovery and withdraws open submissions atomically. Restoration needs a fresh submission.
@@ -32,9 +32,10 @@ unique index allowing at most one `proposed` row per skill. Repeating a proposal
 is idempotent; an open submission for different release bytes must first be withdrawn. The status
 values are `proposed`, `validated`, `rejected`, `removed`, and `withdrawn`. Every implemented transition writes
 an audit event in the same transaction. A rejected proposal can be followed by a fresh proposal;
-rejection and removal are platform moderation decisions.
+blocking checks reject unsafe proposals automatically; moderators can also reject or remove listings.
+Automated rejection records the initiating member and a value-free audit event.
 
-## Automated submission checks (PR 3/9)
+## Automated submission checks
 
 Core checks the exact frozen public ZIP bytes against the stored SHA-256 and byte size **before**
 unpacking. Missing bytes, checksum/size substitution and malformed or unsafe archives fail closed.
@@ -66,7 +67,8 @@ included in anonymous catalog responses.
 - A trimmed `SKILL.md` body shorter than 100 characters produces a nonblocking warning.
 
 Heuristics detect known patterns, not every possible secret or malicious instruction. Passing checks
-leaves the submission `proposed` for moderation; it is not a security certification.
+leaves the submission `proposed` for moderation, or auto-validates an allowlisted organization; it is
+not a security certification.
 
 Only validation enables discovery. Developer requests cannot be validated. Production moderation
 requires a passing automatic check report for the exact frozen version and package checksum.
@@ -102,9 +104,9 @@ unlisting, withdrawal and archiving take effect immediately; an API 404 is a pag
 
 A skill page shows only API fields: name, description, workspace name, frozen version, validation
 date, checksum, size, file list and the rendered `SKILL.md`. Raw HTML in the body is dropped and
-authored links carry `rel="nofollow ugc"`. The install section shows `skillpack auth login` and
-`skillpack install <slug> --version <version>`, which resolve only for members of the listing
-workspace; share tokens are never shown. JSON-LD states only API fields (`SoftwareSourceCode` plus
+authored links carry `rel="nofollow ugc"`. The install section shows
+`skillpack install <org>/<slug> --version <version> --api-url <instance>/v1`, which installs the frozen
+validated package without an account; share tokens are never shown. JSON-LD states only API fields (`SoftwareSourceCode` plus
 breadcrumbs on skill pages, a `CollectionPage` item list on the index).
 
 `sitemap.xml` lists `/catalog` and every skill the anonymous API returns, which means validated and
@@ -150,7 +152,7 @@ release; it rejects replacements. Dependencies, secrets and database prerequisit
 without fetching private resources. Plain skill slugs and unlisted share-token installs keep their
 existing authentication requirements.
 
-## Platform moderation (PR 4/9)
+## Platform moderation
 
 All `/v1/platform/catalog/*` routes require a signed-in browser session and a live platform moderator
 grant. Owner, Admin, Developer, PATs and delegated agents have no moderation authority. Responses
@@ -195,26 +197,18 @@ Do not infer Stan or The Vibe Company's identity from names in a self-hosted dat
 must supply verified IDs. Apply additive migration `0195_catalog_moderation` and runtime grants
 before deploying the API. It has no catalog backfill and does not affect organization memberships.
 
-### Check-report interface shared with PR 3
+### Persisted check reports
 
-This PR consumes checks and does not execute or store them. At API startup, PR 3 registers its
-persisted-report reader with `configureCatalogCheckReader(reader)` from `@skillpack/core`.
-The reader receives `{ orgId, submissionId, skillVersionId, packageChecksum, database }` and returns
-`CatalogCheckReport | null` from `@skillpack/contracts`. A report repeats those four identity fields
-and adds `status: 'pending' | 'passed' | 'failed'` and `reason: string | null` (max 2000 characters).
-`passed` must mean all PR 3 checks passed, including **organization scope and MIT or Apache-2.0
-license only**. Unsupported licenses must produce `failed` with a reason; this consumer exposes that
-failure and prevents validation. No report reader is installed by default: null or mismatched
-identity is treated as pending, never as a pass. Decisions also compare the frozen identity under
-the SQL lock to prevent stale approval.
+Moderation reads the persisted report for the exact organization, submission, version and checksum.
+Missing, malformed or mismatched reports remain pending and cannot validate a listing. A passing
+report requires every blocking package check to pass. Decisions compare frozen identity under the
+SQL lock to prevent stale approval. The report reader returns only status and value-free rule IDs.
 
-After persisting a report, PR 3 calls `autoApproveCatalogSubmission({ orgId, submissionId, database })`.
-This is an internal callback, with no HTTP/MCP authority to manufacture reports. It returns false
-for missing/failing reports, non-allowlisted orgs, bans or closed submissions. Proposal creation and
-admin conversion also invoke it for an already persisted matching report. Repeated callbacks are
-inert after validation. Automatic audit rows use the submission actor and `automatic: true`.
+Proposal creation and admin conversion invoke `autoApproveCatalogSubmission` after persisting a
+passing report in the same transaction. It is inert for non-allowlisted organizations, bans, failed
+reports and closed submissions. Automatic audit rows use the submission actor and `automatic: true`.
 
-## Moderation screen (PR 8/9)
+## Moderation screen
 
 `/platform/catalog` is the internal web screen for platform moderators. The web server returns
 404 unless `SKILLPACK_PUBLIC_CATALOG=true`, sends signed-out visitors to login, and asks the queue
@@ -229,15 +223,11 @@ for proposals whose checks passed; the API still enforces this. Reject, remove (
 ban organization require a nonblank reason of at most 2000 characters. API conflicts stay in the
 confirmation dialog; success refreshes the queue.
 
-The Reports tab is the slot for incoming skill reports from PR 7/9. Until that API exists the page
-loader returns `{ status: "unavailable" }` and the tab says reporting is not connected. PR 7 plugs in
-by returning `{ status: "ready", reports }` from `loadCatalogSkillReports` in
-`apps/web/src/lib/catalogModerationData.ts`, using `CatalogSkillReport` from
-`apps/web/src/lib/catalogModeration.ts` (`id`, `org_id`, `skill_id`, nullable `submission_id`,
-`reason`, nullable `details`, `created_at`). The queue response carries IDs only, not skill or
-organization names, so the screen shows IDs.
+The Reports tab loads the moderator-only reporting queue. It shows report, organization, skill and
+submission IDs, snapshotted slugs, reason, optional details and creation time. Reports remain visible
+after a listing is removed. The API rechecks live moderator authority on every request.
 
-## Anonymous reporting (PR 7/9)
+## Anonymous reporting
 
 `POST /v1/public/catalog/skills/:orgSlug/:skillSlug/reports` accepts anonymous JSON:
 `{ "reason": "secret_exposure" | "malicious" | "license" | "spam", "details"?: "…" }`.
@@ -258,7 +248,7 @@ its conservative quota. A missing connection IP or auth secret shorter than 32 c
 storage failure, returns 503 and does not acknowledge a report. Key rotation resets source quotas.
 
 `GET /v1/platform/catalog/reports?limit=20&offset=0` is part of the platform moderation queue from
-PR #34. It uses the same live moderator grant, browser-session-only authority, pagination bounds,
+the moderation API. It uses the same live moderator grant, browser-session-only authority, pagination bounds,
 default-off flag and `no-store` responses. Rows include report/skill/org IDs, snapshotted slugs,
 the validated submission ID, reason, optional text and timestamp, oldest first. Abuse hashes are
 omitted. Reports remain visible after unlisting/removal so moderators can use the existing
@@ -272,6 +262,5 @@ contact information. Moderators review optional text as untrusted confidential c
 should describe exposure without pasting secret values.
 
 Apply additive migration `0197_catalog_reporting` and runtime grants before the API. It creates
-no reports for existing listings and changes no listing state. The detail page is ported from
-PR #35 with the minimal helpers needed for the form; index pages, sitemap and publishing UI remain
-owned by their respective PRs. Both web and API keep `SKILLPACK_PUBLIC_CATALOG` default off.
+no reports for existing listings and changes no listing state. Both web and API keep
+`SKILLPACK_PUBLIC_CATALOG` default off.

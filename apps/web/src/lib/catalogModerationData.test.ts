@@ -89,7 +89,7 @@ describe("loadCatalogModerationPage", () => {
     serverApiFetch.mockRejectedValue(apiError(403));
 
     await expect(loadCatalogModerationPage({ view: "reports" })).rejects.toThrow("not-found");
-    expect(serverApiFetch).toHaveBeenCalledWith("/v1/platform/catalog/submissions?status=proposed&limit=20&offset=0");
+    expect(serverApiFetch).toHaveBeenCalledWith("/v1/platform/catalog/reports?limit=20&offset=0");
   });
 
   it("redirects to login when the API session expired between checks", async () => {
@@ -116,15 +116,21 @@ describe("loadCatalogModerationPage", () => {
     expect(data.kind === "ready" && data.submissions[0]).toMatchObject({ check_status: "failed", check_reason: "GPL-3.0 is not an accepted license" });
   });
 
-  it("marks reports unavailable until the reporting API exists", async () => {
-    serverApiFetch.mockResolvedValue({ submissions: [] });
-
-    await expect(loadCatalogModerationPage({ view: "reports" })).resolves.toEqual({
-      kind: "ready",
-      view: { view: "reports" },
-      submissions: [],
-      hasNextPage: false,
-      reports: { status: "unavailable" },
+  it("loads the reports API and preserves pagination", async () => {
+    const report = { id: "report-1", org_id: "org-1", skill_id: "skill-1", submission_id: null,
+      org_slug: "acme", skill_slug: "release-helper", reason: "spam", details: "Duplicate", created_at: "2026-10-13T00:00:00.000Z" };
+    serverApiFetch.mockResolvedValue({ reports: Array.from({ length: 20 }, () => report) });
+    await expect(loadCatalogModerationPage({ view: "reports", offset: "20" })).resolves.toMatchObject({
+      kind: "ready", view: { view: "reports", offset: 20 }, submissions: [], hasNextPage: true,
+      reports: { status: "ready", reports: [report, ...Array.from({ length: 19 }, () => report)] },
     });
+    expect(serverApiFetch).toHaveBeenCalledWith("/v1/platform/catalog/reports?limit=20&offset=20");
+  });
+
+  it("shows a retryable error when report data is unavailable or malformed", async () => {
+    serverApiFetch.mockRejectedValueOnce(apiError(503));
+    await expect(loadCatalogModerationPage({ view: "reports" })).resolves.toEqual({ kind: "load-error" });
+    serverApiFetch.mockResolvedValueOnce({ reports: [{ id: "invalid" }] });
+    await expect(loadCatalogModerationPage({ view: "reports" })).resolves.toEqual({ kind: "load-error" });
   });
 });

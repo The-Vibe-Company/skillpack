@@ -2,8 +2,9 @@ import { sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, type Db } from "@skillpack/db";
 import {
-  catalogCheckReportSchema, catalogModerationQuerySchema, catalogModerationReasonSchema,
-  type CatalogCheckReport,
+  catalogCheckReportSchema,
+  catalogModerationCheckReportSchema, catalogModerationQuerySchema, catalogModerationReasonSchema,
+  type CatalogModerationCheckReport,
 } from "@skillpack/contracts";
 
 export interface CatalogCheckIdentity {
@@ -13,10 +14,40 @@ export interface CatalogCheckIdentity {
   packageChecksum: string;
 }
 /** Read a persisted report; never execute checks or package code in this consumer. */
-export type CatalogCheckReader = (input: CatalogCheckIdentity & { database: Db }) => Promise<CatalogCheckReport | null>;
+export type CatalogCheckReader = (input: CatalogCheckIdentity & { database: Db }) => Promise<CatalogModerationCheckReport | null>;
 let checkReader: CatalogCheckReader = async () => null;
 /** PR 3 wires its persisted report reader once at API startup. Missing reports fail closed. */
 export function configureCatalogCheckReader(reader: CatalogCheckReader): void { checkReader = reader; }
+
+/**
+ * Read the checks engine's value-free report through the narrow API-only database function. The
+ * function matches all frozen identity fields; malformed, missing, or internally inconsistent
+ * reports remain pending and cannot authorize moderation.
+ */
+export const readPersistedCatalogCheckReport: CatalogCheckReader = async (input) => {
+  const { database, ...identity } = input;
+  const rows = await database.execute<{ check_report: unknown }>(sql`
+    select public.skillpack_catalog_check_report(
+      ${identity.orgId}::uuid,
+      ${identity.submissionId}::uuid,
+      ${identity.skillVersionId}::uuid,
+      ${identity.packageChecksum}
+    ) as check_report
+  `);
+  const raw = rows[0]?.check_report;
+  if (raw === null || raw === undefined) return null;
+  const report = catalogCheckReportSchema.safeParse(raw);
+  if (!report.success) return null;
+  const blockingRules = report.data.findings
+    .filter((finding) => finding.severity === "blocking")
+    .map((finding) => finding.rule_id);
+  const failedReason = (blockingRules.join(",").slice(0, 2000) || "catalog checks failed");
+  return {
+    ...identity,
+    status: report.data.passed && blockingRules.length === 0 ? "passed" : "failed",
+    reason: report.data.passed && blockingRules.length === 0 ? null : failedReason,
+  };
+};
 
 export class CatalogModerationError extends Error {
   constructor(message: string, readonly status: 403 | 404 | 409) { super(message); }
@@ -60,7 +91,7 @@ async function reportFor(database: Db, row: Omit<Snapshot, "submitted_by">, read
     skillVersionId: row.skill_version_id, packageChecksum: row.package_checksum };
   const report = await reader({ ...identity, database });
   if (!report) return null;
-  const validated = catalogCheckReportSchema.safeParse(report);
+  const validated = catalogModerationCheckReportSchema.safeParse(report);
   if (!validated.success) return null;
   const parsed = validated.data;
   if (parsed.orgId !== identity.orgId || parsed.submissionId !== identity.submissionId

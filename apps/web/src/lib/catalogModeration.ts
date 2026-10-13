@@ -25,26 +25,22 @@ const submissionSchema = z.object({
 export const catalogModerationQueueSchema = z.object({ submissions: z.array(submissionSchema) });
 export type CatalogModerationSubmission = z.infer<typeof submissionSchema>;
 
-/**
- * Incoming skill report, as the catalog reporting API (PR 7/9) will serve it. Until that API ships
- * the server loader returns `unavailable`, and the Reports tab says so instead of an empty inbox.
- */
-export interface CatalogSkillReport {
-  id: string;
-  org_id: string;
-  skill_id: string;
-  submission_id: string | null;
-  reason: string;
-  details: string | null;
-  created_at: string;
-}
+/** Moderator-only report fields; the abuse hash never crosses the API boundary. */
+const catalogSkillReportSchema = z.object({
+  id: z.string(), org_id: z.string(), skill_id: z.string(), submission_id: z.string().nullable(),
+  org_slug: z.string(), skill_slug: z.string(),
+  reason: z.enum(["secret_exposure", "malicious", "license", "spam"]),
+  details: z.string().nullable(), created_at: z.string(),
+});
+export const catalogReportQueueSchema = z.object({ reports: z.array(catalogSkillReportSchema) });
+export type CatalogSkillReport = z.infer<typeof catalogSkillReportSchema>;
 export type CatalogSkillReportsState =
   | { status: "unavailable" }
   | { status: "ready"; reports: CatalogSkillReport[] };
 
 export type CatalogModerationView =
   | { view: "queue"; status: CatalogModerationStatus; offset: number }
-  | { view: "reports" };
+  | { view: "reports"; offset?: number };
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -54,17 +50,16 @@ function single(value: string | string[] | undefined): string | undefined {
 
 /** Unknown or out-of-range params fall back to the first page of proposals. */
 export function parseCatalogModerationView(params: SearchParams): CatalogModerationView {
-  if (single(params.view) === "reports") return { view: "reports" };
   const status = CATALOG_MODERATION_STATUSES.find((value) => value === single(params.status)) ?? "proposed";
   const rawOffset = Number(single(params.offset) ?? 0);
   const offset = Number.isInteger(rawOffset) && rawOffset >= 0 && rawOffset <= MAX_OFFSET
     ? rawOffset - (rawOffset % CATALOG_MODERATION_PAGE_SIZE)
     : 0;
-  return { view: "queue", status, offset };
+  return single(params.view) === "reports" ? { view: "reports", offset } : { view: "queue", status, offset };
 }
 
 export function catalogModerationHref(view: CatalogModerationView): string {
-  if (view.view === "reports") return "/platform/catalog?view=reports";
+  if (view.view === "reports") return `/platform/catalog?view=reports${view.offset ? `&offset=${view.offset}` : ""}`;
   const params = new URLSearchParams({ status: view.status });
   if (view.offset > 0) params.set("offset", String(view.offset));
   return `/platform/catalog?${params.toString()}`;

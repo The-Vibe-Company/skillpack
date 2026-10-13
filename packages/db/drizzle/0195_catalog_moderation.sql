@@ -137,6 +137,32 @@ AS $$
 $$;--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.skillpack_catalog_submission_snapshot(uuid, uuid) FROM PUBLIC;--> statement-breakpoint
 
+-- Moderators read submissions through the queue projection, but the persisted check report is
+-- tenant-owned JSON. Keep this reader narrow: every frozen identity component must match before
+-- a report can cross the pre-tenant moderation boundary. The migration-owner RLS policy makes the
+-- SECURITY DEFINER read safe while the API role receives only EXECUTE on this exact function.
+CREATE FUNCTION public.skillpack_catalog_check_report(
+  p_org uuid,
+  p_submission uuid,
+  p_skill_version uuid,
+  p_package_checksum text
+)
+RETURNS jsonb
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+SET row_security = on
+AS $$
+  SELECT submission."check_report"
+  FROM public."catalog_submissions" AS submission
+  WHERE submission."org_id" = p_org
+    AND submission."id" = p_submission
+    AND submission."skill_version_id" = p_skill_version
+    AND submission."package_checksum" = p_package_checksum
+$$;--> statement-breakpoint
+REVOKE ALL ON FUNCTION public.skillpack_catalog_check_report(uuid, uuid, uuid, text) FROM PUBLIC;--> statement-breakpoint
+
 -- Every proposal path takes this lock before its skill lock. The row is materialized lazily so an
 -- organization with no explicit policy still participates in the same lock ordering as a banned
 -- or auto-approved organization.

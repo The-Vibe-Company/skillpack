@@ -290,6 +290,11 @@ BEGIN
       'public.skillpack_catalog_submission_snapshot(uuid,uuid)'::regprocedure
     ];
   END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_catalog_check_report(uuid,uuid,uuid,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_catalog_check_report(uuid,uuid,uuid,text)'::regprocedure
+    ];
+  END IF;
   IF pg_catalog.to_regprocedure('public.skillpack_lock_catalog_publishing(uuid)') IS NOT NULL THEN
     api_functions := api_functions || ARRAY[
       'public.skillpack_lock_catalog_publishing(uuid)'::regprocedure

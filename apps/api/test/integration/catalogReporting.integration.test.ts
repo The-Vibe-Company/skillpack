@@ -1,4 +1,5 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { zipSync } from "fflate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
@@ -17,6 +18,11 @@ describe("catalog reports persistence and moderation privacy", () => {
   let submissionId: string;
   let source: string;
   let orgSlug: string;
+  function packageFixture(slug: string) {
+    const markdown = Buffer.from(`---\nname: ${slug}\ndescription: Catalog reporting fixture\nlicense: MIT\n---\n${"Useful instructions. ".repeat(10)}`);
+    const bytes = Buffer.from(zipSync({ "SKILL.md": markdown }));
+    return { bytes, checksum: `sha256:${createHash("sha256").update(bytes).digest("hex")}`, files: [{ path: "SKILL.md", size_bytes: markdown.length }] };
+  }
   beforeEach(async () => {
     fixture = await createIntegrationFixture();
     vi.stubEnv("SKILLPACK_PUBLIC_CATALOG", "true");
@@ -24,8 +30,9 @@ describe("catalog reports persistence and moderation privacy", () => {
     source = randomUUID().replaceAll("-", "").repeat(2);
     orgSlug = `integration-a-${fixture.suffix}`;
     skill = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner, scope: "org", slug: `report-${fixture.suffix}` });
-    await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, version: "1.0.0", packageChecksum: `sha256:${"a".repeat(64)}`, packageSizeBytes: 256, packageFiles: [{ path: "SKILL.md", size_bytes: 128 }], database: integrationDb });
-    const proposal = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    const pkg = packageFixture(skill.slug);
+    await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, version: "1.0.0", packageChecksum: pkg.checksum, packageSizeBytes: pkg.bytes.length, packageFiles: pkg.files, database: integrationDb });
+    const proposal = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes: pkg.bytes, database: integrationDb });
     submissionId = proposal.latest_submission!.id;
     await applyValidatedSubmission({ orgId: fixture.orgA, submissionId, decidedBy: fixture.owner.id, database: integrationDb });
     await integrationDb.insert(schema.platformModerators).values({ userId: fixture.outsider.id });

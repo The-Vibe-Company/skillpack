@@ -102,7 +102,7 @@ describe("public catalog skill page", () => {
     stubSkill({ ...listed, share_token: "secret-token" });
     const container = await renderSkill();
     expect(container.querySelector(".v10-code pre")?.textContent).toBe(
-      "skillpack auth login --api-url https://skillpack.app/v1\nskillpack install release-helper --version 1.2.3",
+      "skillpack install acme/release-helper --version 1.2.3 --api-url https://skillpack.app/v1",
     );
     expect(container.innerHTML).not.toContain("--public");
     expect(container.innerHTML).not.toContain("secret-token");

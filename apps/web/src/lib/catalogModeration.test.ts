@@ -33,13 +33,14 @@ describe("catalog moderation navigation", () => {
     expect(parseCatalogModerationView({ status: "withdrawn", offset: "-20" })).toEqual({ view: "queue", status: "proposed", offset: 0 });
     expect(parseCatalogModerationView({ status: "validated", offset: "10020" })).toEqual({ view: "queue", status: "validated", offset: 0 });
     expect(parseCatalogModerationView({ status: ["rejected", "removed"], offset: "45" })).toEqual({ view: "queue", status: "rejected", offset: 40 });
-    expect(parseCatalogModerationView({ view: "reports", status: "removed" })).toEqual({ view: "reports" });
+    expect(parseCatalogModerationView({ view: "reports", status: "removed" })).toEqual({ view: "reports", offset: 0 });
   });
 
   it("round-trips views through page links and asks the API for one bounded page", () => {
     expect(catalogModerationHref({ view: "queue", status: "removed", offset: 40 })).toBe("/platform/catalog?status=removed&offset=40");
     expect(catalogModerationHref({ view: "queue", status: "proposed", offset: 0 })).toBe("/platform/catalog?status=proposed");
     expect(catalogModerationHref({ view: "reports" })).toBe("/platform/catalog?view=reports");
+    expect(catalogModerationHref({ view: "reports", offset: 20 })).toBe("/platform/catalog?view=reports&offset=20");
     expect(catalogModerationQueuePath("validated", 20)).toBe("/v1/platform/catalog/submissions?status=validated&limit=20&offset=20");
   });
 

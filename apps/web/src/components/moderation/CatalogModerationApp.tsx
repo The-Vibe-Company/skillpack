@@ -149,7 +149,10 @@ export function CatalogModerationApp({
                 </Link>
               </nav>
               {view.view === "reports" ? (
-                <ReportsPanel reports={reports} />
+                <>
+                  <ReportsPanel reports={reports} />
+                  <Pager view={view} hasNextPage={hasNextPage} />
+                </>
               ) : (
                 <>
                   {submissions.length === 0 ? (
@@ -189,20 +192,21 @@ export function CatalogModerationApp({
   );
 }
 
-function Pager({ view, hasNextPage }: { view: Extract<CatalogModerationView, { view: "queue" }>; hasNextPage: boolean }) {
-  if (view.offset === 0 && !hasNextPage) return null;
-  const previous = Math.max(0, view.offset - CATALOG_MODERATION_PAGE_SIZE);
+function Pager({ view, hasNextPage }: { view: CatalogModerationView; hasNextPage: boolean }) {
+  const offset = view.offset ?? 0;
+  if (offset === 0 && !hasNextPage) return null;
+  const previous = Math.max(0, offset - CATALOG_MODERATION_PAGE_SIZE);
   return (
     <nav className="mod-pager" aria-label="Pagination">
-      {view.offset > 0 ? (
+      {offset > 0 ? (
         <Link className="btn-sec" href={catalogModerationHref({ ...view, offset: previous })}>
           <Icon name="arrow-left" size={13} />
           Previous
         </Link>
       ) : <span />}
-      <span className="mod-pager__range">Page {view.offset / CATALOG_MODERATION_PAGE_SIZE + 1}</span>
+      <span className="mod-pager__range">Page {offset / CATALOG_MODERATION_PAGE_SIZE + 1}</span>
       {hasNextPage ? (
-        <Link className="btn-sec" href={catalogModerationHref({ ...view, offset: view.offset + CATALOG_MODERATION_PAGE_SIZE })}>
+        <Link className="btn-sec" href={catalogModerationHref({ ...view, offset: offset + CATALOG_MODERATION_PAGE_SIZE })}>
           Next
           <Icon name="arrow-right" size={13} />
         </Link>
@@ -417,7 +421,7 @@ function ReportsPanel({ reports }: { reports: CatalogSkillReportsState }) {
     );
   }
   if (reports.reports.length === 0) {
-    return <EmptyState title="No open reports" description="Nobody has reported a catalog skill." />;
+    return <EmptyState title="No reports" description="Nobody has reported a catalog skill." />;
   }
   return (
     <ul className="mod-list" aria-label="Skill reports">
@@ -434,7 +438,7 @@ function ReportCard({ report }: { report: CatalogSkillReport }) {
   return (
     <article className="mod-card" aria-label={`Report ${report.id}`}>
       <div className="mod-card__head">
-        <Badge tone="warn">{report.reason}</Badge>
+        <Badge tone="warn">{{ secret_exposure: "Secret exposure", malicious: "Malicious content", license: "License concern", spam: "Spam" }[report.reason]}</Badge>
         <span className="mod-card__date">Reported {formatHumanDateUTC(report.created_at)}</span>
       </div>
       {report.details && <p className="mod-card__reason">{report.details}</p>}

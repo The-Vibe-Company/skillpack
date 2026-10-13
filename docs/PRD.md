@@ -24,7 +24,9 @@ Skillpack provides a self-hostable Skills Hub for members and external coding ag
 - Deployment retrofits every existing published version in place with reporting instructions;
   installation status detects checksum changes even at the same version number.
 - Pinned public releases and safe package downloads for verified sessions, approved Agent Auth
-  tickets, and exact `public-skills:install` PATs.
+  tickets, and exact `public-skills:install` PATs. The default-off public catalog adds explicit organization
+  publishing consent, frozen submissions, blocking package checks, platform moderation, anonymous
+  discovery, reports and checksum-verified installs by organization/skill slug.
 - GitHub App synchronization and REST/CLI workflows.
 
 ### Skill capabilities

@@ -64,11 +64,12 @@ describe("catalogInstallCommands", () => {
   it("uses real CLI commands and never a share-token install", () => {
     const commands = catalogInstallCommands({
       siteUrl: new URL("https://skills.example.com"),
+      orgSlug: "acme",
       skillSlug: "release-helper",
       version: "1.2.3",
     });
     expect(commands).toBe(
-      "skillpack auth login --api-url https://skills.example.com/v1\nskillpack install release-helper --version 1.2.3",
+      "skillpack install acme/release-helper --version 1.2.3 --api-url https://skills.example.com/v1",
     );
     expect(commands).not.toContain("--public");
   });

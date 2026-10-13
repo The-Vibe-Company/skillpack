@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { zipSync } from "fflate";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { and, eq, sql } from "drizzle-orm";
 import { schema, type Db } from "@skillpack/db";
@@ -16,10 +17,11 @@ describe("anonymous validated catalog install", () => {
 
   it("delivers the frozen published version through the API role, rejecting unpublished and withdrawn releases", async () => {
     const skill = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner, scope: "org", slug: "catalog-install" });
-    const zip = Buffer.from("immutable published package");
+    const markdown = Buffer.from(`---\nname: ${skill.slug}\ndescription: Catalog install fixture\nlicense: MIT\n---\n${"Useful instructions. ".repeat(10)}`);
+    const zip = Buffer.from(zipSync({ "SKILL.md": markdown }));
     const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
     await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, version: "1.0.0",
-      packageChecksum: checksum, packageSizeBytes: zip.length, packageFiles: [{ path: "SKILL.md", size_bytes: 128 }], database: integrationDb });
+      packageChecksum: checksum, packageSizeBytes: zip.length, packageFiles: [{ path: "SKILL.md", size_bytes: markdown.length }], database: integrationDb });
     const path = { orgSlug: `integration-a-${fixture.suffix}`, skillSlug: skill.slug };
     const url = `/v1/public/catalog/skills/${path.orgSlug}/${skill.slug}/versions/1.0.0/package`;
     const readArchive = vi.fn().mockResolvedValue(zip);
@@ -33,7 +35,7 @@ describe("anonymous validated catalog install", () => {
     });
     const app = createPublicCatalogRoutes({ resolvePackage, readArchive, enabled: () => true });
     expect((await app.request(url)).status).toBe(404);
-    const proposed = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    const proposed = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes: zip, database: integrationDb });
     expect((await app.request(url)).status).toBe(404);
     expect(readArchive).not.toHaveBeenCalled();
     await applyValidatedSubmission({ orgId: fixture.orgA, submissionId: proposed.latest_submission!.id, decidedBy: fixture.owner.id, database: integrationDb });
@@ -55,7 +57,12 @@ describe("anonymous validated catalog install", () => {
     expect((await app.request(url.replace("1.0.0", "2.0.0"))).status).toBe(404);
     await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: false, database: integrationDb });
     expect((await app.request(url)).status).toBe(404);
-    const resubmitted = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    const markdown2 = Buffer.from(`---\nname: ${skill.slug}\ndescription: Catalog install second fixture\nlicense: MIT\n---\n${"Useful instructions. ".repeat(10)}`);
+    const zip2 = Buffer.from(zipSync({ "SKILL.md": markdown2 }));
+    const checksum2 = `sha256:${createHash("sha256").update(zip2).digest("hex")}`;
+    await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, version: "2.0.0",
+      packageChecksum: checksum2, packageSizeBytes: zip2.length, packageFiles: [{ path: "SKILL.md", size_bytes: markdown2.length }], database: integrationDb });
+    const resubmitted = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes: zip2, database: integrationDb });
     await applyValidatedSubmission({ orgId: fixture.orgA, submissionId: resubmitted.latest_submission!.id, decidedBy: fixture.owner.id, database: integrationDb });
     await clearSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, database: integrationDb });
     expect((await app.request(url.replace("1.0.0", "2.0.0"))).status).toBe(404);

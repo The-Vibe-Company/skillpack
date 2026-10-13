@@ -44,7 +44,8 @@
         "date": "2026-10-13",
         "changes": [
           "Document anonymous catalog reporting, moderator-only report privacy and the 48-hour response commitment.",
-          "Update native runtime to 0.3.2 for anonymous validated catalog installs by org/slug and pinned frozen restoration."
+          "Update native runtime to 0.3.2 for anonymous validated catalog installs by org/slug and pinned frozen restoration.",
+          "Consolidate catalog listing, checked submissions, publishing, moderation, reporting and anonymous installation contracts."
         ]
       },
       {
@@ -1163,7 +1164,7 @@
         "version": "1.14.0",
         "date": "2026-06-26",
         "changes": [
-          "Installs a skill into every tool the user works with (Claude Code, Codex, …) in one fan-out, not just the tool in use at the moment.",
+          "Installs a skill into every tool the user works with (Claude Code, Codex, \u2026) in one fan-out, not just the tool in use at the moment.",
           "Adds an extensible tool registry (scripts/tools.json) and records the machine's tool set in ~/.companion/config.json after auto-detecting present tools and confirming with the user.",
           "Tracks each install location per tool and scope through a lockfile targets[] array: user-scope in ~/.companion/skills.lock.json and project-scope in a per-project <repo>/.companion/skills.lock.json.",
           "Keeps the workspace install report aggregate (a single POST /skills/{slug}/install across all tools and projects) and leaves locally customized targets untouched unless forced."

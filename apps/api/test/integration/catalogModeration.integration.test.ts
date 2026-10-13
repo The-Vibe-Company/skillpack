@@ -1,11 +1,12 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import { zipSync } from "fflate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { createDatabase, schema, withTenantContextOn } from "@skillpack/db";
 import postgres from "postgres";
 import {
-  autoApproveCatalogSubmission, configureCatalogCheckReader, listCatalogSubmissions, moderateCatalog,
+  autoApproveCatalogSubmission, configureCatalogCheckReader, listCatalogSubmissions, moderateCatalog, readPersistedCatalogCheckReport,
   getPublicCatalogSkill, requestSkillPublicListing, setSkillPublicListing, type CatalogCheckReader,
 } from "@skillpack/core";
 import { setSkillPublicVersion } from "@skillpack/core/services";
@@ -15,6 +16,18 @@ import { createIntegrationFixture, integrationDb, integrationSql, seedSkill, typ
 
 const passed: CatalogCheckReader = async ({ database: _database, ...identity }) => ({ ...identity, status: "passed", reason: null });
 const failed: CatalogCheckReader = async ({ database: _database, ...identity }) => ({ ...identity, status: "failed", reason: "Only MIT and Apache-2.0 are accepted" });
+
+function packageFixture(slug: string) {
+  const markdown = Buffer.from(`---\nname: ${slug}\ndescription: Catalog moderation fixture\nlicense: MIT\n---\n${"Useful instructions. ".repeat(10)}`);
+  const bytes = Buffer.from(zipSync({ "SKILL.md": markdown }));
+  return {
+    bytes,
+    checksum: `sha256:${createHash("sha256").update(bytes).digest("hex")}`,
+    files: [{ path: "SKILL.md", size_bytes: markdown.length }],
+  };
+}
+
+const persisted: CatalogCheckReader = readPersistedCatalogCheckReport;
 
 describe("platform catalog moderation", () => {
   let fixture: IntegrationFixture;
@@ -33,10 +46,11 @@ describe("platform catalog moderation", () => {
   });
   async function proposal() {
     const skill = await seedSkill({ orgId: fixture.orgA, creator: fixture.owner, scope: "org", slug: `moderation-${randomUUID().slice(0, 8)}` });
+    const pkg = packageFixture(skill.slug);
     await setSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, version: "1.0.0",
-      packageChecksum: `sha256:${"a".repeat(64)}`, packageSizeBytes: 256, packageFiles: [{ path: "SKILL.md", size_bytes: 128 }], database: integrationDb });
-    const result = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
-    return { skill, submissionId: result.latest_submission!.id };
+      packageChecksum: pkg.checksum, packageSizeBytes: pkg.bytes.length, packageFiles: pkg.files, database: integrationDb });
+    const result = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes: pkg.bytes, database: integrationDb });
+    return { skill, packageBytes: pkg.bytes, packageChecksum: pkg.checksum, submissionId: result.latest_submission!.id };
   }
   const decision = (submissionId: string) => ({ actorId: fixture.outsider.id, orgId: fixture.orgA, submissionId, database: integrationDb });
   async function status(submissionId: string) {
@@ -83,7 +97,7 @@ describe("platform catalog moderation", () => {
   });
 
   it("requires passing checks for the exact frozen identity, reflects failures, and audits validation and rejection", async () => {
-    const { skill, submissionId } = await proposal();
+    const { skill, packageBytes, packageChecksum, submissionId } = await proposal();
     await expect(moderateCatalog({ ...decision(submissionId), action: "validate" })).rejects.toMatchObject({ status: 409 });
     expect((await routes(fixture.outsider).request(path(submissionId, "validate"), { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" })).status).toBe(409);
     expect((await routes(fixture.outsider).request(path(submissionId, "reject"), { method: "POST", headers: { "Content-Type": "application/json" }, body: '{"reason":" "}' })).status).toBe(400);
@@ -96,7 +110,7 @@ describe("platform catalog moderation", () => {
       return passed(input);
     };
     await expect(moderateCatalog({ ...decision(submissionId), action: "validate", checks: changing })).rejects.toMatchObject({ status: 409 });
-    await integrationDb.update(schema.catalogSubmissions).set({ packageChecksum: `sha256:${"a".repeat(64)}` })
+    await integrationDb.update(schema.catalogSubmissions).set({ packageChecksum })
       .where(and(eq(schema.catalogSubmissions.orgId, fixture.orgA), eq(schema.catalogSubmissions.id, submissionId)));
     const queue = await listCatalogSubmissions({ actorId: fixture.outsider.id, database: integrationDb, checks: failed });
     expect(queue.find(row => row.id === submissionId)).toMatchObject({ status: "proposed", check_status: "failed", check_reason: "Only MIT and Apache-2.0 are accepted" });
@@ -108,7 +122,7 @@ describe("platform catalog moderation", () => {
     expect(await status(submissionId)).toMatchObject({ status: "validated", decidedBy: fixture.outsider.id });
     expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`, skillSlug: skill.slug, database: integrationDb })).not.toBeNull();
     await expect(moderateCatalog({ ...decision(submissionId), action: "reject", reason: "late" })).rejects.toMatchObject({ status: 409 });
-    const next = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    const next = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes, database: integrationDb });
     await expect(moderateCatalog({ ...decision(next.latest_submission!.id), action: "reject", reason: " " })).rejects.toThrow();
     await moderateCatalog({ ...decision(next.latest_submission!.id), action: "reject", reason: "Unsupported license" });
     expect(await status(next.latest_submission!.id)).toMatchObject({ status: "rejected", rejectionReason: "Unsupported license" });
@@ -117,9 +131,9 @@ describe("platform catalog moderation", () => {
   });
 
   it("removes a published skill, closes pending candidates, retains its release, and cannot resurrect it", async () => {
-    const { skill, submissionId } = await proposal();
+    const { skill, packageBytes, submissionId } = await proposal();
     await moderateCatalog({ ...decision(submissionId), action: "validate", checks: passed });
-    const pending = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    const pending = await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, packageBytes, database: integrationDb });
     await moderateCatalog({ ...decision(submissionId), action: "remove", reason: "Unsafe instructions" });
     expect(await status(submissionId)).toMatchObject({ status: "removed", rejectionReason: "Unsafe instructions" });
     expect(await status(pending.latest_submission!.id)).toMatchObject({ status: "rejected" });
@@ -169,10 +183,62 @@ describe("platform catalog moderation", () => {
     for (const row of audits) expect(row.metadata).toMatchObject({ automatic: true });
   });
 
+  it("reads the persisted frozen report for queue status and automatic approval", async () => {
+    const candidate = await proposal();
+    await integrationDb.insert(schema.catalogPublishingPolicies).values({ orgId: fixture.orgA, autoApprove: false })
+      .onConflictDoUpdate({ target: schema.catalogPublishingPolicies.orgId, set: { autoApprove: false } });
+    configureCatalogCheckReader(persisted);
+
+    const queue = await listCatalogSubmissions({ actorId: fixture.outsider.id, database: integrationDb });
+    expect(queue.find((row) => row.id === candidate.submissionId)).toMatchObject({
+      check_status: "passed",
+      check_reason: null,
+    });
+    const nextVersionId = randomUUID();
+    await integrationDb.insert(schema.skillVersions).values({
+      id: nextVersionId,
+      orgId: fixture.orgA,
+      skillId: candidate.skill.id,
+      version: "2.0.0",
+      frontmatter: JSON.stringify({ name: candidate.skill.slug, description: "Promoted after catalog submission" }),
+      body: "Promoted after catalog submission",
+      sizeBytes: 200,
+      checksum: `sha256:${"c".repeat(64)}`,
+      storagePath: `integration/${fixture.orgA}/${candidate.skill.slug}/2.0.0.tar.gz`,
+      createdBy: fixture.owner.id,
+    });
+    await integrationDb.update(schema.skills).set({ currentVersionId: nextVersionId })
+      .where(and(eq(schema.skills.orgId, fixture.orgA), eq(schema.skills.id, candidate.skill.id)));
+    const promotedPackage = packageFixture(candidate.skill.slug);
+    await setSkillPublicVersion({
+      actor: fixture.owner,
+      orgId: fixture.orgA,
+      slug: candidate.skill.slug,
+      version: "2.0.0",
+      packageChecksum: promotedPackage.checksum,
+      packageSizeBytes: promotedPackage.bytes.length,
+      packageFiles: promotedPackage.files,
+      database: integrationDb,
+    });
+    const staleRow = await status(candidate.submissionId);
+    if (!staleRow) throw new Error("catalog submission fixture missing");
+    expect(await persisted({
+      orgId: staleRow.orgId,
+      submissionId: staleRow.id,
+      skillVersionId: staleRow.skillVersionId,
+      packageChecksum: `sha256:${"b".repeat(64)}`,
+      database: integrationDb,
+    })).toBeNull();
+    await integrationDb.update(schema.catalogPublishingPolicies).set({ autoApprove: true })
+      .where(eq(schema.catalogPublishingPolicies.orgId, fixture.orgA));
+    expect(await autoApproveCatalogSubmission({ orgId: fixture.orgA, submissionId: candidate.submissionId, database: integrationDb })).toBe(true);
+    expect(await status(candidate.submissionId)).toMatchObject({ status: "validated" });
+  });
+
   it("excludes personal skills and developer requests even when checks pass", async () => {
-    const { skill } = await proposal();
+    const { skill, packageBytes } = await proposal();
     await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: false, database: integrationDb });
-    const request = await requestSkillPublicListing({ actor: fixture.developer, orgId: fixture.orgA, slug: skill.slug, database: integrationDb });
+    const request = await requestSkillPublicListing({ actor: fixture.developer, orgId: fixture.orgA, slug: skill.slug, packageBytes, database: integrationDb });
     vi.stubEnv("SKILLPACK_CATALOG_AUTO_APPROVE_ORG_IDS", fixture.orgA);
     expect(await autoApproveCatalogSubmission({ orgId: fixture.orgA, submissionId: request.latest_submission!.id, checks: passed, database: integrationDb })).toBe(false);
     await expect(moderateCatalog({ ...decision(request.latest_submission!.id), action: "validate", checks: passed })).rejects.toMatchObject({ status: 409 });
@@ -188,14 +254,27 @@ describe("platform catalog moderation", () => {
 
   it("uses API-only definer grants without giving runtime roles policy or moderator writes", async () => {
     const { submissionId } = await proposal();
+    const frozen = await status(submissionId);
+    if (!frozen) throw new Error("submission fixture missing");
+    configureCatalogCheckReader(persisted);
     const runtimeUrl = new URL(process.env.DATABASE_URL!);
     runtimeUrl.username = "companion_api";
     runtimeUrl.password = "companion-api";
     const runtimeSql = postgres(runtimeUrl.toString(), { max: 1 });
     try {
       const database = createDatabase(runtimeSql);
-      await moderateCatalog({ ...decision(submissionId), action: "validate", checks: passed, database });
+      await moderateCatalog({ ...decision(submissionId), action: "validate", database });
       expect((await listCatalogSubmissions({ actorId: fixture.outsider.id, status: "validated", database })).some(value => value.id === submissionId)).toBe(true);
+      const [report] = await database.execute(sql`
+        select public.skillpack_catalog_check_report(
+          ${fixture.orgA}::uuid,
+          ${submissionId}::uuid,
+          ${frozen.skillVersionId}::uuid,
+          ${frozen.packageChecksum}
+        ) as check_report
+      `);
+      expect(report?.check_report).toMatchObject({ version: 1, passed: true });
+      await expect(database.execute(sql`select check_report from public.catalog_submissions where id = ${submissionId}`)).resolves.toEqual([]);
       await withTenantContextOn(database, { orgId: fixture.orgA, userId: fixture.owner.id }, async tenantDatabase => {
         await expect(setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: "absent", listed: true, database: tenantDatabase })).rejects.toThrow("skill not found");
       });
@@ -215,6 +294,10 @@ describe("platform catalog moderation", () => {
     await expect(integrationSql.begin(async tx => {
       await tx`set local role companion_worker`;
       await tx`select * from public.skillpack_catalog_moderation_queue(${fixture.outsider.id}, false, 'proposed', 20, 0)`;
+    })).rejects.toThrow("permission denied");
+    await expect(integrationSql.begin(async tx => {
+      await tx`set local role companion_worker`;
+      await tx`select public.skillpack_catalog_check_report(${fixture.orgA}, ${submissionId}, gen_random_uuid(), ${"sha256:" + "a".repeat(64)})`;
     })).rejects.toThrow("permission denied");
   });
 });
