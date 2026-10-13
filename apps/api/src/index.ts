@@ -1,4 +1,5 @@
 import { publicReleaseFileList } from "./publicReleaseFiles";
+import { createCatalogReportingRoutes } from "./catalogReportingRoutes";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
 import { getSkillPublicListing, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
@@ -703,6 +704,7 @@ app.use(
 
 // Public write-only telemetry must not require or resolve credentials.
 app.route("/", createSkillUsageRoutes());
+app.route("/", createCatalogReportingRoutes());
 app.route("/", createPublicCatalogRoutes());
 app.use("*", attachSession);
 app.route("/", createCatalogModerationRoutes());

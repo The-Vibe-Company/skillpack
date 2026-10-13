@@ -22,3 +22,4 @@ export * from "./skillDatabase";
 export * from "./skillUsage";
 export * from "./publicCatalog";
 export * from "./catalogModeration";
+export * from "./catalogReporting";

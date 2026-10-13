@@ -243,6 +243,14 @@ BEGIN
       'public.catalog_submissions'::regclass
     ];
   END IF;
+  IF pg_catalog.to_regclass('public.catalog_reports') IS NOT NULL THEN
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY['public.catalog_reports'::regclass];
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_report_catalog_skill(text,text,text,text,text)'::regprocedure,
+      'public.skillpack_catalog_report_queue(text,boolean,integer,integer)'::regprocedure
+    ];
+  END IF;
+
   -- Platform moderator identity and catalog publishing policy are operator-managed. The API may
   -- inspect them only through the narrow definer functions below; it receives no direct writes and
   -- the worker receives no table privilege at all.
@@ -1524,6 +1532,11 @@ BEGIN
       );
       EXECUTE format('GRANT SELECT ON TABLE %s TO %I', protected_table, api_role);
     END LOOP;
+
+    -- Report content has no tenant projection: the API reads only through the moderator RPC.
+    IF pg_catalog.to_regclass('public.catalog_reports') IS NOT NULL THEN
+      EXECUTE format('REVOKE ALL PRIVILEGES ON TABLE public.catalog_reports FROM %I', api_role);
+    END IF;
 
     -- Billing, GitHub sync, and Skill Database cleanup never inspect or mutate hosted Companion
     -- state. Remove the generic RLS-table grant from every Companion table the worker could

@@ -114,3 +114,46 @@ export function faqPageStructuredData(entries: readonly FaqEntry[]): JsonLdDocum
     ],
   };
 }
+
+export type CatalogSkillFacts = {
+  name: string;
+  description: string;
+  version: string;
+  datePublished: string;
+  url: string;
+  /** Absolute URLs of the site root and the catalog index, the skill's breadcrumb trail. */
+  homeUrl: string;
+  catalogUrl: string;
+};
+
+/** A listed skill and its breadcrumb trail, using only facts returned by the catalog API. */
+export function catalogSkillStructuredData(facts: CatalogSkillFacts): JsonLdDocument {
+  const trail = [
+    { name: "Home", url: facts.homeUrl },
+    { name: "Catalog", url: facts.catalogUrl },
+    { name: facts.name, url: facts.url },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareSourceCode",
+        name: facts.name,
+        description: facts.description,
+        version: facts.version,
+        datePublished: facts.datePublished,
+        url: facts.url,
+        mainEntityOfPage: facts.url,
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: trail.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.url,
+        })),
+      },
+    ],
+  };
+}

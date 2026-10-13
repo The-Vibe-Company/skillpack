@@ -138,3 +138,42 @@ PR 4/9 adds the moderator API and report-consumer boundary independently of PR 3
 Later PRs add anonymous installs by slug and frontend workflows. Share tokens remain separate and
 excluded from every listing and catalog response. Self-hosted deployments remain disabled by default;
 enabling the catalog on managed hosting remains a deployment decision.
+
+## Anonymous reporting (PR 7/9)
+
+`POST /v1/public/catalog/skills/:orgSlug/:skillSlug/reports` accepts anonymous JSON:
+`{ "reason": "secret_exposure" | "malicious" | "license" | "spam", "details"?: "…" }`.
+The public skill page offers a **Signaler** disclosure with the four motifs **Secret exposé**,
+**Malveillant**, **Licence**, and **Spam**, plus optional text. Text is limited to 2000 characters;
+unknown fields, missing/invalid reasons and malformed JSON return 400. The request limit is 16 KiB
+(413). Accepted reports return 201 `{ "ok": true }`, without exposing a report ID or text.
+Only currently validated, listed, active organization skills can be reported; all other targets
+and a disabled catalog return 404. Reports never change publication state automatically.
+
+PostgreSQL serializes admission by anonymous source across API processes, allowing five accepted
+reports in a rolling hour across all skills/organizations (429 with `Retry-After: 3600`). A separate
+process admission cap of 60 attempts per minute includes malformed requests (429, retry after 60s).
+Only an HMAC-SHA256 of the connection IP is persisted, keyed by the existing `BETTER_AUTH_SECRET`
+with a reporting-specific prefix. IPv4-mapped IPv6 is normalized. Raw IPs and submitted text are
+never logged by this handler. Forwarding headers are not trusted: a reverse proxy's clients share
+its conservative quota. A missing connection IP or auth secret shorter than 32 characters, or a
+storage failure, returns 503 and does not acknowledge a report. Key rotation resets source quotas.
+
+`GET /v1/platform/catalog/reports?limit=20&offset=0` is part of the platform moderation queue from
+PR #34. It uses the same live moderator grant, browser-session-only authority, pagination bounds,
+default-off flag and `no-store` responses. Rows include report/skill/org IDs, snapshotted slugs,
+the validated submission ID, reason, optional text and timestamp, oldest first. Abuse hashes are
+omitted. Reports remain visible after unlisting/removal so moderators can use the existing
+submission removal or organization ban actions. Organization members, including Owner/Admin,
+PATs, agents, anonymous callers and worker credentials cannot read reports. No tenant write can
+create or modify them; the API receives only narrow reporting/queue security-definer grants.
+
+**Stan responds to reports within 48 hours.** This is an operational moderation commitment, not
+an automated notification or resolution timer. This PR sends no email and collects no reporter
+contact information. Moderators review optional text as untrusted confidential content; reporters
+should describe exposure without pasting secret values.
+
+Apply additive migration `0197_catalog_reporting` and runtime grants before the API. It creates
+no reports for existing listings and changes no listing state. The detail page is ported from
+PR #35 with the minimal helpers needed for the form; index pages, sitemap and publishing UI remain
+owned by their respective PRs. Both web and API keep `SKILLPACK_PUBLIC_CATALOG` default off.

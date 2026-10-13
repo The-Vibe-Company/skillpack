@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const BLOG_CONTENT_ID = "blog-content";
 
-export function BlogShell({ children }: { children: React.ReactNode }) {
+export function BlogShell({ children, footerLabel = "Skillpack blog" }: { children: React.ReactNode; footerLabel?: string }) {
   return (
     <div className="v10-landing v10-blog">
       <a className="v10-skip" href={`#${BLOG_CONTENT_ID}`}>Skip to content</a>
@@ -34,7 +34,7 @@ export function BlogShell({ children }: { children: React.ReactNode }) {
           <Link className="v5-brand" href="/" aria-label="Skillpack home">
             <img className="v10-wordmark v10-wordmark--sm" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
           </Link>
-          <span className="v10-footer__by">Skillpack blog</span>
+          <span className="v10-footer__by">{footerLabel}</span>
           <span className="v10-footer__links">
             <Link href="/blog">Blog</Link>
             <Link href="/privacy">Privacy</Link>

@@ -57,3 +57,6 @@ admin submission. Platform moderators validate only after matching checks pass, 
 and ban organization publishing. Allowlisted organizations auto-validate after passing checks.
 Validation enables discovery of a frozen version. Existing releases stay
 unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).
+
+Visitors can anonymously report published catalog skills for secret exposure, malicious content,
+license concerns or spam. Reports are private to platform moderators; Stan responds within 48 hours.

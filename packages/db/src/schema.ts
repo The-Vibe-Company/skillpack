@@ -1901,3 +1901,24 @@ export const skillUsageInbox = pgTable("skill_usage_inbox", {
   admission: index("skill_usage_inbox_admission_idx").on(t.declaredSkillId, t.receivedAt),
   expiry: index("skill_usage_inbox_expiry_idx").on(t.processedAt).where(sql`${t.processedAt} is not null`),
 }));
+
+/** Anonymous catalog reports are private to platform moderation, never organization members. */
+export const catalogReports = pgTable("catalog_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  skillId: uuid("skill_id").notNull(),
+  submissionId: uuid("submission_id").notNull().references(() => catalogSubmissions.id, { onDelete: "cascade" }),
+  orgSlug: text("org_slug").notNull(),
+  skillSlug: text("skill_slug").notNull(),
+  reason: text("reason").$type<"secret_exposure" | "malicious" | "license" | "spam">().notNull(),
+  details: text("details"),
+  reporterHash: text("reporter_hash").notNull(),
+  createdAt: now(),
+}, t => ({
+  skillOrgFk: foreignKey({ columns: [t.orgId, t.skillId], foreignColumns: [skills.orgId, skills.id], name: "catalog_reports_skill_org_fk" }).onDelete("cascade"),
+  bySourceTime: index("catalog_reports_source_time_idx").on(t.reporterHash, t.createdAt),
+  byQueue: index("catalog_reports_queue_idx").on(t.createdAt, t.id),
+  reasonCheck: check("catalog_reports_reason_check", sql`${t.reason} in ('secret_exposure', 'malicious', 'license', 'spam')`),
+  detailsCheck: check("catalog_reports_details_check", sql`char_length(${t.details}) <= 2000`),
+  hashCheck: check("catalog_reports_reporter_hash_check", sql`${t.reporterHash} ~ '^[0-9a-f]{64}$'`),
+}));

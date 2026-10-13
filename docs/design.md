@@ -132,3 +132,7 @@ policies cannot be changed through tenant writes. A check-report reader consumes
 exact frozen identity; absent reports remain pending, and auto-approval also requires an allowlist.
 Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
 PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.
+
+Anonymous catalog reports use API-only security definers for durable rate-limited writes and
+platform-moderator-only reads. Report text and abuse hashes have no tenant read policy; see
+[public catalog reporting](public-catalog.md#anonymous-reporting-pr-79).
