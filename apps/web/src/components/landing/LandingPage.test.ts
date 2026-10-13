@@ -38,6 +38,10 @@ async function renderLanding(): Promise<HTMLElement> {
   await act(async () => {
     root.render(React.createElement(LandingPage));
   });
+  // The hero demo is a lazy client island; wait for its chunk before querying it.
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
   return container;
 }
 
