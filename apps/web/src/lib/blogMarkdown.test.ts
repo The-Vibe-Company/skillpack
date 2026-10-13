@@ -4,7 +4,7 @@ import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { ArticleMarkdown } from "@/components/blog/ArticleMarkdown";
-import { findBlogPost, splitLeadHeading } from "./blog";
+import { loadBlogPosts, splitLeadHeading } from "./blog";
 import { blogTableOfContents, slugifyHeading } from "./blogMarkdown";
 
 // SAFETY: React's test harness reads this documented global flag; the test owns its boolean value.
@@ -47,18 +47,50 @@ describe("blog table of contents", () => {
     ]);
   });
 
-  it("renders every outline entry as an anchor on the matching heading", async () => {
-    const post = findBlogPost("what-is-skill-md");
-    const { rest } = splitLeadHeading(post?.body ?? "");
-    const toc = blogTableOfContents(rest);
-    const container = await renderMarkdown(rest);
-    const headings = Array.from(container.querySelectorAll("h2, h3"));
+  it("reads inline Markdown, closing hashes and tilde fences the way the renderer does", async () => {
+    const body = [
+      "## Use **bold**, `code` and [links](https://example.com) ##",
+      "",
+      "~~~md",
+      "## Inside a tilde fence",
+      "~~~",
+      "",
+      "   ### Indented \\*escaped\\*",
+      "",
+      "Not a heading:",
+      "",
+      "    ## Indented code",
+      "",
+      "> ## Quoted",
+      "",
+      "#### Too deep",
+    ].join("\n");
+    const toc = blogTableOfContents(body);
+    const container = await renderMarkdown(body);
 
-    expect(toc.length).toBeGreaterThan(5);
-    expect(toc[0]).toEqual({ id: "the-short-answer", text: "The short answer", depth: 2 });
-    expect(headings.map((heading) => heading.id)).toEqual(toc.map((entry) => entry.id));
-    expect(headings.map((heading) => heading.textContent)).toEqual(toc.map((entry) => entry.text));
+    expect(toc).toEqual([
+      { id: "use-bold-code-and-links", text: "Use bold, code and links", depth: 2 },
+      { id: "indented-escaped", text: "Indented *escaped*", depth: 3 },
+    ]);
+    expect(Array.from(container.querySelectorAll("[id]")).map((element) => element.id)).toEqual(
+      toc.map((entry) => entry.id),
+    );
   });
+
+  it.each(loadBlogPosts().map((post) => [post.slug, post] as const))(
+    "anchors every outline entry of %s on the matching rendered heading",
+    async (_slug, post) => {
+      const { rest } = splitLeadHeading(post.body);
+      const toc = blogTableOfContents(rest);
+      const container = await renderMarkdown(rest);
+      const headings = Array.from(container.querySelectorAll("h2, h3"));
+
+      expect(toc.length).toBeGreaterThan(3);
+      expect(headings.map((heading) => heading.id)).toEqual(toc.map((entry) => entry.id));
+      expect(headings.map((heading) => heading.textContent)).toEqual(toc.map((entry) => entry.text));
+      expect(headings.map((heading) => heading.tagName)).toEqual(toc.map((entry) => `H${entry.depth}`));
+    },
+  );
 });
 
 describe("blog callouts", () => {
