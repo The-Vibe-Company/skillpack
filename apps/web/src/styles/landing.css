@@ -312,7 +312,7 @@
 /* --- agents strip ------------------------------------------------------------------ */
 .lp-agents-strip { border-top: 1px solid var(--v10-line); background: var(--v10-bg-dim); }
 .lp-agents-strip__inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--space-4) var(--space-6); padding-block: var(--space-6); }
-.lp-agents-strip__label { font-size: var(--text-sm); color: var(--v10-ink-faint); }
+.lp-agents-strip__label { margin: 0; font-size: var(--text-sm); font-weight: inherit; color: var(--v10-ink-faint); }
 .lp-agents-strip__list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
 .lp-agent {
   display: inline-flex; align-items: center; gap: 10px;
@@ -517,6 +517,37 @@
 .lp-fact { padding: var(--space-5); background: var(--lp-card); border: 1px solid var(--v10-line); border-radius: 14px; }
 .lp-fact h3 { margin: var(--space-4) 0 0; font-family: var(--lp-display); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em; }
 .lp-fact p { margin: var(--space-1) 0 0; font-size: var(--text-sm); line-height: 1.5; color: var(--v10-ink-muted); text-wrap: pretty; }
+
+/* --- faq ----------------------------------------------------------------------------------------- */
+.lp-faq { max-width: 760px; margin: clamp(40px, 5vw, 64px) auto 0; border-top: 1px solid var(--v10-line); }
+.lp-faq__item { border-bottom: 1px solid var(--v10-line); }
+.lp-faq__q {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  padding: var(--space-5) 0;
+  list-style: none; cursor: pointer;
+  font-family: var(--lp-display); font-size: 1.125rem; font-weight: 600; letter-spacing: -0.015em;
+  color: var(--v10-ink);
+}
+.lp-faq__q::-webkit-details-marker { display: none; }
+.lp-faq__q:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; border-radius: var(--radius-sm); }
+.lp-faq__q svg { flex: none; color: var(--v10-ink-faint); transition: transform 200ms var(--ease-out-quint); }
+.lp-faq__item[open] .lp-faq__q svg { transform: rotate(180deg); }
+.lp-faq__a { padding: 0 0 var(--space-5); max-width: 64ch; }
+.lp-faq__a p { margin: 0; font-size: var(--text-base); line-height: 1.6; color: var(--v10-ink-muted); text-wrap: pretty; }
+.lp-faq__a p + p { margin-top: var(--space-3); }
+.lp-faq__a code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+  background: var(--v10-bg-dim);
+  border: 1px solid var(--v10-line);
+  color: var(--v10-ink);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+.lp-faq__a a { color: var(--color-accent-ink); font-weight: var(--weight-semibold); text-decoration: none; }
+.lp-faq__a a:hover { text-decoration: underline; text-underline-offset: 2px; }
+.lp-faq__a a:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; border-radius: var(--radius-sm); }
+@media (prefers-reduced-motion: reduce) { .lp-faq__q svg { transition: none; } }
 
 /* --- finale ------------------------------------------------------------------------------------ */
 .lp-finale { position: relative; overflow: clip; padding-block: clamp(96px, 12vw, 160px); border-top: 1px solid var(--v10-line); text-align: center; }
