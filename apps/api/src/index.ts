@@ -1,5 +1,6 @@
 import { publicReleaseFileList } from "./publicReleaseFiles";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
+import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
 import { getSkillPublicListing, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
 import { requestSkillPublicListingInputSchema, skillPublicListingStatusSchema, setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
 import { createSkillUsageRoutes } from "./skillUsageRoutes";
@@ -704,6 +705,7 @@ app.use(
 app.route("/", createSkillUsageRoutes());
 app.route("/", createPublicCatalogRoutes());
 app.use("*", attachSession);
+app.route("/", createCatalogModerationRoutes());
 
 registerAgentAuthRoutes(app);
 registerCliLoginRoutes(app);

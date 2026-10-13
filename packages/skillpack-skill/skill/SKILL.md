@@ -80,6 +80,7 @@ skillpack api DELETE /v1/skills/<slug>/public-version
 ```
 
 Public promotion alone does not authorize catalog discovery. Owner/Admin submit an organization release for publication; Developers can request admin submission. Discovery starts only after validation and serves the frozen validated version while a newer submission is pending. Share a personal skill with the organization before public release promotion or submission. The anonymous catalog is disabled by default. Unlisting immediately withdraws open submissions and preserves the public release and share link.
+Catalog validation requires passing automatic checks, including MIT or Apache-2.0 licensing. Platform moderators may reject with a reason, remove listings, or ban organization publishing; organization roles grant no moderation authority. Allowlisted organizations are auto-validated only after a matching check report passes. Missing reports leave submissions proposed.
 
 The PUT body is `{"version":"<version>"}`. Report publication and public promotion separately. After publishing, include the returned skill link and version; a share page does not itself authorize public package access.
 

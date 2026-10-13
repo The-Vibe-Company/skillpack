@@ -64,6 +64,7 @@ export const catalogSubmissionStatusEnum = pgEnum("catalog_submission_status", [
   "validated",
   "rejected",
   "withdrawn",
+  "removed",
 ]);
 export const catalogSubmissionKindEnum = pgEnum("catalog_submission_kind", [
   "publish_request",
@@ -80,6 +81,13 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Global operator-managed catalog moderators. This table has no organization scope. */
+export const platformModerators = pgTable("platform_moderators", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const session = pgTable("session", {
@@ -374,6 +382,15 @@ export const organizations = pgTable(
     updatedAt: updatedAt(),
   },
 );
+
+/** Operator-managed catalog publication policy, one row per organization when configured. */
+export const catalogPublishingPolicies = pgTable("catalog_publishing_policies", {
+  orgId: uuid("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  banned: boolean("banned").notNull().default(false),
+  autoApprove: boolean("auto_approve").notNull().default(false),
+});
 
 export const organizationDomains = pgTable(
   "organization_domains",
@@ -704,10 +721,10 @@ export const catalogSubmissions = pgTable(
     ),
     decisionCheck: check(
       "catalog_submissions_decision_check",
-      sql`(${t.status} = 'proposed' and ${t.decidedBy} is null and ${t.decidedAt} is null)
-        or (${t.status} in ('validated', 'rejected')
+      sql`(${t.status}::text = 'proposed' and ${t.decidedBy} is null and ${t.decidedAt} is null)
+        or (${t.status}::text in ('validated', 'rejected', 'removed')
           and ${t.decidedBy} is not null and ${t.decidedAt} is not null)
-        or ${t.status} = 'withdrawn'`,
+        or ${t.status}::text = 'withdrawn'`,
     ),
   }),
 );

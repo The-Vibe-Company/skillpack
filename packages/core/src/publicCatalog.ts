@@ -18,6 +18,7 @@ import {
 } from "./services";
 import { withdrawOpenCatalogSubmissions } from "./catalogSubmissionLifecycle";
 import { canManagePublicListing } from "./authz";
+import { autoApproveCatalogSubmission, catalogPublishingPolicy } from "./catalogModeration";
 
 export interface PublicCatalogQuery {
   limit: number;
@@ -167,6 +168,10 @@ async function mutateListing(input: SetSkillPublicListingInput, request: boolean
     const transactionDatabase: unknown = tx;
     // SAFETY: transaction queries share the Db schema and query contract.
     const tenantDb = transactionDatabase as Db;
+    await assertMember(tenantDb, input.actor, input.orgId);
+    if (input.listed && (await catalogPublishingPolicy(tenantDb, input.orgId, true)).banned) {
+      throw new SkillPublicReleaseForbiddenError("this organization is banned from catalog publishing");
+    }
     const { skill, role } = await listingSkill(input, tenantDb, true);
     assertListingRole(role, request);
     const open = await tenantDb.query.catalogSubmissions.findFirst({
@@ -211,7 +216,11 @@ async function mutateListing(input: SetSkillPublicListingInput, request: boolean
         }).returning();
     if (!submission) throw new SkillPublicReleaseConflictError("submission changed concurrently");
     await auditSubmission(tenantDb, input.actor.id, submission, request ? "catalog_submission.requested" : "catalog_submission.submitted");
-    return { ...await listingStatus(tenantDb, input.orgId, skill, role), changed: true };
+    const approved = !request && await autoApproveCatalogSubmission({ orgId: input.orgId, submissionId: submission.id, database: tenantDb });
+    const current = approved ? await tenantDb.query.skills.findFirst({
+      where: and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, skill.id)),
+    }) : skill;
+    return { ...await listingStatus(tenantDb, input.orgId, current ?? skill, role), changed: true };
   });
 }
 
@@ -232,13 +241,16 @@ export async function prepareSkillPublicListing(input: ListingInput & { request?
   return { orgId: input.orgId, publicVersionId: release.versionId, checksum: release.checksum, sizeBytes: release.sizeBytes, packageFiles: skill.publicPackageFiles };
 }
 
-/** Internal validation seam. No HTTP/MCP route exposes it before the moderation PR. */
+/** Internal primitive retained for lifecycle tests. Production moderation uses the gated RPC. */
 export async function applyValidatedSubmission(input: { orgId: string; submissionId: string; decidedBy: string; database?: Db }): Promise<void> {
   const database = input.database ?? db;
   await database.transaction(async (tx) => {
     const transactionDatabase: unknown = tx;
     // SAFETY: transaction queries share the Db schema and query contract.
     const tenantDb = transactionDatabase as Db;
+    if ((await catalogPublishingPolicy(tenantDb, input.orgId, true)).banned) {
+      throw new SkillPublicReleaseConflictError("this organization is banned from catalog publishing");
+    }
     const candidate = await tenantDb.query.catalogSubmissions.findFirst({
       where: and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, input.submissionId)),
     });

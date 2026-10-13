@@ -53,5 +53,7 @@ writing it; reporting agents must also check opt-out before reading any identity
 
 Public catalog discovery requires explicit listing consent in addition to a pinned public release.
 Only organization skills can be submitted, with Owner/Admin consent; Developers can request
-admin submission. Validation enables discovery of a frozen version. Existing releases stay
+admin submission. Platform moderators validate only after matching checks pass, reject with reasons, remove listings,
+and ban organization publishing. Allowlisted organizations auto-validate after passing checks.
+Validation enables discovery of a frozen version. Existing releases stay
 unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).

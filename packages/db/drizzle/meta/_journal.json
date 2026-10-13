@@ -1359,6 +1359,13 @@
       "when": 1793426800000,
       "tag": "0193_catalog_submissions",
       "breakpoints": true
+    },
+    {
+      "idx": 195,
+      "version": "7",
+      "when": 1793434000000,
+      "tag": "0195_catalog_moderation",
+      "breakpoints": true
     }
   ]
 }
