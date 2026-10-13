@@ -236,6 +236,11 @@ BEGIN
       'public.skillpack_get_public_catalog_skill(text,text)'::regprocedure
     ];
   END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_get_public_catalog_package(text,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_get_public_catalog_package(text,text)'::regprocedure
+    ];
+  END IF;
   -- Catalog submissions are API-owned review state. The worker receives no direct tenant-table
   -- access, while the API gets the ordinary forced-RLS grants from the generic table pass below.
   IF pg_catalog.to_regclass('public.catalog_submissions') IS NOT NULL THEN

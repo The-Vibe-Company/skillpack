@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"golang.org/x/term"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type profile struct {
@@ -319,4 +321,31 @@ func writePrivate(path string, b []byte) error {
 	}
 	syncDir(parent)
 	return nil
+}
+
+// Catalog requests never send saved or environment credentials to the anonymous endpoint.
+func (a *app) catalogClient() (*client, error) {
+	cfg, err := a.loadConfig()
+	if err != nil {
+		return nil, err
+	}
+	name := a.options.values["profile"]
+	if name == "" {
+		name = cfg.Active
+	}
+	base := a.options.values["api-url"]
+	if base == "" {
+		base = os.Getenv("SKILLPACK_API_URL")
+	}
+	if base == "" {
+		base = cfg.Profiles[name].API
+	}
+	if base == "" {
+		base = "https://skillpack.app/v1"
+	}
+	base, err = normalizeAPI(base)
+	if err != nil {
+		return nil, err
+	}
+	return &client{base: base, http: &http.Client{Timeout: 45 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}, nil
 }

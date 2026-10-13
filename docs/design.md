@@ -130,5 +130,7 @@ Platform moderation is separate from organization roles; API-only security defin
 cross-organization queue and audited decisions. Operator-managed moderator grants and org publishing
 policies cannot be changed through tenant writes. A check-report reader consumes PR 3 reports for the
 exact frozen identity; absent reports remain pending, and auto-approval also requires an allowlist.
+Anonymous org/slug installs pin that validated snapshot and verify its content-addressed ZIP;
+package delivery rechecks listing visibility and the feature flag after storage retrieval.
 Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
 PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.
