@@ -49,6 +49,8 @@ describe("public blog index", () => {
       posts.map((post) => `/blog/${post.slug}`),
     );
     expect(cards[0]?.classList.contains("v10-postcard--featured")).toBe(true);
+    expect(cards[0]?.querySelector("h2")).not.toBeNull();
+    expect(cards.slice(1).every((card) => card.querySelector("h3"))).toBe(true);
     expect(cards.slice(1).every((card) => !card.classList.contains("v10-postcard--featured"))).toBe(true);
     // With a single post there is no empty "More posts" grid.
     expect(container.querySelector(".v10-bloghome__more") === null).toBe(posts.length === 1);
@@ -60,7 +62,7 @@ describe("public blog index", () => {
       (card) => card.querySelector(".v10-postcard__title a")?.getAttribute("href") === "/blog/what-is-skill-md",
     );
 
-    expect(guide?.querySelector("h2")?.textContent).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
+    expect(guide?.querySelector(".v10-postcard__title")?.textContent).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
     expect(guide?.querySelector(".v10-postcard__desc")?.textContent).toMatch(/^SKILL\.md explained: the Agent Skills format/);
     expect(guide?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(guide?.querySelector("time")?.textContent).toBe("October 13, 2026");
