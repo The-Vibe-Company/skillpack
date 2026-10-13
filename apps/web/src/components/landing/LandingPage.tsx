@@ -11,6 +11,7 @@ import { PortalDemo } from "./PortalDemo";
 import Link from "next/link";
 import { Icon } from "@/components/Icon";
 import { HOME_STRUCTURED_DATA, serializeJsonLd } from "@/lib/structuredData";
+import { FaqSection } from "./FaqSection";
 
 const GITHUB_URL = "https://github.com/The-Vibe-Company/skillpack";
 const SKILL_MD_URL = "https://github.com/anthropics/skills";
@@ -32,16 +33,16 @@ const COPY = {
   ctaSecondary: "See how it works",
   heroCommand: "skillpack install code-review",
   heroRelease: "Immutable release",
-  agentsLabel: "Installs into the agents your team already uses",
+  agentsLabel: "Install skills into Claude Code, Codex and OpenCode",
   problemKick: "The problem",
-  problemTitlePre: "Today, your best skills are ",
-  problemTitleMark: "scattered everywhere.",
+  problemTitlePre: "Why teams need a ",
+  problemTitleMark: "private skills registry",
   problemSub:
     "One engineer's review checklist lives in a gist. The deploy skill was pasted in Slack. Every agent runs a different copy, and nobody knows which one is current.",
   problemPunch: "Great skills exist. They just don't travel.",
   howKick: "How it works",
-  howTitlePre: "One skill, from first draft to ",
-  howTitleMark: "every agent.",
+  howTitlePre: "How Skillpack versions and installs ",
+  howTitleMark: "SKILL.md packages",
   steps: [
     {
       n: "01",
@@ -71,8 +72,8 @@ const COPY = {
     },
   ],
   agentsKick: "For coding agents",
-  agentsTitlePre: "Agents connect as ",
-  agentsTitleMark: "delegated clients.",
+  agentsTitlePre: "Connect Claude Code, Codex and OpenCode ",
+  agentsTitleMark: "securely",
   agentsSub:
     "Agents sign in through Agent Auth, personal access tokens or the Skillpack MCP server. Each connection acts with the consenting member's rights, inside the one workspace chosen at consent.",
   agentsPoints: [
@@ -81,8 +82,8 @@ const COPY = {
     { icon: "key-round", text: "Retrieve bound secrets through short-lived grants" },
   ],
   agentsNote: "Skillpack never launches your agents or runs skill package scripts.",
-  trustTitlePre: "Self-hosted. Open source.",
-  trustTitleMark: "Yours.",
+  trustTitlePre: "Open-source, self-hosted ",
+  trustTitleMark: "skills hub",
   trustText:
     "Keep a skill private in My Skills or share it with your organization. Skillpack can run its control plane and skill registry on your own servers, so governance stays on infrastructure you control.",
   trustFacts: [
@@ -233,7 +234,7 @@ function AgentStrip({ c }: { c: Copy }) {
   return (
     <section className="lp-agents-strip" data-screen-label="agents-strip">
       <div className="v10-wrap lp-agents-strip__inner">
-        <span className="lp-agents-strip__label">{c.agentsLabel}</span>
+        <h2 className="lp-agents-strip__label">{c.agentsLabel}</h2>
         <ul className="lp-agents-strip__list">
           {AGENTS.map((a) => (
             <li className="lp-agent" key={a.name}>
@@ -555,6 +556,7 @@ export function LandingPage() {
         <How c={c} />
         <Agents c={c} />
         <Trust c={c} />
+        <FaqSection />
         <Finale c={c} />
       </main>
       <Footer c={c} />
