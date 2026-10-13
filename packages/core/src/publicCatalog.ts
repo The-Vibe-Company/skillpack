@@ -2,6 +2,7 @@
 
 import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema, type Db } from "@skillpack/db";
+import { checkCatalogPackage } from "@skillpack/skills";
 import {
   publicCatalogSkillSchema,
   type PublicCatalogSkill,
@@ -33,6 +34,8 @@ export interface SetSkillPublicListingInput {
   listed: boolean;
   /** File list captured from the exact pinned public ZIP (required for a first listing). */
   packageFiles?: readonly PublicCatalogSkill["files"][number][];
+  /** Exact public ZIP bytes. Missing bytes fail closed; caller-supplied reports are never trusted. */
+  packageBytes?: Buffer;
   /** Release identity read before the archive was extracted, used as a compare-and-swap fence. */
   expectedPublicVersionId?: string;
   expectedChecksum?: string;
@@ -113,6 +116,7 @@ async function listingStatus(database: Db, orgId: string, skill: ListingSkill, r
     listed_at: skill.listedAt?.toISOString() ?? null,
     latest_submission: latest ? { id: latest.id, status: latest.status, kind: latest.kind } : null,
     rejection_reason: latest?.rejectionReason ?? null,
+    check_report: latest?.checkReport ?? null,
     can_manage_listing: canManagePublicListing({ id: skill.creatorId, orgRole: role }, skill),
   };
 }
@@ -201,7 +205,13 @@ async function mutateListing(input: SetSkillPublicListingInput, request: boolean
       }
       return { ...await listingStatus(tenantDb, input.orgId, skill, role), changed: false };
     }
-    const snapshot = { skillVersionId: release.versionId, packageChecksum: release.checksum, packageSizeBytes: release.sizeBytes, packageFiles: files };
+    const checkReport = checkCatalogPackage({ bytes: input.packageBytes, checksum: release.checksum,
+      sizeBytes: release.sizeBytes, slug: skill.slug, shareToken: skill.shareToken });
+    const rejected = !checkReport.passed;
+    const snapshot = { skillVersionId: release.versionId, packageChecksum: release.checksum, packageSizeBytes: release.sizeBytes, packageFiles: files,
+      checkReport, status: rejected ? "rejected" as const : "proposed" as const,
+      decidedBy: rejected ? input.actor.id : null, decidedAt: rejected ? new Date() : null,
+      rejectionReason: rejected ? [...new Set(checkReport.findings.filter(finding => finding.severity === "blocking").map(finding => finding.rule_id))].join(",") : null };
     const [submission] = open
       ? await tenantDb.update(schema.catalogSubmissions).set({ ...snapshot, kind, submittedBy: input.actor.id })
           .where(and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, open.id))).returning()
@@ -211,6 +221,7 @@ async function mutateListing(input: SetSkillPublicListingInput, request: boolean
         }).returning();
     if (!submission) throw new SkillPublicReleaseConflictError("submission changed concurrently");
     await auditSubmission(tenantDb, input.actor.id, submission, request ? "catalog_submission.requested" : "catalog_submission.submitted");
+    if (rejected) await auditSubmission(tenantDb, input.actor.id, submission, "catalog_submission.rejected");
     return { ...await listingStatus(tenantDb, input.orgId, skill, role), changed: true };
   });
 }
@@ -247,7 +258,9 @@ export async function applyValidatedSubmission(input: { orgId: string; submissio
     const submission = await tenantDb.query.catalogSubmissions.findFirst({
       where: and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, input.submissionId)),
     });
-    if (!skill || skill.scope !== "org" || skill.archivedAt || !skill.publicVersionId || !submission || submission.kind !== "submission" || submission.status !== "proposed") {
+    if (!skill || skill.scope !== "org" || skill.archivedAt || !skill.publicVersionId || !submission || submission.kind !== "submission" || submission.status !== "proposed"
+      || submission.checkReport?.version !== 1 || submission.checkReport.passed !== true
+      || submission.checkReport.findings.some(finding => finding.severity === "blocking")) {
       throw new SkillPublicReleaseConflictError("only an active proposed submission can be validated");
     }
     const decidedAt = new Date();

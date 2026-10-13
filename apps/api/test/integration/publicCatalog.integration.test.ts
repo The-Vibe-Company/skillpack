@@ -1,3 +1,4 @@
+import { zipSync } from "fflate";
 import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -50,18 +51,24 @@ describe("public catalog", () => {
 
   afterAll(async () => fixture.cleanup());
 
+  const packages = new Map<string, Buffer>();
+  function packageBytes(slug: string) {
+    return Buffer.from(zipSync({ "SKILL.md": Buffer.from(`---\nname: ${slug}\ndescription: Catalog fixture\nlicense: MIT\n---\n${"Useful instructions. ".repeat(10)}`) }));
+  }
+  const checksumFor = (slug: string) => `sha256:${createHash("sha256").update(packages.get(slug)!).digest("hex")}`;
   async function promote(
     skill: SeededSkill,
     actor: IntegrationFixture["developer"],
     packageFiles: readonly { path: string; size_bytes: number }[] | undefined = FILES,
   ): Promise<void> {
+    packages.set(skill.slug, packageBytes(skill.slug));
     const releaseInput: Parameters<typeof setSkillPublicVersion>[0] = {
       actor,
       orgId: skill.orgId,
       slug: skill.slug,
       version: "1.0.0",
-      packageChecksum: `sha256:${"a".repeat(64)}`,
-      packageSizeBytes: 1_024,
+      packageChecksum: checksumFor(skill.slug),
+      packageSizeBytes: packages.get(skill.slug)!.length,
       database: integrationDb,
     };
     if (packageFiles !== undefined) releaseInput.packageFiles = packageFiles;
@@ -69,7 +76,7 @@ describe("public catalog", () => {
   }
 
   async function submitAndValidate(input: Parameters<typeof setSkillPublicListing>[0]) {
-    const result = await setSkillPublicListing(input);
+    const result = await setSkillPublicListing({ ...input, packageBytes: packages.get(input.slug) });
     if (!result.latest_submission) throw new Error("missing submission");
     await applyValidatedSubmission({ orgId: input.orgId, submissionId: result.latest_submission.id, decidedBy: fixture.owner.id, database: integrationDb });
   }
@@ -150,6 +157,7 @@ describe("public catalog", () => {
       slug: skill.slug,
       listed: true,
       database: integrationDb,
+      packageBytes: packages.get(skill.slug),
     })).resolves.toMatchObject({ listed_publicly: false, latest_submission: { status: "proposed", kind: "submission" }, changed: true });
     const submission = await integrationDb.query.catalogSubmissions.findFirst({ where: eq(schema.catalogSubmissions.skillId, skill.id) });
     if (!submission) throw new Error("missing submission");
@@ -167,8 +175,8 @@ describe("public catalog", () => {
       name: skill.slug,
       description: `Integration skill ${skill.slug}`,
       version: "1.0.0",
-      checksum: `sha256:${"a".repeat(64)}`,
-      size_bytes: 1_024,
+      checksum: checksumFor(skill.slug),
+      size_bytes: packages.get(skill.slug)!.length,
       body: `# ${skill.slug}\n\nIntegration skill ${skill.slug}`,
       files: FILES,
     });
@@ -357,7 +365,7 @@ describe("public catalog", () => {
     const directory = await mkdtemp(join(tmpdir(), "catalog-mcp-"));
     const client = new Client({ name: "catalog-integration", version: "1" });
     try {
-      const markdown = `---\nname: ${skill.slug}\ndescription: MCP release\n---\n\nNew public instructions.\n`;
+      const markdown = `---\nname: ${skill.slug}\ndescription: MCP release\nlicense: MIT\n---\n\nNew public instructions.\n`;
       await writeFile(join(directory, "SKILL.md"), markdown);
       await mkdir(join(directory, "scripts"));
       await writeFile(join(directory, "scripts/helper.sh"), "echo release\n");
@@ -392,6 +400,7 @@ describe("public catalog", () => {
       expect(result.isError).not.toBe(true);
       const zip = await tarGzToZip(packed.archive);
       const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
+      packages.set(skill.slug, zip);
       expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`,
         skillSlug: skill.slug, database: integrationDb })).toMatchObject({ version: "1.0.0", files: FILES });
       await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });

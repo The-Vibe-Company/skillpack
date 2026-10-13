@@ -11,18 +11,19 @@ reject cross-tenant access. Personal skill status stays creator-private and pers
 rejected. Responses and audit metadata never include share tokens. Listing responses use `no-store`.
 
 - `PUT /v1/skills/:slug/public-listing` requires `skills:write` and Owner/Admin.
-  `{ "listed": true }` creates a `proposed` submission containing the current public version ID,
+  `{ "listed": true }` creates a submission containing the current public version ID,
   exact ZIP checksum, byte size and file snapshot. It requires a complete, unarchived organization
   public release and verifies release bytes before recording the proposal. It does **not** enable
-  discovery. If a Developer request is open, the PUT converts it to a submission, preserves its
+  discovery. Automated blocking checks must pass for it to remain `proposed`; failures are `rejected`.
+  If a Developer request is open, the PUT converts it to a submission, preserves its
   requester, records the submitting admin and freezes the release current at approval time.
 - `POST /v1/skills/:slug/public-listing/request` with `{}` requires `skills:write` and Developer.
-  It creates an inert `proposed` row of kind `publish_request`, awaiting Owner/Admin submission.
+  It creates an inert row of kind `publish_request`, awaiting Owner/Admin submission if checks pass.
   The release is frozen in the request too; admin submission refreshes that snapshot to the then
   current release. Owner/Admin submit directly with PUT.
 - `GET /v1/skills/:slug/public-listing` requires `skills:read` and organization membership.
   It returns `listed_publicly`, `listed_at`, `latest_submission` (nullable `{ id, status, kind }`),
-  `rejection_reason` and `can_manage_listing`. Mutation responses add `changed`.
+  `rejection_reason`, `check_report` and `can_manage_listing`. Mutation responses add `changed`.
 - `{ "listed": false }` on PUT immediately unpublishes and withdraws any open request/submission.
   The public release and share token stay intact. Archiving or withdrawing the public release also
   clears discovery and withdraws open submissions atomically. Restoration needs a fresh submission.
@@ -32,12 +33,48 @@ unique index allowing at most one `proposed` row per skill. Repeating a proposal
 is idempotent; an open submission for different release bytes must first be withdrawn. The status
 values are `proposed`, `validated`, `rejected`, and `withdrawn`. Every implemented transition writes
 an audit event in the same transaction. A rejected proposal can be followed by a fresh proposal;
-rejection is a fixture-only transition in this PR, pending the moderation API.
+automated rejection records the initiating member as `decided_by`, a decision timestamp, and a
+`catalog_submission.rejected` audit event. `rejection_reason` is a comma-separated list of blocking
+rule IDs. Neither reports nor audits contain matched values, snippets, or parser error text.
+
+## Automated submission checks (PR 3/9)
+
+Core checks the exact frozen public ZIP bytes against the stored SHA-256 and byte size **before**
+unpacking. Missing bytes, checksum/size substitution and malformed or unsafe archives fail closed.
+The report is persisted in `catalog_submissions.check_report` (migration `0194_catalog_checks`) in
+the submission transaction. Admin conversion rechecks the then-current release; repeated open
+proposals remain idempotent. These checks never execute package scripts or enable listing visibility.
+Historical proposals have no backfilled report and cannot be validated until freshly submitted.
+
+The authenticated listing response exposes `{ version: 1, passed, findings }`, or `null` for an
+unchecked historical proposal. Findings contain only `rule_id`, `severity` (`blocking` or `warning`),
+and optional file `path` and one-based `line`. Secret-shaped paths are redacted. Reports are never
+included in anonymous catalog responses.
+
+- `SKILL.md` must have valid frontmatter using the existing parser: a name and nonempty description,
+  kebab-case name matching the skill slug, and exactly `MIT` or `Apache-2.0` as the license.
+  Wrapper directories are supported; multiple equally shallow `SKILL.md` roots are rejected.
+  Missing/empty licenses, expressions, noncanonical case, free text and file references are rejected.
+  LICENSE contradictions are checked only when recognizable without inferring legal meaning.
+- Every file is scanned, including nested paths and paths excluded by ordinary packing rules.
+  In-process regex rules cover AWS keys, GitHub tokens, private-key PEM, Slack, Stripe, JWTs and
+  high-entropy `api_key`/`secret` assignments, plus share-link and `install --public` tokens.
+  `.gitleaks.toml` extends an external default ruleset rather than defining usable in-process rules;
+  the catalog uses its own tested rule set without the repository's fixture allowlists.
+- Blocking heuristics cover ELF/Mach-O/PE magic, available executable mode bits, downloaded shell
+  pipelines, base64 decoding followed by execution, and URL shorteners. Size limits reuse
+  [package upload constants](../packages/skills/src/constants.ts): 25 MiB aggregate expanded bytes,
+  10 MiB per file, 1 MiB for the selected `SKILL.md`, and 2,000 entries. Compressed packages are
+  also capped at 25 MiB.
+- A trimmed `SKILL.md` body shorter than 100 characters produces a nonblocking warning.
+
+Heuristics detect known patterns, not every possible secret or malicious instruction. Passing checks
+leaves the submission `proposed` for moderation; it is not a security certification.
 
 Only validation enables discovery. The internal core seam `applyValidatedSubmission` is called by
 tests in this phase and has no HTTP or MCP endpoint. It accepts only an active proposed `submission`,
 records the decision and sets listing visibility atomically. Developer requests cannot be validated.
-Stan owns moderation; automated checks and the moderator API arrive in PRs 3 and 4 respectively.
+Stan owns moderation; the moderator API arrives in PR 4.
 
 A listed skill continues serving the previously validated snapshot while a new public release is
 promoted or proposed. Validation of a newer submission replaces that catalog version atomically.
@@ -69,8 +106,8 @@ pre-tenant PostgreSQL functions are executable by the API role only.
 
 ## Later publishing PRs
 
-PR 2/9 adds submissions and frozen validated versions, stacked on PR #26's org-only catalog API.
-It contains no checks engine, moderator API, catalog install command, or frontend. Later PRs add
-MIT/Apache-2.0 enforcement, validation and moderation, and anonymous installs by slug. Share tokens
+PR 3/9 adds automated submission checks, stacked on PR #32's frozen submissions, which is stacked
+on PR #26's org-only catalog API. Later PRs add the moderator API and anonymous installs by slug.
+This backend phase contains no catalog install command or frontend. Share tokens
 remain separate and excluded from every listing and catalog response. Self-hosted deployments
 remain disabled by default; enabling the catalog on managed hosting remains a deployment decision.
