@@ -15,6 +15,7 @@
 @import "../styles/catalog.css";
 @import "../styles/share.css";
 @import "../styles/secrets.css";
+@import "../styles/moderation.css";
 
 /* iOS zooms the page when a focused form control computes below 16px. Keep text-entry controls at
    that floor on every touch-capable device, including phones in landscape and tablets. This lives

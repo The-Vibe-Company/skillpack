@@ -127,7 +127,7 @@ and repository copies remain explicit exceptions; repository updates are reviewa
 The [catalog backend](public-catalog.md) adds separate listing consent to complete public releases.
 Owner/Admin submissions and Developer requests freeze release metadata; validation enables discovery.
 Platform moderation is separate from organization roles; API-only security definers provide the
-cross-organization queue and audited decisions. Operator-managed moderator grants and org publishing
+cross-organization queue and audited decisions, surfaced at the session-only `/platform/catalog` screen, which 404s for non-moderators. Operator-managed moderator grants and org publishing
 policies cannot be changed through tenant writes. A check-report reader consumes PR 3 reports for the
 exact frozen identity; absent reports remain pending, and auto-approval also requires an allowlist.
 Its anonymous read API exposes only validated snapshot content through narrowly scoped pre-tenant
