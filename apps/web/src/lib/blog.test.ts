@@ -3,7 +3,18 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { BLOG_CONTENT_DIR, findBlogPost, formatBlogDate, loadBlogPosts, parseBlogPost } from "./blog";
+import {
+  BLOG_CONTENT_DIR,
+  type BlogPost,
+  blogPostAuthor,
+  findBlogPost,
+  formatBlogDate,
+  loadBlogPosts,
+  parseBlogPost,
+  readingMinutes,
+  relatedBlogPosts,
+  splitLeadHeading,
+} from "./blog";
 
 function postSource(frontmatter: string, body = "\n# Title\n\nBody.\n"): string {
   return `---\n${frontmatter}\n---\n${body}`;
@@ -33,15 +44,28 @@ describe("blog post parsing", () => {
       description: "What it covers.",
       slug: "a-post",
       date: "2026-10-13",
+      tags: [],
       body: "\n# Title\n\nBody.\n",
     });
+  });
+
+  it("reads optional topic tags and a named author", () => {
+    const post = parseBlogPost(
+      postSource(`${VALID_FRONTMATTER}\ntags: ["SKILL.md", "Agent Skills"]\nauthor: "Ada Lovelace"`),
+      "a-post.md",
+    );
+
+    expect(post.tags).toEqual(["SKILL.md", "Agent Skills"]);
+    expect(post.author).toBe("Ada Lovelace");
   });
 
   it.each([
     ["a missing title", 'description: "d"\nslug: a-post\ndate: 2026-10-13', /title/],
     ["an impossible date", 'title: "t"\ndescription: "d"\nslug: a-post\ndate: 2026-02-30', /real day/],
     ["a non-ISO date", 'title: "t"\ndescription: "d"\nslug: a-post\ndate: Oct 13 2026', /YYYY-MM-DD/],
-    ["an unknown key", `${VALID_FRONTMATTER}\nauthor: someone`, /author/],
+    ["an unknown key", `${VALID_FRONTMATTER}\ndraft: true`, /draft/],
+    ["a blank tag", `${VALID_FRONTMATTER}\ntags: ["SKILL.md", " "]`, /tags/],
+    ["a blank author", `${VALID_FRONTMATTER}\nauthor: ""`, /author/],
     ["an uppercase slug", 'title: "t"\ndescription: "d"\nslug: A-Post\ndate: 2026-10-13', /kebab-case/],
   ])("rejects %s and names the file", (_label, frontmatter, reason) => {
     expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(/^a-post\.md: invalid frontmatter/);
@@ -99,5 +123,63 @@ describe("blog post loading", () => {
   it("formats the publication day without shifting it across time zones", () => {
     expect(formatBlogDate("2026-10-13")).toBe("October 13, 2026");
     expect(formatBlogDate("2026-01-01")).toBe("January 1, 2026");
+  });
+});
+
+function fixturePost(slug: string, date: string, tags: string[]): BlogPost {
+  return { title: slug, description: "d", slug, date, tags, body: "\n# Title\n" };
+}
+
+describe("blog post presentation", () => {
+  it("credits a named author, and otherwise the organization from the site footer", () => {
+    expect(blogPostAuthor({ author: "Ada Lovelace" })).toEqual({ kind: "person", name: "Ada Lovelace" });
+    expect(blogPostAuthor({})).toEqual({
+      kind: "organization",
+      name: "The Vibe Company",
+      url: "https://thevibecompany.co",
+    });
+    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toMatchObject({ name: "The Vibe Company" });
+  });
+
+  it("splits off the leading H1 line without rewriting either half", () => {
+    const body = "\n# What is `SKILL.md`?\n\nIntro.\n\n## Section\n";
+    const { heading, rest } = splitLeadHeading(body);
+
+    expect(heading).toBe("# What is `SKILL.md`?");
+    expect(rest).toBe("\nIntro.\n\n## Section\n");
+    expect(body.endsWith(rest)).toBe(true);
+    expect(() => splitLeadHeading("Intro first.\n")).toThrow(/must start/);
+  });
+
+  it("estimates whole reading minutes from prose, skipping fenced code", () => {
+    const prose = Array.from({ length: 460 }, () => "word").join(" ");
+    const code = Array.from({ length: 2000 }, () => "token").join(" ");
+
+    expect(readingMinutes("# Short\n\nA few words.")).toBe(1);
+    expect(readingMinutes(`# Title\n\n${prose}\n`)).toBe(3);
+    expect(readingMinutes(`# Title\n\n${prose}\n\n\`\`\`\n${code}\n\`\`\`\n`)).toBe(3);
+    // The published guide is long enough to say so.
+    expect(readingMinutes(findBlogPost("what-is-skill-md")?.body ?? "")).toBeGreaterThan(3);
+  });
+
+  it("relates posts by shared tags, then fills with the newest others", () => {
+    const posts = [
+      fixturePost("newest", "2026-05-01", ["Releases"]),
+      fixturePost("two-shared", "2026-04-01", ["SKILL.md", "Agent Skills"]),
+      fixturePost("one-shared", "2026-03-01", ["skill.md"]),
+      fixturePost("current", "2026-02-01", ["SKILL.md", "Agent Skills"]),
+      fixturePost("oldest", "2026-01-01", []),
+    ];
+    const current = posts[3];
+    if (!current) throw new Error("fixture missing");
+
+    expect(relatedBlogPosts(current, posts).map((post) => post.slug)).toEqual(["two-shared", "one-shared", "newest"]);
+    expect(relatedBlogPosts(current, posts, 5).map((post) => post.slug)).toEqual([
+      "two-shared",
+      "one-shared",
+      "newest",
+      "oldest",
+    ]);
+    expect(relatedBlogPosts(current, [current])).toEqual([]);
   });
 });

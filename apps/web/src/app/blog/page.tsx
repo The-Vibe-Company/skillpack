@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { BlogShell } from "@/components/blog/BlogChrome";
-import { BLOG_SHARE_IMAGE, blogPostPath, formatBlogDate, loadBlogPosts } from "@/lib/blog";
+import { PostCard } from "@/components/blog/PostCard";
+import { BLOG_SHARE_IMAGE, loadBlogPosts } from "@/lib/blog";
 
 // The root layout template turns the page title into "Blog · Skillpack"; social titles are not
 // templated, so they carry the suffix themselves.
@@ -30,35 +30,43 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndexPage() {
-  const posts = loadBlogPosts();
+  // Newest first: the latest post leads the page and the rest follow as a grid.
+  const [latest, ...older] = loadBlogPosts();
   return (
     <BlogShell>
-      <section className="v10-blog__hero">
-        <div className="v10-wrap">
-          <p className="v10-kick">Skillpack blog</p>
-          <h1 className="v10-blog__title">Blog</h1>
-          <p className="v10-blog__intro">{DESCRIPTION}</p>
-        </div>
-      </section>
+      <div className="lp v10-bloghome">
+        <header className="v10-bloghome__hero">
+          <div className="v10-bloghome__bg" aria-hidden="true" />
+          <div className="v10-wrap v10-bloghome__intro">
+            <p className="lp-kick">Skillpack blog</p>
+            <h1 className="v10-bloghome__title">Guides to SKILL.md and Agent Skills</h1>
+            <p className="lp-sub">Writing, versioning and sharing skills for your team&apos;s coding agents.</p>
+          </div>
+        </header>
 
-      <div className="v10-wrap v10-blog__list">
-        {posts.length === 0 ? (
-          <p className="v10-blog__empty">No posts yet.</p>
-        ) : (
-          <ol className="v10-blog__posts">
-            {posts.map((post) => (
-              <li key={post.slug} className="v10-blog__item">
-                <time className="v10-blog__date" dateTime={post.date}>
-                  {formatBlogDate(post.date)}
-                </time>
-                <h2 className="v10-blog__itemtitle">
-                  <Link href={blogPostPath(post.slug)}>{post.title}</Link>
-                </h2>
-                <p className="v10-blog__itemdesc">{post.description}</p>
-              </li>
-            ))}
-          </ol>
-        )}
+        <div className="v10-wrap v10-bloghome__posts">
+          {latest ? (
+            <section aria-label="Latest post">
+              <PostCard post={latest} featured headingLevel={2} />
+            </section>
+          ) : (
+            <p className="v10-bloghome__empty">No posts yet.</p>
+          )}
+          {older.length > 0 ? (
+            <section className="v10-bloghome__more" aria-labelledby="blog-more-posts">
+              <h2 id="blog-more-posts" className="v10-section-label">
+                More posts
+              </h2>
+              <ul className="v10-postgrid">
+                {older.map((post) => (
+                  <li key={post.slug}>
+                    <PostCard post={post} headingLevel={3} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+        </div>
       </div>
     </BlogShell>
   );

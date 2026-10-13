@@ -1,9 +1,8 @@
 import Link from "next/link";
-import ReactMarkdown, { type Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 /* Public blog chrome. Reuses the marketing (v10) page shell so posts read as part of the
-   landing site; the article prose styles live under `.v10-blog__prose` in landing.css. */
+   landing site. Post bodies render through ./ArticleMarkdown, kept apart so pages that only need
+   the shell do not ship its copy-button island. */
 
 export const BLOG_CONTENT_ID = "blog-content";
 
@@ -43,28 +42,6 @@ export function BlogShell({ children }: { children: React.ReactNode }) {
           </span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-const ARTICLE_COMPONENTS: Components = {
-  // Wide tables scroll inside the column instead of widening the page on small screens.
-  table({ children }) {
-    return (
-      <div className="v10-blog__tablewrap">
-        <table>{children}</table>
-      </div>
-    );
-  },
-};
-
-/** Renders a post body (GFM: tables, task lists, fenced code). Raw HTML in Markdown is not rendered. */
-export function ArticleMarkdown({ body }: { body: string }) {
-  return (
-    <div className="v10-blog__prose">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={ARTICLE_COMPONENTS}>
-        {body}
-      </ReactMarkdown>
     </div>
   );
 }

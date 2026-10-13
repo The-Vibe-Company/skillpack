@@ -28,21 +28,56 @@ afterEach(() => {
 });
 
 describe("public blog index", () => {
-  it("lists every post newest first with its title, description and date", async () => {
+  it("opens with a kicker, one H1 and a short subtitle", async () => {
     const container = await renderIndex();
-    const items = Array.from(container.querySelectorAll(".v10-blog__item"));
-    const posts = loadBlogPosts();
+    const hero = container.querySelector(".v10-bloghome__hero");
 
     expect(container.querySelectorAll("h1")).toHaveLength(1);
-    expect(container.querySelector("h1")?.textContent).toBe("Blog");
-    expect(items.map((item) => item.querySelector("a")?.getAttribute("href"))).toEqual(
+    expect(hero?.querySelector(".lp-kick")?.textContent).toBe("Skillpack blog");
+    expect(hero?.querySelector("h1")?.textContent).toBe("Guides to SKILL.md and Agent Skills");
+    expect(hero?.querySelector(".lp-sub")?.textContent).toBe(
+      "Writing, versioning and sharing skills for your team's coding agents.",
+    );
+  });
+
+  it("features the newest post, then lists every other post newest first", async () => {
+    const container = await renderIndex();
+    const posts = loadBlogPosts();
+    const cards = Array.from(container.querySelectorAll(".v10-postcard"));
+
+    expect(cards.map((card) => card.querySelector(".v10-postcard__title a")?.getAttribute("href"))).toEqual(
       posts.map((post) => `/blog/${post.slug}`),
     );
-    const guide = items.find((item) => item.querySelector("a")?.getAttribute("href") === "/blog/what-is-skill-md");
+    expect(cards[0]?.classList.contains("v10-postcard--featured")).toBe(true);
+    expect(cards.slice(1).every((card) => !card.classList.contains("v10-postcard--featured"))).toBe(true);
+    // With a single post there is no empty "More posts" grid.
+    expect(container.querySelector(".v10-bloghome__more") === null).toBe(posts.length === 1);
+  });
+
+  it("gives each card a cover, date, reading time, description and topic tags", async () => {
+    const container = await renderIndex();
+    const guide = Array.from(container.querySelectorAll(".v10-postcard")).find(
+      (card) => card.querySelector(".v10-postcard__title a")?.getAttribute("href") === "/blog/what-is-skill-md",
+    );
+
     expect(guide?.querySelector("h2")?.textContent).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
-    expect(guide?.querySelector("p")?.textContent).toMatch(/^SKILL\.md explained: the Agent Skills format/);
+    expect(guide?.querySelector(".v10-postcard__desc")?.textContent).toMatch(/^SKILL\.md explained: the Agent Skills format/);
     expect(guide?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(guide?.querySelector("time")?.textContent).toBe("October 13, 2026");
+    expect(guide?.querySelector(".v10-postmeta")?.textContent).toMatch(/\d+ min read$/);
+    expect(Array.from(guide?.querySelectorAll(".v10-tags li") ?? []).map((tag) => tag.textContent)).toEqual([
+      "SKILL.md",
+      "Agent Skills",
+    ]);
+
+    // The cover is drawn from the post's own title and tags and hidden from assistive technology.
+    const cover = guide?.querySelector(".v10-cover");
+    expect(cover?.getAttribute("aria-hidden")).toBe("true");
+    expect(cover?.querySelector(".v10-cover__title")?.textContent).toBe(
+      "What is SKILL.md? The complete guide to Agent Skills (2026)",
+    );
+    // One link per card: the stretched title link.
+    expect(guide?.querySelectorAll("a")).toHaveLength(1);
   });
 
   it("titles itself Blog and canonicalizes to /blog", () => {

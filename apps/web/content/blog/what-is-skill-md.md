@@ -3,6 +3,7 @@ title: "What is SKILL.md? The complete guide to Agent Skills (2026)"
 description: "SKILL.md explained: the Agent Skills format, frontmatter fields, examples, and how to version, share and install skills across Claude Code, Codex and MCP clients."
 slug: what-is-skill-md
 date: 2026-10-13
+tags: ["SKILL.md", "Agent Skills"]
 ---
 
 # What is SKILL.md? The complete guide to Agent Skills (2026)
