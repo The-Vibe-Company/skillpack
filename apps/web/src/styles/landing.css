@@ -312,7 +312,7 @@
 /* --- agents strip ------------------------------------------------------------------ */
 .lp-agents-strip { border-top: 1px solid var(--v10-line); background: var(--v10-bg-dim); }
 .lp-agents-strip__inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--space-4) var(--space-6); padding-block: var(--space-6); }
-.lp-agents-strip__label { font-size: var(--text-sm); color: var(--v10-ink-faint); }
+.lp-agents-strip__label { margin: 0; font-size: var(--text-sm); font-weight: inherit; color: var(--v10-ink-faint); }
 .lp-agents-strip__list { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
 .lp-agent {
   display: inline-flex; align-items: center; gap: 10px;
