@@ -53,3 +53,17 @@ export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocume
     ],
   };
 }
+
+export type SoftwareSourceCodeFacts = { name: string; description: string; license?: string; codeRepository: string };
+
+/** A SoftwareSourceCode stating only SKILL.md frontmatter facts and the source folder URL. */
+export function softwareSourceCodeStructuredData(facts: SoftwareSourceCodeFacts): JsonLdDocument {
+  const { name, description, license, codeRepository } = facts;
+  if (license) {
+    return {
+      "@context": "https://schema.org",
+      "@graph": [{ "@type": "SoftwareSourceCode", name, description, license, codeRepository }],
+    };
+  }
+  return { "@context": "https://schema.org", "@graph": [{ "@type": "SoftwareSourceCode", name, description, codeRepository }] };
+}

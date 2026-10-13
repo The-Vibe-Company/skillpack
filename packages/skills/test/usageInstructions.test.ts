@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { packDir, prepareSkillDirForPublish, withSkillUsageInstructions } from "../src/index";
+import { packDir, prepareSkillDirForPublish, stripSkillUsageInstructions, withSkillUsageInstructions } from "../src/index";
 
 const input = { skillId: "733fd021-274c-48ac-a843-95ee78b47759", version: "1.0.0", instanceUrl: "https://skills.example.test" };
 describe("runtime usage metadata", () => {
@@ -24,6 +24,14 @@ describe("runtime usage metadata", () => {
   it("preserves marker examples inside the authored body", () => {
     const body = "# Documentation\n\n```html\n<!-- skillpack:usage:start -->example<!-- skillpack:usage:end -->\n```";
     expect(withSkillUsageInstructions(body, input).endsWith(body)).toBe(true);
+  });
+  it("strips only the generated leading block for display", () => {
+    const body = "# Review\n\nRead the code.\n\n```html\n<!-- skillpack:usage:start -->example<!-- skillpack:usage:end -->\n```";
+    const stripped = stripSkillUsageInstructions(withSkillUsageInstructions(body, input));
+    expect(stripped).toBe(body);
+    expect(stripped).not.toContain("Skillpack runtime");
+    expect(stripSkillUsageInstructions(body)).toBe(body);
+    expect(() => stripSkillUsageInstructions("<!-- skillpack:usage:start -->oops")).toThrow("Unclosed");
   });
   it("rejects malformed blocks and non-HTTP destinations", () => {
     expect(() => withSkillUsageInstructions("<!-- skillpack:usage:start -->oops", input)).toThrow("Unclosed");

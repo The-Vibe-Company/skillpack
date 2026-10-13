@@ -13,12 +13,7 @@ export function withSkillUsageInstructions(body: string, input: {
   const usage = skillRuntimeUsageSchema.parse({ schemaVersion: 1,
     skillId: input.skillId, version: input.version, origin: url.origin });
   if (url.username || url.password) throw new Error("Skill usage origin cannot contain credentials");
-  let clean = body.trimStart();
-  while (clean.startsWith(START)) {
-    const end = clean.indexOf(END, START.length);
-    if (end < 0) throw new Error("Unclosed Skillpack usage instruction block");
-    clean = clean.slice(end + END.length).trimStart();
-  }
+  const clean = stripSkillUsageInstructions(body);
   return `${START}
 ## Skillpack runtime
 
@@ -27,4 +22,15 @@ Do not send activation reports, run tracking commands, or install hooks during t
 ${END}
 
 ${clean.trim()}`;
+}
+
+/** Remove generated leading blocks (markers and content); authored marker examples remain literal. */
+export function stripSkillUsageInstructions(body: string): string {
+  let clean = body.trimStart();
+  while (clean.startsWith(START)) {
+    const end = clean.indexOf(END, START.length);
+    if (end < 0) throw new Error("Unclosed Skillpack usage instruction block");
+    clean = clean.slice(end + END.length).trimStart();
+  }
+  return clean;
 }

@@ -20,7 +20,7 @@ describe("technical SEO routes", () => {
     });
   });
 
-  it("lists the public pages and every blog post on the configured origin", () => {
+  it("lists the public pages, every blog post and every catalog skill on the configured origin", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("COMPANION_WEB_URL", "https://skillpack.app");
 
@@ -31,6 +31,9 @@ describe("technical SEO routes", () => {
       { url: "https://skillpack.app/privacy" },
       { url: "https://skillpack.app/blog", lastModified: posts[0]?.date },
       ...posts.map((post) => ({ url: `https://skillpack.app/blog/${post.slug}`, lastModified: post.date })),
+      { url: "https://skillpack.app/catalog" },
+      { url: "https://skillpack.app/catalog/skillpack" },
+      { url: "https://skillpack.app/catalog/incident-summary" },
     ]);
     expect(sitemap()).toContainEqual({ url: "https://skillpack.app/blog/what-is-skill-md", lastModified: "2026-10-13" });
   });

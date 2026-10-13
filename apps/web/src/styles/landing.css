@@ -823,6 +823,46 @@
   .v10-blog__prose pre { padding: var(--space-3) var(--space-4); font-size: 0.8125rem; }
 }
 
+/* --- catalog (blog shell and prose, plus skill facts and file list) ------------------ */
+.v10-catalog__lead { color: var(--v10-ink); font-size: var(--text-lead); }
+.v10-catalog__facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-6) 0 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--v10-line);
+  border-radius: var(--radius-lg);
+  background: var(--v10-bg-dim);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.v10-catalog__facts dt {
+  color: var(--v10-ink-faint);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  line-height: 1.6rem;
+  text-transform: uppercase;
+}
+.v10-catalog__facts dd { margin: 0; color: var(--v10-ink); overflow-wrap: anywhere; }
+.v10-blog__prose .v10-catalog__files {
+  padding-left: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.v10-blog__prose .v10-catalog__files li + li { margin-top: var(--space-1); }
+.v10-catalog__files li { overflow-wrap: anywhere; }
+.v10-catalog__skillmd { margin-top: var(--space-8); padding-top: var(--space-7); border-top: 1px solid var(--v10-line); }
+/* SKILL.md bodies carry long unbroken paths in inline code; wrap them rather than widen the page. */
+.v10-catalog__skillmd :not(pre) > code { overflow-wrap: anywhere; }
+.v10-catalog__skillmd > .v10-blog__date { margin: 0 0 var(--space-4); font-family: var(--font-mono); text-transform: none; }
+@media (max-width: 560px) {
+  .v10-catalog__facts { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .v10-catalog__facts dd + dt { margin-top: var(--space-3); }
+}
+
 /* --- reveals (staggered) ------------------------------------------------------------ */
 @media (prefers-reduced-motion: no-preference) {
   .v5-reveal { opacity: 0; transform: translateY(16px); transition: opacity 560ms var(--ease-out-quint), transform 560ms var(--ease-out-quint); }

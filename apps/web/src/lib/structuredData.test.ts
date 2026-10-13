@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { metadata } from "@/app/layout";
-import { HOME_STRUCTURED_DATA, blogPostingStructuredData, serializeJsonLd } from "./structuredData";
+import { HOME_STRUCTURED_DATA, blogPostingStructuredData, serializeJsonLd, softwareSourceCodeStructuredData } from "./structuredData";
 
 describe("home structured data", () => {
   it("describes Skillpack as a developer application published by the Skillpack organization", () => {
@@ -63,5 +63,20 @@ describe("blog post structured data", () => {
         },
       ],
     });
+  });
+});
+
+describe("catalog skill structured data", () => {
+  it("states only the name, description, license and source folder", () => {
+    const facts = {
+      name: "demo",
+      description: "Does one thing.",
+      codeRepository: "https://github.com/The-Vibe-Company/skillpack/tree/main/examples/skills/demo",
+    };
+
+    expect(softwareSourceCodeStructuredData({ ...facts, license: "MIT" })["@graph"]).toEqual([
+      { "@type": "SoftwareSourceCode", ...facts, license: "MIT" },
+    ]);
+    expect(softwareSourceCodeStructuredData(facts)["@graph"]).toEqual([{ "@type": "SoftwareSourceCode", ...facts }]);
   });
 });

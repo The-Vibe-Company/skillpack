@@ -14,6 +14,14 @@ describe("canonical host middleware", () => {
     },
   );
 
+  it.each(["/catalog", "/catalog/skillpack"])("passes the public catalog page %s straight through", (path) => {
+    const response = middleware(new NextRequest(`https://skillpack.app${path}`));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("location")).toBeNull();
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+    expect(response.headers.get("x-middleware-override-headers")).toBeNull();
+  });
+
   it("redirects www to the configured apex while preserving path and query", () => {
     const request = new NextRequest("https://www.skillpack.app/skills?lib=mine&skill=demo");
 

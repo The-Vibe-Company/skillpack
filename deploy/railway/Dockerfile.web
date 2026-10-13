@@ -47,6 +47,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY --from=pruner /app/out/full/ .
 COPY --from=pruner /app/tsconfig.base.json ./tsconfig.base.json
+# The public catalog reads these skill folders at build time (apps/web/src/lib/catalog.ts
+# CATALOG_SOURCES). They are not web workspace dependencies, so turbo prune omits them.
+COPY --from=pruner /app/packages/skillpack-skill/skill ./packages/skillpack-skill/skill
+COPY --from=pruner /app/examples/skills/incident-summary ./examples/skills/incident-summary
 
 RUN pnpm --filter @skillpack/web build
 

@@ -5,6 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
+// Catalog skill folders (src/lib/catalog.ts CATALOG_SOURCES) are read at build time; the catalog
+// test keeps this list in step with the sources.
+const CATALOG_TRACE = ["../../packages/skillpack-skill/skill/**/*", "../../examples/skills/incident-summary/**/*"];
+
 const config: NextConfig = {
   output: "standalone",
   outputFileTracingRoot: repoRoot,
@@ -15,7 +19,9 @@ const config: NextConfig = {
   outputFileTracingIncludes: {
     "/blog": ["./content/blog/**/*"],
     "/blog/[slug]": ["./content/blog/**/*"],
-    "/sitemap.xml": ["./content/blog/**/*"],
+    "/catalog": CATALOG_TRACE,
+    "/catalog/[slug]": CATALOG_TRACE,
+    "/sitemap.xml": ["./content/blog/**/*", ...CATALOG_TRACE],
   },
   async rewrites() {
     const api = process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";
