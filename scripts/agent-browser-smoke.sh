@@ -495,6 +495,11 @@ fill_input "#si-email" "$SMOKE_EMAIL"
 fill_input "#si-pw" "$SMOKE_PASSWORD"
 click_button_text "Sign in"
 wait_for_skills
+
+log "Checking catalog moderation is hidden from a non-moderator"
+agent-browser open "$APP_URL/platform/catalog"
+wait_for_body_contains "Page not found"
+
 agent-browser open "$APP_URL/skills?lib=org"
 wait_for_skills
 agent-browser eval "for (const b of Array.from(document.querySelectorAll('button'))) { if (b.textContent && b.textContent.trim() === 'Clear') b.click(); }" >/dev/null

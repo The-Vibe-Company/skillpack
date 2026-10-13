@@ -131,10 +131,33 @@ for missing/failing reports, non-allowlisted orgs, bans or closed submissions. P
 admin conversion also invoke it for an already persisted matching report. Repeated callbacks are
 inert after validation. Automatic audit rows use the submission actor and `automatic: true`.
 
+## Moderation screen (PR 8/9)
+
+`/platform/catalog` is the internal web screen for platform moderators. The web server returns
+404 unless `SKILLPACK_PUBLIC_CATALOG=true`, sends signed-out visitors to login, and asks the queue
+API with the browser session before rendering anything. A 403 or 404 from the API renders the same
+404, so non-moderators, revoked grants and disabled deployments cannot tell that the screen exists.
+There is no navigation entry; moderators open the URL directly.
+
+Tabs list `proposed`, `validated`, `rejected` and `removed` submissions 20 per page. Each card shows
+the frozen organization, skill, version, checksum and submission IDs, dates, any decision reason,
+and the check summary (`passed`, `failed` with its reason, or `pending`). Validate is enabled only
+for proposals whose checks passed; the API still enforces this. Reject, remove (validated rows) and
+ban organization require a nonblank reason of at most 2000 characters. API conflicts stay in the
+confirmation dialog; success refreshes the queue.
+
+The Reports tab is the slot for incoming skill reports from PR 7/9. Until that API exists the page
+loader returns `{ status: "unavailable" }` and the tab says reporting is not connected. PR 7 plugs in
+by returning `{ status: "ready", reports }` from `loadCatalogSkillReports` in
+`apps/web/src/lib/catalogModerationData.ts`, using `CatalogSkillReport` from
+`apps/web/src/lib/catalogModeration.ts` (`id`, `org_id`, `skill_id`, nullable `submission_id`,
+`reason`, nullable `details`, `created_at`). The queue response carries IDs only, not skill or
+organization names, so the screen shows IDs.
+
 ## Later publishing PRs
 
 PR 2/9 adds submissions and frozen validated versions, stacked on PR #26's org-only catalog API.
 PR 4/9 adds the moderator API and report-consumer boundary independently of PR 3's checks engine.
-Later PRs add anonymous installs by slug and frontend workflows. Share tokens remain separate and
+PR 8/9 adds the moderator web screen. Later PRs add anonymous installs by slug and frontend workflows. Share tokens remain separate and
 excluded from every listing and catalog response. Self-hosted deployments remain disabled by default;
 enabling the catalog on managed hosting remains a deployment decision.
