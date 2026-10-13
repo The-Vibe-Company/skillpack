@@ -12,9 +12,9 @@ Use the native `skillpack` CLI for this workflow. It runs on macOS, Linux and Wi
 
 ## Start with the requested outcome
 
-1. Run `skillpack --version` and `skillpack auth status --json` once when first using this skill in a conversation. Reuse the selected profile when its API and organization match the request.
+1. Run `skillpack --version` once when first using this skill in a conversation. For authenticated workspace operations, also run `skillpack auth status --json`. Anonymous catalog installs by `org/slug` can proceed without login. Reuse the selected profile when its API and organization match the request.
 2. If the binary is absent, use the shell or PowerShell installer from the official Skillpack GitHub release linked by the instance's install prompt. The release installer embeds archive checksums; never run an unverified archive or improvise a Python/Node bootstrap.
-3. If connection is missing or expired, launch `skillpack auth login` immediately (add `--api-url <base>` for a self-hosted instance). Keep the interactive command running while the human approves the browser URL, then wait for it to exit and rerun `skillpack auth status --json`. Continue the original task in the same conversation after approval; do not stop at merely presenting a login command or link. In CI, inject `SKILLPACK_API_KEY` from the secret store; `SKILLPACK_API_URL` is needed only for a non-default instance. A trusted pipe may use `--token-stdin`, and `--manual` retains hidden terminal entry. Never ask the user to paste a key into chat, place it in argv, or commit it.
+3. For authenticated workspace operations, if connection is missing or expired, launch `skillpack auth login` immediately (add `--api-url <base>` for a self-hosted instance). Keep the interactive command running while the human approves the browser URL, then wait for it to exit and rerun `skillpack auth status --json`. Continue the original task in the same conversation after approval; do not stop at merely presenting a login command or link. In CI, inject `SKILLPACK_API_KEY` from the secret store; `SKILLPACK_API_URL` is needed only for a non-default instance. A trusted pipe may use `--token-stdin`, and `--manual` retains hidden terminal entry. Never ask the user to paste a key into chat, place it in argv, or commit it.
    For a custom server: `skillpack auth login --api-url <base>`.
 4. Run `skillpack doctor --json` for setup, update or troubleshooting requests. Check the result rather than just the exit code: credentials, every requested package target, local prerequisites, and hook configuration. Do not repeatedly bootstrap during ordinary skill execution.
 
@@ -47,6 +47,19 @@ Updates preserve pinned versions and report local changes as conflicts. Inspect 
 The native installer recognizes the historic `https://thecompanion.sh/v1` → `https://skillpack.app/v1` service move for the same authenticated workspace and updates that workspace's lock entry only after a successful install. It also adopts an untracked, intact older management skill whose manifest identity and integrity baseline match. On either error with an older CLI, update the CLI and retry the preview before touching the lock or using `--force`. For a customization conflict, inspect the affected files and preserve them; never infer that an integrity file alone authorizes replacing user edits. Preview with `--dry-run --json`, perform the authorized install, and verify the resulting lock and all selected tool roots with `doctor`.
 
 Importing an old `companion.lock` is explicit and preserves the source export. It verifies existing content before creating the portable managed installation. Do not delete the original until the user accepts the migration.
+
+For a validated public catalog skill, install by organization and skill slug:
+
+```bash
+skillpack install <org>/<slug> --scope project --api-url <base>
+```
+
+This anonymous path requires the server's public catalog flag and a currently listed validated
+release. It verifies the frozen ZIP checksum and pins that version; `--version` must match the
+validated release. `sync --frozen` restores the same pinned content anonymously while that release
+remains validated. Report dependency, environment and database prerequisites without fetching
+private resources. A 404 means catalog access is unavailable; use authenticated workspace access
+only when the user is entitled to the skill.
 
 For a public share link, use its exact token and advertised version:
 

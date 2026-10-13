@@ -21,7 +21,7 @@ func executeCommand(args []string, in io.Reader, out, diagnostic io.Writer) (any
 	root := &cobra.Command{
 		Use: "skillpack", Short: "Manage skills, credentials and agent setup",
 		Long:         "Skillpack installs and publishes portable agent skills and manages their workspace capabilities.",
-		Example:      "  skillpack auth login\n  skillpack skills list\n  skillpack install plan-pr --scope project\n  skillpack doctor",
+		Example:      "  skillpack auth login\n  skillpack skills list\n  skillpack install example/plan-pr\n  skillpack install plan-pr --scope project\n  skillpack doctor",
 		SilenceUsage: true, SilenceErrors: true,
 	}
 	root.SetOut(out)
@@ -66,7 +66,7 @@ func executeCommand(args []string, in io.Reader, out, diagnostic io.Writer) (any
 		add(auth, name, strings.Title(name)+" the CLI connection", "  skillpack auth "+name, (*app).auth, nil, nil)
 	}
 	add(root, "setup", "Configure agent integrations and usage hooks", "  skillpack setup --tools codex,claude-code,opencode", (*app).setup, []string{"dry-run"}, []string{"tools"})
-	add(root, "install [slug]", "Install a skill and its dependencies", "  skillpack install plan-pr --scope project\n  skillpack install --public TOKEN --version 1.2.3", (*app).install, []string{"public", "force", "pin", "dry-run", "confirm-secrets"}, []string{"scope", "tools", "version"})
+	add(root, "install [slug]", "Install a skill and its dependencies", "  skillpack install example/plan-pr\n  skillpack install plan-pr --scope project\n  skillpack install --public TOKEN --version 1.2.3", (*app).install, []string{"public", "force", "pin", "dry-run", "confirm-secrets"}, []string{"scope", "tools", "version"})
 	add(root, "update [slug]", "Update installed skills", "  skillpack update --all --dry-run\n  skillpack update plan-pr", (*app).update, []string{"all", "dry-run", "force", "confirm-secrets"}, []string{"scope", "tools", "version"})
 	add(root, "sync", "Verify and restore pinned project skills", "  skillpack sync --frozen", func(a *app) (any, error) {
 		if !a.options.flags["frozen"] {

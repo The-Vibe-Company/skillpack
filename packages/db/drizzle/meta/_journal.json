@@ -1375,6 +1375,13 @@
       "breakpoints": true
     },
     {
+      "idx": 196,
+      "version": "7",
+      "when": 1793437600000,
+      "tag": "0196_catalog_install",
+      "breakpoints": true
+    },
+    {
       "idx": 197,
       "version": "7",
       "when": 1793450000000,

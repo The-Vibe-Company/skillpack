@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 
@@ -16,7 +17,7 @@ describe("anonymous public catalog", () => {
     const list = vi.fn();
     const get = vi.fn();
     const app = createPublicCatalogRoutes({ list, get });
-    for (const path of [index, detail]) {
+    for (const path of [index, detail, `${detail}/versions/1.0.0/package`]) {
       const response = await app.request(path);
       expect(response.status).toBe(404);
       expect(response.headers.get("cache-control")).toBe("no-store");
@@ -83,5 +84,63 @@ describe("anonymous public catalog", () => {
     expect(response.status).toBe(503);
     expect(await response.text()).toBe('{"error":"catalog temporarily unavailable"}');
     expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+});
+
+const packagePath = `${detail}/versions/1.0.0/package`;
+const zip = Buffer.from("frozen published zip");
+const frozen = { orgId: "org-id", slug: "public-skill", version: "1.0.0",
+  checksum: `sha256:${createHash("sha256").update(zip).digest("hex")}`, sizeBytes: zip.length };
+
+describe("anonymous catalog packages", () => {
+  it("serves only the exact validated snapshot without credentials or token exposure", async () => {
+    const resolvePackage = vi.fn().mockResolvedValue(frozen);
+    const readArchive = vi.fn().mockResolvedValue(zip);
+    const app = createPublicCatalogRoutes({ resolvePackage, readArchive, enabled: () => true });
+    const response = await app.request(packagePath);
+    expect(response.status).toBe(200);
+    expect(Buffer.from(await response.arrayBuffer())).toEqual(zip);
+    expect(readArchive).toHaveBeenCalledWith({ key: `org-id/public-releases/sha256/${frozen.checksum.slice(7)}.zip` });
+    expect(resolvePackage).toHaveBeenCalledTimes(2);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("x-companion-public-version")).toBe("1.0.0");
+    expect(response.headers.get("x-companion-package-checksum")).toBe(frozen.checksum);
+    expect((await app.request(`${detail}/versions/2.0.0/package`)).status).toBe(404);
+    expect(readArchive).toHaveBeenCalledTimes(1);
+  });
+
+  it("hides unlisted, unvalidated and withdrawn packages without reading storage", async () => {
+    const readArchive = vi.fn();
+    const app = createPublicCatalogRoutes({ resolvePackage: vi.fn().mockResolvedValue(null), readArchive, enabled: () => true });
+    expect((await app.request(packagePath)).status).toBe(404);
+    expect(readArchive).not.toHaveBeenCalled();
+  });
+
+  it.each(["unlisted", "changed", "disabled"])("rechecks %s after storage completes", async (change) => {
+    let enabled = true;
+    const resolvePackage = vi.fn().mockResolvedValueOnce(frozen).mockResolvedValue(
+      change === "unlisted" ? null : change === "changed" ? { ...frozen, checksum: `sha256:${"b".repeat(64)}` } : frozen,
+    );
+    const readArchive = vi.fn().mockImplementation(async () => {
+      if (change === "disabled") enabled = false;
+      return zip;
+    });
+    const app = createPublicCatalogRoutes({ resolvePackage, readArchive, enabled: () => enabled });
+    const response = await app.request(packagePath);
+    expect(response.status).toBe(404);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+
+  it.each([Buffer.from("x".repeat(zip.length)), Buffer.concat([zip, Buffer.from("x")])])("rejects mismatched bytes", async (bytes) => {
+    const app = createPublicCatalogRoutes({ resolvePackage: vi.fn().mockResolvedValue(frozen), readArchive: vi.fn().mockResolvedValue(bytes), enabled: () => true });
+    expect((await app.request(packagePath)).status).toBe(409);
+  });
+
+  it("fails closed when storage is unavailable without leaking internal errors", async () => {
+    const app = createPublicCatalogRoutes({ resolvePackage: vi.fn().mockResolvedValue(frozen),
+      readArchive: vi.fn().mockRejectedValue(new Error("private storage secret")), enabled: () => true });
+    const response = await app.request(packagePath);
+    expect(response.status).toBe(503);
+    expect(await response.text()).not.toContain("secret");
   });
 });

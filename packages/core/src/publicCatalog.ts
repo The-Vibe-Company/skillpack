@@ -324,3 +324,17 @@ function sqlGetCatalogSkill(orgSlug: string, skillSlug: string) {
     select * from public.skillpack_get_public_catalog_skill(${orgSlug}, ${skillSlug})
   `;
 }
+
+/** Internal storage identity for the same currently visible, validated catalog snapshot. */
+export async function getPublicCatalogPackage(input: {
+  orgSlug: string;
+  skillSlug: string;
+  database?: Db;
+}): Promise<{ orgId: string; slug: string; version: string; checksum: string; sizeBytes: number } | null> {
+  const database = input.database ?? db;
+  const [row] = await database.execute<{
+    org_id: string; skill_slug: string; version: string; checksum: string; size_bytes: number;
+  }>(sql`select * from public.skillpack_get_public_catalog_package(${input.orgSlug}, ${input.skillSlug})`);
+  return row ? { orgId: row.org_id, slug: row.skill_slug, version: row.version,
+    checksum: row.checksum, sizeBytes: row.size_bytes } : null;
+}

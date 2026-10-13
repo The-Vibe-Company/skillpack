@@ -78,7 +78,9 @@ func (c *client) request(method, path string, body []byte, contentType string, l
 	if err != nil {
 		return nil, fail(2, "invalid request")
 	}
-	req.Header.Set("Authorization", "Bearer "+c.key)
+	if c.key != "" {
+		req.Header.Set("Authorization", "Bearer "+c.key)
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "skillpack-native")
 	if contentType != "" {

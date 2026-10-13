@@ -121,6 +121,11 @@ flow as any other organization skill.
   personal labels never participate. Results are ordered by organization slug and skill slug.
   `next_offset` is null for a short page or pagination bound; a full final page can be followed by
   an empty page.
+- `GET /v1/public/catalog/skills/:orgSlug/:skillSlug/versions/:version/package` anonymously
+  downloads the currently validated frozen ZIP. Any other version returns 404. The API verifies
+  checksum and size and rechecks current listing/flag after storage retrieval; delivery is `no-store`.
+  Apply migration `0196_catalog_install` and runtime grants before deploying this route. Its internal
+  storage-identity projection is API-only and reuses the catalog visibility function.
 - `GET /v1/public/catalog/skills/:orgSlug/:skillSlug` is anonymous and returns 404 when unlisted,
   unvalidated, personal, archived, missing, or disabled. Organization and skill slugs identify entries;
   existing public-release rename restrictions apply.
@@ -136,6 +141,14 @@ visibility before a 304, so unlisting and disabling the flag take effect immedia
 `no-store`. A process-wide cap of 600 requests per minute follows the existing anonymous usage route
 pattern and does not trust forwarding headers or retain IP addresses. The narrowly scoped
 pre-tenant PostgreSQL functions are executable by the API role only.
+
+`skillpack install <org>/<slug>` uses these anonymous routes without credentials, installs only the
+validated version, and pins it in a separate catalog organization lock entry. `--version` must match
+that validated version. The CLI verifies ZIP checksum/size before package validation and activation.
+`sync --frozen` can restore that exact catalog package anonymously while it remains the validated
+release; it rejects replacements. Dependencies, secrets and database prerequisites are reported
+without fetching private resources. Plain skill slugs and unlisted share-token installs keep their
+existing authentication requirements.
 
 ## Platform moderation (PR 4/9)
 
