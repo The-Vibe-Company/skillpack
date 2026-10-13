@@ -3,6 +3,7 @@ title: "How to Install Skills in Claude Code (Manual and CLI)"
 description: "Install Agent Skills in Claude Code by hand or with the Skillpack CLI: where SKILL.md folders go, user vs project scope, and how to pin versions for your team."
 slug: how-to-install-skills-in-claude-code
 date: 2026-10-13
+tags: ["Claude Code", "Agent Skills", "Skillpack CLI"]
 ---
 
 # How to install skills in Claude Code

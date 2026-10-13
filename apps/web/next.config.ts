@@ -15,6 +15,7 @@ const config: NextConfig = {
   outputFileTracingIncludes: {
     "/blog": ["./content/blog/**/*"],
     "/blog/[slug]": ["./content/blog/**/*"],
+    "/blog/[slug]/opengraph-image": ["./content/blog/**/*", "./assets/fonts/**/*"],
     "/sitemap.xml": ["./content/blog/**/*"],
   },
   async rewrites() {
