@@ -39,3 +39,36 @@ export function ArticleMarkdown({ body }: { body: string }) {
     </div>
   );
 }
+
+const PUBLISHED_SKILL_COMPONENTS: Components = {
+  ...ARTICLE_COMPONENTS,
+  // The page owns the only H1 (the skill name), so an authored H1 renders one level down.
+  h1({ children }) {
+    return <h2>{children}</h2>;
+  },
+  // Links in a published SKILL.md are authored by the listing workspace, not by Skillpack.
+  a({ children, href }) {
+    return (
+      <a href={href} rel="nofollow ugc noopener noreferrer">
+        {children}
+      </a>
+    );
+  },
+};
+
+// No heading ids: authored headings must not collide with the ids of the page around them.
+const PUBLISHED_SKILL_REMARK_PLUGINS = [remarkGfm, remarkGfmAlerts];
+
+/**
+ * Renders a catalog skill's SKILL.md with the article styles. Raw HTML (including the HTML comments
+ * that mark managed sections) is dropped rather than shown as escaped text.
+ */
+export function PublishedSkillMarkdown({ body }: { body: string }) {
+  return (
+    <div className="v10-blog__prose">
+      <ReactMarkdown remarkPlugins={PUBLISHED_SKILL_REMARK_PLUGINS} components={PUBLISHED_SKILL_COMPONENTS} skipHtml>
+        {body}
+      </ReactMarkdown>
+    </div>
+  );
+}

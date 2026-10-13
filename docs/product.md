@@ -57,3 +57,4 @@ admin submission. Validation enables discovery of a frozen version. Existing rel
 unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).
 The public release dialog shows the submission status and frozen version, and offers Owner/Admin
 Publish/Unpublish or a Developer's Request publication. It is absent while the catalog is off.
+Validated skills appear at `/catalog/<workspace>/<skill>` and in the sitemap; see the catalog pages.
