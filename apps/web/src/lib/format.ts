@@ -52,3 +52,10 @@ export function formatHumanDateUTC(iso: string | null): string {
     timeZone: "UTC",
   }).format(new Date(iso));
 }
+
+/** A single-line meta description, cut at `max` characters with an ellipsis. */
+export function truncateMeta(value: string, max = 180): string {
+  const text = value.replace(/\s+/g, " ").trim();
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 3).trimEnd()}...`;
+}

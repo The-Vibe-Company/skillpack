@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import {
-  catalogModerationQuerySchema, catalogModerationTargetSchema, catalogModerationReasonSchema,
+  catalogModerationQuerySchema, catalogModerationTargetSchema, catalogModerationReasonSchema, catalogReportQueueQuerySchema,
 } from "@skillpack/contracts";
-import { assertCatalogModerator, CatalogModerationError, listCatalogSubmissions, moderateCatalog } from "@skillpack/core";
+import { assertCatalogModerator, CatalogModerationError, listCatalogSubmissions, listCatalogReports, moderateCatalog } from "@skillpack/core";
 import { actorFromContext, AuthenticationRequiredError, isAgentRequest, isTokenRequest, type ApiVariables } from "./context";
 import type { Db } from "@skillpack/db";
 
@@ -28,6 +28,11 @@ export function createCatalogModerationRoutes(input: { database?: Db } = {}) {
       if (error instanceof z.ZodError || error instanceof SyntaxError) return c.json({ error: "invalid moderation input" }, 400);
       throw error;
     }
+  });
+  app.get("/v1/platform/catalog/reports", async c => {
+    const query = catalogReportQueueQuerySchema.parse(c.req.query());
+    const reports = await listCatalogReports({ actorId: actorFromContext(c).id, ...query, database: input.database });
+    return c.json({ reports });
   });
   app.get("/v1/platform/catalog/submissions", async c => {
     const query = catalogModerationQuerySchema.parse(c.req.query());
