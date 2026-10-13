@@ -227,6 +227,93 @@ BEGIN
     api_functions := api_functions || ARRAY['public.skillpack_receive_skill_usage(jsonb)'::regprocedure];
     worker_functions := worker_functions || ARRAY['public.skillpack_process_skill_usage()'::regprocedure];
   END IF;
+  -- Public catalog reads are pre-tenant, but remain a narrow API-only capability. Resolve the
+  -- signatures conditionally so replaying this grants pass before migration 0192 stays valid.
+  IF pg_catalog.to_regprocedure('public.skillpack_list_public_catalog(integer,integer,text)') IS NOT NULL
+     AND pg_catalog.to_regprocedure('public.skillpack_get_public_catalog_skill(text,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_list_public_catalog(integer,integer,text)'::regprocedure,
+      'public.skillpack_get_public_catalog_skill(text,text)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_get_public_catalog_package(text,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_get_public_catalog_package(text,text)'::regprocedure
+    ];
+  END IF;
+  -- Catalog submissions are API-owned review state. The worker receives no direct tenant-table
+  -- access, while the API gets the ordinary forced-RLS grants from the generic table pass below.
+  IF pg_catalog.to_regclass('public.catalog_submissions') IS NOT NULL THEN
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY[
+      'public.catalog_submissions'::regclass
+    ];
+  END IF;
+  IF pg_catalog.to_regclass('public.catalog_reports') IS NOT NULL THEN
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY['public.catalog_reports'::regclass];
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_report_catalog_skill(text,text,text,text,text)'::regprocedure,
+      'public.skillpack_catalog_report_queue(text,boolean,integer,integer)'::regprocedure
+    ];
+  END IF;
+
+  -- Platform moderator identity and catalog publishing policy are operator-managed. The API may
+  -- inspect them only through the narrow definer functions below; it receives no direct writes and
+  -- the worker receives no table privilege at all.
+  IF pg_catalog.to_regclass('public.platform_moderators') IS NOT NULL THEN
+    api_capability_managed_tables := api_capability_managed_tables || ARRAY[
+      'public.platform_moderators'::regclass
+    ];
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY[
+      'public.platform_moderators'::regclass
+    ];
+  END IF;
+  IF pg_catalog.to_regclass('public.catalog_publishing_policies') IS NOT NULL THEN
+    api_capability_managed_tables := api_capability_managed_tables || ARRAY[
+      'public.catalog_publishing_policies'::regclass
+    ];
+    worker_forbidden_companion_tables := worker_forbidden_companion_tables || ARRAY[
+      'public.catalog_publishing_policies'::regclass
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_catalog_publishing_policy(uuid)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_catalog_publishing_policy(uuid)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_is_catalog_moderator(text,boolean)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_is_catalog_moderator(text,boolean)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_catalog_submission_snapshot(uuid,uuid)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_catalog_submission_snapshot(uuid,uuid)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_catalog_check_report(uuid,uuid,uuid,text)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_catalog_check_report(uuid,uuid,uuid,text)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure('public.skillpack_lock_catalog_publishing(uuid)') IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_lock_catalog_publishing(uuid)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure(
+    'public.skillpack_catalog_moderation_queue(text,boolean,text,integer,integer)'
+  ) IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_catalog_moderation_queue(text,boolean,text,integer,integer)'::regprocedure
+    ];
+  END IF;
+  IF pg_catalog.to_regprocedure(
+    'public.skillpack_moderate_catalog(text,boolean,uuid,uuid,text,text,boolean,boolean,boolean,uuid,text)'
+  ) IS NOT NULL THEN
+    api_functions := api_functions || ARRAY[
+      'public.skillpack_moderate_catalog(text,boolean,uuid,uuid,text,text,boolean,boolean,boolean,uuid,text)'::regprocedure
+    ];
+  END IF;
   IF api_role IS NULL OR worker_role IS NULL OR companion_runtime_role IS NULL THEN
     RAISE EXCEPTION 'companion API, worker, and runtime roles are required';
   END IF;
@@ -1455,6 +1542,11 @@ BEGIN
       );
       EXECUTE format('GRANT SELECT ON TABLE %s TO %I', protected_table, api_role);
     END LOOP;
+
+    -- Report content has no tenant projection: the API reads only through the moderator RPC.
+    IF pg_catalog.to_regclass('public.catalog_reports') IS NOT NULL THEN
+      EXECUTE format('REVOKE ALL PRIVILEGES ON TABLE public.catalog_reports FROM %I', api_role);
+    END IF;
 
     -- Billing, GitHub sync, and Skill Database cleanup never inspect or mutate hosted Companion
     -- state. Remove the generic RLS-table grant from every Companion table the worker could

@@ -77,10 +77,11 @@ import {
   type UpdateSecretInput,
 } from "@skillpack/contracts";
 import { getSkillArchive, skillDatabaseKey } from "@skillpack/storage";
-import { extractArchiveFileContent, extractArchiveFiles, tarGzToZip, toTar } from "@skillpack/skills";
+import { extractArchiveFileContent, extractArchiveFiles, skillChecksum, tarGzToZip, toTar } from "@skillpack/skills";
 import { putPublicSkillReleaseSnapshot } from "@skillpack/storage";
 import { publishSkillFromFiles, type SkillPublishFile } from "../skillPublish";
 import { parseSkillListQuery } from "../skillListQuery";
+import { publicReleaseFileList } from "../publicReleaseFiles";
 
 /**
  * The Skills Hub as an MCP server.
@@ -94,6 +95,8 @@ export interface McpServerDependencies {
   connection: McpConnection;
   skillDatabaseRuntime: SkillDatabaseRuntime;
   skillDatabaseStorage: SkillDatabaseStorage;
+  publicReleaseStorage?: Pick<typeof import("@skillpack/storage"),
+    "getSkillArchive" | "putPublicSkillReleaseSnapshot">;
 }
 
 /** Tool results are JSON text: one readable payload the calling agent can parse or quote. */
@@ -117,6 +120,7 @@ const labelScopeArgument = z
 
 export function createSkillpackMcpServer(dependencies: McpServerDependencies): McpServer {
   const { connection } = dependencies;
+  const publicReleaseStorage = dependencies.publicReleaseStorage ?? { getSkillArchive, putPublicSkillReleaseSnapshot };
   const actor: ActorContext = connection.actor;
   const orgId = connection.orgId;
 
@@ -380,9 +384,12 @@ export function createSkillpackMcpServer(dependencies: McpServerDependencies): M
         getDownloadVersion({ actor, orgId, slug: args.slug, version: args.version, forPublicRelease: true, database }),
       );
       if (!packageVersion.isCurrent) return failure("only the current skill version can be made public");
-      const stored = await getSkillArchive({ key: packageVersion.storagePath });
+      const stored = await publicReleaseStorage.getSkillArchive({ key: packageVersion.storagePath });
       let publicZip: Buffer;
       try {
+        if (skillChecksum(toTar(stored)) !== packageVersion.checksum) {
+          return failure("the stored archive does not match the immutable version checksum");
+        }
         publicZip = await tarGzToZip(stored);
       } catch {
         return failure(
@@ -390,7 +397,8 @@ export function createSkillpackMcpServer(dependencies: McpServerDependencies): M
         );
       }
       const packageChecksum = `sha256:${createHash("sha256").update(publicZip).digest("hex")}`;
-      await putPublicSkillReleaseSnapshot({ orgId, checksum: packageChecksum, body: publicZip });
+      const packageFiles = await publicReleaseFileList(publicZip);
+      await publicReleaseStorage.putPublicSkillReleaseSnapshot({ orgId, checksum: packageChecksum, body: publicZip });
       return ok(
         await tenant(({ database }) =>
           setSkillPublicVersion({
@@ -400,6 +408,7 @@ export function createSkillpackMcpServer(dependencies: McpServerDependencies): M
             version: args.version,
             packageChecksum,
             packageSizeBytes: publicZip.length,
+            packageFiles,
             expectedCurrentVersionId: packageVersion.versionId,
             database,
           }),

@@ -1345,6 +1345,48 @@
       "when": 1793419600000,
       "tag": "0191_skill_usage_runtime",
       "breakpoints": true
+    },
+    {
+      "idx": 192,
+      "version": "7",
+      "when": 1793423200000,
+      "tag": "0192_public_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 193,
+      "version": "7",
+      "when": 1793426800000,
+      "tag": "0193_catalog_submissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 194,
+      "version": "7",
+      "when": 1793430400000,
+      "tag": "0194_catalog_checks",
+      "breakpoints": true
+    },
+    {
+      "idx": 195,
+      "version": "7",
+      "when": 1793434000000,
+      "tag": "0195_catalog_moderation",
+      "breakpoints": true
+    },
+    {
+      "idx": 196,
+      "version": "7",
+      "when": 1793437600000,
+      "tag": "0196_catalog_install",
+      "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1793450000000,
+      "tag": "0197_catalog_reporting",
+      "breakpoints": true
     }
   ]
 }

@@ -24,8 +24,17 @@ import type {
   ValidationResult,
   FrontmatterWarning,
   GettingStartedState,
+  PublicCatalogSkill,
 } from "@skillpack/contracts";
-import { apiFetch } from "./apiClient";
+import {
+  publicCatalogSkillSchema,
+  skillPublicListingResultSchema,
+  skillPublicListingStatusSchema,
+  type SkillPublicListingResult,
+  type SkillPublicListingStatus,
+} from "@skillpack/contracts";
+import { ApiFetchError, apiFetch } from "./apiClient";
+import { publicCatalogSkillApiPath } from "./publicCatalog";
 
 /**
  * Budget for multipart uploads. A skill archive may be 25 MB and a comment can carry images; on a
@@ -147,6 +156,56 @@ export async function clearSkillPublicVersion(slug: string): Promise<SkillPublic
   return apiFetch<SkillPublicVersionResult>(`/v1/skills/${encodeURIComponent(slug)}/public-version`, {
     method: "DELETE",
   });
+}
+
+export type { SkillPublicListingResult, SkillPublicListingStatus };
+
+function publicListingPath(slug: string): string {
+  return `/v1/skills/${encodeURIComponent(slug)}/public-listing`;
+}
+
+/** Catalog submission state for an org skill in the selected workspace. Never carries share tokens. */
+export async function fetchSkillPublicListing(slug: string): Promise<SkillPublicListingStatus> {
+  const result = await apiFetch<SkillPublicListingStatus>(publicListingPath(slug), { cache: "no-store" });
+  return skillPublicListingStatusSchema.parse(result);
+}
+
+/**
+ * Owner/Admin only. `true` proposes the current public release for validation (converting an open
+ * Developer request); `false` unpublishes at once and withdraws any open request or submission.
+ */
+export async function setSkillPublicListing(slug: string, listed: boolean): Promise<SkillPublicListingResult> {
+  const result = await apiFetch<SkillPublicListingResult>(publicListingPath(slug), {
+    method: "PUT",
+    body: JSON.stringify({ listed }),
+  });
+  return skillPublicListingResultSchema.parse(result);
+}
+
+/** Developer only: an inert request an Owner/Admin must turn into a submission. */
+export async function requestSkillPublicListing(slug: string): Promise<SkillPublicListingResult> {
+  const result = await apiFetch<SkillPublicListingResult>(`${publicListingPath(slug)}/request`, {
+    method: "POST",
+    body: JSON.stringify({}),
+  });
+  return skillPublicListingResultSchema.parse(result);
+}
+
+/**
+ * The listing status does not name the frozen version, so it is read from the anonymous catalog,
+ * which serves exactly the validated snapshot. Null when the skill is not discoverable.
+ */
+export async function fetchCatalogPublishedVersion(orgSlug: string, slug: string): Promise<string | null> {
+  try {
+    const entry = await apiFetch<PublicCatalogSkill>(publicCatalogSkillApiPath(orgSlug, slug), {
+      credentials: "omit",
+      cache: "no-store",
+    });
+    return publicCatalogSkillSchema.parse(entry).version;
+  } catch (cause) {
+    if (cause instanceof ApiFetchError && cause.status === 404) return null;
+    throw cause;
+  }
 }
 
 export interface SkillDetailData {

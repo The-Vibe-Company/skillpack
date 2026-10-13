@@ -9,6 +9,7 @@ import {
   canManageSecret,
   canManagePersonalSkill,
   canManagePublicSkill,
+  canManagePublicListing,
   canPerform,
   canTouchOwner,
   isLastOwner,
@@ -104,7 +105,36 @@ describe("canManagePublicSkill — exhaustive member × role × creator × scope
       // The pure capability intentionally assumes membership; combine the tenant gate here so the
       // table proves a role in another org can never authorize the mutation.
       const allowed = member && capability;
-      expect(allowed).toBe(member && scope === "org" && (creator || role === "owner" || role === "admin"));
+      expect(allowed).toBe(
+        member && scope === "org" && (creator || role === "owner" || role === "admin"),
+      );
+    },
+  );
+});
+
+describe("canManagePublicListing — exhaustive member × role × creator × scope matrix", () => {
+  const cases = ([false, true] as const).flatMap((member) =>
+    ROLES.flatMap((role) =>
+      ([false, true] as const).flatMap((creator) =>
+        (["org", "personal"] as const).map((scope) => ({ member, role, creator, scope })),
+      ),
+    ),
+  );
+
+  it.each(cases)(
+    "member=$member role=$role creator=$creator scope=$scope",
+    ({ member, role, creator, scope }) => {
+      const actorId = "u-actor";
+      const capability = canManagePublicListing(
+        { id: actorId, orgRole: role },
+        { scope, creatorId: creator ? actorId : "u-creator" },
+      );
+      // The pure capability intentionally assumes membership; combine the tenant gate here so the
+      // table proves a role in another org can never authorize the mutation.
+      const allowed = member && capability;
+      expect(allowed).toBe(
+        member && scope === "org" && (role === "owner" || role === "admin"),
+      );
     },
   );
 });

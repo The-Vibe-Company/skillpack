@@ -50,3 +50,16 @@ and Git history are excluded. This sends declared email addresses to the package
 CLI login writes only the declared ID/email to `~/.skillpack/telemetry.json`, separate from session
 cookies. Logout removes that file when it still belongs to that account. Telemetry opt-out skips
 writing it; reporting agents must also check opt-out before reading any identity.
+
+Public catalog discovery requires explicit listing consent in addition to a pinned public release.
+Only organization skills can be submitted, with Owner/Admin consent; Developers can request
+admin submission. Platform moderators validate only after matching checks pass, reject with reasons, remove listings,
+and ban organization publishing. Allowlisted organizations auto-validate after passing checks.
+Validation enables discovery of a frozen version. Existing releases stay
+unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).
+The public release dialog shows the submission status and frozen version, and offers Owner/Admin
+Publish/Unpublish or a Developer's Request publication. It is absent while the catalog is off.
+
+Visitors can anonymously report published catalog skills for secret exposure, malicious content,
+license concerns or spam. Reports are private to platform moderators; Stan responds within 48 hours.
+Validated skills appear at `/catalog/<workspace>/<skill>` and in the sitemap; see the catalog pages.

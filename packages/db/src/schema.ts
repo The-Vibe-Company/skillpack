@@ -22,6 +22,18 @@ import { sql } from "drizzle-orm";
 /** JSON object payloads retain their existing open contract at the database boundary. */
 interface SchemaJsonObject {}
 
+/** File metadata snapshotted with a public immutable release for anonymous catalog reads. */
+type PublicPackageFile = {
+  path: string;
+  size_bytes: number;
+};
+
+type CatalogCheckReport = {
+  version: 1;
+  passed: boolean;
+  findings: { rule_id: string; severity: "blocking" | "warning"; path?: string; line?: number }[];
+};
+
 export const orgRoleEnum = pgEnum("org_role", ["owner", "admin", "developer"]);
 export const validationStateEnum = pgEnum("validation_state", ["valid", "validating", "invalid"]);
 // A skill's library scope. 'org' = the flat org-wide library (default; visible to every member).
@@ -53,6 +65,17 @@ export const githubSyncStatusEnum = pgEnum("github_sync_status", [
   "error",
   "disconnected",
 ]);
+export const catalogSubmissionStatusEnum = pgEnum("catalog_submission_status", [
+  "proposed",
+  "validated",
+  "rejected",
+  "withdrawn",
+  "removed",
+]);
+export const catalogSubmissionKindEnum = pgEnum("catalog_submission_kind", [
+  "publish_request",
+  "submission",
+]);
 const now = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 const updatedAt = () => timestamp("updated_at", { withTimezone: true }).notNull().defaultNow();
 
@@ -64,6 +87,13 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Global operator-managed catalog moderators. This table has no organization scope. */
+export const platformModerators = pgTable("platform_moderators", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const session = pgTable("session", {
@@ -359,6 +389,15 @@ export const organizations = pgTable(
   },
 );
 
+/** Operator-managed catalog publication policy, one row per organization when configured. */
+export const catalogPublishingPolicies = pgTable("catalog_publishing_policies", {
+  orgId: uuid("org_id")
+    .primaryKey()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  banned: boolean("banned").notNull().default(false),
+  autoApprove: boolean("auto_approve").notNull().default(false),
+});
+
 export const organizationDomains = pgTable(
   "organization_domains",
   {
@@ -516,8 +555,14 @@ export const skills = pgTable(
     publicPackageChecksum: text("public_package_checksum"),
     /** Byte length of those exact ZIP transport bytes (not the stored tar.gz size). */
     publicPackageSizeBytes: integer("public_package_size_bytes"),
+    /** File list for the exact public ZIP; null for releases created before catalog snapshots. */
+    publicPackageFiles: jsonb("public_package_files").$type<PublicPackageFile[]>(),
     /** Time this version/ZIP tuple was explicitly promoted. */
     publicReleasedAt: timestamp("public_released_at", { withTimezone: true }),
+    /** Explicit discovery consent for the immutable public release. */
+    listedPublicly: boolean("listed_publicly").notNull().default(false),
+    /** Time the owner/admin opted this pinned release into the public catalog. */
+    listedAt: timestamp("listed_at", { withTimezone: true }),
     validation: validationStateEnum("validation").notNull().default("valid"),
     validationError: text("validation_error"),
     // Archive (soft-hide) lifecycle: archived skills drop out of the normal lists but stay
@@ -556,6 +601,18 @@ export const skills = pgTable(
       "skills_public_package_size_check",
       sql`${t.publicPackageSizeBytes} is null or ${t.publicPackageSizeBytes} >= 0`,
     ),
+    /** A catalog entry can only expose a complete immutable organization public release. */
+    publicListingComplete: check(
+      "skills_public_listing_complete_check",
+      sql`(
+        ${t.listedPublicly} = false and ${t.listedAt} is null
+      ) or (
+        ${t.listedPublicly} = true
+        and ${t.scope} = 'org'
+        and ${t.listedAt} is not null
+      )`,
+    ),
+    byPublicCatalog: index("skills_public_catalog_idx").on(t.listedPublicly, t.archivedAt, t.slug),
   }),
 );
 
@@ -596,6 +653,93 @@ export const skillVersions = pgTable(
     uniqueOrgSkillId: unique("skill_versions_org_skill_id_uq").on(t.orgId, t.skillId, t.id),
     byOrg: index("skill_versions_org_idx").on(t.orgId),
     checksumCheck: check("skill_versions_checksum_check", sql`${t.checksum} ~ '^sha256:[0-9a-f]{64}$'`),
+  }),
+);
+
+/**
+ * A frozen, org-scoped catalog publication snapshot. A validated submission remains the catalog
+ * source even when the skill's mutable public release pointer moves to another version.
+ */
+export const catalogSubmissions = pgTable(
+  "catalog_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    skillId: uuid("skill_id").notNull(),
+    skillVersionId: uuid("skill_version_id").notNull(),
+    packageChecksum: text("package_checksum").notNull(),
+    packageSizeBytes: integer("package_size_bytes").notNull(),
+    packageFiles: jsonb("package_files").$type<PublicPackageFile[]>().notNull(),
+    checkReport: jsonb("check_report").$type<CatalogCheckReport>(),
+    status: catalogSubmissionStatusEnum("status").notNull().default("proposed"),
+    kind: catalogSubmissionKindEnum("kind").notNull(),
+    /** Developer request actor; direct admin submissions leave this null. */
+    requestedBy: text("requested_by").references(() => user.id),
+    /** Optional actor who materialized a request; direct submissions should identify their author. */
+    submittedBy: text("submitted_by").references(() => user.id),
+    decidedBy: text("decided_by").references(() => user.id),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    rejectionReason: text("rejection_reason"),
+    createdAt: now(),
+  },
+  (t) => ({
+    skillOrgFk: foreignKey({
+      columns: [t.orgId, t.skillId],
+      foreignColumns: [skills.orgId, skills.id],
+      name: "catalog_submissions_skill_org_fk",
+    }).onDelete("cascade"),
+    versionOrgSkillFk: foreignKey({
+      columns: [t.orgId, t.skillId, t.skillVersionId],
+      foreignColumns: [skillVersions.orgId, skillVersions.skillId, skillVersions.id],
+      name: "catalog_submissions_version_org_skill_fk",
+    }).onDelete("cascade"),
+    oneProposedPerSkill: uniqueIndex("catalog_submissions_one_proposed_per_skill_idx")
+      .on(t.orgId, t.skillId)
+      .where(sql`${t.status} = 'proposed'`),
+    byOrgStatus: index("catalog_submissions_org_status_idx").on(t.orgId, t.status, t.createdAt),
+    bySkillStatus: index("catalog_submissions_skill_status_idx").on(
+      t.orgId,
+      t.skillId,
+      t.status,
+      t.decidedAt,
+      t.createdAt,
+      t.id,
+    ),
+    byRequestedBy: index("catalog_submissions_requested_by_idx").on(t.orgId, t.requestedBy, t.createdAt),
+    packageChecksumCheck: check(
+      "catalog_submissions_package_checksum_check",
+      sql`${t.packageChecksum} ~ '^sha256:[0-9a-f]{64}$'`,
+    ),
+    packageSizeCheck: check(
+      "catalog_submissions_package_size_check",
+      sql`${t.packageSizeBytes} >= 0`,
+    ),
+    packageFilesCheck: check(
+      "catalog_submissions_package_files_check",
+      sql`jsonb_typeof(${t.packageFiles}) = 'array'`,
+    ),
+    checkReportCheck: check(
+      "catalog_submissions_check_report_check",
+      sql`${t.checkReport} is null or coalesce((jsonb_typeof(${t.checkReport}) = 'object'
+        and ${t.checkReport}->>'version' = '1'
+        and jsonb_typeof(${t.checkReport}->'passed') = 'boolean'
+        and jsonb_typeof(${t.checkReport}->'findings') = 'array'), false)`,
+    ),
+    requestActorCheck: check(
+      "catalog_submissions_request_actor_check",
+      sql`(${t.kind} = 'publish_request'
+          and ${t.requestedBy} is not null and ${t.submittedBy} is null)
+        or (${t.kind} = 'submission' and ${t.submittedBy} is not null)`,
+    ),
+    decisionCheck: check(
+      "catalog_submissions_decision_check",
+      sql`(${t.status}::text = 'proposed' and ${t.decidedBy} is null and ${t.decidedAt} is null)
+        or (${t.status}::text in ('validated', 'rejected', 'removed')
+          and ${t.decidedBy} is not null and ${t.decidedAt} is not null)
+        or ${t.status}::text = 'withdrawn'`,
+    ),
   }),
 );
 
@@ -1770,4 +1914,25 @@ export const skillUsageInbox = pgTable("skill_usage_inbox", {
   pending: index("skill_usage_inbox_pending_idx").on(t.receivedAt).where(sql`${t.processedAt} is null`),
   admission: index("skill_usage_inbox_admission_idx").on(t.declaredSkillId, t.receivedAt),
   expiry: index("skill_usage_inbox_expiry_idx").on(t.processedAt).where(sql`${t.processedAt} is not null`),
+}));
+
+/** Anonymous catalog reports are private to platform moderation, never organization members. */
+export const catalogReports = pgTable("catalog_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id").notNull().references(() => organizations.id, { onDelete: "cascade" }),
+  skillId: uuid("skill_id").notNull(),
+  submissionId: uuid("submission_id").notNull().references(() => catalogSubmissions.id, { onDelete: "cascade" }),
+  orgSlug: text("org_slug").notNull(),
+  skillSlug: text("skill_slug").notNull(),
+  reason: text("reason").$type<"secret_exposure" | "malicious" | "license" | "spam">().notNull(),
+  details: text("details"),
+  reporterHash: text("reporter_hash").notNull(),
+  createdAt: now(),
+}, t => ({
+  skillOrgFk: foreignKey({ columns: [t.orgId, t.skillId], foreignColumns: [skills.orgId, skills.id], name: "catalog_reports_skill_org_fk" }).onDelete("cascade"),
+  bySourceTime: index("catalog_reports_source_time_idx").on(t.reporterHash, t.createdAt),
+  byQueue: index("catalog_reports_queue_idx").on(t.createdAt, t.id),
+  reasonCheck: check("catalog_reports_reason_check", sql`${t.reason} in ('secret_exposure', 'malicious', 'license', 'spam')`),
+  detailsCheck: check("catalog_reports_details_check", sql`char_length(${t.details}) <= 2000`),
+  hashCheck: check("catalog_reports_reporter_hash_check", sql`${t.reporterHash} ~ '^[0-9a-f]{64}$'`),
 }));

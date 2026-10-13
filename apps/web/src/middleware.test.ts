@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { agentAuthProxyHeaders, canonicalAliasRedirect, legacyRuntimeRedirect, middleware } from "./middleware";
+import { agentAuthProxyHeaders, canonicalAliasRedirect, legacyCatalogRedirect, legacyRuntimeRedirect, middleware } from "./middleware";
 
 describe("canonical host middleware", () => {
   it.each(["/projects", "/projects/legacy/session", "/runs/legacy"])(
@@ -11,6 +11,25 @@ describe("canonical host middleware", () => {
       const response = middleware(request);
       expect(response.status).toBe(308);
       expect(response.headers.get("location")).toBe("https://skillpack.app/skills");
+    },
+  );
+
+  it.each([
+    ["/catalog/skillpack", "https://skillpack.app/catalog/the-vibe-company/skillpack"],
+    ["/catalog/incident-summary?ref=old", "https://skillpack.app/catalog/the-vibe-company/incident-summary"],
+  ])("moves the build-time catalog URL %s permanently under the official workspace", (path, location) => {
+    const response = middleware(new NextRequest(`https://skillpack.app${path}`));
+    expect(response.status).toBe(301);
+    expect(response.headers.get("location")).toBe(location);
+  });
+
+  it.each(["/catalog", "/catalog/", "/catalog/acme/release-helper", "/catalog/the-vibe-company/skillpack"])(
+    "serves public catalog path %s without a redirect",
+    (path) => {
+      const request = new NextRequest(`https://skillpack.app${path}`);
+      expect(legacyCatalogRedirect(request)).toBeNull();
+      expect(legacyRuntimeRedirect(request)).toBeNull();
+      expect(middleware(request).headers.get("location")).toBeNull();
     },
   );
 

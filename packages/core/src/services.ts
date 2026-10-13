@@ -1,3 +1,4 @@
+import { withdrawOpenCatalogSubmissions } from "./catalogSubmissionLifecycle";
 /* oxlint-disable anti-slop/no-conditional-empty-object-spread, anti-slop/no-known-value-widening, anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns, anti-slop/no-unsafe-dictionary-type, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- This shared legacy service module predates the incremental anti-slop gate; the profile timezone path uses typed Drizzle fields and validated input. */
 import { createHash, randomBytes } from "node:crypto";
 import { and, asc, count, desc, eq, exists, inArray, isNull, ne, not, or, sql } from "drizzle-orm";
@@ -1356,11 +1357,13 @@ async function publicReleaseSkillForActor(input: {
   actor: ActorContext;
   orgId: string;
   slug: string;
+  lock?: boolean;
 }): Promise<{ skill: typeof schema.skills.$inferSelect; role: OrgRole }> {
   const role = await assertMember(input.database, input.actor, input.orgId);
-  const skill = await input.database.query.skills.findFirst({
-    where: and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug)),
-  });
+  const where = and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug));
+  const skill = input.lock
+    ? (await input.database.select().from(schema.skills).where(where).for("update"))[0]
+    : await input.database.query.skills.findFirst({ where });
   if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
     throw new SkillPublicReleaseNotFoundError("skill not found");
   }
@@ -1383,6 +1386,8 @@ export async function setSkillPublicVersion(input: {
   packageChecksum: string;
   /** Exact deterministic ZIP byte length. */
   packageSizeBytes: number;
+  /** File metadata for the exact public ZIP, captured while the release bytes are available. */
+  packageFiles?: readonly { path: string; size_bytes: number }[];
   /** Version observed as current before the caller persisted the content-addressed ZIP snapshot. */
   expectedCurrentVersionId?: string;
   database?: Db;
@@ -1393,6 +1398,27 @@ export async function setSkillPublicVersion(input: {
   }
   if (!Number.isSafeInteger(input.packageSizeBytes) || input.packageSizeBytes < 0) {
     throw new SkillPublicReleaseValidationError("public package size must be a non-negative integer");
+  }
+  const packageFiles = input.packageFiles === undefined
+    ? undefined
+    : input.packageFiles.map((file) => {
+        if (
+          !file.path
+          || file.path.length > 1024
+          || file.path.includes("\0")
+          || !Number.isSafeInteger(file.size_bytes)
+          || file.size_bytes < 0
+        ) {
+          throw new SkillPublicReleaseValidationError("public package files must contain safe paths and sizes");
+        }
+        return { path: file.path, size_bytes: file.size_bytes };
+      });
+  const packageFilePaths = new Set<string>();
+  for (const file of packageFiles ?? []) {
+    if (packageFilePaths.has(file.path)) {
+      throw new SkillPublicReleaseValidationError("public package files must not contain duplicate paths");
+    }
+    packageFilePaths.add(file.path);
   }
   return database.transaction(async (tx) => {
     const tenantDb = tx as unknown as Db;
@@ -1423,6 +1449,8 @@ export async function setSkillPublicVersion(input: {
       skill.publicVersionId !== version.id ||
       skill.publicPackageChecksum !== input.packageChecksum ||
       skill.publicPackageSizeBytes !== input.packageSizeBytes;
+    const filesChanged = packageFiles !== undefined
+      && JSON.stringify(skill.publicPackageFiles ?? null) !== JSON.stringify(packageFiles);
     const expectedPointer = skill.publicVersionId
       ? eq(schema.skills.publicVersionId, skill.publicVersionId)
       : isNull(schema.skills.publicVersionId);
@@ -1435,6 +1463,9 @@ export async function setSkillPublicVersion(input: {
     const expectedReleasedAt = skill.publicReleasedAt
       ? eq(schema.skills.publicReleasedAt, skill.publicReleasedAt)
       : isNull(schema.skills.publicReleasedAt);
+    const expectedListedAt = skill.listedAt
+      ? eq(schema.skills.listedAt, skill.listedAt)
+      : isNull(schema.skills.listedAt);
     const [updated] = await tenantDb
       .update(schema.skills)
       .set(
@@ -1443,9 +1474,12 @@ export async function setSkillPublicVersion(input: {
               publicVersionId: version.id,
               publicPackageChecksum: input.packageChecksum,
               publicPackageSizeBytes: input.packageSizeBytes,
+              publicPackageFiles: packageFiles ?? null,
               publicReleasedAt: new Date(),
               updatedAt: new Date(),
             }
+          : filesChanged
+            ? { publicVersionId: version.id, publicPackageFiles: packageFiles }
           // A same-value UPDATE is intentional: it takes the row lock and rechecks the complete
           // observed release state after any concurrent writer, without changing idempotent semantics.
           : { publicVersionId: version.id },
@@ -1457,6 +1491,8 @@ export async function setSkillPublicVersion(input: {
         eq(schema.skills.scope, "org"),
         isNull(schema.skills.archivedAt),
         eq(schema.skills.currentVersionId, version.id),
+        eq(schema.skills.listedPublicly, skill.listedPublicly),
+        expectedListedAt,
         expectedPointer,
         expectedChecksum,
         expectedSize,
@@ -1489,6 +1525,7 @@ export async function setSkillPublicVersion(input: {
         previousVersion: previousVersion?.version ?? null,
         packageChecksum: input.packageChecksum,
         packageSizeBytes: input.packageSizeBytes,
+        packageFileCount: packageFiles?.length ?? null,
         changed,
       },
     });
@@ -1506,7 +1543,7 @@ export async function clearSkillPublicVersion(input: {
   const database = input.database ?? db;
   return database.transaction(async (tx) => {
     const tenantDb = tx as unknown as Db;
-    const { skill } = await publicReleaseSkillForActor({ ...input, database: tenantDb });
+    const { skill } = await publicReleaseSkillForActor({ ...input, database: tenantDb, lock: true });
     const previousVersion = skill.publicVersionId
       ? await tenantDb.query.skillVersions.findFirst({
           columns: { version: true },
@@ -1538,7 +1575,10 @@ export async function clearSkillPublicVersion(input: {
               publicVersionId: null,
               publicPackageChecksum: null,
               publicPackageSizeBytes: null,
+              publicPackageFiles: null,
               publicReleasedAt: null,
+              listedPublicly: false,
+              listedAt: null,
               updatedAt: new Date(),
             }
           // Preserve the no-op result while still fencing a promotion that committed after our read.
@@ -1565,6 +1605,17 @@ export async function clearSkillPublicVersion(input: {
       targetId: skill.id,
       metadata: { slug: skill.slug, previousVersion: previousVersion?.version ?? null, changed },
     });
+    await withdrawOpenCatalogSubmissions({ database: tenantDb, orgId: input.orgId, skillId: skill.id, actorId: input.actor.id });
+    if (skill.listedPublicly) {
+      await tenantDb.insert(schema.auditLog).values({
+        orgId: input.orgId,
+        actorId: input.actor.id,
+        action: "skill.public_listing.clear",
+        targetType: "skill",
+        targetId: skill.id,
+        metadata: { slug: skill.slug, reason: "public_release_cleared" },
+      });
+    }
     return { ok: true as const, public_version: null, share_token: skill.shareToken, changed };
   });
 }
@@ -3899,28 +3950,59 @@ export async function archiveSkill(input: {
   database?: Db;
 }): Promise<{ id: string }> {
   const database = input.database ?? db;
-  const skill = await getSkillBySlug(input);
-  if (!skill) throw new Error("skill not found");
-  await assertCanModifySkillRow({
-    actor: input.actor,
-    orgId: input.orgId,
-    skill: { scope: skill.scope, creatorId: skill.creator_id },
-    database,
+  return database.transaction(async (tx) => {
+    const transactionDatabase: unknown = tx;
+    // SAFETY: Drizzle's transaction surface has the same schema and query contract as Db; only
+    // the private client holder differs while this callback is active.
+    const transactionDb = transactionDatabase as Db;
+    const skill = await getSkillBySlug({ ...input, database: transactionDb });
+    if (!skill) throw new Error("skill not found");
+    await assertCanModifySkillRow({
+      actor: input.actor,
+      orgId: input.orgId,
+      skill: { scope: skill.scope, creatorId: skill.creator_id },
+      database: transactionDb,
+    });
+    const [skillState] = await transactionDb
+      .select({ listedPublicly: schema.skills.listedPublicly })
+      .from(schema.skills)
+      .where(and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, skill.id)))
+      .for("update");
+    await transactionDb
+      .update(schema.skills)
+      .set({
+        archivedAt: new Date(),
+        archivedBy: input.actor.id,
+        archiveReason: input.reason ?? null,
+        // Archiving always withdraws catalog consent. Keeping this unconditional makes the final
+        // state safe when an archive races a listing transaction that read the row just before it.
+        listedPublicly: false,
+        listedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, skill.id)));
+    await transactionDb.insert(schema.auditLog).values({
+      orgId: input.orgId,
+      actorId: input.actor.id,
+      action: "skill.archive",
+      targetType: "skill",
+      targetId: skill.id,
+      metadata: { slug: skill.slug, reason: input.reason ?? null },
+    });
+    await withdrawOpenCatalogSubmissions({ database: transactionDb, orgId: input.orgId, skillId: skill.id, actorId: input.actor.id });
+    if (skillState?.listedPublicly) {
+      await transactionDb.insert(schema.auditLog).values({
+        orgId: input.orgId,
+        actorId: input.actor.id,
+        action: "skill.public_listing.clear",
+        targetType: "skill",
+        targetId: skill.id,
+        metadata: { slug: skill.slug, reason: "skill.archived" },
+      });
+    }
+    if (skill.scope === "org") await enqueueGitHubAfterOrgSkillMutation(transactionDb, input.orgId);
+    return { id: skill.id };
   });
-  await database
-    .update(schema.skills)
-    .set({ archivedAt: new Date(), archivedBy: input.actor.id, archiveReason: input.reason ?? null, updatedAt: new Date() })
-    .where(eq(schema.skills.id, skill.id));
-  await database.insert(schema.auditLog).values({
-    orgId: input.orgId,
-    actorId: input.actor.id,
-    action: "skill.archive",
-    targetType: "skill",
-    targetId: skill.id,
-    metadata: { slug: skill.slug, reason: input.reason ?? null },
-  });
-  if (skill.scope === "org") await enqueueGitHubAfterOrgSkillMutation(database, input.orgId);
-  return { id: skill.id };
 }
 
 export async function restoreSkill(input: {

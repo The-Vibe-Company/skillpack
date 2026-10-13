@@ -1,3 +1,9 @@
+import { publicReleaseFileList } from "./publicReleaseFiles";
+import { createCatalogReportingRoutes } from "./catalogReportingRoutes";
+import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
+import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
+import { configureCatalogCheckReader, getSkillPublicListing, readPersistedCatalogCheckReport, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
+import { requestSkillPublicListingInputSchema, skillPublicListingStatusSchema, setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
 import { createSkillUsageRoutes } from "./skillUsageRoutes";
 import { registerCliLoginRoutes } from "./cliLoginRoutes";
 import { getSkillUsage } from "@skillpack/core";
@@ -232,6 +238,7 @@ import {
 import { SqliteWasmSkillDatabaseRuntime } from "@skillpack/skilldb";
 import {
   compareSemver,
+  skillChecksum,
   extractArchiveFileContent,
   extractArchiveFiles,
   buildNormalizedSkillpackJson,
@@ -297,6 +304,10 @@ import {
 } from "@skillpack/core";
 
 const app = new Hono<{ Variables: ApiVariables }>();
+
+// API startup is the only production wiring point; callers that do not install a reader fail
+// closed through the default null reader in core.
+configureCatalogCheckReader(readPersistedCatalogCheckReport);
 
 app.onError((err, c) => {
   captureServerError(err, {
@@ -697,7 +708,10 @@ app.use(
 
 // Public write-only telemetry must not require or resolve credentials.
 app.route("/", createSkillUsageRoutes());
+app.route("/", createCatalogReportingRoutes());
+app.route("/", createPublicCatalogRoutes());
 app.use("*", attachSession);
+app.route("/", createCatalogModerationRoutes());
 
 registerAgentAuthRoutes(app);
 registerCliLoginRoutes(app);
@@ -2657,6 +2671,9 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
     const storedArchive = await getSkillArchive({ key: packageVersion.storagePath });
     let publicZip: Buffer;
     try {
+      if (skillChecksum(toTar(storedArchive)) !== packageVersion.checksum) {
+        throw new SkillPublicReleaseValidationError("the stored archive does not match the immutable version checksum");
+      }
       publicZip = await tarGzToZip(storedArchive);
     } catch {
       throw new SkillPublicReleaseValidationError(
@@ -2664,6 +2681,7 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
       );
     }
     const packageChecksum = `sha256:${createHash("sha256").update(publicZip).digest("hex")}`;
+    const packageFiles = await publicReleaseFileList(publicZip);
     await putPublicSkillReleaseSnapshot({
       orgId: packageVersion.orgId,
       checksum: packageChecksum,
@@ -2680,6 +2698,7 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
             version: body.version,
             packageChecksum,
             packageSizeBytes: publicZip.length,
+            packageFiles,
             expectedCurrentVersionId: packageVersion.versionId,
             database,
           }),
@@ -2689,6 +2708,64 @@ app.put("/v1/skills/:slug/public-version", async (c) => {
   } catch (error) {
     return publicReleaseRouteError(c, error);
   }
+});
+
+async function publicListingSnapshot(c: Context, slug: string, request: boolean) {
+  const release = await withTenant(c, ({ actor, orgId, database }) =>
+    prepareSkillPublicListing({ actor, orgId, slug, database, request }), true);
+  const zip = await getSkillArchive({ key: publicSkillReleaseKey({ orgId: release.orgId, checksum: release.checksum }) });
+  let packageFiles = release.packageFiles ?? undefined;
+  if (!packageFiles) {
+    // Legacy releases lack file metadata. Do not parse unverified bytes or surface archive errors.
+    packageFiles = [];
+    if (`sha256:${createHash("sha256").update(zip).digest("hex")}` === release.checksum && zip.length === release.sizeBytes) {
+      try { packageFiles = await publicReleaseFileList(zip); } catch { /* Core records archive rejection. */ }
+    }
+  }
+  // Core verifies the frozen checksum before unpacking and persists failures as rejected reports.
+  return { packageBytes: zip, packageFiles, expectedPublicVersionId: release.publicVersionId, expectedChecksum: release.checksum };
+}
+
+/** Read submission state with the member's selected workspace authority. */
+app.get("/v1/skills/:slug/public-listing", async (c) => {
+  c.header("Cache-Control", "no-store");
+  try {
+    actorFromContext(c, true);
+    await requireScope(c, "skills:read");
+    const result = await withTenant(c, ({ actor, orgId, database }) =>
+      getSkillPublicListing({ actor, orgId, slug: c.req.param("slug"), database }), true);
+    return c.json(skillPublicListingStatusSchema.parse(result));
+  } catch (error) { return publicReleaseRouteError(c, error); }
+});
+
+/** Owner/Admin submission or immediate withdrawal; visibility requires later validation. */
+app.put("/v1/skills/:slug/public-listing", async (c) => {
+  c.header("Cache-Control", "no-store");
+  try {
+    actorFromContext(c, true);
+    await requireScope(c, "skills:write");
+    const body = setSkillPublicListingInputSchema.parse(await c.req.json());
+    const slug = c.req.param("slug");
+    const snapshot = body.listed ? await publicListingSnapshot(c, slug, false) : undefined;
+    const result = await withTenant(c, ({ actor, orgId, database }) =>
+      setSkillPublicListing({ actor, orgId, slug, listed: body.listed, database, ...snapshot }), true);
+    return c.json(skillPublicListingResultSchema.parse(result));
+  } catch (error) { return publicReleaseRouteError(c, error); }
+});
+
+/** Developer publication request. It grants no listing consent or validation authority. */
+app.post("/v1/skills/:slug/public-listing/request", async (c) => {
+  c.header("Cache-Control", "no-store");
+  try {
+    actorFromContext(c, true);
+    await requireScope(c, "skills:write");
+    requestSkillPublicListingInputSchema.parse(await c.req.json());
+    const slug = c.req.param("slug");
+    const snapshot = await publicListingSnapshot(c, slug, true);
+    const result = await withTenant(c, ({ actor, orgId, database }) =>
+      requestSkillPublicListing({ actor, orgId, slug, database, ...snapshot }), true);
+    return c.json(skillPublicListingResultSchema.parse(result));
+  } catch (error) { return publicReleaseRouteError(c, error); }
 });
 
 /** Idempotently withdraw package access. The share token and immutable version stay intact. */

@@ -4,14 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { clearSkillPublicVersion, setSkillPublicVersion } from "@/lib/queries";
 import type { SkillVM } from "@/lib/types";
 import { Icon } from "../Icon";
+import { CatalogPublication, type PublicReleaseCatalog } from "./CatalogPublication";
 import { useModalA11y } from "./UploadDialog";
+
+export type { PublicReleaseCatalog };
 
 export function PublicReleaseDialog({
   skill,
+  catalog,
   onClose,
   onChanged,
 }: {
   skill: SkillVM;
+  /** Null while `SKILLPACK_PUBLIC_CATALOG` is off: catalog publishing is then absent entirely. */
+  catalog: PublicReleaseCatalog | null;
   onClose: () => void;
   onChanged: (version: string | null) => void;
 }) {
@@ -143,6 +149,8 @@ export function PublicReleaseDialog({
               {error}
             </div>
           )}
+
+          {catalog && <CatalogPublication skill={skill} catalog={catalog} publicVersion={publicVersion} releaseBusy={busy} />}
         </div>
 
         <div className="up__foot">

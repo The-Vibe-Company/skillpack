@@ -9,3 +9,6 @@ export * from "./billing";
 export * from "./billingService";
 export * from "./deploymentRelease";
 export * from "./skillUsage";
+export * from "./publicCatalog";
+export * from "./catalogModeration";
+export * from "./catalogReporting";

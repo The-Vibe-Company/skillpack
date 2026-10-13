@@ -489,6 +489,8 @@ func (a *app) install() (any, error) {
 		return nil, fail(2, "install requires a skill slug")
 	}
 	rootSlug := args[1]
+	catalog := strings.Contains(rootSlug, "/") && !a.options.flags["public"]
+	publicInstall := catalog || a.options.flags["public"]
 	scope := a.options.values["scope"]
 	if scope == "" {
 		scope = "user"
@@ -538,15 +540,22 @@ func (a *app) install() (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	c, err := a.client()
+	var c *client
+	var workspace string
+	if catalog {
+		c, err = a.catalogClient()
+		workspace = "catalog:" + strings.Split(rootSlug, "/")[0]
+	} else {
+		c, err = a.client()
+		if err == nil {
+			var status keyStatus
+			status, err = c.status()
+			workspace = status.Workspace.ID
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-	status, err := c.status()
-	if err != nil {
-		return nil, err
-	}
-	workspace := status.Workspace.ID
 	entry := lock.Workspaces[workspace]
 	if entry.API != "" && !sameSkillpackInstance(entry.API, c.base) {
 		return nil, fail(6, "lockfile organization belongs to another API instance")
@@ -556,7 +565,12 @@ func (a *app) install() (any, error) {
 		entry.Skills = map[string]installedSkill{}
 	}
 	var nodes []installNode
-	if a.options.flags["public"] {
+	if catalog {
+		var node installNode
+		node, err = c.catalogNode(rootSlug, a.options.values["version"])
+		nodes = []installNode{node}
+		rootSlug = node.Slug
+	} else if a.options.flags["public"] {
 		var node installNode
 		node, err = c.publicNode(rootSlug, a.options.values["version"])
 		nodes = []installNode{node}
@@ -678,11 +692,17 @@ func (a *app) install() (any, error) {
 		if n.Slug == rootSlug && a.options.values["version"] != "" {
 			pin = n.Version
 		}
-		if a.options.flags["public"] {
+		if publicInstall {
 			if old.Extra == nil {
 				old.Extra = map[string]json.RawMessage{}
 			}
-			old.Extra["publicToken"], _ = json.Marshal(args[1])
+			if catalog {
+				old.Extra["catalogReference"], _ = json.Marshal(args[1])
+				delete(old.Extra, "publicToken")
+			} else {
+				old.Extra["publicToken"], _ = json.Marshal(args[1])
+				delete(old.Extra, "catalogReference")
+			}
 			pin = n.Version
 		}
 		entry.Skills[n.Slug] = installedSkill{Extra: old.Extra, Name: n.Slug, Slug: n.Slug, ID: n.ID, Version: n.Version, Checksum: n.Checksum, Targets: targets, Pinned: pin, Added: old.Added}
@@ -693,7 +713,7 @@ func (a *app) install() (any, error) {
 	// Secret/package coupling is assembled before activation; none of the staged packages is visible yet.
 	var secretRows []replacement
 	var secretPaths map[string]string
-	if !a.options.flags["public"] {
+	if !publicInstall {
 		secretRows, secretPaths, err = a.stageInstallSecrets(c, workspace, nodes)
 	}
 	if err != nil {
@@ -716,7 +736,7 @@ func (a *app) install() (any, error) {
 	}
 	reports := []map[string]any{}
 	for _, n := range nodes {
-		if a.options.flags["public"] {
+		if publicInstall {
 			continue
 		}
 		path := "/skills/" + n.Slug + "/install"
@@ -743,7 +763,7 @@ func (a *app) install() (any, error) {
 		}
 	}
 	var prerequisites any
-	if a.options.flags["public"] {
+	if publicInstall {
 		var m map[string]any
 		_ = json.Unmarshal(nodes[0].Files["companion.json"], &m)
 		prerequisites = map[string]any{"dependencies": m["dependencies"], "environment": m["environment"], "database": m["database"]}
@@ -827,8 +847,8 @@ func (a *app) frozenSync() (any, error) {
 		return nil, err
 	}
 	type missingTarget struct {
-		target                                           installedTarget
-		slug, version, hash, workspace, api, publicToken string
+		target                                                             installedTarget
+		slug, version, hash, workspace, api, publicToken, catalogReference string
 	}
 	var missing []missingTarget
 	verified := map[string]map[string][]byte{}
@@ -855,9 +875,10 @@ func (a *app) frozenSync() (any, error) {
 					version = skill.Version
 				}
 				if _, err := os.Lstat(destination); os.IsNotExist(err) {
-					var publicToken string
+					var publicToken, catalogReference string
 					_ = json.Unmarshal(skill.Extra["publicToken"], &publicToken)
-					missing = append(missing, missingTarget{target, slug, version, expected, workspaceID, workspace.API, publicToken})
+					_ = json.Unmarshal(skill.Extra["catalogReference"], &catalogReference)
+					missing = append(missing, missingTarget{target, slug, version, expected, workspaceID, workspace.API, publicToken, catalogReference})
 					continue
 				} else if err != nil {
 					return nil, err
@@ -884,6 +905,24 @@ func (a *app) frozenSync() (any, error) {
 	var remoteWorkspace string
 	for _, m := range missing {
 		files := verified[m.hash]
+		if files == nil && m.catalogReference != "" {
+			catalogRemote, e := a.catalogClient()
+			if e != nil {
+				return nil, e
+			}
+			if !sameSkillpackInstance(catalogRemote.base, m.api) {
+				return nil, fail(7, "API does not match locked catalog instance")
+			}
+			n, e := catalogRemote.catalogNode(m.catalogReference, m.version)
+			if e != nil {
+				return nil, e
+			}
+			if n.Slug != m.slug || n.Checksum != m.hash {
+				return nil, fail(5, "catalog package differs from frozen lock")
+			}
+			files = n.Files
+			verified[m.hash] = files
+		}
 		if files == nil {
 			if remote == nil {
 				remote, err = a.client()

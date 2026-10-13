@@ -99,6 +99,14 @@ export function canManagePublicSkill(
   return skill.scope === "org" && (skill.creatorId === actor.id || isOrgAdmin(actor.orgRole));
 }
 
+/** Public catalog discovery requires an organization skill and its workspace's Owner/Admin role. */
+export function canManagePublicListing(
+  actor: { id: string; orgRole: OrgRole },
+  skill: SkillScopeRef,
+): boolean {
+  return skill.scope === "org" && isOrgAdmin(actor.orgRole);
+}
+
 export interface SecretAccessRef {
   ownerId: string;
   audience: SecretAudience;

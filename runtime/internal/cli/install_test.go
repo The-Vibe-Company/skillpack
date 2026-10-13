@@ -26,6 +26,12 @@ func TestManagementInstallAdoptsCleanUntrackedCopies(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	var release struct {
+		Version string `json:"version"`
+	}
+	if err := json.Unmarshal(newFiles["companion.json"], &release); err != nil || release.Version == "" {
+		t.Fatalf("read bundled release version: %v", err)
+	}
 	_, checksum, err := canonicalPackage(newFiles)
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +45,7 @@ func TestManagementInstallAdoptsCleanUntrackedCopies(t *testing.T) {
 		case "/v1/tokens/current":
 			w.Write([]byte(`{"user":{"id":"user"},"workspace":{"id":"org"},"token":{"id":"key"}}`))
 		case "/v1/local-skills/skillpack":
-			json.NewEncoder(w).Encode(map[string]any{"availableVersion": "1.120.1", "integrity": map[string]string{"packageChecksum": checksum}})
+			json.NewEncoder(w).Encode(map[string]any{"availableVersion": release.Version, "integrity": map[string]string{"packageChecksum": checksum}})
 		case "/v1/local-skills/skillpack/package":
 			w.Write(archive)
 		case "/v1/local-skills/skillpack/installed":
@@ -97,7 +103,7 @@ func TestManagementInstallAdoptsCleanUntrackedCopies(t *testing.T) {
 		t.Fatalf("migration install: %d %s %s", code, out, diag)
 	}
 	updated, err := readLock(lockPath)
-	if err != nil || updated.Workspaces["org"].API != server.URL+"/v1" || updated.Workspaces["org"].Skills["skillpack"].Version != "1.120.1" {
+	if err != nil || updated.Workspaces["org"].API != server.URL+"/v1" || updated.Workspaces["org"].Skills["skillpack"].Version != release.Version {
 		t.Fatalf("migration lock: %v %#v", err, updated.Workspaces["org"])
 	}
 	for _, tool := range []string{"codex", "claude-code", "opencode"} {
@@ -106,7 +112,7 @@ func TestManagementInstallAdoptsCleanUntrackedCopies(t *testing.T) {
 		var manifest struct {
 			Version string `json:"version"`
 		}
-		if json.Unmarshal(got, &manifest) != nil || manifest.Version != "1.120.1" {
+		if json.Unmarshal(got, &manifest) != nil || manifest.Version != release.Version {
 			t.Fatalf("%s was not updated", tool)
 		}
 	}
