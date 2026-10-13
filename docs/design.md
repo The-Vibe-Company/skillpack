@@ -126,4 +126,5 @@ and repository copies remain explicit exceptions; repository updates are reviewa
 
 The [catalog backend](public-catalog.md) adds separate listing consent to complete public releases.
 Its anonymous read API exposes only pinned release content through narrowly scoped pre-tenant
-PostgreSQL functions. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.
+PostgreSQL functions. The web renders `/catalog` pages and sitemap entries from that API on every
+request. `SKILLPACK_PUBLIC_CATALOG` defaults off; token-based sharing remains separate.

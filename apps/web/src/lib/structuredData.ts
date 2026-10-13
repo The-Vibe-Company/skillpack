@@ -1,7 +1,7 @@
 import { HOME_DESCRIPTION } from "./siteMetadata";
 import { PRODUCTION_SITE_URL } from "./siteUrl";
 
-export type JsonLdValue = string | JsonLdValue[] | JsonLdNode;
+export type JsonLdValue = string | number | JsonLdValue[] | JsonLdNode;
 type JsonLdNode = { [key: string]: JsonLdValue };
 export type JsonLdDocument = { "@context": "https://schema.org"; "@graph": JsonLdNode[] };
 
@@ -49,6 +49,60 @@ export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocume
         datePublished: facts.datePublished,
         url: facts.url,
         mainEntityOfPage: facts.url,
+      },
+    ],
+  };
+}
+
+export type CatalogSkillFacts = {
+  name: string;
+  description: string;
+  version: string;
+  datePublished: string;
+  url: string;
+};
+
+/** A listed skill, stating only fields the catalog API returns for its pinned public release. */
+export function catalogSkillStructuredData(facts: CatalogSkillFacts): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareSourceCode",
+        name: facts.name,
+        description: facts.description,
+        version: facts.version,
+        datePublished: facts.datePublished,
+        url: facts.url,
+        mainEntityOfPage: facts.url,
+      },
+    ],
+  };
+}
+
+/** One catalog index page and the skills listed on it; positions continue across pages. */
+export function catalogIndexStructuredData(input: {
+  name: string;
+  url: string;
+  firstPosition: number;
+  items: { name: string; url: string }[];
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: input.name,
+        url: input.url,
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: input.items.map((item, index) => ({
+            "@type": "ListItem",
+            position: input.firstPosition + index,
+            name: item.name,
+            url: item.url,
+          })),
+        },
       },
     ],
   };

@@ -81,6 +81,7 @@ import { matchFilters, type Filter } from "./filters";
 import { deriveTreeRows, remapTreeOrder, removeTreeOrderPath, reorderTreeRows } from "./sidebarTree";
 import type { TreeRow } from "./sidebarTree";
 import type { SkillAction } from "./skillActions";
+import { canManagePublicListing } from "./skillActions";
 
 const SETTINGS_LOAD_ERROR =
   "Refresh the page to try again. If the problem continues, check that the API and database are reachable.";
@@ -208,6 +209,7 @@ export function SkillsApp({
   currentOrg,
   initialRoute,
   initialRouteSource,
+  publicCatalogEnabled = false,
 }: {
   initialMineSkills: SkillVM[];
   initialOrgSkills: SkillVM[];
@@ -222,6 +224,8 @@ export function SkillsApp({
   currentOrg: OrgVM;
   initialRoute: SkillsRoute;
   initialRouteSource: SkillsRouteSource;
+  /** Server-read `SKILLPACK_PUBLIC_CATALOG`; the listing toggle is hidden while the catalog is off. */
+  publicCatalogEnabled?: boolean;
 }) {
   const router = useRouter();
   const orgActions = useOrgActions();
@@ -1924,6 +1928,11 @@ export function SkillsApp({
       {publicReleaseSkill && (
         <PublicReleaseDialog
           skill={publicReleaseSkill}
+          catalog={
+            publicCatalogEnabled && canManagePublicListing(publicReleaseSkill, me.id, currentOrg.myRole)
+              ? { orgSlug: currentOrg.slug }
+              : null
+          }
           onClose={() => setPublicReleaseSkill(null)}
           onChanged={(publicVersion) => {
             const updateRows = (rows: SkillVM[]) =>

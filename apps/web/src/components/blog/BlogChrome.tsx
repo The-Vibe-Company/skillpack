@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 
 export const BLOG_CONTENT_ID = "blog-content";
 
-export function BlogShell({ children }: { children: React.ReactNode }) {
+export function BlogShell({ children, footerLabel = "Skillpack blog" }: { children: React.ReactNode; footerLabel?: string }) {
   return (
     <div className="v10-landing v10-blog">
       <a className="v10-skip" href={`#${BLOG_CONTENT_ID}`}>Skip to content</a>
@@ -35,7 +35,7 @@ export function BlogShell({ children }: { children: React.ReactNode }) {
           <Link className="v5-brand" href="/" aria-label="Skillpack home">
             <img className="v10-wordmark v10-wordmark--sm" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
           </Link>
-          <span className="v10-footer__by">Skillpack blog</span>
+          <span className="v10-footer__by">{footerLabel}</span>
           <span className="v10-footer__links">
             <Link href="/blog">Blog</Link>
             <Link href="/privacy">Privacy</Link>
@@ -63,6 +63,33 @@ export function ArticleMarkdown({ body }: { body: string }) {
   return (
     <div className="v10-blog__prose">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={ARTICLE_COMPONENTS}>
+        {body}
+      </ReactMarkdown>
+    </div>
+  );
+}
+
+const PUBLISHED_SKILL_COMPONENTS: Components = {
+  ...ARTICLE_COMPONENTS,
+  // The page owns the only H1 (the skill name), so an authored H1 renders one level down.
+  h1({ children }) {
+    return <h2>{children}</h2>;
+  },
+  // Links in a published SKILL.md are authored by the listing workspace, not by Skillpack.
+  a({ children, href }) {
+    return (
+      <a href={href} rel="nofollow ugc noopener noreferrer">
+        {children}
+      </a>
+    );
+  },
+};
+
+/** Renders a listed skill's SKILL.md with the article styles. Raw HTML in Markdown is not rendered. */
+export function PublishedSkillMarkdown({ body }: { body: string }) {
+  return (
+    <div className="v10-blog__prose">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={PUBLISHED_SKILL_COMPONENTS}>
         {body}
       </ReactMarkdown>
     </div>

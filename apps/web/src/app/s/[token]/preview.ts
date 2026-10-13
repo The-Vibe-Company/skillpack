@@ -19,6 +19,7 @@ export type PublicSkillPreview = SkillPublicPreview & {
 };
 
 const rollingPublicPreviewSchema = skillPublicPreviewSchema.extend({
+  // oxlint-disable-next-line anti-slop/no-shape-in-symbol-names -- Zod exposes the nested release validator only through its shape API.
   public_release: skillPublicPreviewSchema.shape.public_release.optional().default(null),
 });
 
@@ -49,8 +50,4 @@ export function skillDetailHref(preview: PublicSkillPreview): string {
   return skillDetailHrefForSlug(preview.slug);
 }
 
-export function truncateMeta(value: string, max = 180): string {
-  const text = value.replace(/\s+/g, " ").trim();
-  if (text.length <= max) return text;
-  return `${text.slice(0, max - 3).trimEnd()}...`;
-}
+export { truncateMeta } from "@/lib/format";

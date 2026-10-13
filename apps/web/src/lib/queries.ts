@@ -24,8 +24,12 @@ import type {
   ValidationResult,
   FrontmatterWarning,
   GettingStartedState,
+  PublicCatalogSkill,
 } from "@skillpack/contracts";
-import { apiFetch } from "./apiClient";
+import { skillPublicListingResultSchema } from "@skillpack/contracts";
+import type { z } from "zod";
+import { ApiFetchError, apiFetch } from "./apiClient";
+import { publicCatalogSkillApiPath } from "./publicCatalog";
 
 /**
  * Budget for multipart uploads. A skill archive may be 25 MB and a comment can carry images; on a
@@ -147,6 +151,34 @@ export async function clearSkillPublicVersion(slug: string): Promise<SkillPublic
   return apiFetch<SkillPublicVersionResult>(`/v1/skills/${encodeURIComponent(slug)}/public-version`, {
     method: "DELETE",
   });
+}
+
+export type SkillPublicListingResult = z.infer<typeof skillPublicListingResultSchema>;
+
+/** Record or withdraw catalog discovery consent. Unlisting keeps the public release and share link. */
+export async function setSkillPublicListing(slug: string, listed: boolean): Promise<SkillPublicListingResult> {
+  const result = await apiFetch<SkillPublicListingResult>(`/v1/skills/${encodeURIComponent(slug)}/public-listing`, {
+    method: "PUT",
+    body: JSON.stringify({ listed }),
+  });
+  return skillPublicListingResultSchema.parse(result);
+}
+
+/**
+ * No authenticated skill read returns listing state, so it is read from the anonymous catalog:
+ * a listed skill resolves there and anything else is a 404. Only meaningful while the catalog is on.
+ */
+export async function fetchSkillListedPublicly(orgSlug: string, slug: string): Promise<boolean> {
+  try {
+    await apiFetch<PublicCatalogSkill>(publicCatalogSkillApiPath(orgSlug, slug), {
+      credentials: "omit",
+      cache: "no-store",
+    });
+    return true;
+  } catch (cause) {
+    if (cause instanceof ApiFetchError && cause.status === 404) return false;
+    throw cause;
+  }
 }
 
 export interface SkillDetailData {

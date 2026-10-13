@@ -36,9 +36,27 @@ consent before a 304, so unlisting and disabling the flag take effect immediatel
 route pattern and does not trust forwarding headers or retain IP addresses.
 
 Unlisting leaves the public release and share token intact. Withdrawing a release removes discovery
-consent atomically. Archiving also withdraws listing consent; restoring requires a fresh opt-in. No web pages, robots/sitemap changes, catalog install command or moderation
-workflow are provided in this phase. The backend flag defaults off on every deployment, including
-self-hosted instances.
+consent atomically. Archiving also withdraws listing consent; restoring requires a fresh opt-in. No
+catalog install command or moderation workflow is provided in this phase. The backend flag defaults
+off on every deployment, including self-hosted instances.
+
+## Web
+
+The web reads the same `SKILLPACK_PUBLIC_CATALOG` flag; set it on both the API and web services.
+While it is off, catalog pages return 404 and the sitemap omits them.
+
+- `/catalog` (paginated with `?page=`) and `/catalog/:orgSlug/:skillSlug` are server-rendered on
+  every request, anonymous, and indexable. `/skills` remains the authenticated library. A skill page
+  shows the pinned release's name, description, version, release date, checksum, size, file list and
+  rendered `SKILL.md` (raw HTML is not rendered; authored links are `nofollow ugc`). Its install
+  section shows `skillpack auth login` and `skillpack install <slug> --version <version>`, which
+  resolve only for someone with access in the listing workspace; the share token is never shown.
+- `sitemap.xml` adds `/catalog` and every listed skill when the flag is on. Share pages
+  (`/s/:token`) keep their noindex meta tag, and `robots.txt` does not disallow any path.
+- The "Manage public link" dialog shows a "List in the public catalog" toggle to the actors the
+  backend allows (org Owner/Admin; the personal-skill creator), enabled only while a public release
+  exists. No authenticated skill read returns `listed_publicly` yet, so the dialog reads the current
+  state from the anonymous catalog skill endpoint and writes it with `PUT /v1/skills/:slug/public-listing`.
 
 ## Pending decisions
 

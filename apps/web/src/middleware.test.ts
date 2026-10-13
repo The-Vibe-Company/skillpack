@@ -14,6 +14,12 @@ describe("canonical host middleware", () => {
     },
   );
 
+  it.each(["/catalog", "/catalog/acme/release-helper"])("serves public catalog path %s without a redirect", (path) => {
+    const request = new NextRequest(`https://skillpack.app${path}`);
+    expect(legacyRuntimeRedirect(request)).toBeNull();
+    expect(middleware(request).headers.get("location")).toBeNull();
+  });
+
   it("redirects www to the configured apex while preserving path and query", () => {
     const request = new NextRequest("https://www.skillpack.app/skills?lib=mine&skill=demo");
 

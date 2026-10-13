@@ -53,4 +53,5 @@ writing it; reporting agents must also check opt-out before reading any identity
 
 Public catalog discovery requires explicit listing consent in addition to a pinned public release.
 Organization listing is Owner/Admin-only; personal listing is creator-only. Existing releases stay
-unlisted. The anonymous backend is disabled by default; see [public catalog](public-catalog.md).
+unlisted. Consent is a toggle in the "Manage public link" dialog. The anonymous API and the `/catalog`
+web pages are disabled by default; see [public catalog](public-catalog.md).

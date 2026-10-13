@@ -16,6 +16,7 @@ import {
 } from "@/components/skills/route";
 import { AuthUnavailable, WorkspaceLoadError } from "@/components/org/WorkspaceLoadError";
 import { loadServerAuth } from "@/lib/serverAuth";
+import { isPublicCatalogEnabled } from "@/lib/publicCatalog";
 import { mapSkill, type MeVM } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -98,6 +99,7 @@ export default async function SkillsPage({
       currentOrg={current}
       initialRoute={initialRoute}
       initialRouteSource={initialRouteSource}
+      publicCatalogEnabled={isPublicCatalogEnabled()}
     />
   );
 }

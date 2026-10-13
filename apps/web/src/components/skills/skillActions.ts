@@ -1,3 +1,4 @@
+import type { OrgRole } from "@skillpack/contracts";
 import type { SkillVM } from "@/lib/types";
 
 export type SkillActionId =
@@ -79,6 +80,18 @@ export function skillActionPermissions(
     canCorrectInstall: skill.scope === "org",
     canManagePublic: skill.scope === "org" && skill.canManagePublic === true,
   };
+}
+
+/**
+ * Presentation-only mirror of Core `canManagePublicListing`: catalog consent for an org skill is
+ * Owner/Admin-only (even for its Developer creator); a personal skill's is creator-only.
+ */
+export function canManagePublicListing(
+  skill: Pick<SkillVM, "scope" | "authorId">,
+  actorId: string,
+  orgRole: OrgRole,
+): boolean {
+  return skill.scope === "personal" ? skill.authorId === actorId : orgRole === "owner" || orgRole === "admin";
 }
 
 /**

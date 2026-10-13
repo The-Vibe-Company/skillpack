@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { SkillVM } from "@/lib/types";
 import {
   SKILL_ACTIONS,
+  canManagePublicListing,
   resolveSkillActions,
   skillActionPermissions,
   type SkillActionPermissions,
@@ -197,5 +198,22 @@ describe("skillActionPermissions", () => {
       canCorrectInstall: false,
       canManagePublic: false,
     });
+  });
+});
+
+describe("canManagePublicListing", () => {
+  it("keeps org catalog consent Owner/Admin-only, even for a Developer creator", () => {
+    const org = skill({ scope: "org", authorId: "user-1" });
+    expect(canManagePublicListing(org, "user-2", "owner")).toBe(true);
+    expect(canManagePublicListing(org, "user-2", "admin")).toBe(true);
+    expect(canManagePublicListing(org, "user-1", "developer")).toBe(false);
+    expect(canManagePublicListing(org, "user-2", "developer")).toBe(false);
+  });
+
+  it("keeps personal catalog consent creator-only, with no admin override", () => {
+    const personal = skill({ scope: "personal", authorId: "user-1" });
+    expect(canManagePublicListing(personal, "user-1", "developer")).toBe(true);
+    expect(canManagePublicListing(personal, "user-2", "owner")).toBe(false);
+    expect(canManagePublicListing(personal, "user-2", "admin")).toBe(false);
   });
 });
