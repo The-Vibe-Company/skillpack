@@ -42,26 +42,64 @@ describe("home structured data", () => {
 });
 
 describe("blog post structured data", () => {
-  it("states only the post's frontmatter facts and its URL", () => {
-    const data = blogPostingStructuredData({
+  const FACTS = {
+    headline: "A post",
+    description: "What it covers.",
+    datePublished: "2026-10-13",
+    url: "https://skillpack.app/blog/a-post",
+    image: "https://skillpack.app/blog/a-post/opengraph-image",
+    keywords: ["SKILL.md", "Agent Skills"],
+    author: { kind: "organization", name: "The Vibe Company", url: "https://thevibecompany.co" },
+    homeUrl: "https://skillpack.app/",
+    blogUrl: "https://skillpack.app/blog",
+  } as const;
+
+  it("states the post's frontmatter facts, credited author, publisher and share image", () => {
+    expect(blogPostingStructuredData(FACTS)["@graph"][0]).toEqual({
+      "@type": "BlogPosting",
       headline: "A post",
       description: "What it covers.",
       datePublished: "2026-10-13",
       url: "https://skillpack.app/blog/a-post",
+      mainEntityOfPage: "https://skillpack.app/blog/a-post",
+      image: "https://skillpack.app/blog/a-post/opengraph-image",
+      keywords: ["SKILL.md", "Agent Skills"],
+      author: { "@type": "Organization", name: "The Vibe Company", url: "https://thevibecompany.co" },
+      publisher: {
+        "@type": "Organization",
+        "@id": "https://skillpack.app/#organization",
+        name: "Skillpack",
+        url: "https://skillpack.app",
+      },
     });
+  });
 
-    expect(data).toEqual({
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "BlogPosting",
-          headline: "A post",
-          description: "What it covers.",
-          datePublished: "2026-10-13",
-          url: "https://skillpack.app/blog/a-post",
-          mainEntityOfPage: "https://skillpack.app/blog/a-post",
-        },
+  it("credits a named author as a person and omits keywords for an untagged post", () => {
+    const [posting] = blogPostingStructuredData({
+      ...FACTS,
+      keywords: [],
+      author: { kind: "person", name: "Ada Lovelace" },
+    })["@graph"];
+
+    expect(posting).toMatchObject({ author: { "@type": "Person", name: "Ada Lovelace" } });
+    expect(posting).not.toHaveProperty("keywords");
+  });
+
+  it("adds the Home › Blog › post breadcrumb trail", () => {
+    expect(blogPostingStructuredData(FACTS)["@graph"][1]).toEqual({
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://skillpack.app/" },
+        { "@type": "ListItem", position: 2, name: "Blog", item: "https://skillpack.app/blog" },
+        { "@type": "ListItem", position: 3, name: "A post", item: "https://skillpack.app/blog/a-post" },
       ],
     });
+  });
+
+  it("claims no ratings, prices or modification dates the frontmatter does not state", () => {
+    const serialized = JSON.stringify(blogPostingStructuredData(FACTS));
+    for (const property of ["aggregateRating", "review", "offers", "price", "dateModified", "sameAs"]) {
+      expect(serialized).not.toContain(`"${property}"`);
+    }
   });
 });

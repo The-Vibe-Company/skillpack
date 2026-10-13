@@ -38,6 +38,10 @@ async function renderLanding(): Promise<HTMLElement> {
   await act(async () => {
     root.render(React.createElement(LandingPage));
   });
+  // The hero demo is a lazy client island; wait for its chunk before querying it.
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
   return container;
 }
 
@@ -183,11 +187,50 @@ describe("LandingPage portal preview", () => {
     expect(container.textContent).not.toContain("your data never leave the building");
   });
 
+  it("keeps one H1 and gives every section a descriptive H2", async () => {
+    const container = await renderLanding();
+    const sectionHeading = (id: string) => container.querySelector(`#${id} h2`)?.textContent;
+
+    expect(container.querySelectorAll("h1")).toHaveLength(1);
+    expect(container.querySelector('[data-screen-label="agents-strip"] h2')?.textContent).toBe(
+      "Install skills into Claude Code, Codex and OpenCode",
+    );
+    expect(sectionHeading("problem")).toBe("Why teams need a private skills registry");
+    expect(sectionHeading("how")).toBe("How Skillpack versions and installs SKILL.md packages");
+    expect(sectionHeading("agents")).toBe("Connect Claude Code, Codex and OpenCode securely");
+    expect(sectionHeading("open-source")).toBe("Open-source, self-hosted skills hub");
+  });
+
+  it("keeps landing claims verifiable: no demo metrics, real CLI install flow and only supported --tools agents", async () => {
+    const container = await renderLanding();
+    const strip = container.querySelector<HTMLElement>('[data-screen-label="agents-strip"]');
+    const agents = Array.from(strip?.querySelectorAll(".lp-agent") ?? []).map((agent) => agent.lastChild?.textContent);
+    const installStep = Array.from(container.querySelectorAll<HTMLElement>(".lp-step")).find(
+      (step) => step.querySelector("h3")?.textContent === "Install everywhere",
+    );
+
+    expect(agents).toEqual(["Claude Code", "Codex", "OpenCode"]);
+    expect(container.textContent).not.toContain("Any MCP client");
+    expect(Array.from(container.querySelectorAll(".lp-hub__node strong")).map((node) => node.textContent)).toEqual([
+      "Claude Code",
+      "OpenCode",
+      "Codex",
+    ]);
+    expect(container.textContent).not.toContain("12,480");
+    expect(container.textContent).not.toContain("last 30 days");
+    expect(installStep?.textContent).toContain("--tools");
+    expect(installStep?.textContent).toContain("sha256");
+    expect(installStep?.textContent).toContain("--pin");
+    expect(installStep?.textContent).toContain("skillpack update --all --dry-run");
+    expect(installStep?.textContent).toContain("skillpack sync --frozen");
+    expect(installStep?.textContent).not.toContain("when the checksum changes");
+  });
+
   it("publishes SoftwareApplication and Organization JSON-LD for search engines", async () => {
     const container = await renderLanding();
     const scripts = container.querySelectorAll('script[type="application/ld+json"]');
 
-    expect(scripts).toHaveLength(1);
+    expect(scripts).toHaveLength(2);
     expect(JSON.parse(scripts[0]?.textContent ?? "null")).toMatchObject({
       "@context": "https://schema.org",
       "@graph": [

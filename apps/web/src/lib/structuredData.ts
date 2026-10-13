@@ -1,7 +1,8 @@
+import type { BlogAuthor } from "./blog";
 import { HOME_DESCRIPTION } from "./siteMetadata";
 import { PRODUCTION_SITE_URL } from "./siteUrl";
 
-export type JsonLdValue = string | JsonLdValue[] | JsonLdNode;
+export type JsonLdValue = string | number | JsonLdValue[] | JsonLdNode;
 type JsonLdNode = { [key: string]: JsonLdValue };
 export type JsonLdDocument = { "@context": "https://schema.org"; "@graph": JsonLdNode[] };
 
@@ -35,20 +36,80 @@ export function serializeJsonLd(data: JsonLdValue): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
-export type BlogPostingFacts = { headline: string; description: string; datePublished: string; url: string };
+export type BlogPostingFacts = {
+  headline: string;
+  description: string;
+  datePublished: string;
+  url: string;
+  /** Absolute URL of the post's generated share image. */
+  image: string;
+  /** The post's frontmatter tags. */
+  keywords: readonly string[];
+  author: BlogAuthor;
+  /** Absolute URLs of the site root and the blog index, the post's breadcrumb trail. */
+  homeUrl: string;
+  blogUrl: string;
+};
 
-/** A BlogPosting stating only what the post's frontmatter says; no invented author or images. */
+type JsonLdAuthor = { "@type": "Person"; name: string } | { "@type": "Organization"; name: string; url: string };
+
+function authorNode(author: BlogAuthor): JsonLdAuthor {
+  if (author.kind === "person") return { "@type": "Person", name: author.name };
+  return { "@type": "Organization", name: author.name, url: author.url };
+}
+
+/**
+ * A BlogPosting and its breadcrumb trail, stating only what the post's frontmatter and URL say:
+ * the credited author, the site publisher, and the share image the site generates for it.
+ */
 export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocument {
+  const posting = {
+    "@type": "BlogPosting",
+    headline: facts.headline,
+    description: facts.description,
+    datePublished: facts.datePublished,
+    url: facts.url,
+    mainEntityOfPage: facts.url,
+    image: facts.image,
+    author: authorNode(facts.author),
+    publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: "Skillpack", url: PRODUCTION_SITE_URL },
+  };
+  const trail = [
+    { name: "Home", url: facts.homeUrl },
+    { name: "Blog", url: facts.blogUrl },
+    { name: facts.headline, url: facts.url },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      facts.keywords.length > 0 ? { ...posting, keywords: [...facts.keywords] } : posting,
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: trail.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.url,
+        })),
+      },
+    ],
+  };
+}
+
+export type FaqEntry = { question: string; answer: string };
+
+/** A FAQPage built from the entries the page renders, so it cannot drift from the visible text. */
+export function faqPageStructuredData(entries: readonly FaqEntry[]): JsonLdDocument {
   return {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "BlogPosting",
-        headline: facts.headline,
-        description: facts.description,
-        datePublished: facts.datePublished,
-        url: facts.url,
-        mainEntityOfPage: facts.url,
+        "@type": "FAQPage",
+        mainEntity: entries.map((entry) => ({
+          "@type": "Question",
+          name: entry.question,
+          acceptedAnswer: { "@type": "Answer", text: entry.answer },
+        })),
       },
     ],
   };
