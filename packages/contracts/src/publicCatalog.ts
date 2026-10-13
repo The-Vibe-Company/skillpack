@@ -34,8 +34,24 @@ export const publicCatalogPathSchema = z.object({
 });
 
 export const setSkillPublicListingInputSchema = z.object({ listed: z.boolean() }).strict();
-export const skillPublicListingResultSchema = z.object({
+export const catalogSubmissionStatusSchema = z.enum(["proposed", "validated", "rejected", "withdrawn"]);
+export const catalogSubmissionKindSchema = z.enum(["publish_request", "submission"]);
+
+export const skillPublicListingStatusSchema = z.object({
   listed_publicly: z.boolean(),
   listed_at: z.string().datetime().nullable(),
+  latest_submission: z.object({
+    id: z.string().uuid(),
+    status: catalogSubmissionStatusSchema,
+    kind: catalogSubmissionKindSchema,
+  }).strip().nullable(),
+  rejection_reason: z.string().nullable(),
+  can_manage_listing: z.boolean(),
+}).strip();
+export type SkillPublicListingStatus = z.infer<typeof skillPublicListingStatusSchema>;
+
+export const skillPublicListingResultSchema = skillPublicListingStatusSchema.extend({
   changed: z.boolean(),
 }).strip();
+export type SkillPublicListingResult = z.infer<typeof skillPublicListingResultSchema>;
+export const requestSkillPublicListingInputSchema = z.object({}).strict();

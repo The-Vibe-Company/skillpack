@@ -1,11 +1,13 @@
 /* oxlint-disable anti-slop/no-shape-in-symbol-names -- the contracts package exposes the nested file validator through Zod's shape API. */
 
-import { and, eq, isNull, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db, schema, type Db } from "@skillpack/db";
 import {
   publicCatalogSkillSchema,
   type PublicCatalogSkill,
   type OrgRole,
+  type SkillPublicListingStatus,
+  type SkillPublicListingResult,
 } from "@skillpack/contracts";
 import type { ActorContext } from "./services";
 import {
@@ -14,6 +16,7 @@ import {
   SkillPublicReleaseForbiddenError,
   SkillPublicReleaseNotFoundError,
 } from "./services";
+import { withdrawOpenCatalogSubmissions } from "./catalogSubmissionLifecycle";
 import { canManagePublicListing } from "./authz";
 
 export interface PublicCatalogQuery {
@@ -34,12 +37,6 @@ export interface SetSkillPublicListingInput {
   expectedPublicVersionId?: string;
   expectedChecksum?: string;
   database?: Db;
-}
-
-export interface SkillPublicListingResult {
-  listed_publicly: boolean;
-  listed_at: string | null;
-  changed: boolean;
 }
 
 interface PublicCatalogFunctionRow {
@@ -87,137 +84,134 @@ function resultRows<T>(result: Iterable<T>): T[] {
   return Array.from(result);
 }
 
-/**
- * Set explicit public discovery consent for one immutable public release. This is a tenant
- * mutation, so membership and scope authorization are checked before the conditional update. Org
- * catalog consent is Owner/Admin-only; personal skills cannot be listed.
- */
-export async function setSkillPublicListing(
-  input: SetSkillPublicListingInput,
-): Promise<SkillPublicListingResult> {
-  const packageFiles = input.packageFiles === undefined
-    ? undefined
-    : publicCatalogSkillSchema.shape.files.parse(input.packageFiles);
+type ListingSkill = typeof schema.skills.$inferSelect;
+type Submission = typeof schema.catalogSubmissions.$inferSelect;
+type ListingInput = { actor: ActorContext; orgId: string; slug: string; database?: Db };
+
+async function listingSkill(input: ListingInput, database: Db, lock = false) {
+  const role = await assertMember(database, input.actor, input.orgId);
+  const query = database.select().from(schema.skills).where(and(
+    eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug),
+  ));
+  const [skill] = await (lock ? query.for("update") : query);
+  if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
+    throw new SkillPublicReleaseNotFoundError("skill not found");
+  }
+  if (skill.scope !== "org") {
+    throw new SkillPublicReleaseForbiddenError("share this personal skill with the organization before requesting publication");
+  }
+  return { skill, role };
+}
+
+async function listingStatus(database: Db, orgId: string, skill: ListingSkill, role: OrgRole): Promise<SkillPublicListingStatus> {
+  const latest = await database.query.catalogSubmissions.findFirst({
+    where: and(eq(schema.catalogSubmissions.orgId, orgId), eq(schema.catalogSubmissions.skillId, skill.id)),
+    orderBy: [desc(schema.catalogSubmissions.createdAt), desc(schema.catalogSubmissions.id)],
+  });
+  return {
+    listed_publicly: skill.listedPublicly,
+    listed_at: skill.listedAt?.toISOString() ?? null,
+    latest_submission: latest ? { id: latest.id, status: latest.status, kind: latest.kind } : null,
+    rejection_reason: latest?.rejectionReason ?? null,
+    can_manage_listing: canManagePublicListing({ id: skill.creatorId, orgRole: role }, skill),
+  };
+}
+
+export async function getSkillPublicListing(input: ListingInput): Promise<SkillPublicListingStatus> {
   const database = input.database ?? db;
   return database.transaction(async (tx) => {
     const transactionDatabase: unknown = tx;
-    // SAFETY: Drizzle's transaction surface has the same schema and query contract as Db; only
-    // the private client holder differs while this callback is active.
-    const tenantDatabase = transactionDatabase as Db;
-    const role: OrgRole = await assertMember(tenantDatabase, input.actor, input.orgId);
-    const skill = await tenantDatabase.query.skills.findFirst({
-      where: and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug)),
-    });
-    if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
-      throw new SkillPublicReleaseNotFoundError("skill not found");
-    }
-    if (!canManagePublicListing({ id: input.actor.id, orgRole: role }, skill)) {
-      throw new SkillPublicReleaseForbiddenError("only an organization Owner/Admin may manage org catalog discovery");
-    }
-    if (input.expectedPublicVersionId && input.expectedPublicVersionId !== skill.publicVersionId) {
-      throw new SkillPublicReleaseConflictError("the public release changed concurrently; refresh and try again");
-    }
-    if (input.expectedChecksum && input.expectedChecksum !== skill.publicPackageChecksum) {
-      throw new SkillPublicReleaseConflictError("the public release changed concurrently; refresh and try again");
-    }
-    if (input.listed && skill.archivedAt) {
-      throw new SkillPublicReleaseConflictError("restore the skill before listing it publicly");
-    }
-    if (
-      input.listed
-      && (
-        !skill.publicVersionId
-        || !skill.publicPackageChecksum
-        || skill.publicPackageSizeBytes == null
-        || !skill.publicReleasedAt
-        || (packageFiles === undefined && skill.publicPackageFiles == null)
-      )
-    ) {
-      throw new SkillPublicReleaseConflictError("prepare a complete public release before listing it");
-    }
+    // SAFETY: transaction queries share the Db schema and query contract.
+    const tenantDb = transactionDatabase as Db;
+    const { skill, role } = await listingSkill(input, tenantDb);
+    return listingStatus(tenantDb, input.orgId, skill, role);
+  });
+}
 
-    const changed = skill.listedPublicly !== input.listed;
-    const filesChanged = packageFiles !== undefined
-      && JSON.stringify(skill.publicPackageFiles ?? null) !== JSON.stringify(packageFiles);
-    if (input.listed && skill.publicPackageFiles && filesChanged) {
+function assertListingRole(role: OrgRole, request: boolean) {
+  if (request ? role !== "developer" : role !== "owner" && role !== "admin") {
+    throw new SkillPublicReleaseForbiddenError(request
+      ? "only a Developer may request publication; Owner/Admin can submit directly"
+      : "only an organization Owner/Admin may manage org catalog discovery");
+  }
+}
+
+function completeRelease(skill: ListingSkill) {
+  if (skill.archivedAt) throw new SkillPublicReleaseConflictError("restore the skill before requesting publication");
+  if (!skill.publicVersionId || !skill.publicPackageChecksum || skill.publicPackageSizeBytes == null || !skill.publicReleasedAt) {
+    throw new SkillPublicReleaseConflictError("prepare a complete public release before requesting publication");
+  }
+  return { versionId: skill.publicVersionId, checksum: skill.publicPackageChecksum, sizeBytes: skill.publicPackageSizeBytes };
+}
+
+async function auditSubmission(database: Db, actorId: string, submission: Submission, action: string) {
+  await database.insert(schema.auditLog).values({
+    orgId: submission.orgId, actorId, action, targetType: "catalog_submission", targetId: submission.id,
+    metadata: { skillId: submission.skillId, releaseVersionId: submission.skillVersionId, kind: submission.kind, status: submission.status },
+  });
+}
+
+/** Owner/Admin submits the current release; only validation may enable discovery. */
+export async function setSkillPublicListing(input: SetSkillPublicListingInput): Promise<SkillPublicListingResult> {
+  return mutateListing(input, false);
+}
+
+/** Developer requests are inert until an Owner/Admin submits them. */
+export async function requestSkillPublicListing(input: Omit<SetSkillPublicListingInput, "listed">): Promise<SkillPublicListingResult> {
+  return mutateListing({ ...input, listed: true }, true);
+}
+
+async function mutateListing(input: SetSkillPublicListingInput, request: boolean): Promise<SkillPublicListingResult> {
+  const database = input.database ?? db;
+  return database.transaction(async (tx) => {
+    const transactionDatabase: unknown = tx;
+    // SAFETY: transaction queries share the Db schema and query contract.
+    const tenantDb = transactionDatabase as Db;
+    const { skill, role } = await listingSkill(input, tenantDb, true);
+    assertListingRole(role, request);
+    const open = await tenantDb.query.catalogSubmissions.findFirst({
+      where: and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.skillId, skill.id), eq(schema.catalogSubmissions.status, "proposed")),
+    });
+    if (!input.listed) {
+      const changed = skill.listedPublicly || !!open;
+      await tenantDb.update(schema.skills).set({ listedPublicly: false, listedAt: null }).where(and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, skill.id)));
+      await withdrawOpenCatalogSubmissions({ database: tenantDb, orgId: input.orgId, skillId: skill.id, actorId: input.actor.id });
+      if (skill.listedPublicly) await tenantDb.insert(schema.auditLog).values({
+        orgId: input.orgId, actorId: input.actor.id, action: "skill.public_listing.clear", targetType: "skill", targetId: skill.id,
+        metadata: { slug: skill.slug },
+      });
+      return { ...await listingStatus(tenantDb, input.orgId, { ...skill, listedPublicly: false, listedAt: null }, role), changed };
+    }
+    const release = completeRelease(skill);
+    if ((input.expectedPublicVersionId && input.expectedPublicVersionId !== release.versionId)
+      || (input.expectedChecksum && input.expectedChecksum !== release.checksum)) {
+      throw new SkillPublicReleaseConflictError("the public release changed concurrently; refresh and try again");
+    }
+    if (input.packageFiles === undefined && skill.publicPackageFiles === null) {
+      throw new SkillPublicReleaseConflictError("prepare a complete public release before requesting publication");
+    }
+    const files = publicCatalogSkillSchema.shape.files.parse(input.packageFiles ?? skill.publicPackageFiles);
+    if (skill.publicPackageFiles && JSON.stringify(files) !== JSON.stringify(skill.publicPackageFiles)) {
       throw new SkillPublicReleaseConflictError("the public release file list changed; refresh and try again");
     }
-    const listedAt = input.listed
-      ? (changed ? new Date() : skill.listedAt)
-      : null;
-    const expectedListedAt = skill.listedAt
-      ? eq(schema.skills.listedAt, skill.listedAt)
-      : isNull(schema.skills.listedAt);
-    const expectedPublicVersion = skill.publicVersionId
-      ? eq(schema.skills.publicVersionId, skill.publicVersionId)
-      : isNull(schema.skills.publicVersionId);
-    const expectedChecksum = skill.publicPackageChecksum
-      ? eq(schema.skills.publicPackageChecksum, skill.publicPackageChecksum)
-      : isNull(schema.skills.publicPackageChecksum);
-    const expectedSize = skill.publicPackageSizeBytes != null
-      ? eq(schema.skills.publicPackageSizeBytes, skill.publicPackageSizeBytes)
-      : isNull(schema.skills.publicPackageSizeBytes);
-    const expectedReleasedAt = skill.publicReleasedAt
-      ? eq(schema.skills.publicReleasedAt, skill.publicReleasedAt)
-      : isNull(schema.skills.publicReleasedAt);
-    type ListingUpdate = {
-      listedPublicly?: boolean;
-      listedAt?: Date | null;
-      publicPackageFiles?: PublicCatalogSkill["files"];
-      updatedAt?: Date;
-    };
-    const update: ListingUpdate = changed
-      ? { listedPublicly: input.listed, listedAt, updatedAt: new Date() }
-      : filesChanged
-        ? { publicPackageFiles: packageFiles, updatedAt: new Date() }
-        : { listedPublicly: input.listed };
-    if (changed && packageFiles !== undefined && !skill.publicPackageFiles) {
-      update.publicPackageFiles = packageFiles;
+    const kind = request ? "publish_request" : "submission";
+    if (open && (request || open.kind === "submission")) {
+      if (open.skillVersionId !== release.versionId || open.packageChecksum !== release.checksum || open.packageSizeBytes !== release.sizeBytes) {
+        throw new SkillPublicReleaseConflictError("withdraw the open submission before submitting a different release");
+      }
+      return { ...await listingStatus(tenantDb, input.orgId, skill, role), changed: false };
     }
-    const [updated] = await tenantDatabase
-      .update(schema.skills)
-      .set(update)
-      .where(and(
-        eq(schema.skills.orgId, input.orgId),
-        eq(schema.skills.id, skill.id),
-        eq(schema.skills.slug, input.slug),
-        eq(schema.skills.scope, skill.scope),
-        eq(schema.skills.creatorId, skill.creatorId),
-        eq(schema.skills.listedPublicly, skill.listedPublicly),
-        expectedListedAt,
-        expectedPublicVersion,
-        expectedChecksum,
-        expectedSize,
-        expectedReleasedAt,
-        ...(input.listed
-          ? [isNull(schema.skills.archivedAt), ...(packageFiles === undefined ? [isNotNull(schema.skills.publicPackageFiles)] : [])]
-          : []),
-      ))
-      .returning({ id: schema.skills.id });
-    if (!updated) {
-      throw new SkillPublicReleaseConflictError("the public listing changed concurrently; refresh and try again");
-    }
-
-    if (changed) {
-      await tenantDatabase.insert(schema.auditLog).values({
-        orgId: input.orgId,
-        actorId: input.actor.id,
-        action: input.listed ? "skill.public_listing.set" : "skill.public_listing.clear",
-        targetType: "skill",
-        targetId: skill.id,
-        metadata: {
-          slug: skill.slug,
-          listed: input.listed,
-          releaseVersionId: skill.publicVersionId,
-        },
-      });
-    }
-
-    return {
-      listed_publicly: input.listed,
-      listed_at: listedAt ? listedAt.toISOString() : null,
-      changed,
-    };
+    const snapshot = { skillVersionId: release.versionId, packageChecksum: release.checksum, packageSizeBytes: release.sizeBytes, packageFiles: files };
+    const [submission] = open
+      ? await tenantDb.update(schema.catalogSubmissions).set({ ...snapshot, kind, submittedBy: input.actor.id })
+          .where(and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, open.id))).returning()
+      : await tenantDb.insert(schema.catalogSubmissions).values({
+          orgId: input.orgId, skillId: skill.id, ...snapshot, kind,
+          requestedBy: request ? input.actor.id : null, submittedBy: request ? null : input.actor.id,
+        }).returning();
+    if (!submission) throw new SkillPublicReleaseConflictError("submission changed concurrently");
+    await auditSubmission(tenantDb, input.actor.id, submission, request ? "catalog_submission.requested" : "catalog_submission.submitted");
+    return { ...await listingStatus(tenantDb, input.orgId, skill, role), changed: true };
   });
 }
 
@@ -229,42 +223,45 @@ export interface PreparedSkillPublicListing {
   packageFiles: PublicCatalogSkill["files"] | null;
 }
 
-/**
- * Read the exact public release identity before an API caller extracts its immutable archive.
- * The caller must pass the returned identity back to setSkillPublicListing as a CAS fence.
- */
-export async function prepareSkillPublicListing(input: {
-  actor: ActorContext;
-  orgId: string;
-  slug: string;
-  database?: Db;
-}): Promise<PreparedSkillPublicListing> {
+/** Authorize before reading storage; compare the identity again under the skill lock. */
+export async function prepareSkillPublicListing(input: ListingInput & { request?: boolean }): Promise<PreparedSkillPublicListing> {
   const database = input.database ?? db;
-  const role: OrgRole = await assertMember(database, input.actor, input.orgId);
-  const skill = await database.query.skills.findFirst({
-    where: and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug)),
+  const { skill, role } = await listingSkill(input, database);
+  assertListingRole(role, input.request ?? false);
+  const release = completeRelease(skill);
+  return { orgId: input.orgId, publicVersionId: release.versionId, checksum: release.checksum, sizeBytes: release.sizeBytes, packageFiles: skill.publicPackageFiles };
+}
+
+/** Internal validation seam. No HTTP/MCP route exposes it before the moderation PR. */
+export async function applyValidatedSubmission(input: { orgId: string; submissionId: string; decidedBy: string; database?: Db }): Promise<void> {
+  const database = input.database ?? db;
+  await database.transaction(async (tx) => {
+    const transactionDatabase: unknown = tx;
+    // SAFETY: transaction queries share the Db schema and query contract.
+    const tenantDb = transactionDatabase as Db;
+    const candidate = await tenantDb.query.catalogSubmissions.findFirst({
+      where: and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, input.submissionId)),
+    });
+    if (!candidate) throw new SkillPublicReleaseNotFoundError("submission not found");
+    const [skill] = await tenantDb.select().from(schema.skills).where(and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, candidate.skillId))).for("update");
+    const submission = await tenantDb.query.catalogSubmissions.findFirst({
+      where: and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, input.submissionId)),
+    });
+    if (!skill || skill.scope !== "org" || skill.archivedAt || !skill.publicVersionId || !submission || submission.kind !== "submission" || submission.status !== "proposed") {
+      throw new SkillPublicReleaseConflictError("only an active proposed submission can be validated");
+    }
+    const decidedAt = new Date();
+    const [validated] = await tenantDb.update(schema.catalogSubmissions).set({ status: "validated", decidedBy: input.decidedBy, decidedAt, rejectionReason: null })
+      .where(and(eq(schema.catalogSubmissions.orgId, input.orgId), eq(schema.catalogSubmissions.id, submission.id), eq(schema.catalogSubmissions.status, "proposed"))).returning();
+    if (!validated) throw new SkillPublicReleaseConflictError("submission changed concurrently");
+    await tenantDb.update(schema.skills).set({ listedPublicly: true, listedAt: decidedAt, updatedAt: decidedAt })
+      .where(and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.id, skill.id)));
+    await auditSubmission(tenantDb, input.decidedBy, validated, "catalog_submission.validated");
+    await tenantDb.insert(schema.auditLog).values({
+      orgId: input.orgId, actorId: input.decidedBy, action: "skill.public_listing.set", targetType: "skill", targetId: skill.id,
+      metadata: { submissionId: submission.id, releaseVersionId: submission.skillVersionId },
+    });
   });
-  if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
-    throw new SkillPublicReleaseNotFoundError("skill not found");
-  }
-  if (!canManagePublicListing({ id: input.actor.id, orgRole: role }, skill)) {
-    throw new SkillPublicReleaseForbiddenError("only an organization Owner/Admin may manage org catalog discovery");
-  }
-  if (
-    !skill.publicVersionId
-    || !skill.publicPackageChecksum
-    || skill.publicPackageSizeBytes == null
-    || !skill.publicReleasedAt
-  ) {
-    throw new SkillPublicReleaseConflictError("promote a complete public release before listing it");
-  }
-  return {
-    orgId: input.orgId,
-    publicVersionId: skill.publicVersionId,
-    checksum: skill.publicPackageChecksum,
-    sizeBytes: skill.publicPackageSizeBytes,
-    packageFiles: skill.publicPackageFiles,
-  };
 }
 
 /** List explicit public catalog entries through the pre-tenant SECURITY DEFINER projection. */

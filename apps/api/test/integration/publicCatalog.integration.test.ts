@@ -18,6 +18,7 @@ import {
   SkillPublicReleaseNotFoundError,
 } from "@skillpack/core/services";
 import {
+  applyValidatedSubmission,
   getPublicCatalogSkill,
   listPublicCatalog,
   prepareSkillPublicListing,
@@ -67,6 +68,12 @@ describe("public catalog", () => {
     await setSkillPublicVersion(releaseInput);
   }
 
+  async function submitAndValidate(input: Parameters<typeof setSkillPublicListing>[0]) {
+    const result = await setSkillPublicListing(input);
+    if (!result.latest_submission) throw new Error("missing submission");
+    await applyValidatedSubmission({ orgId: input.orgId, submissionId: result.latest_submission.id, decidedBy: fixture.owner.id, database: integrationDb });
+  }
+
   async function skillRow(skill: SeededSkill) {
     const [row] = await integrationDb
       .select()
@@ -110,12 +117,7 @@ describe("public catalog", () => {
       database: integrationDb,
     })).rejects.toBeInstanceOf(SkillPublicReleaseConflictError);
 
-    await expect(
-      integrationDb
-        .update(schema.skills)
-        .set({ listedPublicly: true, listedAt: new Date() })
-        .where(eq(schema.skills.id, skill.id)),
-    ).rejects.toThrow();
+    expect(await integrationDb.query.catalogSubmissions.findFirst({ where: eq(schema.catalogSubmissions.skillId, skill.id) })).toBeUndefined();
   });
 
   it("allows only Owner/Admin org discovery consent and fences non-members", async () => {
@@ -148,7 +150,10 @@ describe("public catalog", () => {
       slug: skill.slug,
       listed: true,
       database: integrationDb,
-    })).resolves.toMatchObject({ listed_publicly: true, changed: true });
+    })).resolves.toMatchObject({ listed_publicly: false, latest_submission: { status: "proposed", kind: "submission" }, changed: true });
+    const submission = await integrationDb.query.catalogSubmissions.findFirst({ where: eq(schema.catalogSubmissions.skillId, skill.id) });
+    if (!submission) throw new Error("missing submission");
+    await applyValidatedSubmission({ orgId: fixture.orgA, submissionId: submission.id, decidedBy: fixture.owner.id, database: integrationDb });
 
     const catalog = await getPublicCatalogSkill({
       orgSlug: `integration-a-${fixture.suffix}`,
@@ -188,7 +193,7 @@ describe("public catalog", () => {
       scope: "org",
     });
     await promote(skill, fixture.developer);
-    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug, listed: true, database: integrationDb });
+    await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug, listed: true, database: integrationDb });
 
     try {
       await integrationDb.update(schema.memberships)
@@ -305,7 +310,7 @@ describe("public catalog", () => {
       path: labelPath,
       createdBy: fixture.owner.id,
     });
-    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
 
     const draftId = randomUUID();
     await integrationDb.insert(schema.skillVersions).values({
@@ -347,7 +352,7 @@ describe("public catalog", () => {
       slug: `catalog-mcp-${fixture.suffix.slice(0, 8)}`, scope: "org",
     });
     await promote(skill, fixture.owner);
-    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA,
+    await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA,
       slug: skill.slug, listed: true, database: integrationDb });
     const directory = await mkdtemp(join(tmpdir(), "catalog-mcp-"));
     const client = new Client({ name: "catalog-integration", version: "1" });
@@ -388,6 +393,9 @@ describe("public catalog", () => {
       const zip = await tarGzToZip(packed.archive);
       const checksum = `sha256:${createHash("sha256").update(zip).digest("hex")}`;
       expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`,
+        skillSlug: skill.slug, database: integrationDb })).toMatchObject({ version: "1.0.0", files: FILES });
+      await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+      expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`,
         skillSlug: skill.slug, database: integrationDb })).toMatchObject({
         version: "2.0.0", body: "New public instructions.", checksum,
         files: [
@@ -419,7 +427,7 @@ describe("public catalog", () => {
       scope: "org",
     });
     await promote(skill, fixture.owner);
-    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
     const listed = await skillRow(skill);
 
     await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: false, database: integrationDb });
@@ -430,7 +438,7 @@ describe("public catalog", () => {
     expect(unlisted.shareToken).toBe(listed.shareToken);
     expect(await getPublicCatalogSkill({ orgSlug: `integration-a-${fixture.suffix}`, skillSlug: skill.slug, database: integrationDb })).toBeNull();
 
-    await setSkillPublicListing({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    await submitAndValidate({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
     await clearSkillPublicVersion({ actor: fixture.owner, orgId: fixture.orgA, slug: skill.slug, database: integrationDb });
     const cleared = await skillRow(skill);
     expect(cleared.publicVersionId).toBeNull();
@@ -454,7 +462,7 @@ describe("public catalog", () => {
       scope: "org",
     });
     await promote(skill, fixture.developer);
-    await setSkillPublicListing({ actor: fixture.admin, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
+    await submitAndValidate({ actor: fixture.admin, orgId: fixture.orgA, slug: skill.slug, listed: true, database: integrationDb });
     await archiveSkill({ actor: fixture.developer, orgId: fixture.orgA, slug: skill.slug, database: integrationDb });
     const archived = await skillRow(skill);
     expect(archived.archivedAt).toBeInstanceOf(Date);

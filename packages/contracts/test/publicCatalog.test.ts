@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { publicCatalogSkillSchema, setSkillPublicListingInputSchema } from "../src/publicCatalog";
+import { publicCatalogSkillSchema, skillPublicListingStatusSchema, requestSkillPublicListingInputSchema, setSkillPublicListingInputSchema } from "../src/publicCatalog";
 
 describe("catalog privacy contract", () => {
   it("projects only released presentation content, including nested file entries", () => {
@@ -22,4 +22,16 @@ describe("catalog privacy contract", () => {
     }
     expect(setSkillPublicListingInputSchema.parse({ listed: false })).toEqual({ listed: false });
   });
+});
+
+
+it("strips internal identity and token fields from listing status", () => {
+  const value = skillPublicListingStatusSchema.parse({
+    listed_publicly: false, listed_at: null, latest_submission: {
+      id: "11111111-1111-4111-8111-111111111111", status: "rejected", kind: "submission", share_token: "private",
+    }, rejection_reason: "Unsupported package", can_manage_listing: true, share_token: "private", submitted_by: "private",
+  });
+  expect(JSON.stringify(value)).not.toContain("private");
+  expect(value.rejection_reason).toBe("Unsupported package");
+  expect(requestSkillPublicListingInputSchema.safeParse({ version: "override" }).success).toBe(false);
 });

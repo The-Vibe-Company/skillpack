@@ -1,3 +1,4 @@
+import { withdrawOpenCatalogSubmissions } from "./catalogSubmissionLifecycle";
 /* oxlint-disable anti-slop/no-conditional-empty-object-spread, anti-slop/no-known-value-widening, anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters, anti-slop/no-unknown-returns, anti-slop/no-unsafe-dictionary-type, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion -- This shared legacy service module predates the incremental anti-slop gate; the profile timezone path uses typed Drizzle fields and validated input. */
 import { createHash, randomBytes } from "node:crypto";
 import { and, asc, count, desc, eq, exists, inArray, isNull, ne, not, or, sql } from "drizzle-orm";
@@ -1356,11 +1357,13 @@ async function publicReleaseSkillForActor(input: {
   actor: ActorContext;
   orgId: string;
   slug: string;
+  lock?: boolean;
 }): Promise<{ skill: typeof schema.skills.$inferSelect; role: OrgRole }> {
   const role = await assertMember(input.database, input.actor, input.orgId);
-  const skill = await input.database.query.skills.findFirst({
-    where: and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug)),
-  });
+  const where = and(eq(schema.skills.orgId, input.orgId), eq(schema.skills.slug, input.slug));
+  const skill = input.lock
+    ? (await input.database.select().from(schema.skills).where(where).for("update"))[0]
+    : await input.database.query.skills.findFirst({ where });
   if (!skill || (skill.scope === "personal" && skill.creatorId !== input.actor.id)) {
     throw new SkillPublicReleaseNotFoundError("skill not found");
   }
@@ -1473,9 +1476,6 @@ export async function setSkillPublicVersion(input: {
               publicPackageSizeBytes: input.packageSizeBytes,
               publicPackageFiles: packageFiles ?? null,
               publicReleasedAt: new Date(),
-              ...(skill.listedPublicly && packageFiles === undefined
-                ? { listedPublicly: false, listedAt: null }
-                : {}),
               updatedAt: new Date(),
             }
           : filesChanged
@@ -1529,16 +1529,6 @@ export async function setSkillPublicVersion(input: {
         changed,
       },
     });
-    if (changed && skill.listedPublicly && packageFiles === undefined) {
-      await tenantDb.insert(schema.auditLog).values({
-        orgId: input.orgId,
-        actorId: input.actor.id,
-        action: "skill.public_listing.clear",
-        targetType: "skill",
-        targetId: skill.id,
-        metadata: { slug: skill.slug, reason: "public_release_file_snapshot_missing" },
-      });
-    }
     return { ok: true as const, public_version: version.version, share_token: skill.shareToken, changed };
   });
 }
@@ -1553,7 +1543,7 @@ export async function clearSkillPublicVersion(input: {
   const database = input.database ?? db;
   return database.transaction(async (tx) => {
     const tenantDb = tx as unknown as Db;
-    const { skill } = await publicReleaseSkillForActor({ ...input, database: tenantDb });
+    const { skill } = await publicReleaseSkillForActor({ ...input, database: tenantDb, lock: true });
     const previousVersion = skill.publicVersionId
       ? await tenantDb.query.skillVersions.findFirst({
           columns: { version: true },
@@ -1615,6 +1605,7 @@ export async function clearSkillPublicVersion(input: {
       targetId: skill.id,
       metadata: { slug: skill.slug, previousVersion: previousVersion?.version ?? null, changed },
     });
+    await withdrawOpenCatalogSubmissions({ database: tenantDb, orgId: input.orgId, skillId: skill.id, actorId: input.actor.id });
     if (skill.listedPublicly) {
       await tenantDb.insert(schema.auditLog).values({
         orgId: input.orgId,
@@ -3998,6 +3989,7 @@ export async function archiveSkill(input: {
       targetId: skill.id,
       metadata: { slug: skill.slug, reason: input.reason ?? null },
     });
+    await withdrawOpenCatalogSubmissions({ database: transactionDb, orgId: input.orgId, skillId: skill.id, actorId: input.actor.id });
     if (skillState?.listedPublicly) {
       await transactionDb.insert(schema.auditLog).values({
         orgId: input.orgId,

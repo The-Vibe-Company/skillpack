@@ -134,6 +134,8 @@ const dbMocks = vi.hoisted(() => ({
 
 const coreMocks = vi.hoisted(() => ({
   setSkillPublicListing: vi.fn(),
+  getSkillPublicListing: vi.fn(),
+  requestSkillPublicListing: vi.fn(),
   prepareSkillPublicListing: vi.fn(),
 }));
 
@@ -1059,8 +1061,9 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
     serviceMocks.resolveApiToken.mockImplementation(async (token: string) => tokenFor(token));
     coreMocks.prepareSkillPublicListing.mockResolvedValue({ orgId: "org-1", publicVersionId: "version-1",
       checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0", sizeBytes: 10 });
-    coreMocks.setSkillPublicListing.mockResolvedValue({ listed_publicly: true,
-      listed_at: "2026-10-13T00:00:00.000Z", changed: true, share_token: "private-token" });
+    coreMocks.setSkillPublicListing.mockResolvedValue({ listed_publicly: false,
+      listed_at: null, latest_submission: { id: "11111111-1111-4111-8111-111111111111", status: "proposed", kind: "submission" },
+      rejection_reason: null, can_manage_listing: true, changed: true, share_token: "private-token" });
   });
 
   it("requires authentication and write authority before recording consent", async () => {
@@ -1083,7 +1086,7 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
     expect(coreMocks.setSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({
       actor: actorA, orgId: "org-1", slug: "review", listed: true,
     }));
-    expect(await response.json()).toEqual({ listed_publicly: true, listed_at: "2026-10-13T00:00:00.000Z", changed: true });
+    expect(await response.json()).toEqual({ listed_publicly: false, listed_at: null, latest_submission: { id: "11111111-1111-4111-8111-111111111111", status: "proposed", kind: "submission" }, rejection_reason: null, can_manage_listing: true, changed: true });
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 
@@ -1096,7 +1099,7 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
     expect(rejected.status).toBe(409);
     expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
     vi.clearAllMocks();
-    coreMocks.setSkillPublicListing.mockResolvedValueOnce({ listed_publicly: false, listed_at: null, changed: true });
+    coreMocks.setSkillPublicListing.mockResolvedValueOnce({ listed_publicly: false, listed_at: null, latest_submission: null, rejection_reason: null, can_manage_listing: true, changed: true });
     const unlisted = await app.request("/v1/skills/review/public-listing", {
       method: "PUT", headers: { "content-type": "application/json", authorization: "Bearer write-only" },
       body: JSON.stringify({ listed: false }),
@@ -1115,5 +1118,52 @@ describe("PUT /v1/skills/:slug/public-listing", () => {
     });
     expect(response.status).toBe(400);
     expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("public listing status and Developer requests", () => {
+  const state = { listed_publicly: false, listed_at: null, latest_submission: null,
+    rejection_reason: null, can_manage_listing: false };
+  beforeEach(() => {
+    vi.clearAllMocks();
+    authMocks.getSession.mockResolvedValue(null);
+    serviceMocks.resolveApiToken.mockImplementation(async (token: string) => tokenFor(token));
+    coreMocks.getSkillPublicListing.mockResolvedValue({ ...state, share_token: "private-token" });
+    coreMocks.requestSkillPublicListing.mockResolvedValue({ ...state, changed: true, share_token: "private-token" });
+    coreMocks.prepareSkillPublicListing.mockResolvedValue({ orgId: "org-1", publicVersionId: "version-1",
+      checksum: "sha256:9ea6c6f0f341bbc742ca319c2df80d21a059322f0191be46a75e19b709a969f0", sizeBytes: 10 });
+  });
+  it("returns token-free selected-workspace status to a read client", async () => {
+    const response = await app.request("/v1/skills/review/public-listing", { headers: { authorization: "Bearer read-a" } });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual(state);
+    expect(coreMocks.getSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ actor: actorA, orgId: "org-1" }));
+    expect(response.headers.get("cache-control")).toBe("no-store");
+  });
+  it("authenticates status and requires write scope for requests", async () => {
+    expect((await app.request("/v1/skills/review/public-listing")).status).toBeGreaterThanOrEqual(400);
+    for (const token of [null, "read-a"]) {
+      const headers = new Headers({ "content-type": "application/json" });
+      if (token) headers.set("authorization", `Bearer ${token}`);
+      const response = await app.request("/v1/skills/review/public-listing/request", { method: "POST", headers, body: "{}" });
+      expect(response.status).toBeGreaterThanOrEqual(400);
+    }
+    expect(coreMocks.requestSkillPublicListing).not.toHaveBeenCalled();
+  });
+  it("verifies bytes and delegates an inert request without leaking a share token", async () => {
+    const response = await app.request("/v1/skills/review/public-listing/request", { method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer write-only" }, body: "{}" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ...state, changed: true });
+    expect(coreMocks.prepareSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ request: true }));
+    expect(coreMocks.requestSkillPublicListing).toHaveBeenCalledWith(expect.objectContaining({ orgId: "org-1", actor: actorA }));
+    expect(coreMocks.setSkillPublicListing).not.toHaveBeenCalled();
+  });
+  it("rejects client-chosen authority on requests", async () => {
+    const response = await app.request("/v1/skills/review/public-listing/request", { method: "POST",
+      headers: { "content-type": "application/json", authorization: "Bearer write-only" }, body: JSON.stringify({ org_id: "org-2" }) });
+    expect(response.status).toBe(400);
+    expect(coreMocks.prepareSkillPublicListing).not.toHaveBeenCalled();
   });
 });

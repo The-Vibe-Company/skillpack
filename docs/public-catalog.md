@@ -1,54 +1,76 @@
 # Public catalog backend
 
-The anonymous catalog is disabled unless `SKILLPACK_PUBLIC_CATALOG=true`. Existing skills remain
-unlisted, including existing public releases. Listing is a separate explicit consent decision;
-creating or promoting a public release does not opt a skill into discovery.
-The catalog includes organization skills only. Personal skills must first be shared with the
-organization before public release promotion or listing.
+The anonymous catalog is disabled unless `SKILLPACK_PUBLIC_CATALOG=true`. Existing releases remain
+unlisted. Catalog publication is a separate explicit decision from public release promotion and
+share-link access. Only organization skills can be submitted; personal skills must first be shared.
 
-## API
+## Publication API
 
-- `PUT /v1/skills/:slug/public-listing` with `{ "listed": true }` or `{ "listed": false }`
-  uses the authenticated selected workspace and `skills:write` authority. Only organization skills
-  can be listed, and listing requires Owner/Admin. Developers cannot list directly.
-  Listing requires a complete public release. Changes write audit events.
+All listing routes require authentication in the selected workspace, recheck live membership, and
+reject cross-tenant access. Personal skill status stays creator-private and personal publication is
+rejected. Responses and audit metadata never include share tokens. Listing responses use `no-store`.
+
+- `PUT /v1/skills/:slug/public-listing` requires `skills:write` and Owner/Admin.
+  `{ "listed": true }` creates a `proposed` submission containing the current public version ID,
+  exact ZIP checksum, byte size and file snapshot. It requires a complete, unarchived organization
+  public release and verifies release bytes before recording the proposal. It does **not** enable
+  discovery. If a Developer request is open, the PUT converts it to a submission, preserves its
+  requester, records the submitting admin and freezes the release current at approval time.
+- `POST /v1/skills/:slug/public-listing/request` with `{}` requires `skills:write` and Developer.
+  It creates an inert `proposed` row of kind `publish_request`, awaiting Owner/Admin submission.
+  The release is frozen in the request too; admin submission refreshes that snapshot to the then
+  current release. Owner/Admin submit directly with PUT.
+- `GET /v1/skills/:slug/public-listing` requires `skills:read` and organization membership.
+  It returns `listed_publicly`, `listed_at`, `latest_submission` (nullable `{ id, status, kind }`),
+  `rejection_reason` and `can_manage_listing`. Mutation responses add `changed`.
+- `{ "listed": false }` on PUT immediately unpublishes and withdraws any open request/submission.
+  The public release and share token stay intact. Archiving or withdrawing the public release also
+  clears discovery and withdraws open submissions atomically. Restoration needs a fresh submission.
+
+`catalog_submissions` uses tenant RLS, organization-bound skill/version foreign keys, and a partial
+unique index allowing at most one `proposed` row per skill. Repeating a proposal for the same release
+is idempotent; an open submission for different release bytes must first be withdrawn. The status
+values are `proposed`, `validated`, `rejected`, and `withdrawn`. Every implemented transition writes
+an audit event in the same transaction. A rejected proposal can be followed by a fresh proposal;
+rejection is a fixture-only transition in this PR, pending the moderation API.
+
+Only validation enables discovery. The internal core seam `applyValidatedSubmission` is called by
+tests in this phase and has no HTTP or MCP endpoint. It accepts only an active proposed `submission`,
+records the decision and sets listing visibility atomically. Developer requests cannot be validated.
+Stan owns moderation; automated checks and the moderator API arrive in PRs 3 and 4 respectively.
+
+A listed skill continues serving the previously validated snapshot while a new public release is
+promoted or proposed. Validation of a newer submission replaces that catalog version atomically.
+The catalog reads the latest validated submission's frozen version, checksum, size and files, never
+the mutable public release pin or a later private draft. There is no submission backfill.
+
+## Anonymous catalog API
+
 - `GET /v1/public/catalog/skills?limit=20&offset=0&label=engineering` is anonymous.
   `limit` is 1–50 and `offset` is 0–10000. The optional label is an exact organization label path;
-  personal labels are private and are never used for discovery. Results are ordered by organization
-  slug and skill slug. `next_offset` is null for a short page or the pagination bound; a full final
-  page may be followed by an empty page.
+  personal labels never participate. Results are ordered by organization slug and skill slug.
+  `next_offset` is null for a short page or pagination bound; a full final page can be followed by
+  an empty page.
 - `GET /v1/public/catalog/skills/:orgSlug/:skillSlug` is anonymous and returns 404 when unlisted,
-  personal, archived, missing, or disabled. Both paths use existing slugs; the organization slug is already
-  unique, and organization name edits do not change it.
+  unvalidated, personal, archived, missing, or disabled. Organization and skill slugs identify entries;
+  existing public-release rename restrictions apply.
 
-Each skill contains only `org_name`, `org_slug`, `skill_slug`, `name`, `description`, `version`,
-`released_at`, `checksum`, `size_bytes`, `body`, and `files` (`path`, `size_bytes`). The instructions,
-name, description and file list come from the pinned public version, never a later draft or current
-private version. The checksum and size describe the existing public ZIP release. A nullable `public_package_files`
-snapshot stores its file paths and sizes; it is populated from verified release bytes at promotion or
-first listing, so older unlisted releases need no backfill. No member identity,
-share token, activity statistics, secret declarations or storage path is serialized. Authored
-instructions and file names are intentionally public when an organization Owner/Admin consents to listing.
+Each entry contains only `org_name`, `org_slug`, `skill_slug`, `name`, `description`, `version`,
+`released_at`, `checksum`, `size_bytes`, `body`, and `files` (`path`, `size_bytes`). `released_at` is
+when the selected submission was validated. Content comes from the frozen skill version and ZIP
+snapshot. No member identity, share token, activity statistics, secret declarations or storage path
+is serialized. Authored instructions and file names are intentionally public after validation.
 
-Responses support ETag caching with mandatory revalidation: every request checks current listing
-consent before a 304, so unlisting and disabling the flag take effect immediately. Errors use
-`no-store`. A process-wide cap of 600 requests per minute follows the existing anonymous usage
-route pattern and does not trust forwarding headers or retain IP addresses.
-
-Unlisting leaves the public release and share token intact. Withdrawing a release removes discovery
-consent atomically. Archiving also withdraws listing consent; restoring requires a fresh opt-in. No web pages, robots/sitemap changes, catalog install command or moderation
-workflow are provided in this phase. The backend flag defaults off on every deployment, including
-self-hosted instances.
+Anonymous responses support ETag caching with mandatory revalidation. Every request checks current
+visibility before a 304, so unlisting and disabling the flag take effect immediately. Errors use
+`no-store`. A process-wide cap of 600 requests per minute follows the existing anonymous usage route
+pattern and does not trust forwarding headers or retain IP addresses. The narrowly scoped
+pre-tenant PostgreSQL functions are executable by the API role only.
 
 ## Later publishing PRs
 
-The approved plan will add Developer publication requests, MIT/Apache-2.0 license enforcement,
-and anonymous installs by slug for published skills. This backend keeps the PUT listing consent
-semantics; submissions and catalog installs are not implemented in this PR. Share tokens remain
-excluded from catalog responses.
-
-## Pending decisions
-
-- Moderation ownership, report handling and SLA; listing-specific credential scanning and bans.
-- Whether managed hosting should enable the catalog; self-hosted deployments default off.
-- Redirect policy for future slug renames. Existing public-release rename restrictions apply.
+PR 2/9 adds submissions and frozen validated versions, stacked on PR #26's org-only catalog API.
+It contains no checks engine, moderator API, catalog install command, or frontend. Later PRs add
+MIT/Apache-2.0 enforcement, validation and moderation, and anonymous installs by slug. Share tokens
+remain separate and excluded from every listing and catalog response. Self-hosted deployments
+remain disabled by default; enabling the catalog on managed hosting remains a deployment decision.
