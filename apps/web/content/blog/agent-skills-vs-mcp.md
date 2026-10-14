@@ -68,7 +68,7 @@ Most real setups need both. Anthropic said so at launch: it plans to explore how
 
 A typical example: a Linear MCP server lets the agent read and update issues. A `triage` skill tells it which labels to use, how to judge priority and what to write in the comment. The server gives access. The skill gives the method.
 
-Skillpack works the same way. Skills are `SKILL.md` packages, and the Skills Hub also runs an MCP server. After you approve the connection, a connected agent can search, read, publish and install your team's skills.
+Skillpack works the same way. Skills are `SKILL.md` packages, and the Skills Hub also runs an MCP server. After you approve the connection, a connected agent can search, read and publish your team's skills, and record installs.
 
 ## Sharing skills across a team
 
