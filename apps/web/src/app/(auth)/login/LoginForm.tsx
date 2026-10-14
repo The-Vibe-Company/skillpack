@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/cds";
+import { armSignupMarker, signupPagePath, withSignupMarker } from "@/lib/signupMarker";
 
 /* ============================================================================
    Icons — Lucide-style line glyphs (24x24, currentColor, ~1.75 stroke).
@@ -391,7 +392,9 @@ export function LoginForm({
   const verifyBackRef = useRef<Screen>("signup");
 
   const goGoogle = () => {
-    window.location.href = `/v1/auth/google?next=${encodeURIComponent(next)}`;
+    const signupPage = encodeURIComponent(window.location.pathname);
+    armSignupMarker(() => window.sessionStorage);
+    window.location.href = `/v1/auth/google?next=${encodeURIComponent(next)}&signup_page=${signupPage}`;
   };
 
   return (
@@ -662,7 +665,10 @@ function Verify({ email, next, onBack }: { email: string; next: string; onBack: 
     try {
       const { data } = await postJson("/v1/auth/verify-email", { email, otp: value, next });
       if (data.ok && typeof data.redirect === "string") {
-        window.location.href = data.redirect;
+        // Verification creates the session, so it completes an email signup whichever screen led here.
+        const signupPage = signupPagePath(window.location.pathname) ?? "/login";
+        armSignupMarker(() => window.sessionStorage);
+        window.location.href = withSignupMarker(data.redirect, { method: "email", signupPage });
         return;
       }
       setErr(typeof data.message === "string" ? data.message : "That code is incorrect.");

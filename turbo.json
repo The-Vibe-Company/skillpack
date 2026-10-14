@@ -18,7 +18,8 @@
         "NEXT_PUBLIC_SENTRY_RELEASE",
         "NEXT_PUBLIC_SUPABASE_ANON_KEY",
         "NEXT_PUBLIC_SUPABASE_URL",
-        "NODE_ENV"
+        "NODE_ENV",
+        "VERCEL_ENV"
       ]
     },
     "dev": {

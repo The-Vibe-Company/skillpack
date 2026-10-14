@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { agentAuthProxyHeaders, canonicalAliasRedirect, legacyCatalogRedirect, legacyRuntimeRedirect, middleware } from "./middleware";
+import {
+  agentAuthProxyHeaders,
+  canonicalAliasRedirect,
+  legacyCatalogRedirect,
+  legacyRuntimeRedirect,
+  middleware,
+  posthogProxyHeaders,
+  trailingSlashRedirect,
+} from "./middleware";
 
 describe("canonical host middleware", () => {
   it.each(["/projects", "/projects/legacy/session", "/runs/legacy"])(
@@ -23,13 +31,31 @@ describe("canonical host middleware", () => {
     expect(response.headers.get("location")).toBe(location);
   });
 
-  it.each(["/catalog", "/catalog/", "/catalog/acme/release-helper", "/catalog/the-vibe-company/skillpack"])(
+  it.each(["/catalog", "/catalog/acme/release-helper", "/catalog/the-vibe-company/skillpack"])(
     "serves public catalog path %s without a redirect",
     (path) => {
       const request = new NextRequest(`https://skillpack.app${path}`);
       expect(legacyCatalogRedirect(request)).toBeNull();
       expect(legacyRuntimeRedirect(request)).toBeNull();
       expect(middleware(request).headers.get("location")).toBeNull();
+    },
+  );
+
+  it.each([
+    ["/catalog/", "https://skillpack.app/catalog"],
+    ["/blog/agent-skills/?ref=x", "https://skillpack.app/blog/agent-skills?ref=x"],
+    ["/v1/auth/whoami//", "https://skillpack.app/v1/auth/whoami"],
+  ])("keeps the default permanent trailing-slash redirect for %s", (path, location) => {
+    const response = middleware(new NextRequest(`https://skillpack.app${path}`));
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(location);
+  });
+
+  it.each(["/", "/ingest/e/", "/ingest/flags/", "/ingest/static/array.js"])(
+    "leaves %s for the router and the PostHog proxy",
+    (path) => {
+      expect(trailingSlashRedirect(new NextRequest(`https://skillpack.app${path}`))).toBeNull();
+      expect(middleware(new NextRequest(`https://skillpack.app${path}`)).headers.get("location")).toBeNull();
     },
   );
 
@@ -75,6 +101,33 @@ describe("canonical host middleware", () => {
       new NextRequest("https://skillpack.app/skills"),
       "https://skillpack.app",
     )).toBeNull();
+  });
+
+  it("strips Skillpack credentials from requests proxied to PostHog", () => {
+    const request = new NextRequest("https://skillpack.app/ingest/e/", {
+      headers: {
+        cookie: "__Secure-better-auth.session_token=secret; companion_org=org-1",
+        authorization: "Bearer pat",
+        "content-type": "text/plain",
+      },
+    });
+
+    const headers = posthogProxyHeaders(request);
+    expect(headers?.has("cookie")).toBe(false);
+    expect(headers?.has("authorization")).toBe(false);
+    expect(headers?.get("content-type")).toBe("text/plain");
+
+    const response = middleware(request);
+    const forwarded = response.headers.get("x-middleware-override-headers")?.split(",") ?? [];
+    expect(forwarded).toContain("content-type");
+    expect(forwarded).not.toContain("cookie");
+    expect(forwarded).not.toContain("authorization");
+    expect(response.headers.get("x-middleware-request-cookie")).toBeNull();
+  });
+
+  it("leaves credentials on non-PostHog paths", () => {
+    expect(posthogProxyHeaders(new NextRequest("https://skillpack.app/ingestion"))).toBeNull();
+    expect(posthogProxyHeaders(new NextRequest("https://skillpack.app/skills"))).toBeNull();
   });
 
   it("forwards the Agent Auth origin marker into the external rewrite request", () => {

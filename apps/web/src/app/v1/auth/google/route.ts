@@ -1,7 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiBaseUrl, responseSetCookies, safeNext, type AuthJson } from "@/lib/authProxy";
+import { z } from "zod";
+import { apiBaseUrl, responseSetCookies, safeNext } from "@/lib/authProxy";
+import { signupPagePath, withSignupMarker } from "@/lib/signupMarker";
 
 export const dynamic = "force-dynamic";
+
+/** Better Auth's sign-in/social answer: the provider consent URL to send the browser to. */
+const socialSignIn = z.object({ url: z.string().url() });
 
 function webOrigin(request: NextRequest): string {
   return process.env.COMPANION_WEB_URL ?? request.nextUrl.origin;
@@ -26,6 +31,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   };
   const errorRedirect = () => NextResponse.redirect(loginErrorUrl("Google sign-in is unavailable."), 303);
   const callbackURL = new URL(next, origin).toString();
+  const signupPage = signupPagePath(request.nextUrl.searchParams.get("signup_page")) ?? "/login";
 
   try {
     const response = await fetch(`${apiBaseUrl()}/auth/sign-in/social`, {
@@ -37,14 +43,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         provider: "google",
         callbackURL,
         // `/skills` already redirects a not-yet-onboarded user to `/onboarding`. Keeping the same
-        // validated target for new users preserves public-install and device-approval return paths.
-        newUserCallbackURL: callbackURL,
+        // validated target for new users preserves public-install and device-approval return paths;
+        // only the signup marker fragment distinguishes them.
+        newUserCallbackURL: withSignupMarker(callbackURL, { method: "google", signupPage }),
         errorCallbackURL: loginErrorUrl("Google sign-in failed.").toString(),
       }),
     });
-    const json = (await response.json().catch(() => null)) as AuthJson;
-    if (response.ok && json?.url) {
-      const redirect = NextResponse.redirect(json.url, 303);
+    const json = socialSignIn.safeParse(await response.json().catch(() => null));
+    if (response.ok && json.success) {
+      const redirect = NextResponse.redirect(json.data.url, 303);
       for (const cookie of responseSetCookies(response)) redirect.headers.append("set-cookie", cookie);
       return redirect;
     }

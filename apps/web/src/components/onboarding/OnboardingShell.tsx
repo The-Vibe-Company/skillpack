@@ -2,6 +2,7 @@
 
 import { useRef, type ReactNode } from "react";
 import { Icon } from "@/components/Icon";
+import { analytics } from "@/lib/analytics";
 
 export type OnboardingStep = "workspace" | "team" | "agent";
 
@@ -72,7 +73,10 @@ export function OnboardingShell({
           <button
             type="button"
             className="ob-logout"
-            onClick={() => logoutForm.current?.submit()}
+            onClick={() => {
+              analytics.reset();
+              logoutForm.current?.submit();
+            }}
             aria-label="Log out"
             title="Log out"
           >
