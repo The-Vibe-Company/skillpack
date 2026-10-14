@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { analytics } from "@/lib/analytics";
 import { apiFetch, ApiFetchError } from "@/lib/apiClient";
 import { formatAgentConstraints } from "@/lib/agentAuth";
 import { Icon } from "@/components/Icon";
 
 interface RequestedCapability {
   name: string;
+  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- Predates the anti-slop gate; matches formatAgentConstraints in lib/agentAuth.
   constraints: Record<string, unknown> | null;
   reason: string | null;
 }
@@ -116,7 +118,7 @@ export function DeviceCapabilitiesApproval({ agentId, code }: { agentId: string;
         <h1>Approval could not continue</h1>
         <p>{error ?? "This request is unavailable or has expired."}</p>
         {reauthRequired ? (
-          <form className="device-approval__reauth" method="post" action="/v1/auth/logout">
+          <form className="device-approval__reauth" method="post" action="/v1/auth/logout" onSubmit={() => analytics.reset()}>
             <input type="hidden" name="next" value={`/device/capabilities?${query}`} />
             <button className="btn-primary" type="submit">Sign in again</button>
           </form>

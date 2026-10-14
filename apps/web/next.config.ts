@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { posthogHosts, posthogRewrites } from "./src/lib/posthogHosts";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -10,6 +11,12 @@ const config: NextConfig = {
   outputFileTracingRoot: repoRoot,
   // Internal workspace packages ship TypeScript source; transpile them.
   transpilePackages: ["@skillpack/contracts", "@skillpack/skills", "@skillpack/core"],
+  // Analytics only runs on the Vercel production deployment. Inline the build's environment so the
+  // client sees it even when the project does not auto-expose Vercel system variables.
+  env: { NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "" },
+  // PostHog's API paths end in a slash (`/e/`, `/flags/`); a trailing-slash redirect would break the
+  // /ingest proxy.
+  skipTrailingSlashRedirect: true,
   // Blog posts are read from content/blog at build time; keep them beside standalone output too in
   // case a route renders on demand.
   outputFileTracingIncludes: {
@@ -40,6 +47,8 @@ const config: NextConfig = {
       { source: "/auth/:path*", destination: `${api}/auth/:path*` },
       { source: "/v1/:path*", destination: `${api}/v1/:path*` },
       { source: "/trpc/:path*", destination: `${api}/trpc/:path*` },
+      // First-party PostHog proxy so tracking-domain blockers do not drop product analytics.
+      ...posthogRewrites(posthogHosts(process.env.NEXT_PUBLIC_POSTHOG_HOST)),
     ];
   },
 };

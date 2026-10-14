@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { agentAuthProxyHeaders, canonicalAliasRedirect, legacyCatalogRedirect, legacyRuntimeRedirect, middleware } from "./middleware";
+import {
+  agentAuthProxyHeaders,
+  canonicalAliasRedirect,
+  legacyCatalogRedirect,
+  legacyRuntimeRedirect,
+  middleware,
+  trailingSlashRedirect,
+} from "./middleware";
 
 describe("canonical host middleware", () => {
   it.each(["/projects", "/projects/legacy/session", "/runs/legacy"])(
@@ -23,13 +30,31 @@ describe("canonical host middleware", () => {
     expect(response.headers.get("location")).toBe(location);
   });
 
-  it.each(["/catalog", "/catalog/", "/catalog/acme/release-helper", "/catalog/the-vibe-company/skillpack"])(
+  it.each(["/catalog", "/catalog/acme/release-helper", "/catalog/the-vibe-company/skillpack"])(
     "serves public catalog path %s without a redirect",
     (path) => {
       const request = new NextRequest(`https://skillpack.app${path}`);
       expect(legacyCatalogRedirect(request)).toBeNull();
       expect(legacyRuntimeRedirect(request)).toBeNull();
       expect(middleware(request).headers.get("location")).toBeNull();
+    },
+  );
+
+  it.each([
+    ["/catalog/", "https://skillpack.app/catalog"],
+    ["/blog/agent-skills/?ref=x", "https://skillpack.app/blog/agent-skills?ref=x"],
+    ["/v1/auth/whoami//", "https://skillpack.app/v1/auth/whoami"],
+  ])("keeps the default permanent trailing-slash redirect for %s", (path, location) => {
+    const response = middleware(new NextRequest(`https://skillpack.app${path}`));
+    expect(response.status).toBe(308);
+    expect(response.headers.get("location")).toBe(location);
+  });
+
+  it.each(["/", "/ingest/e/", "/ingest/flags/", "/ingest/static/array.js"])(
+    "leaves %s for the router and the PostHog proxy",
+    (path) => {
+      expect(trailingSlashRedirect(new NextRequest(`https://skillpack.app${path}`))).toBeNull();
+      expect(middleware(new NextRequest(`https://skillpack.app${path}`)).headers.get("location")).toBeNull();
     },
   );
 

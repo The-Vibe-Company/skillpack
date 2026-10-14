@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { analytics } from "@/lib/analytics";
 import { apiFetch, ApiFetchError } from "@/lib/apiClient";
 import { Icon } from "@/components/Icon";
 
@@ -112,7 +113,7 @@ export function McpConsentApproval({ consentCode, returnPath }: { consentCode: s
         <h1>Connection could not continue</h1>
         <p>{error ?? "This request is unavailable or has expired."}</p>
         {reauthRequired ? (
-          <form className="device-approval__reauth" method="post" action="/v1/auth/logout">
+          <form className="device-approval__reauth" method="post" action="/v1/auth/logout" onSubmit={() => analytics.reset()}>
             <input type="hidden" name="next" value={returnPath} />
             <button className="btn-primary" type="submit">Sign in again</button>
           </form>

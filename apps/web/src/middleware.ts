@@ -1,4 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { POSTHOG_PROXY_PATH } from "@/lib/posthogHosts";
+
+/**
+ * `skipTrailingSlashRedirect` keeps PostHog's slash-terminated API paths intact behind the /ingest
+ * proxy. Every other URL keeps Next.js's default permanent redirect to its slash-less form.
+ */
+export function trailingSlashRedirect(request: NextRequest): URL | null {
+  const pathname = request.nextUrl.pathname;
+  if (pathname === "/" || !pathname.endsWith("/")) return null;
+  if (pathname.startsWith(`${POSTHOG_PROXY_PATH}/`)) return null;
+  // A plain URL: NextURL keeps the request's trailing-slash flag and would put the slash back.
+  const destination = new URL(request.nextUrl.href);
+  destination.pathname = pathname.replace(/\/+$/, "");
+  return destination;
+}
 
 export function canonicalAliasRedirect(request: NextRequest, configuredWebUrl = process.env.COMPANION_WEB_URL) {
   if (!configuredWebUrl) return null;
@@ -82,6 +97,8 @@ export function legacyCatalogRedirect(request: NextRequest): URL | null {
 }
 
 export function middleware(request: NextRequest) {
+  const slashless = trailingSlashRedirect(request);
+  if (slashless) return NextResponse.redirect(slashless, 308);
   const destination = canonicalAliasRedirect(request);
   if (destination) return NextResponse.redirect(destination, 308);
   const skillsDestination = legacyRuntimeRedirect(request);

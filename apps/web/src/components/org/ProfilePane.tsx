@@ -6,6 +6,7 @@ import { Icon } from "../Icon";
 import { UserAvatar } from "../UserAvatar";
 import { PaneHead, EditField } from "./paneKit";
 import type { OrgCtx } from "./model";
+import { analytics } from "@/lib/analytics";
 import { reopenGettingStarted } from "@/lib/queries";
 
 /**
@@ -126,7 +127,10 @@ export function ProfilePane({ ctx }: { ctx: OrgCtx }) {
   // route handler clears the session cookie and 303s to /login in one shot. A client-side
   // `fetch` + `router.push` races the redirect — the still-live cookie bounces back to /skills.
   const logoutForm = useRef<HTMLFormElement>(null);
-  const signOut = () => logoutForm.current?.submit();
+  const signOut = () => {
+    analytics.reset();
+    logoutForm.current?.submit();
+  };
   const showGettingStarted = async () => {
     if (resuming) return;
     setResuming(true);
