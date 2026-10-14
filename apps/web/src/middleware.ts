@@ -96,6 +96,19 @@ export function legacyCatalogRedirect(request: NextRequest): URL | null {
   return destination;
 }
 
+/**
+ * The /ingest proxy is same-origin, so the browser attaches Skillpack's session cookie to every
+ * PostHog request. Drop credentials before the external rewrite so they never reach PostHog.
+ */
+export function posthogProxyHeaders(request: NextRequest): Headers | null {
+  const pathname = request.nextUrl.pathname;
+  if (pathname !== POSTHOG_PROXY_PATH && !pathname.startsWith(`${POSTHOG_PROXY_PATH}/`)) return null;
+  const headers = new Headers(request.headers);
+  headers.delete("cookie");
+  headers.delete("authorization");
+  return headers;
+}
+
 export function middleware(request: NextRequest) {
   const slashless = trailingSlashRedirect(request);
   if (slashless) return NextResponse.redirect(slashless, 308);
@@ -105,6 +118,6 @@ export function middleware(request: NextRequest) {
   if (skillsDestination) return NextResponse.redirect(skillsDestination, 308);
   const catalogDestination = legacyCatalogRedirect(request);
   if (catalogDestination) return NextResponse.redirect(catalogDestination, 301);
-  const headers = agentAuthProxyHeaders(request);
+  const headers = posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request);
   return headers ? NextResponse.next({ request: { headers } }) : NextResponse.next();
 }

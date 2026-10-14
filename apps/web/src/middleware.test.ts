@@ -6,6 +6,7 @@ import {
   legacyCatalogRedirect,
   legacyRuntimeRedirect,
   middleware,
+  posthogProxyHeaders,
   trailingSlashRedirect,
 } from "./middleware";
 
@@ -100,6 +101,33 @@ describe("canonical host middleware", () => {
       new NextRequest("https://skillpack.app/skills"),
       "https://skillpack.app",
     )).toBeNull();
+  });
+
+  it("strips Skillpack credentials from requests proxied to PostHog", () => {
+    const request = new NextRequest("https://skillpack.app/ingest/e/", {
+      headers: {
+        cookie: "__Secure-better-auth.session_token=secret; companion_org=org-1",
+        authorization: "Bearer pat",
+        "content-type": "text/plain",
+      },
+    });
+
+    const headers = posthogProxyHeaders(request);
+    expect(headers?.has("cookie")).toBe(false);
+    expect(headers?.has("authorization")).toBe(false);
+    expect(headers?.get("content-type")).toBe("text/plain");
+
+    const response = middleware(request);
+    const forwarded = response.headers.get("x-middleware-override-headers")?.split(",") ?? [];
+    expect(forwarded).toContain("content-type");
+    expect(forwarded).not.toContain("cookie");
+    expect(forwarded).not.toContain("authorization");
+    expect(response.headers.get("x-middleware-request-cookie")).toBeNull();
+  });
+
+  it("leaves credentials on non-PostHog paths", () => {
+    expect(posthogProxyHeaders(new NextRequest("https://skillpack.app/ingestion"))).toBeNull();
+    expect(posthogProxyHeaders(new NextRequest("https://skillpack.app/skills"))).toBeNull();
   });
 
   it("forwards the Agent Auth origin marker into the external rewrite request", () => {

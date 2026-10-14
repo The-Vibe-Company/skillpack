@@ -16,6 +16,8 @@ export interface SignupMarker {
 
 const METHOD_KEY = "signed_up";
 const PAGE_KEY = "signup_page";
+/** Tab-scoped flag set by the login form, so a shared or crafted link cannot report a signup. */
+const ARMED_KEY = "skillpack:signup-armed";
 
 /** A same-origin pathname, or null. Query and fragment are dropped: only the page is reported. */
 export function signupPagePath(value: string | null): string | null {
@@ -38,6 +40,32 @@ export function withSignupMarker(destination: string, marker: SignupMarker): str
   if (destination.includes("#")) return destination;
   const params = new URLSearchParams({ [METHOD_KEY]: marker.method, [PAGE_KEY]: marker.signupPage });
   return `${destination}#${params.toString()}`;
+}
+
+/**
+ * Called by the login form right before it leaves for a signup completion (OTP redirect or Google).
+ * sessionStorage stays with the tab across the Google round trip. Storage is passed as a getter because
+ * merely reading `window.sessionStorage` throws where site storage is blocked; the signup then simply
+ * goes unreported.
+ */
+export function armSignupMarker(storage: () => Pick<Storage, "setItem">): void {
+  try {
+    storage().setItem(ARMED_KEY, "1");
+  } catch {
+    // Private modes may refuse storage; analytics is best-effort.
+  }
+}
+
+/** Read and clear the flag. Every page load consumes it, so it never outlives the next landing. */
+export function takeSignupArming(storage: () => Pick<Storage, "getItem" | "removeItem">): boolean {
+  try {
+    const store = storage();
+    const armed = store.getItem(ARMED_KEY) === "1";
+    store.removeItem(ARMED_KEY);
+    return armed;
+  } catch {
+    return false;
+  }
 }
 
 /** Parse a marker from `location.hash`. Anything else in the fragment means it is not ours. */

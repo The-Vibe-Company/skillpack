@@ -4,7 +4,7 @@ import { PostHogProvider as PHProvider } from "@posthog/react";
 import posthog from "posthog-js";
 import { useEffect, type ReactNode } from "react";
 import { analytics, analyticsUser, type Analytics, type AnalyticsUser } from "@/lib/analytics";
-import { readSignupMarker } from "@/lib/signupMarker";
+import { readSignupMarker, takeSignupArming } from "@/lib/signupMarker";
 
 async function loadSignedInUser(): Promise<AnalyticsUser | null> {
   try {
@@ -18,15 +18,17 @@ async function loadSignedInUser(): Promise<AnalyticsUser | null> {
 }
 
 /**
- * Report a signup announced by the page that sent the member here. The marker is removed from the
- * address bar either way, so a reload or a copied link never reports the signup twice.
+ * Report a signup announced by the login form that sent the member here. The marker is removed from
+ * the address bar either way, and it only counts when this tab's login form armed it, so a reload, a
+ * copied link, or a crafted URL never reports a signup.
  */
 export async function reportSignupFromLocation(target: Analytics): Promise<void> {
+  const armed = takeSignupArming(() => window.sessionStorage);
   const marker = readSignupMarker(window.location.hash);
   if (!marker) return;
   const { pathname, search } = window.location;
   window.history.replaceState(window.history.state, "", `${pathname}${search}`);
-  if (!target.init()) return;
+  if (!armed || !target.init()) return;
   target.signedUp(await loadSignedInUser(), marker);
 }
 

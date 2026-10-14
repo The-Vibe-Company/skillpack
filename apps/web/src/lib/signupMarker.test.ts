@@ -1,5 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { readSignupMarker, signupPagePath, withSignupMarker } from "./signupMarker";
+import { armSignupMarker, readSignupMarker, signupPagePath, takeSignupArming, withSignupMarker } from "./signupMarker";
+
+function memoryStorage(): Pick<Storage, "getItem" | "setItem" | "removeItem"> {
+  const values = new Map<string, string>();
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => void values.set(key, value),
+    removeItem: (key) => void values.delete(key),
+  };
+}
+
+function refusingStorage(): Pick<Storage, "getItem" | "setItem" | "removeItem"> {
+  const refuse = () => {
+    throw new Error("SecurityError: storage is disabled");
+  };
+  return { getItem: refuse, setItem: refuse, removeItem: refuse };
+}
 
 describe("signup marker", () => {
   it("round-trips the method and signup page through a URL fragment", () => {
@@ -18,6 +34,27 @@ describe("signup marker", () => {
       expect(readSignupMarker(hash)).toBeNull();
     },
   );
+
+  it("arms one landing page per login-form navigation", () => {
+    const storage = memoryStorage();
+    expect(takeSignupArming(() => storage)).toBe(false);
+
+    armSignupMarker(() => storage);
+
+    expect(takeSignupArming(() => storage)).toBe(true);
+    expect(takeSignupArming(() => storage)).toBe(false);
+  });
+
+  it("treats unavailable storage as unarmed instead of failing the page", () => {
+    const storage = refusingStorage();
+    expect(() => armSignupMarker(() => storage)).not.toThrow();
+    expect(takeSignupArming(() => storage)).toBe(false);
+    const blocked = () => {
+      throw new Error("SecurityError: access to sessionStorage is denied");
+    };
+    expect(() => armSignupMarker(blocked)).not.toThrow();
+    expect(takeSignupArming(blocked)).toBe(false);
+  });
 
   it("reports only a same-origin pathname as the signup page", () => {
     expect(signupPagePath("/login?mode=signup#x")).toBe("/login");

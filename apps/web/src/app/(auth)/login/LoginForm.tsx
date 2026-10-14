@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/cds";
-import { signupPagePath, withSignupMarker } from "@/lib/signupMarker";
+import { armSignupMarker, signupPagePath, withSignupMarker } from "@/lib/signupMarker";
 
 /* ============================================================================
    Icons — Lucide-style line glyphs (24x24, currentColor, ~1.75 stroke).
@@ -393,6 +393,7 @@ export function LoginForm({
 
   const goGoogle = () => {
     const signupPage = encodeURIComponent(window.location.pathname);
+    armSignupMarker(() => window.sessionStorage);
     window.location.href = `/v1/auth/google?next=${encodeURIComponent(next)}&signup_page=${signupPage}`;
   };
 
@@ -666,6 +667,7 @@ function Verify({ email, next, onBack }: { email: string; next: string; onBack: 
       if (data.ok && typeof data.redirect === "string") {
         // Verification creates the session, so it completes an email signup whichever screen led here.
         const signupPage = signupPagePath(window.location.pathname) ?? "/login";
+        armSignupMarker(() => window.sessionStorage);
         window.location.href = withSignupMarker(data.redirect, { method: "email", signupPage });
         return;
       }
