@@ -54,7 +54,7 @@ Commit `.companion/skills.lock.json`. Then a teammate (or CI) runs:
 skillpack sync --frozen
 ```
 
-It checks installed skills against the lockfile and restores anything that's missing or modified. To move to newer versions:
+It checks installed skills against the lockfile and restores missing copies. If someone edited a skill locally, it fails instead of overwriting the change. Sharing skills across several repos? See [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team). To move to newer versions:
 
 ```sh
 skillpack update --all --dry-run
