@@ -68,7 +68,7 @@ Skillpack will only copy files; it will never run package scripts.
 Install this skill? [y/N]
 ```
 
-`--yes` accepts without prompting and retains the warning; CI, redirected input and `--json` require it for changed content. `--dry-run` only prints the plan. Frozen sync prints the warning without asking. Trust a committed lock only after reviewing its source: pinning ensures reproducibility, not safety. Scripts (Git executable mode or `scripts/` paths) are flagged and copied; Skillpack never runs them or automatically installs their dependencies, hooks, tools or secrets.
+`--yes` accepts without prompting and retains the warning; CI, redirected input and `--json` require it for install/update, including an unchanged reinstall. `--dry-run` only prints the plan. Frozen sync prints the warning without asking. Trust a committed lock only after reviewing its source: pinning ensures reproducibility, not safety. Scripts (Git executable mode or `scripts/` paths) are flagged and copied; Skillpack never runs them or automatically installs their dependencies, hooks, tools or secrets.
 
 GitHub entries upgrade `.companion/skills.lock.json` to v3 (user scope: `~/.companion/skills.lock.json`). v2 remains readable; older CLIs reject v3. Existing registry entries and extension metadata survive. Each virtual workspace `github:owner/repo` contains the usual skill and target checksums plus:
 

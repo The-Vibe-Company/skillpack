@@ -446,3 +446,118 @@ func TestGitHubFrozenChecksumSubstitutionPreservesEverything(t *testing.T) {
 		}
 	}
 }
+
+func TestGitHubFrozenRestorationChecksEveryTargetFolder(t *testing.T) {
+	for _, network := range []bool{false, true} {
+		t.Run(fmt.Sprint("network=", network), func(t *testing.T) {
+			_, project := newInstallGitHubFixture(t)
+			if code, _, diag := installGitHubRun(t, project, "--yes"); code != 0 {
+				t.Fatal(code, diag)
+			}
+			path := filepath.Join(project, ".companion", "skills.lock.json")
+			lock, e := readLock(path)
+			if e != nil {
+				t.Fatal(e)
+			}
+			skill := lock.Workspaces["github:acme/skills"].Skills["review"]
+			last := len(skill.Targets) - 1
+			skill.Targets[last].Checksum = "sha256:" + strings.Repeat("a", 64)
+			for i, target := range skill.Targets {
+				if network || i == last {
+					destination, _ := targetPath(target, "review", project)
+					os.RemoveAll(destination)
+				}
+			}
+			lock.Workspaces["github:acme/skills"].Skills["review"] = skill
+			before, _ := json.MarshalIndent(lock, "", "  ")
+			os.WriteFile(path, before, 0600)
+			code, _, diag := invoke(t, "", "sync", "--frozen", "--project", project, "--json")
+			if code != 5 || !strings.Contains(diag, "folder checksum") {
+				t.Fatal("restoration ignored target checksum", code, diag)
+			}
+			after, _ := os.ReadFile(path)
+			if !bytes.Equal(before, after) {
+				t.Fatal("failed restoration changed lock")
+			}
+			for i, target := range skill.Targets {
+				if network || i == last {
+					destination, _ := targetPath(target, "review", project)
+					if _, e := os.Stat(destination); !os.IsNotExist(e) {
+						t.Fatal("partially activated failed restore")
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestGitHubReinstallRequiresNoninteractiveConsent(t *testing.T) {
+	_, project := newInstallGitHubFixture(t)
+	if code, _, diag := installGitHubRun(t, project, "--yes"); code != 0 {
+		t.Fatal(code, diag)
+	}
+	// Even an unchanged JSON install requires the explicit CI acknowledgement.
+	if code, _, _ := installGitHubRun(t, project); code != 2 {
+		t.Fatal("unchanged install bypassed noninteractive consent", code)
+	}
+	target := filepath.Join(project, ".codex", "skills", "review")
+	os.RemoveAll(target)
+	lockPath := filepath.Join(project, ".companion", "skills.lock.json")
+	before, _ := os.ReadFile(lockPath)
+	if code, _, _ := installGitHubRun(t, project); code != 2 {
+		t.Fatal("missing target bypassed consent", code)
+	}
+	if _, e := os.Stat(target); !os.IsNotExist(e) {
+		t.Fatal("unconfirmed target activated")
+	}
+	after, _ := os.ReadFile(lockPath)
+	if !bytes.Equal(before, after) {
+		t.Fatal("unconfirmed install changed lock")
+	}
+	if code, _, diag := invoke(t, "", "sync", "--frozen", "--project", project, "--json"); code != 0 {
+		t.Fatal("frozen unexpectedly required consent", code, diag)
+	}
+}
+
+func TestGitHubSourceExtensionsSurviveReinstallAndUpdate(t *testing.T) {
+	f, project := newInstallGitHubFixture(t)
+	if code, _, diag := installGitHubRun(t, project, "--yes"); code != 0 {
+		t.Fatal(code, diag)
+	}
+	path := filepath.Join(project, ".companion", "skills.lock.json")
+	lock, e := readLock(path)
+	if e != nil {
+		t.Fatal(e)
+	}
+	skill := lock.Workspaces["github:acme/skills"].Skills["review"]
+	extension := json.RawMessage(`{"schema":2,"flags":["future"]}`)
+	skill.Source.Extra["futureSourceMetadata"] = extension
+	bytes, _ := json.MarshalIndent(lock, "", "  ")
+	os.WriteFile(path, bytes, 0600)
+	if code, _, diag := installGitHubRun(t, project, "--yes"); code != 0 {
+		t.Fatal(code, diag)
+	}
+	assertExtension := func() {
+		t.Helper()
+		current, e := readLock(path)
+		if e != nil {
+			t.Fatal(e)
+		}
+		source := current.Workspaces["github:acme/skills"].Skills["review"].Source
+		var actual, want any
+		json.Unmarshal(source.Extra["futureSourceMetadata"], &actual)
+		json.Unmarshal(extension, &want)
+		a, _ := json.Marshal(actual)
+		b, _ := json.Marshal(want)
+		if string(a) != string(b) {
+			t.Fatal("source extension lost", string(a))
+		}
+	}
+	assertExtension()
+	f.branch = installGitHubCommitB
+	code, out, diag := invoke(t, "", "update", "github:acme/skills/review", "--scope", "project", "--project", project, "--yes", "--json")
+	if code != 0 {
+		t.Fatal(code, out, diag)
+	}
+	assertExtension()
+}

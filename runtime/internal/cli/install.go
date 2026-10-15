@@ -642,6 +642,10 @@ func (a *app) install() (any, error) {
 	for i := range nodes {
 		n := &nodes[i]
 		old := entry.Skills[n.Slug]
+		githubActivationNeeded := false
+		if source != nil && old.Source != nil {
+			source.Extra = old.Source.Extra
+		}
 		if err = checkGitHubCollision(lock, workspace, n.Slug, source); err != nil {
 			return nil, err
 		}
@@ -667,6 +671,11 @@ func (a *app) install() (any, error) {
 			}
 			if err = noSymlinkPath(boundary, path); err != nil {
 				return nil, err
+			}
+			if github {
+				if _, e := os.Lstat(path); os.IsNotExist(e) {
+					githubActivationNeeded = true
+				}
 			}
 			stored := path
 			if scope == "project" {
@@ -725,7 +734,7 @@ func (a *app) install() (any, error) {
 			}
 			warning := githubWarning(*source, executables)
 			change["warning"], change["executables"] = warning, executables
-			changed := old.Checksum != n.Checksum || a.options.flags["share-org"]
+			changed := githubActivationNeeded || old.Checksum != n.Checksum || a.options.flags["share-org"]
 			for _, target := range targets {
 				if !hasGitHubTarget(old, target) {
 					changed = true
@@ -1093,6 +1102,9 @@ func (a *app) frozenSync() (any, error) {
 			}
 			files = n.Files
 			verified[m.hash] = files
+		}
+		if m.target.Checksum != "" && folderChecksum(files) != m.target.Checksum {
+			return nil, fail(5, "restored target differs from frozen folder checksum")
 		}
 		if !a.options.flags["dry-run"] {
 			destination, err := targetPath(m.target, m.slug, project)

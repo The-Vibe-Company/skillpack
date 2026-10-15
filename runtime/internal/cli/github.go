@@ -36,11 +36,12 @@ const (
 // githubSource is the stable source contract used by the v3 lock format.
 // Ref is nil when the source follows the repository's default branch.
 type githubSource struct {
-	Type       string  `json:"type"`
-	Repository string  `json:"repository"`
-	Path       string  `json:"path"`
-	Ref        *string `json:"ref"`
-	Commit     string  `json:"commit"`
+	Extra      map[string]json.RawMessage `json:"-"`
+	Type       string                     `json:"type"`
+	Repository string                     `json:"repository"`
+	Path       string                     `json:"path"`
+	Ref        *string                    `json:"ref"`
+	Commit     string                     `json:"commit"`
 
 	// treeParts is retained only while resolving a /tree/ URL. GitHub URLs do
 	// not delimit a slash-containing ref from its path, so resolution must

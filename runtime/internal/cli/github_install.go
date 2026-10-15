@@ -104,12 +104,15 @@ func (a *app) confirmGitHub(warning string, changed bool) error {
 	} else if _, err := fmt.Fprintln(a.diagnostic, warning); err != nil {
 		return err
 	}
-	if !changed || a.options.flags["dry-run"] || a.options.flags["frozen"] || a.options.flags["yes"] {
+	if a.options.flags["dry-run"] || a.options.flags["frozen"] || a.options.flags["yes"] {
 		return nil
 	}
 	input, ok := a.in.(*os.File)
 	if a.options.flags["json"] || !ok || !term.IsTerminal(int(input.Fd())) {
 		return fail(2, "third-party skill requires confirmation; inspect the source and use --yes in CI or non-interactive mode")
+	}
+	if !changed {
+		return nil
 	}
 	if _, err := fmt.Fprintln(a.diagnostic, "Install this skill? [y/N]"); err != nil {
 		return err

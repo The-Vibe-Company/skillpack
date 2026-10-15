@@ -89,3 +89,20 @@ func (v installLock) MarshalJSON() ([]byte, error) {
 	type plain installLock
 	return mergeLockFields(v.Extra, plain(v))
 }
+
+func (v *githubSource) UnmarshalJSON(b []byte) error {
+	type plain githubSource
+	var p plain
+	if err := json.Unmarshal(b, &p); err != nil {
+		return err
+	}
+	if err := json.Unmarshal(b, &p.Extra); err != nil {
+		return err
+	}
+	*v = githubSource(p)
+	return nil
+}
+func (v githubSource) MarshalJSON() ([]byte, error) {
+	type plain githubSource
+	return mergeLockFields(v.Extra, plain(v))
+}
