@@ -1,9 +1,9 @@
 package cli
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha1"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"io"
@@ -98,72 +98,29 @@ func TestParseGitHubReference(t *testing.T) {
 	}
 }
 
-func TestGitHubResolveAndDownloadPinnedTree(t *testing.T) {
-	commit := strings.Repeat("a", 40)
-	packageTree := strings.Repeat("c", 40)
-	skill := []byte("---\nname: review\ndescription: Review code\n---\nBody\n")
-	script := []byte("#!/bin/sh\necho review\n")
-	skillSHA := githubTestBlobSHA(skill)
-	scriptSHA := githubTestBlobSHA(script)
-	requests := []string{}
+func TestGitHubResolveAndDownload(t *testing.T) {
+	f, _ := newInstallGitHubFixture(t)
 	r := newGitHubResolver()
-	r.http.Transport = githubTestRoundTripper(func(req *http.Request) (*http.Response, error) {
-		requests = append(requests, req.URL.String())
-		if req.URL.Scheme != "https" || req.URL.Host != "api.github.com" {
-			t.Fatalf("request escaped fixed API origin: %s", req.URL)
-		}
-		switch {
-		case req.URL.Path == "/repos/acme/skills":
-			return githubTestJSON(http.StatusOK, map[string]any{"private": false, "visibility": "public", "default_branch": "main"}), nil
-		case req.URL.Path == "/repos/acme/skills/commits/main":
-			return githubTestJSON(http.StatusOK, map[string]string{"sha": commit}), nil
-		case req.URL.Path == "/repos/acme/skills/git/trees/"+commit:
-			return githubTestJSON(http.StatusOK, map[string]any{"truncated": false, "tree": []any{
-				map[string]any{"path": "review", "mode": "040000", "type": "tree", "sha": packageTree},
-				map[string]any{"path": "unrelated-link", "mode": "120000", "type": "blob", "sha": strings.Repeat("1", 40)},
-			}}), nil
-		case req.URL.Path == "/repos/acme/skills/git/trees/"+packageTree:
-			return githubTestJSON(http.StatusOK, map[string]any{"truncated": false, "tree": []any{
-				map[string]any{"path": "SKILL.md", "mode": "100644", "type": "blob", "sha": skillSHA, "size": len(skill)},
-				map[string]any{"path": "scripts", "mode": "040000", "type": "tree", "sha": strings.Repeat("f", 40)},
-			}}), nil
-		case req.URL.Path == "/repos/acme/skills/git/trees/"+strings.Repeat("f", 40):
-			return githubTestJSON(http.StatusOK, map[string]any{"truncated": false, "tree": []any{
-				map[string]any{"path": "run.sh", "mode": "100644", "type": "blob", "sha": scriptSHA, "size": len(script)},
-			}}), nil
-		case req.URL.Path == "/repos/acme/skills/git/blobs/"+skillSHA:
-			return githubTestJSON(http.StatusOK, map[string]any{"encoding": "base64", "size": len(skill), "content": base64.StdEncoding.EncodeToString(skill)}), nil
-		case req.URL.Path == "/repos/acme/skills/git/blobs/"+scriptSHA:
-			return githubTestJSON(http.StatusOK, map[string]any{"encoding": "base64", "size": len(script), "content": base64.StdEncoding.EncodeToString(script)}), nil
-		default:
-			return githubTestResponse(http.StatusNotFound, "private response must never be exposed"), nil
-		}
-	})
 	source, err := parseGitHubReference("github:acme/skills/review", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 	resolved, err := r.resolve(source)
 	if err != nil {
-		t.Fatalf("resolve() error = %v", err)
+		t.Fatal(err)
 	}
-	if resolved.Commit != commit || resolved.Ref != nil || resolved.Path != "review" {
-		t.Fatalf("resolved source = %#v", resolved)
+	if resolved.Commit != installGitHubCommitA || resolved.Ref != nil || resolved.Path != "review" {
+		t.Fatal(resolved)
 	}
 	files, executables, err := r.download(resolved)
 	if err != nil {
-		t.Fatalf("download() error = %v", err)
+		t.Fatal(err)
 	}
-	if string(files["SKILL.md"]) != string(skill) || string(files["scripts/run.sh"]) != string(script) {
-		t.Fatalf("downloaded files = %#v", files)
+	if !bytes.Equal(files["SKILL.md"], f.files[installGitHubCommitA]["SKILL.md"]) || len(files) != 2 || len(executables) != 1 || executables[0] != "scripts/check.sh" {
+		t.Fatal("downloaded wrong package")
 	}
-	if len(executables) != 1 || executables[0] != "scripts/run.sh" {
-		t.Fatalf("executables = %#v", executables)
-	}
-	for _, request := range requests {
-		if strings.Contains(request, "private response") || strings.Contains(request, "GITHUB_TOKEN") {
-			t.Fatalf("request leaked data: %s", request)
-		}
+	if len(f.requests) != 2 || len(f.archives) != 1 {
+		t.Fatalf("API=%v archives=%v", f.requests, f.archives)
 	}
 }
 
@@ -174,14 +131,13 @@ func TestGitHubTreeURLAmbiguityAndDefaultRef(t *testing.T) {
 		switch req.URL.Path {
 		case "/repos/acme/skills":
 			return githubTestJSON(http.StatusOK, map[string]any{"private": false, "visibility": "public", "default_branch": "main"}), nil
-		case "/repos/acme/skills/commits/feature":
-			return githubTestJSON(http.StatusOK, map[string]string{"sha": commit}), nil
-		case "/repos/acme/skills/commits/feature/review":
-			return githubTestJSON(http.StatusOK, map[string]string{"sha": commit}), nil
 		default:
 			return githubTestResponse(http.StatusNotFound, "secret response"), nil
 		}
 	})
+	r.listRefs = func(context.Context, string, []string) (map[string]string, error) {
+		return map[string]string{"refs/heads/feature": commit, "refs/heads/feature/review": commit}, nil
+	}
 	source, err := parseGitHubReference("https://github.com/acme/skills/tree/feature/review", "")
 	if err != nil {
 		t.Fatal(err)
@@ -301,10 +257,12 @@ func TestGitHubDownloadLimitsAndMissingSkill(t *testing.T) {
 				case "/repos/acme/skills/git/trees/" + commit:
 					return githubTestJSON(http.StatusOK, map[string]any{"truncated": tc.truncated, "tree": tc.entries}), nil
 				}
-				for sha, data := range tc.blobs {
-					if req.URL.Path == "/repos/acme/skills/git/blobs/"+sha {
-						return githubTestJSON(http.StatusOK, map[string]any{"encoding": "base64", "size": len(data), "content": base64.StdEncoding.EncodeToString(data)}), nil
+				if req.URL.Host == "codeload.github.com" {
+					files := map[string][]byte{}
+					for _, entry := range tc.entries {
+						files[entry.Path] = tc.blobs[entry.SHA]
 					}
+					return &http.Response{StatusCode: 200, Header: make(http.Header), Body: io.NopCloser(bytes.NewReader(githubFixtureArchive(files, "")))}, nil
 				}
 				return githubTestResponse(http.StatusNotFound, "unavailable body"), nil
 			})
@@ -316,6 +274,7 @@ func TestGitHubDownloadLimitsAndMissingSkill(t *testing.T) {
 	}
 
 	missingRef := newGitHubResolver()
+	missingRef.listRefs = func(context.Context, string, []string) (map[string]string, error) { return map[string]string{}, nil }
 	missingRef.http.Transport = githubTestRoundTripper(func(req *http.Request) (*http.Response, error) {
 		switch req.URL.Path {
 		case "/repos/acme/skills":
@@ -341,5 +300,39 @@ func TestGitHubUnknownVisibilityFailsClosed(t *testing.T) {
 	_, _, err := r.download(githubSource{Type: "github", Repository: "acme/skills", Commit: strings.Repeat("a", 40)})
 	if githubCode(err) != 7 {
 		t.Fatal("unknown repository visibility accepted", err)
+	}
+}
+
+func TestGitHubAPITransportBoundsAndRetry(t *testing.T) {
+	for _, status := range []int{http.StatusForbidden, http.StatusTooManyRequests} {
+		t.Run(strconv.Itoa(status), func(t *testing.T) {
+			r := newGitHubResolver()
+			calls := 0
+			r.http.Transport = githubTestRoundTripper(func(req *http.Request) (*http.Response, error) {
+				calls++
+				if calls == 1 {
+					resp := githubTestResponse(status, "private body")
+					resp.Header.Set("Retry-After", "0")
+					return resp, nil
+				}
+				return githubTestResponse(200, "ok"), nil
+			})
+			body, e := r.request(context.Background(), "/repos/acme/skills", 10)
+			if e != nil || string(body) != "ok" || calls != 2 {
+				t.Fatal(string(body), e, calls)
+			}
+		})
+	}
+	r := newGitHubResolver()
+	r.http.Transport = githubTestRoundTripper(func(*http.Request) (*http.Response, error) {
+		return githubTestResponse(200, "untrusted oversized response"), nil
+	})
+	if _, e := r.request(context.Background(), "/repos/acme/skills", 4); githubCode(e) != 8 || strings.Contains(e.Error(), "untrusted") {
+		t.Fatal("response bound", e)
+	}
+	for _, path := range []string{"https://elsewhere.test/repos/acme/skills", "/repos/acme/skills?token=x", "/repos/acme/skills?recursive=1", "/repos/acme/skills/git/trees/x?recursive=1&x=y"} {
+		if _, e := r.request(context.Background(), path, 4); githubCode(e) != 2 {
+			t.Fatal("invalid path accepted", path, e)
+		}
 	}
 }

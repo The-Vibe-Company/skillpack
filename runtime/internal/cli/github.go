@@ -2,16 +2,12 @@ package cli
 
 import (
 	"context"
-	"crypto/sha1"
-	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -24,13 +20,11 @@ const (
 	githubOperationTimeout = 2 * time.Minute
 	githubRequestTimeout   = 20 * time.Second
 	githubMaxRequests      = maxPackageFiles*3 + 64
-	githubMaxTreeEntries   = maxPackageFiles * 2
+	githubMaxTreeEntries   = 100000
 	githubMaxRateRetries   = 2
 	githubMaxRateWait      = 2 * time.Second
 	githubRepositoryLimit  = 512 << 10
-	githubCommitLimit      = 512 << 10
 	githubTreeLimit        = 8 << 20
-	githubBlobLimit        = 2*maxFileBytes + 1<<20
 )
 
 // githubSource is the stable source contract used by the v3 lock format.
@@ -46,15 +40,13 @@ type githubSource struct {
 	// treeParts is retained only while resolving a /tree/ URL. GitHub URLs do
 	// not delimit a slash-containing ref from its path, so resolution must
 	// test each possible split against the repository's refs.
-	treeParts     []string
-	resolvedRef   string
-	publicChecked bool
+	treeParts []string
 }
 
 type githubResolver struct {
 	// Keep this field injectable for package tests. A nil Transport still uses
-	// http.DefaultTransport, while every request URL below remains fixed to
-	// api.github.com.
+	// http.DefaultTransport. Request origins are fixed to GitHub API/codeload.
+	listRefs githubRefReader
 	http     *http.Client
 	token    string
 	requests int
@@ -78,12 +70,6 @@ type githubTreeEntry struct {
 	Type string `json:"type"`
 	SHA  string `json:"sha"`
 	Size int64  `json:"size"`
-}
-
-type githubBlob struct {
-	Content  string `json:"content"`
-	Encoding string `json:"encoding"`
-	Size     int64  `json:"size"`
 }
 
 // githubStatusError keeps the HTTP status available to the resolver without
@@ -380,10 +366,7 @@ func (g *githubResolver) resolve(source githubSource) (githubSource, error) {
 		if !validGitHubSHA(source.Commit) {
 			return githubSource{}, fail(5, "GitHub source is not pinned to a full commit")
 		}
-		commit, err = g.resolveRef(ctx, source.Repository, source.Commit)
-		if err != nil {
-			return githubSource{}, err
-		}
+		commit = source.Commit
 	case true:
 		info, infoErr := g.repository(ctx, source.Repository)
 		if infoErr != nil {
@@ -393,14 +376,15 @@ func (g *githubResolver) resolve(source githubSource) (githubSource, error) {
 		if !validGitHubRef(ref) {
 			return githubSource{}, fail(5, "GitHub repository has an invalid default branch")
 		}
-		commit, err = g.resolveRef(ctx, source.Repository, ref)
+		commit, err = g.resolveRef(ctx, source.Repository, "HEAD")
 		if err != nil {
 			return githubSource{}, err
 		}
 	}
+	if resolved.Ref != nil && validGitHubSHA(*resolved.Ref) {
+		resolved.Ref = stringPointer(strings.ToLower(*resolved.Ref))
+	}
 	resolved.Commit = strings.ToLower(commit)
-	resolved.resolvedRef = ref
-	resolved.publicChecked = true
 	return resolved, nil
 }
 
@@ -423,18 +407,31 @@ func (g *githubResolver) resolveTreeURL(ctx context.Context, repository string, 
 		return *explicit, strings.Join(parts[len(refParts):], "/"), commit, nil
 	}
 
-	type candidate struct {
-		ref, path, commit string
+	type candidate struct{ ref, path, commit string }
+	patterns := []string{}
+	for i := 1; i <= len(parts); i++ {
+		ref := strings.Join(parts[:i], "/")
+		if validGitHubRef(ref) && !validGitHubSHA(ref) {
+			patterns = append(patterns, githubRefPatterns(ref)...)
+		}
 	}
-	candidates := make([]candidate, 0, len(parts))
+	refs := map[string]string{}
+	if len(patterns) > 0 {
+		var err error
+		refs, err = g.resolveRefs(ctx, repository, patterns)
+		if err != nil {
+			return "", "", "", err
+		}
+	}
+	candidates := []candidate{}
 	for i := 1; i <= len(parts); i++ {
 		ref := strings.Join(parts[:i], "/")
 		if !validGitHubRef(ref) {
 			continue
 		}
-		commit, err := g.resolveRef(ctx, repository, ref)
+		commit, err := commitForGitHubRef(refs, ref)
 		if err == nil {
-			candidates = append(candidates, candidate{ref: ref, path: strings.Join(parts[i:], "/"), commit: commit})
+			candidates = append(candidates, candidate{ref, strings.Join(parts[i:], "/"), commit})
 			continue
 		}
 		if githubHasStatus(err, 404) {
@@ -467,21 +464,14 @@ func (g *githubResolver) resolveRef(ctx context.Context, repository, ref string)
 	if !validGitHubRef(ref) {
 		return "", fail(2, "invalid GitHub ref")
 	}
-	path := "/repos/" + repository + "/commits/" + url.PathEscape(ref)
-	body, err := g.request(ctx, path, githubCommitLimit)
+	if validGitHubSHA(ref) {
+		return strings.ToLower(ref), nil
+	}
+	refs, err := g.resolveRefs(ctx, repository, githubRefPatterns(ref))
 	if err != nil {
 		return "", err
 	}
-	var response struct {
-		SHA string `json:"sha"`
-	}
-	if json.Unmarshal(body, &response) != nil || !validGitHubSHA(response.SHA) {
-		return "", fail(8, "GitHub returned an invalid commit response")
-	}
-	if validGitHubSHA(ref) && strings.ToLower(response.SHA) != strings.ToLower(ref) {
-		return "", fail(5, "GitHub commit identity changed while resolving")
-	}
-	return strings.ToLower(response.SHA), nil
+	return commitForGitHubRef(refs, ref)
 }
 
 func (g *githubResolver) repository(ctx context.Context, repository string) (githubRepository, error) {
@@ -531,76 +521,24 @@ func (g *githubResolver) download(source githubSource) (map[string][]byte, []str
 		return nil, nil, err
 	}
 
-	commit := strings.ToLower(source.Commit)
-	root, err := g.getTree(ctx, source.Repository, commit)
+	tree, err := g.getTree(ctx, source.Repository, source.Commit)
 	if err != nil {
 		return nil, nil, err
 	}
-	selected := root
-	repositoryPath := ""
-	for _, component := range splitPackagePath(source.Path) {
-		entries, err := g.validateTreeListing(selected.Tree, repositoryPath, "", false, false)
-		if err != nil {
-			return nil, nil, err
-		}
-		entry, ok := entries[component]
-		if !ok {
-			return nil, nil, &githubStatusError{status: 404, err: fail(4, "GitHub package path was not found")}
-		}
-		if err := validateGitHubTreeEntry(entry); err != nil {
-			return nil, nil, err
-		}
-		if entry.Type != "tree" || entry.Mode != "040000" {
-			return nil, nil, fail(5, "GitHub package path is not a directory")
-		}
-		if !validGitHubSHA(entry.SHA) {
-			return nil, nil, fail(8, "GitHub returned an invalid tree identity")
-		}
-		repositoryPath = joinGitHubPath(repositoryPath, component)
-		selected, err = g.getTree(ctx, source.Repository, strings.ToLower(entry.SHA))
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
-	files := map[string][]byte{}
-	executables := map[string]struct{}{}
-	seen := portablePaths{}
-	exact := map[string]struct{}{}
-	var total int64
-	if err := g.walkTree(ctx, source.Repository, selected, repositoryPath, "", files, executables, seen, exact, &total); err != nil {
+	expected, err := githubSelectedTree(tree.Tree, source.Path)
+	if err != nil {
 		return nil, nil, err
 	}
-	if _, err := validatePackage(files); err != nil {
-		return nil, nil, err
-	}
-	list := make([]string, 0, len(executables))
-	for name := range executables {
-		list = append(list, name)
-	}
-	sort.Strings(list)
-	return files, list, nil
+	return g.downloadTarball(ctx, source, expected)
 }
 
-func splitPackagePath(path string) []string {
-	if path == "" {
-		return nil
-	}
-	return strings.Split(path, "/")
-}
-
-func joinGitHubPath(prefix, name string) string {
-	if prefix == "" {
-		return name
-	}
-	return prefix + "/" + name
-}
-
+// One bounded recursive listing preserves gitlink detection (archives omit
+// submodules) and anchors every downloaded file to its Git blob checksum.
 func (g *githubResolver) getTree(ctx context.Context, repository, sha string) (githubTree, error) {
 	if !validGitHubSHA(sha) {
 		return githubTree{}, fail(5, "GitHub tree is not pinned to a full commit")
 	}
-	body, err := g.request(ctx, "/repos/"+repository+"/git/trees/"+strings.ToLower(sha), githubTreeLimit)
+	body, err := g.request(ctx, "/repos/"+repository+"/git/trees/"+strings.ToLower(sha)+"?recursive=1", githubTreeLimit)
 	if err != nil {
 		return githubTree{}, err
 	}
@@ -614,45 +552,71 @@ func (g *githubResolver) getTree(ctx context.Context, repository, sha string) (g
 	return tree, nil
 }
 
-func (g *githubResolver) validateTreeListing(entries []githubTreeEntry, repositoryPrefix, packagePrefix string, checkSizes, strict bool) (map[string]githubTreeEntry, error) {
-	result := make(map[string]githubTreeEntry, len(entries))
-	portable := portablePaths{}
+func githubSelectedTree(entries []githubTreeEntry, selected string) (map[string]githubTreeEntry, error) {
+	result := map[string]githubTreeEntry{}
+	seen := portablePaths{}
+	exact := map[string]bool{}
+	found := selected == ""
+	total := int64(0)
+	count := 0
 	for _, entry := range entries {
-		name, err := githubEntryName(entry.Path, repositoryPrefix)
-		if err != nil {
+		// Validate selected contents, ancestors, and siblings of each ancestor,
+		// matching the old directory-by-directory traversal's collision checks.
+		parent := ""
+		if i := strings.LastIndexByte(entry.Path, '/'); i >= 0 {
+			parent = entry.Path[:i]
+		}
+		inside := selected == "" || strings.HasPrefix(entry.Path, selected+"/")
+		ancestor := entry.Path == selected || strings.HasPrefix(selected, entry.Path+"/")
+		sibling := parent == "" || parent == selected || strings.HasPrefix(selected, parent+"/")
+		if !inside && !ancestor && !sibling {
+			continue
+		}
+		if _, err := safePackagePath(entry.Path); err != nil {
 			return nil, err
 		}
-		if _, ok := result[name]; ok {
+		if exact[entry.Path] {
 			return nil, fail(5, "GitHub tree contains duplicate paths")
 		}
-		if err := portable.add(name, entry.Mode == "040000"); err != nil {
+		exact[entry.Path] = true
+		if err := seen.add(entry.Path, entry.Type == "tree"); err != nil {
 			return nil, err
 		}
-		if strict {
-			if err := validateGitHubTreeEntry(entry); err != nil {
-				return nil, err
+		if !inside && !ancestor {
+			continue
+		}
+		if err := validateGitHubTreeEntry(entry); err != nil {
+			return nil, err
+		}
+		if ancestor {
+			if entry.Type != "tree" {
+				return nil, fail(5, "GitHub package path is not a directory")
+			}
+			if entry.Path == selected {
+				found = true
+			}
+			continue
+		}
+		rel := entry.Path
+		if selected != "" {
+			rel = strings.TrimPrefix(entry.Path, selected+"/")
+		}
+		if excludedPackagePath(rel) {
+			continue
+		}
+		if entry.Type == "blob" {
+			count++
+			total += entry.Size
+			if count > maxPackageFiles || entry.Size > maxFileBytes || total > maxPackageBytes || rel == "SKILL.md" && entry.Size > 1<<20 {
+				return nil, fail(5, "GitHub package exceeds the size or file limit")
 			}
 		}
-		fullPackagePath := joinGitHubPath(packagePrefix, name)
-		if strict && checkSizes && entry.Type == "blob" && !excludedPackagePath(fullPackagePath) && entry.Size > maxFileBytes {
-			return nil, fail(5, "GitHub package file exceeds the size limit")
-		}
-		result[name] = entry
+		result[rel] = entry
+	}
+	if !found {
+		return nil, &githubStatusError{status: 404, err: fail(4, "GitHub package path was not found")}
 	}
 	return result, nil
-}
-
-func githubEntryName(raw, repositoryPrefix string) (string, error) {
-	if repositoryPrefix != "" && strings.HasPrefix(raw, repositoryPrefix+"/") {
-		raw = strings.TrimPrefix(raw, repositoryPrefix+"/")
-	}
-	if strings.Contains(raw, "/") {
-		return "", fail(5, "GitHub tree entry is not a direct child")
-	}
-	if _, err := safePackagePath(raw); err != nil {
-		return "", err
-	}
-	return raw, nil
 }
 
 func validateGitHubTreeEntry(entry githubTreeEntry) error {
@@ -678,101 +642,9 @@ func validateGitHubTreeEntry(entry githubTreeEntry) error {
 	return nil
 }
 
-func (g *githubResolver) walkTree(ctx context.Context, repository string, tree githubTree, repositoryPrefix, packagePrefix string, files map[string][]byte, executables map[string]struct{}, seen portablePaths, exact map[string]struct{}, total *int64) error {
-	entries, err := g.validateTreeListing(tree.Tree, repositoryPrefix, packagePrefix, true, true)
-	if err != nil {
-		return err
-	}
-	names := make([]string, 0, len(entries))
-	for name := range entries {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	for _, name := range names {
-		entry := entries[name]
-		rel := joinGitHubPath(packagePrefix, name)
-		repoPath := joinGitHubPath(repositoryPrefix, name)
-		if _, exists := exact[rel]; exists {
-			return fail(5, "GitHub tree contains duplicate paths")
-		}
-		exact[rel] = struct{}{}
-		if err := seen.add(rel, entry.Type == "tree"); err != nil {
-			return err
-		}
-		if excludedPackagePath(rel) {
-			continue
-		}
-		if entry.Type == "tree" {
-			nested, err := g.getTree(ctx, repository, strings.ToLower(entry.SHA))
-			if err != nil {
-				return err
-			}
-			if err := g.walkTree(ctx, repository, nested, repoPath, rel, files, executables, seen, exact, total); err != nil {
-				return err
-			}
-			continue
-		}
-		if len(files) >= maxPackageFiles {
-			return fail(5, "GitHub package exceeds the file limit")
-		}
-		if entry.Size > maxFileBytes || *total+entry.Size > maxPackageBytes {
-			return fail(5, "GitHub package exceeds the size limit")
-		}
-		body, err := g.getBlob(ctx, repository, strings.ToLower(entry.SHA), entry.Size)
-		if err != nil {
-			return err
-		}
-		if len(body) > maxFileBytes || *total+int64(len(body)) > maxPackageBytes {
-			return fail(5, "GitHub package exceeds the size limit")
-		}
-		files[rel] = body
-		*total += int64(len(body))
-		if entry.Mode == "100755" || fileMode(rel) == 0755 {
-			executables[rel] = struct{}{}
-		}
-	}
-	return nil
-}
-
-func (g *githubResolver) getBlob(ctx context.Context, repository, sha string, expectedSize int64) ([]byte, error) {
-	if !validGitHubSHA(sha) {
-		return nil, fail(5, "GitHub blob is not valid")
-	}
-	body, err := g.request(ctx, "/repos/"+repository+"/git/blobs/"+strings.ToLower(sha), githubBlobLimit)
-	if err != nil {
-		return nil, err
-	}
-	var blob githubBlob
-	if json.Unmarshal(body, &blob) != nil || blob.Encoding != "base64" {
-		return nil, fail(8, "GitHub returned an invalid blob response")
-	}
-	if blob.Size < 0 || blob.Size > maxFileBytes || (expectedSize >= 0 && blob.Size != expectedSize) {
-		return nil, fail(5, "GitHub blob size is invalid")
-	}
-	content := strings.ReplaceAll(strings.ReplaceAll(blob.Content, "\r", ""), "\n", "")
-	if strings.IndexFunc(content, unicode.IsSpace) >= 0 {
-		return nil, fail(8, "GitHub returned invalid blob content")
-	}
-	decoded, err := base64.StdEncoding.Strict().DecodeString(content)
-	if err != nil || int64(len(decoded)) != blob.Size || int64(len(decoded)) > maxFileBytes {
-		return nil, fail(5, "GitHub blob content is invalid")
-	}
-	if expectedSize >= 0 && int64(len(decoded)) != expectedSize {
-		return nil, fail(5, "GitHub blob size changed during download")
-	}
-	hash := sha1.New()
-	_, _ = hash.Write([]byte("blob "))
-	_, _ = hash.Write([]byte(strconv.FormatInt(int64(len(decoded)), 10)))
-	_, _ = hash.Write([]byte{0})
-	_, _ = hash.Write(decoded)
-	if hex.EncodeToString(hash.Sum(nil)) != strings.ToLower(sha) {
-		return nil, fail(5, "GitHub blob checksum mismatch")
-	}
-	return decoded, nil
-}
-
 func (g *githubResolver) request(ctx context.Context, path string, limit int64) ([]byte, error) {
-	if !strings.HasPrefix(path, "/repos/") || strings.ContainsAny(path, "?#\r\n") || strings.Contains(path, "//") {
+	apiPath := strings.TrimSuffix(path, "?recursive=1")
+	if !strings.HasPrefix(apiPath, "/repos/") || strings.ContainsAny(apiPath, "?#\r\n") || strings.Contains(apiPath, "//") || apiPath != path && !strings.Contains(apiPath, "/git/trees/") {
 		return nil, fail(2, "invalid GitHub API path")
 	}
 	for attempt := 0; attempt <= githubMaxRateRetries; attempt++ {
@@ -782,7 +654,7 @@ func (g *githubResolver) request(ctx context.Context, path string, limit int64) 
 		g.requests++
 		requestURL := githubAPIOrigin + path
 		u, err := url.Parse(requestURL)
-		if err != nil || u.Scheme != "https" || u.Host != "api.github.com" || u.User != nil || u.RawQuery != "" || u.Fragment != "" {
+		if err != nil || u.Scheme != "https" || u.Host != "api.github.com" || u.User != nil || (u.RawQuery != "" && u.RawQuery != "recursive=1") || u.Fragment != "" {
 			return nil, fail(2, "invalid GitHub API request")
 		}
 		reqCtx, cancel := context.WithTimeout(ctx, githubRequestTimeout)
