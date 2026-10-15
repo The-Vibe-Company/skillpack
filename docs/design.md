@@ -140,3 +140,17 @@ public release dialog and the anonymous `/catalog` pages and sitemap entries fro
 Anonymous catalog reports use API-only security definers for durable rate-limited writes and
 platform-moderator-only reads. Report text and abuse hashes have no tenant read policy; see
 [public catalog reporting](public-catalog.md#anonymous-reporting).
+
+## Operator statistics
+
+`GET /v1/stats` returns instance-wide account counts from the global auth `user` table:
+`total_users`, `new_users_1d`, and `new_users_7d`. New-user windows are rolling 24-hour
+and seven-day periods ending at database query time, inclusive at both boundaries.
+`active_users_1d` and `active_users_7d` are `null`: the data model has no reliable
+per-user activity tracking. Session timestamps and unverified usage identities are not proxies.
+
+Set `STATS_TOKEN` to a strong random secret on the Railway API service (or the self-hosted
+API process). Send it as `Authorization: Bearer <token>`. Missing or incorrect credentials,
+or an unset/empty `STATS_TOKEN`, return 401. Responses use `Cache-Control: no-store`.
+This operator credential grants aggregate instance statistics only; the endpoint runs
+a read-only SELECT before session middleware and returns no account identities.

@@ -4,6 +4,7 @@ import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
 import { configureCatalogCheckReader, getSkillPublicListing, readPersistedCatalogCheckReport, requestSkillPublicListing, prepareSkillPublicListing, setSkillPublicListing } from "@skillpack/core";
 import { requestSkillPublicListingInputSchema, skillPublicListingStatusSchema, setSkillPublicListingInputSchema, skillPublicListingResultSchema } from "@skillpack/contracts";
+import { createStatsRoutes } from "./statsRoutes";
 import { createSkillUsageRoutes } from "./skillUsageRoutes";
 import { registerCliLoginRoutes } from "./cliLoginRoutes";
 import { getSkillUsage } from "@skillpack/core";
@@ -710,6 +711,8 @@ app.use(
 app.route("/", createSkillUsageRoutes());
 app.route("/", createCatalogReportingRoutes());
 app.route("/", createPublicCatalogRoutes());
+// Operator stats use only STATS_TOKEN and must not refresh sessions or bootstrap users.
+app.route("/", createStatsRoutes());
 app.use("*", attachSession);
 app.route("/", createCatalogModerationRoutes());
 
