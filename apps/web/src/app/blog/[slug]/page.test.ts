@@ -196,3 +196,105 @@ describe("public blog post page", () => {
     });
   });
 });
+
+describe("ranking blog post page", () => {
+  const RANKING_SLUG = "best-claude-code-skills-frontend-design";
+
+  it("sets the intro, the author's role and both the publication and data-collection days in the header", async () => {
+    const container = await renderPost(RANKING_SLUG);
+    const header = container.querySelector(".v10-rankhead");
+
+    expect(header?.querySelector("h1")?.textContent).toBe("Best Claude Code Skills for Frontend Design in 2026: the Buyer's Shortlist");
+    expect(header?.querySelector(".v10-rankhead__eyebrow")?.textContent).toBe("Ranking · 7 skills");
+    expect(header?.querySelector(".v10-rankhead__lead")?.textContent).toMatch(/^The best Claude Code skill for frontend design in 2026 is frontend-design/);
+    expect(header?.querySelector(".v10-postmeta__author")?.textContent).toBe(
+      "By Stan Girard, co-founder of The Vibe Company, which builds Skillpack",
+    );
+    expect(Array.from(header?.querySelectorAll(".v10-postmeta time") ?? []).map((time) => time.parentElement?.textContent)).toEqual([
+      "Published October 15, 2026",
+      "Data collected October 15, 2026",
+    ]);
+    // The lead moved to the header, so the body does not repeat it; the generic banner is left out.
+    expect(container.querySelector("#article-body")?.textContent).not.toContain("The best Claude Code skill for frontend design in 2026 is");
+    expect(container.querySelector(".v10-post__cover")).toBeNull();
+  });
+
+  it("renders one card per skill, in rank order, with figures, a copyable command and its source", async () => {
+    const container = await renderPost(RANKING_SLUG);
+    const cards = Array.from(container.querySelectorAll<HTMLElement>("article.v10-skillcard"));
+
+    expect(cards.map((card) => card.querySelector("h3")?.id)).toEqual([
+      "skill-frontend-design",
+      "skill-react-best-practices",
+      "skill-web-design-guidelines",
+      "skill-emil-design-eng",
+      "skill-impeccable",
+      "skill-webapp-testing",
+      "skill-web-artifacts-builder",
+    ]);
+    const first = cards[0];
+    expect(first?.querySelector("h3")?.textContent).toBe("1. frontend-design");
+    expect(Array.from(first?.querySelectorAll(".v10-badge") ?? []).map((badge) => badge.textContent)).toEqual([
+      "988.5Kinstalls",
+      "181.1Krepo stars",
+      "Apache 2.0license",
+    ]);
+    expect(first?.querySelector("[data-code-block] pre code")?.textContent).toBe(
+      "skillpack install github:anthropics/skills/skills/frontend-design --scope project",
+    );
+    expect(first?.querySelector("button[aria-label='Copy code']")).not.toBeNull();
+    expect(first?.querySelector(".v10-skillcard__suited")?.textContent).toMatch(/^Best suited forteams starting a new landing page/);
+    expect(first?.querySelector(".v10-skillcard__by a")?.getAttribute("href")).toBe(
+      "https://github.com/anthropics/skills/tree/main/skills/frontend-design",
+    );
+    // A missing license is a warning badge with its words, never color alone.
+    expect(cards[2]?.querySelector(".v10-badge--warn")?.textContent).toBe("None declaredlicense");
+  });
+
+  it("builds the comparison table from the cards and keeps the use-case table, both labelled for stacking", async () => {
+    const container = await renderPost(RANKING_SLUG);
+    const rows = Array.from(container.querySelectorAll(".v10-rtable--compare tbody tr"));
+    const cells = (row: Element | undefined) => Array.from(row?.querySelectorAll("td") ?? []).map((cell) => cell.textContent);
+
+    expect(rows).toHaveLength(7);
+    expect(rows[1]?.querySelector("th a")?.getAttribute("href")).toBe("#skill-react-best-practices");
+    expect(rows[1]?.querySelector("th")?.textContent).toBe("2react-best-practicesVercel");
+    expect(cells(rows[1])).toEqual(["802.6K", "32.4K", "MIT", "React/Next.js performance"]);
+    expect(rows[1]?.querySelector("td")?.getAttribute("data-label")).toBe("Installs (skills.sh)");
+    expect(container.querySelectorAll(".v10-rtable--usecases tbody tr")).toHaveLength(5);
+  });
+
+  it("renders the FAQ as closed disclosures and publishes the same questions as FAQPage JSON-LD", async () => {
+    const container = await renderPost(RANKING_SLUG);
+    const items = Array.from(container.querySelectorAll("details.lp-faq__item"));
+    const scripts = Array.from(container.querySelectorAll("script[type='application/ld+json']")).map((script) =>
+      JSON.parse(script.textContent ?? "{}"),
+    );
+    const faqPage = scripts.flatMap((data) => data["@graph"]).find((node) => node["@type"] === "FAQPage");
+
+    expect(items).toHaveLength(7);
+    expect(items.every((item) => !item.hasAttribute("open") && item.querySelector(".lp-faq__a")?.textContent)).toBe(true);
+    expect(faqPage.mainEntity.map((entry: { name: string }) => entry.name)).toEqual(
+      items.map((item) => item.querySelector("summary")?.textContent),
+    );
+    expect(faqPage.mainEntity[1].acceptedAnswer.text).toBe(
+      "Run skillpack install github:owner/repo/path, for example skillpack install github:anthropics/skills/skills/frontend-design. Add --scope project to install it in the current repository. You can also copy the skill's folder into .claude/skills/ by hand.",
+    );
+  });
+
+  it("outlines the takeaways and every skill card, and offers sign-up panels plus a hidden sticky bar", async () => {
+    const container = await renderPost(RANKING_SLUG);
+    const targets = Array.from(container.querySelectorAll(".v10-toc--sidebar a")).map((a) => a.getAttribute("href"));
+
+    expect(targets.slice(0, 1)).toEqual(["#key-takeaways"]);
+    expect(targets).toContain("#skill-web-artifacts-builder");
+    for (const target of targets) expect(container.querySelector(target ?? "")).not.toBeNull();
+
+    const panels = Array.from(container.querySelectorAll(".v10-ctablock"));
+    expect(panels.map((panel) => panel.querySelector(".v10-btn--primary")?.getAttribute("href"))).toEqual(["/login", "/login", "/login"]);
+    const sticky = container.querySelector(".v10-stickycta");
+    expect(sticky?.getAttribute("data-visible")).toBe("false");
+    expect(sticky?.textContent).toContain("Your team's skills, in one place.");
+    expect(container.querySelector(".v10-callout")).toBeNull();
+  });
+});

@@ -4,6 +4,9 @@
    The plugins see react-markdown's mdast tree. Only the few node fields read or written here are
    typed (https://github.com/syntax-tree/mdast), so the web app does not need mdast's own types. */
 
+import { blogBlockTocEntries, isBlogBlockLanguage, parseBlogBlock } from "./blogBlocks";
+import { inlineMarkdownText } from "./markdownText";
+
 type MdProperties = { id?: string; className?: string[]; role?: string };
 type MdData = { hName?: string; hProperties?: MdProperties };
 type MdPoint = { offset?: number };
@@ -33,25 +36,12 @@ export function slugifyHeading(text: string): string {
 // hashes, then at least one space or tab, and an optional closing run of hashes.
 const ATX_TOC_HEADING_RE = /^ {0,3}(#{2,3})[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$/;
 
-/** Plain text of a heading's inline Markdown: code spans, emphasis, links and escapes unwrapped. */
-function inlineText(markdown: string): string {
-  // Backslash-escaped punctuation is literal, so park it before the emphasis and link passes.
-  const escaped: string[] = [];
-  return markdown
-    .replace(/\\([!-/:-@[-`{-~])/g, (_match, char: string) => `\uE000${escaped.push(char) - 1}\uE001`)
-    .replace(/`+([^`]*)`+/g, "$1")
-    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/(\*\*|__|\*|_|~~)(?=\S)(.+?)(?<=\S)\1/g, "$2")
-    .replace(/\uE000(\d+)\uE001/g, (_match, index: string) => escaped[Number(index)] ?? "")
-    .trim();
-}
-
 /** Text and depth of an H2/H3 source line, or null for anything else. */
 function parseTocHeading(line: string): { text: string; depth: 2 | 3 } | null {
   const match = ATX_TOC_HEADING_RE.exec(line);
   const hashes = match?.[1];
   if (!match || !hashes) return null;
-  return { text: inlineText(match[2] ?? ""), depth: hashes.length === 2 ? 2 : 3 };
+  return { text: inlineMarkdownText(match[2] ?? ""), depth: hashes.length === 2 ? 2 : 3 };
 }
 
 /** Hands out unique ids in document order: "setup", then "setup-1", "setup-2"… */
@@ -73,13 +63,26 @@ export function blogTableOfContents(markdown: string): TocEntry[] {
   const slug = createSlugger();
   const entries: TocEntry[] = [];
   let fence: string | null = null;
+  // Structured blocks (skill cards, takeaways) carry their own fixed anchors; collect their YAML.
+  let block: { language: string; lines: string[] } | null = null;
   for (const line of markdown.split("\n")) {
     const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line)?.[1];
     if (marker && (fence === null || (marker[0] === fence[0] && marker.length >= fence.length))) {
+      if (fence === null) {
+        const language = /^ {0,3}(?:`{3,}|~{3,})\s*([^\s`]*)/.exec(line)?.[1];
+        block = isBlogBlockLanguage(language) ? { language, lines: [] } : null;
+      } else if (block && isBlogBlockLanguage(block.language)) {
+        const text = block.lines.join("\n");
+        entries.push(...blogBlockTocEntries(parseBlogBlock(block.language, text)));
+        block = null;
+      }
       fence = fence === null ? marker : null;
       continue;
     }
-    if (fence !== null) continue;
+    if (fence !== null) {
+      block?.lines.push(line);
+      continue;
+    }
     const heading = parseTocHeading(line);
     if (heading) entries.push({ id: slug(heading.text), ...heading });
   }

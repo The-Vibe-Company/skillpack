@@ -5,24 +5,35 @@ slug: best-claude-code-skills-frontend-design
 date: 2026-10-15
 tags: ["Claude Code", "Agent Skills", "Frontend"]
 author: "Stan Girard"
+authorRole: "co-founder of The Vibe Company, which builds Skillpack"
+layout: ranking
+dataCollected: 2026-10-15
 ---
 
 # Best Claude Code Skills for Frontend Design in 2026: the Buyer's Shortlist
 
-*By Stan Girard, co-founder of The Vibe Company, which builds Skillpack · Published October 15, 2026 · Data collected October 15, 2026*
-
 The best Claude Code skill for frontend design in 2026 is **frontend-design** from Anthropic. It's the most-installed design skill on skills.sh, with 988.5K installs, and it ships under Apache 2.0. Below are seven Claude Code skills for frontend design, ranked on public install counts, maintainer, license and scope. Each comes with the exact command to install it and share it with your team.
 
-> [!TIP]
-> **Install any skill on this page with one command, and share it with your team.** `skillpack install github:anthropics/skills/skills/frontend-design` works without an account. [Create a free Skillpack workspace](/login) to share skills across your organization.
+```cta
+title: "Install any skill on this page with one command, and share it with your team."
+text: "`skillpack install github:anthropics/skills/skills/frontend-design` works without an account. Create a free Skillpack workspace to share skills across your organization."
+primary: { label: "Create a free Skillpack workspace", href: /login }
+```
 
-## Key Takeaways
-
-- **frontend-design (Anthropic) is the default pick.** It's the most-installed frontend skill on skills.sh. It pushes Claude toward deliberate palette, typography and layout choices instead of templated defaults.
-- **Pair a taste skill with a review skill.** frontend-design, Impeccable or emil-design-eng shape how the UI looks and feels. Vercel's web-design-guidelines checks the result against a published rule set.
-- **React teams should add react-best-practices.** Vercel's MIT-licensed skill packs 70 performance rules for React and Next.js, ordered by impact.
-- **Check the license before shipping.** Most skills here are Apache 2.0 or MIT, but web-design-guidelines declares no license at all.
-- **Copies drift on a team.** Pin the exact commit each developer installs, in a lockfile that lives in the repo.
+```takeaways
+title: Key Takeaways
+items:
+  - lead: "frontend-design (Anthropic) is the default pick."
+    text: "It's the most-installed frontend skill on skills.sh. It pushes Claude toward deliberate palette, typography and layout choices instead of templated defaults."
+  - lead: "Pair a taste skill with a review skill."
+    text: "frontend-design, Impeccable or emil-design-eng shape how the UI looks and feels. Vercel's web-design-guidelines checks the result against a published rule set."
+  - lead: "React teams should add react-best-practices."
+    text: "Vercel's MIT-licensed skill packs 70 performance rules for React and Next.js, ordered by impact."
+  - lead: "Check the license before shipping."
+    text: "Most skills here are Apache 2.0 or MIT, but web-design-guidelines declares no license at all."
+  - lead: "Copies drift on a team."
+    text: "Pin the exact commit each developer installs, in a lockfile that lives in the repo."
+```
 
 ## What frontend design skills actually are (and what they are not)
 
@@ -49,160 +60,225 @@ Adoption sets the order. The other three criteria are shown for every skill, so 
 
 Install counts change every day, so treat this as a snapshot from October 15, 2026. Each entry gives the source, what the skill does, the numbers we could verify, and a Skillpack install command that points at the skill's real folder on GitHub. Add `--scope project` to install it in the current repo for Claude Code, Codex and OpenCode (the default tools), and `--share-org` to publish a copy to your Skillpack organization.
 
-### 1. frontend-design (Anthropic), best for distinctive new UI
+```skill-card
+rank: 1
+name: frontend-design
+maintainer: "Anthropic"
+bestFor: "distinctive new UI"
+source: { label: anthropics/skills, url: "https://github.com/anthropics/skills/tree/main/skills/frontend-design" }
+repoStars: "181.1K"
+installs:
+  count: "988.5K"
+  url: "https://skills.sh/anthropics/skills/frontend-design"
+license:
+  name: "Apache 2.0"
+  note: "LICENSE.txt in the skill folder"
+focus: "Visual direction"
+install: "skillpack install github:anthropics/skills/skills/frontend-design --scope project"
+description: |
+  frontend-design is Anthropic's answer to UI that looks AI-generated. The skill casts Claude as the design lead of a studio whose client "has already rejected proposals that felt cliché or templated". It asks for deliberate, opinionated choices about palette, typography and layout, specific to the brief, and allows aesthetic risk when it's justified.
 
-- **Maintainer:** Anthropic, in [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/frontend-design) (repository: 181.1K GitHub stars)
-- **Installs:** 988.5K on [skills.sh](https://skills.sh/anthropics/skills/frontend-design)
-- **License:** Apache 2.0 (LICENSE.txt in the skill folder)
+  Its most useful habit is grounding the design in the subject. If the brief doesn't say what the product is, the skill has Claude name a concrete subject, audience and primary job before drawing anything, and confirm them with you. The skill's own example: a toy for girls aged 8 to 11 shouldn't look anything like a dashboard for financial analysts. It also treats the hero as a decision, not a default: Claude picks the most characteristic thing in the subject's world, whether that's a headline, an image, a live demo or a big number.
 
-```bash
-skillpack install github:anthropics/skills/skills/frontend-design --scope project
+  The skill is a single `SKILL.md` plus its license file, with no scripts, so it adds no executables to your repo. It's also the most adopted design skill in the ecosystem. For a team, that means new hires have often seen its output before.
+suitedFor: |
+  teams starting a new landing page, marketing site or product UI who want Claude to commit to a visual direction. Less useful if you must follow a strict existing design system, since it pushes toward distinctiveness.
 ```
 
-frontend-design is Anthropic's answer to UI that looks AI-generated. The skill casts Claude as the design lead of a studio whose client "has already rejected proposals that felt cliché or templated". It asks for deliberate, opinionated choices about palette, typography and layout, specific to the brief, and allows aesthetic risk when it's justified.
+```skill-card
+rank: 2
+name: react-best-practices
+maintainer: "Vercel"
+bestFor: "React and Next.js performance"
+source: { label: vercel-labs/agent-skills, url: "https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices" }
+repoStars: "32.4K"
+installs:
+  count: "802.6K"
+  url: "https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices"
+  note: "listed under its SKILL.md name"
+license:
+  name: "MIT"
+  note: "declared in SKILL.md"
+focus: "React/Next.js performance"
+install: "skillpack install github:vercel-labs/agent-skills/skills/react-best-practices --scope project"
+description: |
+  react-best-practices (named `vercel-react-best-practices` in its SKILL.md, which is also the folder name it installs under) is Vercel Engineering's performance guide for React and Next.js. It's meant for writing, reviewing or refactoring components, pages, data fetching and bundles.
 
-Its most useful habit is grounding the design in the subject. If the brief doesn't say what the product is, the skill has Claude name a concrete subject, audience and primary job before drawing anything, and confirm them with you. The skill's own example: a toy for girls aged 8 to 11 shouldn't look anything like a dashboard for financial analysts. It also treats the hero as a decision, not a default: Claude picks the most characteristic thing in the subject's world, whether that's a headline, an image, a live demo or a big number.
+  It contains 70 rules in 8 categories, ordered by impact. Two are marked critical: eliminating waterfalls and bundle size optimization. Next come server-side performance, client-side data fetching, re-render optimization, rendering performance, JavaScript performance and advanced patterns. Each rule has a short prefixed name, such as `async-parallel` (use `Promise.all()` for independent operations) or `async-defer-await` (move an await into the branch that needs it). That makes findings easy to reference in code review. The detailed rules live in a `rules/` folder next to the SKILL.md.
 
-The skill is a single `SKILL.md` plus its license file, with no scripts, so it adds no executables to your repo. It's also the most adopted design skill in the ecosystem. For a team, that means new hires have often seen its output before.
-
-**Best suited for:** teams starting a new landing page, marketing site or product UI who want Claude to commit to a visual direction. Less useful if you must follow a strict existing design system, since it pushes toward distinctiveness.
-
-### 2. react-best-practices (Vercel), best for React and Next.js performance
-
-- **Maintainer:** Vercel, in [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices) (repository: 32.4K GitHub stars)
-- **Installs:** 802.6K on [skills.sh](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices), listed under its SKILL.md name
-- **License:** MIT (declared in SKILL.md)
-
-```bash
-skillpack install github:vercel-labs/agent-skills/skills/react-best-practices --scope project
+  On scope, it's about how fast your UI is, not how it looks.
+suitedFor: |
+  teams shipping React or Next.js apps who want Claude to avoid common performance mistakes by default. Pair it with a design skill so speed and appearance both get attention.
 ```
 
-react-best-practices (named `vercel-react-best-practices` in its SKILL.md, which is also the folder name it installs under) is Vercel Engineering's performance guide for React and Next.js. It's meant for writing, reviewing or refactoring components, pages, data fetching and bundles.
+```skill-card
+rank: 3
+name: web-design-guidelines
+maintainer: "Vercel"
+bestFor: "reviewing UI against a rule set"
+source: { label: vercel-labs/agent-skills, url: "https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines" }
+repoStars: "32.4K"
+installs:
+  count: "737.8K"
+  url: "https://skills.sh/vercel-labs/agent-skills/web-design-guidelines"
+license:
+  name: "None declared"
+  note: "either in the skill or at the repository level"
+  declared: false
+focus: "UI and accessibility review"
+install: "skillpack install github:vercel-labs/agent-skills/skills/web-design-guidelines --scope project"
+description: |
+  web-design-guidelines is a reviewer, not a designer. It triggers on requests like "review my UI", "check accessibility", "audit design" or "check my site against best practices". It then checks the files you name, or asks which ones to review.
 
-It contains 70 rules in 8 categories, ordered by impact. Two are marked critical: eliminating waterfalls and bundle size optimization. Next come server-side performance, client-side data fetching, re-render optimization, rendering performance, JavaScript performance and advanced patterns. Each rule has a short prefixed name, such as `async-parallel` (use `Promise.all()` for independent operations) or `async-defer-await` (move an await into the branch that needs it). That makes findings easy to reference in code review. The detailed rules live in a `rules/` folder next to the SKILL.md.
+  The skill is short on purpose. It doesn't embed the rules. Instead, it tells Claude to fetch the latest version of Vercel's Web Interface Guidelines from the [web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) repository before every review, then apply every rule to your code. Findings come back in a terse `file:line` format that's easy to act on, or to paste into a pull request.
 
-On scope, it's about how fast your UI is, not how it looks.
-
-**Best suited for:** teams shipping React or Next.js apps who want Claude to avoid common performance mistakes by default. Pair it with a design skill so speed and appearance both get attention.
-
-### 3. web-design-guidelines (Vercel), best for reviewing UI against a rule set
-
-- **Maintainer:** Vercel, in [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines) (repository: 32.4K GitHub stars)
-- **Installs:** 737.8K on [skills.sh](https://skills.sh/vercel-labs/agent-skills/web-design-guidelines)
-- **License:** none declared, either in the skill or at the repository level
-
-```bash
-skillpack install github:vercel-labs/agent-skills/skills/web-design-guidelines --scope project
+  The upside: the rules stay current without reinstalling the skill. There are two trade-offs. The agent needs web access at review time, and the output depends on a file that can change between two reviews. Keep that in mind if you need reproducible reviews in CI. The other caveat is legal: neither the skill nor its repository declares a license, so check with your legal team before redistributing it inside a company.
+suitedFor: |
+  teams that want a consistent UI and accessibility pass before merging frontend changes. It works best as the second half of a pair, after a design skill has produced the interface.
 ```
 
-web-design-guidelines is a reviewer, not a designer. It triggers on requests like "review my UI", "check accessibility", "audit design" or "check my site against best practices". It then checks the files you name, or asks which ones to review.
+```skill-card
+rank: 4
+name: emil-design-eng
+maintainer: "Emil Kowalski"
+bestFor: "motion and interaction polish"
+source: { label: emilkowalski/skills, url: "https://github.com/emilkowalski/skills/tree/main/skills/emil-design-eng" }
+repoStars: "46.3K"
+installs:
+  count: "353.7K"
+  url: "https://skills.sh/emilkowalski/skills/emil-design-eng"
+license:
+  name: "MIT"
+  note: "repository LICENSE"
+focus: "Motion and polish"
+install: "skillpack install github:emilkowalski/skills/skills/emil-design-eng --scope project"
+description: |
+  emil-design-eng encodes Emil Kowalski's design-engineering philosophy: "UI polish, component design, animation decisions, and the invisible details that make software feel great." Kowalski is the author of the Sonner toast library, and his repository holds 15 skills in total, including this one and animate, review-animations, improve-animations and pick-ui-library.
 
-The skill is short on purpose. It doesn't embed the rules. Instead, it tells Claude to fetch the latest version of Vercel's Web Interface Guidelines from the [web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) repository before every review, then apply every rule to your code. Findings come back in a terse `file:line` format that's easy to act on, or to paste into a pull request.
+  The skill reads more like a point of view than a checklist. It argues that taste is trained, not innate, that unseen details compound, and that "beauty is leverage" in a world where most software is good enough. In practice, it steers Claude toward the details users never consciously notice but always feel: timing, easing, focus states, interactions that behave exactly as expected.
 
-The upside: the rules stay current without reinstalling the skill. There are two trade-offs. The agent needs web access at review time, and the output depends on a file that can change between two reviews. Keep that in mind if you need reproducible reviews in CI. The other caveat is legal: neither the skill nor its repository declares a license, so check with your legal team before redistributing it inside a company.
-
-**Best suited for:** teams that want a consistent UI and accessibility pass before merging frontend changes. It works best as the second half of a pair, after a design skill has produced the interface.
-
-### 4. emil-design-eng (Emil Kowalski), best for motion and interaction polish
-
-- **Maintainer:** Emil Kowalski, in [emilkowalski/skills](https://github.com/emilkowalski/skills/tree/main/skills/emil-design-eng) (repository: 46.3K GitHub stars)
-- **Installs:** 353.7K on [skills.sh](https://skills.sh/emilkowalski/skills/emil-design-eng)
-- **License:** MIT (repository LICENSE)
-
-```bash
-skillpack install github:emilkowalski/skills/skills/emil-design-eng --scope project
+  One quirk: when you invoke it without a specific question, it answers with a single fixed sentence and waits for you to ask. That's intended, but it surprises people the first time. Since the other skills in the repository cover narrower jobs, you can install emil-design-eng for the philosophy and add a focused one, such as review-animations, for a specific task.
+suitedFor: |
+  product teams whose UI already works but doesn't feel premium, especially around animation and micro-interactions. Pair it with frontend-design if you're also starting the visual direction from scratch.
 ```
 
-emil-design-eng encodes Emil Kowalski's design-engineering philosophy: "UI polish, component design, animation decisions, and the invisible details that make software feel great." Kowalski is the author of the Sonner toast library, and his repository holds 15 skills in total, including this one and animate, review-animations, improve-animations and pick-ui-library.
+```skill-card
+rank: 5
+name: impeccable
+title: "Impeccable"
+maintainer: "Paul Bakaus"
+bestFor: "auditing and polishing an existing interface"
+source: { label: pbakaus/impeccable, url: "https://github.com/pbakaus/impeccable/tree/main/.claude/skills/impeccable" }
+repoStars: "81.3K"
+installs:
+  count: "333.5K"
+  url: "https://skills.sh/pbakaus/impeccable/impeccable"
+license:
+  name: "Apache 2.0"
+  note: "declared in SKILL.md and in the repository; version 4.5.2 at time of writing"
+focus: "Audit and polish commands"
+install: "skillpack install github:pbakaus/impeccable/.claude/skills/impeccable --scope project"
+description: |
+  Impeccable is the broadest skill on this list. Its description covers designing, redesigning, critiquing, auditing, polishing, hardening, optimizing, animating and theming frontend interfaces. That spans websites, dashboards, app shells, forms, onboarding and empty states, plus accessibility, performance, responsive behavior, typography, color, motion and UX copy.
 
-The skill reads more like a point of view than a checklist. It argues that taste is trained, not innate, that unseen details compound, and that "beauty is leverage" in a world where most software is good enough. In practice, it steers Claude toward the details users never consciously notice but always feel: timing, easing, focus states, interactions that behave exactly as expected.
+  It works as a set of commands. You call it with a verb and a target: `audit`, `critique`, `polish`, `harden`, `bolder`, `quieter`, `typeset`, `colorize`, `distill`, `onboard` and more, as listed in its argument hint. That makes it practical on an existing product. "Audit the settings page", then "polish" it, is a more controlled loop than asking for a redesign. Its stated ambition is "out-of-distribution craft": production-grade code and a clear point of view, rather than safe, measured output.
 
-One quirk: when you invoke it without a specific question, it answers with a single fixed sentence and waits for you to ask. That's intended, but it surprises people the first time. Since the other skills in the repository cover narrower jobs, you can install emil-design-eng for the philosophy and add a focused one, such as review-animations, for a specific task.
-
-**Best suited for:** product teams whose UI already works but doesn't feel premium, especially around animation and micro-interactions. Pair it with frontend-design if you're also starting the visual direction from scratch.
-
-### 5. Impeccable (Paul Bakaus), best for auditing and polishing an existing interface
-
-- **Maintainer:** Paul Bakaus, in [pbakaus/impeccable](https://github.com/pbakaus/impeccable/tree/main/.claude/skills/impeccable) (repository: 81.3K GitHub stars)
-- **Installs:** 333.5K on [skills.sh](https://skills.sh/pbakaus/impeccable/impeccable)
-- **License:** Apache 2.0 (declared in SKILL.md and in the repository); version 4.5.2 at time of writing
-
-```bash
-skillpack install github:pbakaus/impeccable/.claude/skills/impeccable --scope project
+  The skill's source lives in the repository's `skill/` folder as a template. A build generates an installable copy for each agent (.claude, .cursor, .agents, .opencode and others) plus a Claude Code plugin in `plugin/`, and the repository commits those copies so it can be installed straight from GitHub. The command above uses the generated Claude Code copy, `.claude/skills/impeccable`. That copy ships a `scripts/` folder with a launcher that downloads the Impeccable engine binary on first run, so the Skillpack CLI lists those files as executables when you install it.
+suitedFor: |
+  teams with a live product that needs a structured design review and targeted fixes, rather than a blank-page redesign. Its breadth overlaps with frontend-design, so install one of the two as your main design skill.
 ```
 
-Impeccable is the broadest skill on this list. Its description covers designing, redesigning, critiquing, auditing, polishing, hardening, optimizing, animating and theming frontend interfaces. That spans websites, dashboards, app shells, forms, onboarding and empty states, plus accessibility, performance, responsive behavior, typography, color, motion and UX copy.
+```skill-card
+rank: 6
+name: webapp-testing
+maintainer: "Anthropic"
+bestFor: "checking the UI in a real browser"
+source: { label: anthropics/skills, url: "https://github.com/anthropics/skills/tree/main/skills/webapp-testing" }
+repoStars: "181.1K"
+installs:
+  count: "177.8K"
+  url: "https://skills.sh/anthropics/skills/webapp-testing"
+license:
+  name: "Apache 2.0"
+  note: "LICENSE.txt in the skill folder"
+focus: "Browser testing (Playwright)"
+install: "skillpack install github:anthropics/skills/skills/webapp-testing --scope project"
+description: |
+  webapp-testing covers what design skills leave out: checking that the interface actually works once rendered. It's a toolkit for testing local web applications with Playwright. Claude writes native Python Playwright scripts to verify behavior, debug the UI, capture screenshots and read browser logs.
 
-It works as a set of commands. You call it with a verb and a target: `audit`, `critique`, `polish`, `harden`, `bolder`, `quieter`, `typeset`, `colorize`, `distill`, `onboard` and more, as listed in its argument hint. That makes it practical on an existing product. "Audit the settings page", then "polish" it, is a more controlled loop than asking for a redesign. Its stated ambition is "out-of-distribution craft": production-grade code and a clear point of view, rather than safe, measured output.
+  The skill includes a decision tree. For static HTML, Claude reads the file to find selectors. For a dynamic app, it starts the server if needed, waits for the page to settle, takes a screenshot or inspects the DOM, and only then acts on the selectors it found. A helper, `scripts/with_server.py`, manages the server lifecycle, including several servers at once. The skill tells Claude to run helpers with `--help` and treat them as black boxes rather than reading them, which keeps the context window small.
 
-The skill's source lives in the repository's `skill/` folder as a template. A build generates an installable copy for each agent (.claude, .cursor, .agents, .opencode and others) plus a Claude Code plugin in `plugin/`, and the repository commits those copies so it can be installed straight from GitHub. The command above uses the generated Claude Code copy, `.claude/skills/impeccable`. That copy ships a `scripts/` folder with a launcher that downloads the Impeccable engine binary on first run, so the Skillpack CLI lists those files as executables when you install it.
-
-**Best suited for:** teams with a live product that needs a structured design review and targeted fixes, rather than a blank-page redesign. Its breadth overlaps with frontend-design, so install one of the two as your main design skill.
-
-### 6. webapp-testing (Anthropic), best for checking the UI in a real browser
-
-- **Maintainer:** Anthropic, in [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/webapp-testing) (repository: 181.1K GitHub stars)
-- **Installs:** 177.8K on [skills.sh](https://skills.sh/anthropics/skills/webapp-testing)
-- **License:** Apache 2.0 (LICENSE.txt in the skill folder)
-
-```bash
-skillpack install github:anthropics/skills/skills/webapp-testing --scope project
+  Because it ships scripts, the Skillpack CLI flags them as executable files during install. Skillpack copies them but never runs them, and it doesn't install Playwright for you. You'll need Python and Playwright set up in the project.
+suitedFor: |
+  developers who want Claude to check its own frontend work, with screenshots and console logs, before handing it over. It's a testing skill, not a design one, so it complements the design and review skills above.
 ```
 
-webapp-testing covers what design skills leave out: checking that the interface actually works once rendered. It's a toolkit for testing local web applications with Playwright. Claude writes native Python Playwright scripts to verify behavior, debug the UI, capture screenshots and read browser logs.
+```skill-card
+rank: 7
+name: web-artifacts-builder
+maintainer: "Anthropic"
+bestFor: "complex React artifacts in claude.ai"
+source: { label: anthropics/skills, url: "https://github.com/anthropics/skills/tree/main/skills/web-artifacts-builder" }
+repoStars: "181.1K"
+installs:
+  count: "108.9K"
+  url: "https://skills.sh/anthropics/skills/web-artifacts-builder"
+license:
+  name: "Apache 2.0"
+  note: "LICENSE.txt in the skill folder"
+focus: "claude.ai artifacts"
+install: "skillpack install github:anthropics/skills/skills/web-artifacts-builder --scope project"
+description: |
+  web-artifacts-builder is for building elaborate, multi-component HTML artifacts for claude.ai with React, Tailwind CSS and shadcn/ui. Its description reserves it for complex artifacts that need state management, routing or shadcn/ui components, not for simple single-file HTML.
 
-The skill includes a decision tree. For static HTML, Claude reads the file to find selectors. For a dynamic app, it starts the server if needed, waits for the page to settle, takes a screenshot or inspects the DOM, and only then acts on the selectors it found. A helper, `scripts/with_server.py`, manages the server lifecycle, including several servers at once. The skill tells Claude to run helpers with `--help` and treat them as black boxes rather than reading them, which keeps the context window small.
+  The workflow runs through two scripts. `scripts/init-artifact.sh` creates a React and TypeScript project on Vite, with Tailwind CSS 3.4.1, path aliases and more than 40 shadcn/ui components preinstalled. `scripts/bundle-artifact.sh` then bundles everything into a single HTML file with Parcel. In between, Claude edits the generated code like any React app.
 
-Because it ships scripts, the Skillpack CLI flags them as executable files during install. Skillpack copies them but never runs them, and it doesn't install Playwright for you. You'll need Python and Playwright set up in the project.
+  It also has a short style rule. To avoid "AI slop", it tells Claude to steer clear of excessive centered layouts, purple gradients, uniform rounded corners and the Inter font. That rule is useful even if you never build an artifact.
 
-**Best suited for:** developers who want Claude to check its own frontend work, with screenshots and console logs, before handing it over. It's a testing skill, not a design one, so it complements the design and review skills above.
-
-### 7. web-artifacts-builder (Anthropic), best for complex React artifacts in claude.ai
-
-- **Maintainer:** Anthropic, in [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills/web-artifacts-builder) (repository: 181.1K GitHub stars)
-- **Installs:** 108.9K on [skills.sh](https://skills.sh/anthropics/skills/web-artifacts-builder)
-- **License:** Apache 2.0 (LICENSE.txt in the skill folder)
-
-```bash
-skillpack install github:anthropics/skills/skills/web-artifacts-builder --scope project
+  It ranks last on installs, and its scope is also narrower than the skills above. It targets self-contained artifacts, not your production app's codebase.
+suitedFor: |
+  people prototyping interactive tools, demos or internal mini-apps as shareable single-file artifacts. For work inside an existing frontend repository, the skills above fit better.
 ```
-
-web-artifacts-builder is for building elaborate, multi-component HTML artifacts for claude.ai with React, Tailwind CSS and shadcn/ui. Its description reserves it for complex artifacts that need state management, routing or shadcn/ui components, not for simple single-file HTML.
-
-The workflow runs through two scripts. `scripts/init-artifact.sh` creates a React and TypeScript project on Vite, with Tailwind CSS 3.4.1, path aliases and more than 40 shadcn/ui components preinstalled. `scripts/bundle-artifact.sh` then bundles everything into a single HTML file with Parcel. In between, Claude edits the generated code like any React app.
-
-It also has a short style rule. To avoid "AI slop", it tells Claude to steer clear of excessive centered layouts, purple gradients, uniform rounded corners and the Inter font. That rule is useful even if you never build an artifact.
-
-It ranks last on installs, and its scope is also narrower than the skills above. It targets self-contained artifacts, not your production app's codebase.
-
-**Best suited for:** people prototyping interactive tools, demos or internal mini-apps as shareable single-file artifacts. For work inside an existing frontend repository, the skills above fit better.
 
 ## Side-by-Side Comparison
 
 Ranked by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected October 15, 2026. Stars are for each skill's whole GitHub repository.
 
-| # | Skill | Maintainer | Installs (skills.sh) | Repo stars (GitHub) | License | Focus |
-|---|---|---|---|---|---|---|
-| 1 | frontend-design | Anthropic | 988.5K | 181.1K | Apache 2.0 | Visual direction |
-| 2 | react-best-practices | Vercel | 802.6K | 32.4K | MIT | React/Next.js performance |
-| 3 | web-design-guidelines | Vercel | 737.8K | 32.4K | None declared | UI and accessibility review |
-| 4 | emil-design-eng | Emil Kowalski | 353.7K | 46.3K | MIT | Motion and polish |
-| 5 | impeccable | Paul Bakaus | 333.5K | 81.3K | Apache 2.0 | Audit and polish commands |
-| 6 | webapp-testing | Anthropic | 177.8K | 181.1K | Apache 2.0 | Browser testing (Playwright) |
-| 7 | web-artifacts-builder | Anthropic | 108.9K | 181.1K | Apache 2.0 | claude.ai artifacts |
+```skill-comparison
+```
 
-> [!TIP]
-> **Already using three of these?** Put them in one Skillpack workspace and pin each one to an exact commit in `.companion/skills.lock.json`, so every developer and every agent runs the same files. [Start free](/login) · [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team)
+```cta
+title: "Already using three of these?"
+text: "Put them in one Skillpack workspace and pin each one to an exact commit in `.companion/skills.lock.json`, so every developer and every agent runs the same files."
+primary: { label: "Start free", href: /login }
+secondary: { label: "How to share Claude Code skills with your team", href: /blog/how-to-share-claude-code-skills-with-your-team }
+```
 
 ## Which frontend skill fits your use case
 
-| Use case | Start with | Add | Why |
-|---|---|---|---|
-| New landing page or product UI | frontend-design | emil-design-eng | Visual direction first, interaction polish second |
-| Improving an existing app | impeccable | web-design-guidelines | Targeted audit and fixes, then a rule-based check |
-| React or Next.js codebase | react-best-practices | frontend-design | Performance and appearance |
-| QA before shipping | webapp-testing | web-design-guidelines | A real browser check plus a guidelines review |
-| Interactive prototype or demo | web-artifacts-builder | frontend-design | A single-file artifact that doesn't look templated |
+```use-cases
+rows:
+  - useCase: "New landing page or product UI"
+    start: "frontend-design"
+    add: "emil-design-eng"
+    why: "Visual direction first, interaction polish second"
+  - useCase: "Improving an existing app"
+    start: "impeccable"
+    add: "web-design-guidelines"
+    why: "Targeted audit and fixes, then a rule-based check"
+  - useCase: "React or Next.js codebase"
+    start: "react-best-practices"
+    add: "frontend-design"
+    why: "Performance and appearance"
+  - useCase: "QA before shipping"
+    start: "webapp-testing"
+    add: "web-design-guidelines"
+    why: "A real browser check plus a guidelines review"
+  - useCase: "Interactive prototype or demo"
+    start: "web-artifacts-builder"
+    add: "frontend-design"
+    why: "A single-file artifact that doesn't look templated"
+```
 
 ## How to install and share these skills with your team
 
@@ -220,30 +296,30 @@ Skillpack is open source (MIT) and self-hostable. The Free plan includes up to 2
 
 ## FAQ
 
-**What is the best Claude Code skill for frontend design?**
-By installs on skills.sh, it's Anthropic's frontend-design, with 988.5K installs on October 15, 2026. It's Apache 2.0 and maintained in anthropics/skills.
-
-**How do I install a Claude Code skill from GitHub?**
-Run `skillpack install github:owner/repo/path`, for example `skillpack install github:anthropics/skills/skills/frontend-design`. Add `--scope project` to install it in the current repository. You can also copy the skill's folder into `.claude/skills/` by hand.
-
-**How many design skills should I install?**
-Two or three that don't overlap: one for visual direction, one for review, and optionally one for testing. Overlapping skills can give the agent contradictory instructions.
-
-**What is the difference between a skill and an MCP server?**
-A skill teaches the agent a method. An MCP server gives it access to a system. See [Agent Skills vs MCP](/blog/agent-skills-vs-mcp).
-
-**How do I keep the same skills across my team?**
-Pin each skill to an exact commit in a lockfile committed to the repo, and share it through one workspace. See [how to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team).
-
-**What licenses do these skills use?**
-Six of the seven are Apache 2.0 or MIT. web-design-guidelines declares no license, so check before redistributing it.
-
-**Are third-party skills safe to install?**
-Not automatically. A skill's instructions can make your agent run commands, so read the source first and pin a reviewed commit.
+```faq
+items:
+  - question: "What is the best Claude Code skill for frontend design?"
+    answer: "By installs on skills.sh, it's Anthropic's frontend-design, with 988.5K installs on October 15, 2026. It's Apache 2.0 and maintained in anthropics/skills."
+  - question: "How do I install a Claude Code skill from GitHub?"
+    answer: "Run `skillpack install github:owner/repo/path`, for example `skillpack install github:anthropics/skills/skills/frontend-design`. Add `--scope project` to install it in the current repository. You can also copy the skill's folder into `.claude/skills/` by hand."
+  - question: "How many design skills should I install?"
+    answer: "Two or three that don't overlap: one for visual direction, one for review, and optionally one for testing. Overlapping skills can give the agent contradictory instructions."
+  - question: "What is the difference between a skill and an MCP server?"
+    answer: "A skill teaches the agent a method. An MCP server gives it access to a system. See [Agent Skills vs MCP](/blog/agent-skills-vs-mcp)."
+  - question: "How do I keep the same skills across my team?"
+    answer: "Pin each skill to an exact commit in a lockfile committed to the repo, and share it through one workspace. See [how to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team)."
+  - question: "What licenses do these skills use?"
+    answer: "Six of the seven are Apache 2.0 or MIT. web-design-guidelines declares no license, so check before redistributing it."
+  - question: "Are third-party skills safe to install?"
+    answer: "Not automatically. A skill's instructions can make your agent run commands, so read the source first and pin a reviewed commit."
+```
 
 ## Try Skillpack for free
 
 After you've picked your skills, the next step is making sure everyone on your team runs the same ones. Skillpack installs any public skill from GitHub with one command. It pins the exact commit in a lockfile you can commit. It shares skills with your whole organization, with license and source kept. It's open source and free for up to 20 organization skills. [Create your free Skillpack workspace](/login) and share your first skill in a few minutes.
 
-> [!TIP]
-> **Your team's skills, in one place.** [Sign up free for Skillpack](/login)
+```cta
+title: "Your team's skills, in one place."
+primary: { label: "Sign up free for Skillpack", href: /login }
+sticky: true
+```

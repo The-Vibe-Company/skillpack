@@ -4,12 +4,13 @@ import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CodeBlock } from "./CodeBlock";
+import { StickyCta } from "./ranking/StickyCta";
 import { ReadingProgress } from "./ReadingProgress";
 import { TocActiveState } from "./TocActiveState";
 
 /*
- * The blog's only client code: the copy button, the table-of-contents highlight and the reading
- * progress bar. A copy that claims success after a blocked clipboard, a highlight stuck on the
+ * The blog's only client code: the copy button, the table-of-contents highlight, the reading
+ * progress bar and the ranking posts' sticky sign-up bar. A copy that claims success after a blocked clipboard, a highlight stuck on the
  * wrong section, or a bar that overflows its track fails the assertions below.
  */
 
@@ -131,5 +132,80 @@ describe("reading progress bar", () => {
       await new Promise((resolve) => window.requestAnimationFrame(resolve));
     });
     expect(fill?.style.transform).toBe("scaleX(1)");
+  });
+});
+
+describe("sticky sign-up bar", () => {
+  type Observed = { target: Element; callback: IntersectionObserverCallback };
+  let observed: Observed[] = [];
+
+  function stubObserver() {
+    observed = [];
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        constructor(private readonly callback: IntersectionObserverCallback) {}
+        observe(target: Element) {
+          observed.push({ target, callback: this.callback });
+        }
+        // next/link observes its anchor for prefetching; the bar's own markers are found by id.
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+  }
+
+  function report(id: string, isIntersecting: boolean, top: number) {
+    const entry = observed.find((item) => item.target.id === id);
+    // SAFETY: StickyCta reads only `isIntersecting` and `boundingClientRect.top` from the entry and never touches the observer argument.
+    act(() => entry?.callback([{ isIntersecting, boundingClientRect: { top } } as IntersectionObserverEntry], {} as IntersectionObserver));
+  }
+
+  async function renderBar() {
+    for (const id of ["start", "end"]) document.body.appendChild(Object.assign(document.createElement("div"), { id }));
+    const container = await render(
+      React.createElement(StickyCta, { title: "Your team's skills.", label: "Sign up", href: "/login", showAfterId: "start", hideWhenVisibleId: "end" }),
+    );
+    return container.querySelector<HTMLElement>(".v10-stickycta");
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    window.sessionStorage.clear();
+  });
+
+  it("stays hidden and inert until the reader scrolls past the header, and steps aside at the end", async () => {
+    stubObserver();
+    const bar = await renderBar();
+
+    expect(bar?.dataset.visible).toBe("false");
+    expect(bar?.hasAttribute("inert")).toBe(true);
+    report("start", true, 10);
+    expect(bar?.dataset.visible).toBe("false");
+    report("start", false, -400);
+    expect(bar?.dataset.visible).toBe("true");
+    expect(bar?.hasAttribute("inert")).toBe(false);
+    report("end", true, 300);
+    expect(bar?.dataset.visible).toBe("false");
+    // Below the viewport is not past it: scrolling back up to the top hides the bar again.
+    report("end", false, 900);
+    report("start", false, 900);
+    expect(bar?.dataset.visible).toBe("false");
+  });
+
+  it("stays closed for the session once dismissed", async () => {
+    stubObserver();
+    const bar = await renderBar();
+    report("start", false, -400);
+
+    act(() => bar?.querySelector<HTMLButtonElement>("button[aria-label='Dismiss']")?.click());
+
+    expect(bar?.dataset.visible).toBe("false");
+    expect(window.sessionStorage.getItem("skillpack:blog-sticky-cta-dismissed")).toBe("1");
+    act(() => roots.splice(0).forEach((root) => root.unmount()));
+    document.body.innerHTML = "";
+    const again = await renderBar();
+    report("start", false, -400);
+    expect(again?.dataset.visible).toBe("false");
   });
 });
