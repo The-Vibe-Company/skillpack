@@ -8,6 +8,8 @@ import { BlogBanner } from "@/components/blog/BlogCover";
 import { PostCard } from "@/components/blog/PostCard";
 import { PostMeta, TagList } from "@/components/blog/PostMeta";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
+import { RankingHeader } from "@/components/blog/ranking/RankingHeader";
+import { StickyCta } from "@/components/blog/ranking/StickyCta";
 import { SignupCta } from "@/components/blog/SignupCta";
 import { TocActiveState } from "@/components/blog/TocActiveState";
 import { TocDisclosure, TocSidebar } from "@/components/blog/TableOfContents";
@@ -20,14 +22,19 @@ import {
   readingMinutes,
   relatedBlogPosts,
   splitLeadHeading,
+  splitLeadParagraphs,
 } from "@/lib/blog";
+import { blogFaqEntries, extractBlogBlocks, skillCards, stickyCta } from "@/lib/blogBlocks";
 import { blogTableOfContents } from "@/lib/blogMarkdown";
+import { inlineMarkdownText } from "@/lib/markdownText";
 import { resolveSiteUrl } from "@/lib/siteUrl";
-import { blogPostingStructuredData, serializeJsonLd } from "@/lib/structuredData";
+import { blogPostingStructuredData, faqPageStructuredData, serializeJsonLd } from "@/lib/structuredData";
 
 type BlogPostPageProps = { params: Promise<{ slug: string }> };
 
 const ARTICLE_BODY_ID = "article-body";
+const ARTICLE_HEADER_ID = "article-header";
+const ARTICLE_END_ID = "article-end";
 
 // Posts are files in the build, so every valid slug is prerendered and anything else is a 404.
 export const dynamicParams = false;
@@ -76,7 +83,14 @@ const TITLE_COMPONENTS: Components = {
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const post = findBlogPost((await params).slug);
   if (!post) notFound();
-  const { heading, rest } = splitLeadHeading(post.body);
+  const { heading, rest: afterHeading } = splitLeadHeading(post.body);
+  const ranking = post.layout === "ranking";
+  // A ranking post sets its opening paragraphs in the header; an article keeps them in the body.
+  const { lead, rest } = ranking ? splitLeadParagraphs(afterHeading) : { lead: "", rest: afterHeading };
+  const blocks = extractBlogBlocks(rest);
+  const faq = blogFaqEntries(blocks);
+  const sticky = ranking ? stickyCta(blocks) : null;
+  const minutes = readingMinutes(post.body);
   const toc = blogTableOfContents(rest);
   const related = relatedBlogPosts(post, loadBlogPosts());
   const author = blogPostAuthor(post);
@@ -94,28 +108,51 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   });
   return (
     <BlogShell>
-      <div className="lp v10-post">
+      <div className={ranking ? "lp v10-post v10-post--ranking" : "lp v10-post"}>
         <ReadingProgress targetId={ARTICLE_BODY_ID} />
         <article>
-          <header className="v10-wrap v10-post__header">
-            <nav className="v10-crumbs" aria-label="Breadcrumb">
-              <ol>
-                <li>
-                  <Link href="/">Home</Link>
-                </li>
-                <li>
-                  <Link href="/blog">Blog</Link>
-                </li>
-              </ol>
-            </nav>
-            <ReactMarkdown components={TITLE_COMPONENTS}>{heading}</ReactMarkdown>
-            <PostMeta date={post.date} minutes={readingMinutes(post.body)} author={author} />
-            <TagList tags={post.tags} />
-          </header>
+          {ranking ? (
+            <RankingHeader
+              id={ARTICLE_HEADER_ID}
+              heading={heading}
+              lead={lead}
+              skillCount={skillCards(blocks).length}
+              author={author}
+              authorRole={post.authorRole}
+              date={post.date}
+              dataCollected={post.dataCollected}
+              minutes={minutes}
+              tags={post.tags}
+            />
+          ) : (
+            <>
+              <header id={ARTICLE_HEADER_ID} className="v10-wrap v10-post__header">
+                <nav className="v10-crumbs" aria-label="Breadcrumb">
+                  <ol>
+                    <li>
+                      <Link href="/">Home</Link>
+                    </li>
+                    <li>
+                      <Link href="/blog">Blog</Link>
+                    </li>
+                  </ol>
+                </nav>
+                <ReactMarkdown components={TITLE_COMPONENTS}>{heading}</ReactMarkdown>
+                <PostMeta
+                  date={post.date}
+                  minutes={minutes}
+                  author={author}
+                  authorRole={post.authorRole}
+                  dataCollected={post.dataCollected}
+                />
+                <TagList tags={post.tags} />
+              </header>
 
-          <div className="v10-wrap v10-post__cover">
-            <BlogBanner />
-          </div>
+              <div className="v10-wrap v10-post__cover">
+                <BlogBanner />
+              </div>
+            </>
+          )}
 
           <div className="v10-wrap v10-post__layout">
             <div className="v10-post__main">
@@ -133,7 +170,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </article>
 
-        <div className="v10-wrap v10-post__end">
+        <div id={ARTICLE_END_ID} className="v10-wrap v10-post__end">
           <SignupCta />
         </div>
 
@@ -151,8 +188,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </ul>
           </section>
         ) : null}
+        {sticky ? (
+          <StickyCta
+            title={inlineMarkdownText(sticky.title)}
+            label={sticky.primary.label}
+            href={sticky.primary.href}
+            showAfterId={ARTICLE_HEADER_ID}
+            hideWhenVisibleId={ARTICLE_END_ID}
+            focusWithinId={ARTICLE_BODY_ID}
+          />
+        ) : null}
       </div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
+      {faq.length > 0 ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqPageStructuredData(faq)) }} />
+      ) : null}
     </BlogShell>
   );
 }

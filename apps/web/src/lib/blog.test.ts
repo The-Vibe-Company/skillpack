@@ -14,6 +14,7 @@ import {
   readingMinutes,
   relatedBlogPosts,
   splitLeadHeading,
+  splitLeadParagraphs,
 } from "./blog";
 
 function postSource(frontmatter: string, body = "\n# Title\n\nBody.\n"): string {
@@ -45,6 +46,7 @@ describe("blog post parsing", () => {
       slug: "a-post",
       date: "2026-10-13",
       tags: [],
+      layout: "article",
       body: "\n# Title\n\nBody.\n",
     });
   });
@@ -70,6 +72,40 @@ describe("blog post parsing", () => {
   ])("rejects %s and names the file", (_label, frontmatter, reason) => {
     expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(/^a-post\.md: invalid frontmatter/);
     expect(() => parseBlogPost(postSource(frontmatter), "a-post.md")).toThrow(reason);
+  });
+
+  it("reads the ranking layout, the author's role and the data-collection day", () => {
+    const post = parseBlogPost(
+      postSource(`${VALID_FRONTMATTER}\nauthor: "Ada Lovelace"\nauthorRole: "co-founder of Example"\nlayout: ranking\ndataCollected: 2026-10-12`),
+      "a-post.md",
+    );
+
+    expect(post).toMatchObject({ layout: "ranking", authorRole: "co-founder of Example", dataCollected: "2026-10-12" });
+    expect(parseBlogPost(postSource(VALID_FRONTMATTER), "a-post.md").layout).toBe("article");
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nauthorRole: "editor"`), "a-post.md")).toThrow(
+      "a-post.md: invalid frontmatter (authorRole: authorRole needs an author)",
+    );
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nlayout: gallery`), "a-post.md")).toThrow(/a-post\.md: invalid frontmatter \(layout/);
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\ndataCollected: 2026-02-30`), "a-post.md")).toThrow(
+      /dataCollected: dataCollected must be a real day/,
+    );
+  });
+
+  it("fails the build when a heading takes a block's fixed anchor", () => {
+    const takeaways = "```takeaways\ntitle: Key Takeaways\nitems:\n  - { lead: One., text: Two. }\n```";
+    const body = `\n# Title\n\n## Key Takeaways\n\n${takeaways}\n`;
+
+    expect(() => parseBlogPost(postSource(VALID_FRONTMATTER, body), "a-post.md")).toThrow(
+      'a-post.md: two outline entries share the anchor "key-takeaways"',
+    );
+  });
+
+  it("fails the build on an invalid structured block, naming the file and the field", () => {
+    const body = "\n# Title\n\n```cta\ntitle: Go\nprimary: { label: Go, href: \"javascript:alert(1)\" }\n```\n";
+
+    expect(() => parseBlogPost(postSource(VALID_FRONTMATTER, body), "a-post.md")).toThrow(
+      /^a-post\.md: cta block: primary\.href: must be a site path or an https URL$/,
+    );
   });
 
   it("rejects a file without frontmatter or whose slug differs from its file name", () => {
@@ -127,7 +163,7 @@ describe("blog post loading", () => {
 });
 
 function fixturePost(slug: string, date: string, tags: string[]): BlogPost {
-  return { title: slug, description: "d", slug, date, tags, body: "\n# Title\n" };
+  return { title: slug, description: "d", slug, date, tags, layout: "article", body: "\n# Title\n" };
 }
 
 describe("blog post presentation", () => {
@@ -160,6 +196,40 @@ describe("blog post presentation", () => {
     expect(readingMinutes(`# Title\n\n${prose}\n\n\`\`\`\n${code}\n\`\`\`\n`)).toBe(3);
     // The published guide is long enough to say so.
     expect(readingMinutes(findBlogPost("what-is-skill-md")?.body ?? "")).toBeGreaterThan(3);
+  });
+
+  it("counts the prose inside structured blocks toward reading time, but not their commands, URLs or keys", () => {
+    const words = Array.from({ length: 460 }, () => "word").join(" ");
+    const faq = `\`\`\`faq\nitems:\n  - question: "Why?"\n    answer: "${words}"\n\`\`\``;
+    // 700 flags and a long URL would add three minutes if machine values were read as prose.
+    const flags = Array.from({ length: 700 }, (_, index) => `--flag${index}`).join(" ");
+    const card = [
+      "```skill-card",
+      "rank: 1",
+      "name: a-skill",
+      "maintainer: Ada",
+      "bestFor: one thing",
+      `source: { label: ada/skills, url: "https://github.com/ada/skills/tree/main/${words.replaceAll(" ", "/")}" }`,
+      'repoStars: "1K"',
+      'installs: { count: "2K", url: "https://skills.sh/ada/skills/a-skill" }',
+      "license: { name: MIT }",
+      "focus: Testing",
+      `install: "skillpack install github:ada/skills/a-skill ${flags}"`,
+      "description: Short.",
+      "suitedFor: Teams.",
+      "```",
+    ].join("\n");
+
+    expect(readingMinutes(`# Title\n\n${faq}\n`)).toBe(3);
+    expect(readingMinutes(`# Title\n\n${card}\n`)).toBe(1);
+  });
+
+  it("splits off the opening paragraphs, leaving the rest byte for byte", () => {
+    const rest = "> [!TIP]\n> Go.\n\n```bash\nline one\n  \nline two\n```\n";
+
+    expect(splitLeadParagraphs(`\nFirst **lead**.\n\nSecond lead.\n\n${rest}`)).toEqual({ lead: "First **lead**.\n\nSecond lead.", rest });
+    expect(splitLeadParagraphs("\n## Heading\n\nText.\n")).toEqual({ lead: "", rest: "## Heading\n\nText.\n" });
+    expect(splitLeadParagraphs("\nOnly a lead.\n")).toEqual({ lead: "Only a lead.", rest: "" });
   });
 
   it("relates posts by shared tags, then fills with the newest others", () => {

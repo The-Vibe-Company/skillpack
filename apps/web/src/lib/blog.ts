@@ -2,6 +2,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
+import { blogBlockText, extractBlogBlocks, isBlogBlockLanguage, parseBlogBlock, validateBlogBlocks } from "./blogBlocks";
+import { blogTableOfContents } from "./blogMarkdown";
 
 /** Markdown posts live beside the app, not in `src/`, so editors can add one without touching code. */
 export const BLOG_CONTENT_DIR = join(process.cwd(), "content", "blog");
@@ -26,8 +28,22 @@ const blogFrontmatterSchema = z
     tags: z.array(z.string().trim().min(1)).max(6).default([]),
     // A named person who wrote the post. Without one, the post is credited to the organization.
     author: z.string().trim().min(1).optional(),
+    // What the named author does, shown after the name in the byline ("co-founder of …").
+    authorRole: z.string().trim().min(1).optional(),
+    // `ranking` sets the post as a ranked shortlist: lead in the header, structured blocks, sticky CTA.
+    layout: z.enum(["article", "ranking"]).default("article"),
+    // The day the post's figures (installs, stars…) were read, when it differs from publication.
+    dataCollected: z
+      .string()
+      .regex(ISO_DAY_RE, "dataCollected must be YYYY-MM-DD")
+      .refine(isCalendarDay, "dataCollected must be a real day")
+      .optional(),
   })
-  .strict();
+  .strict()
+  .refine((frontmatter) => frontmatter.authorRole === undefined || frontmatter.author !== undefined, {
+    message: "authorRole needs an author",
+    path: ["authorRole"],
+  });
 
 export type BlogPost = z.infer<typeof blogFrontmatterSchema> & {
   /** Markdown after the closing frontmatter fence, unmodified. It opens with the post's only H1. */
@@ -60,6 +76,17 @@ export function parseBlogPost(source: string, fileName: string): BlogPost {
   // with exactly one.
   if (!/^\s*# \S/.test(body) || countH1(body) !== 1) {
     throw new Error(`${fileName}: body must start with its only "# " heading`);
+  }
+  try {
+    validateBlogBlocks(extractBlogBlocks(body));
+  } catch (error) {
+    throw new Error(`${fileName}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  // Block anchors are fixed ("key-takeaways", "skill-<name>"), so a heading can claim the same one.
+  const anchors = new Set<string>();
+  for (const entry of blogTableOfContents(body)) {
+    if (anchors.has(entry.id)) throw new Error(`${fileName}: two outline entries share the anchor "${entry.id}"`);
+    anchors.add(entry.id);
   }
   return { ...frontmatter.data, body };
 }
@@ -100,15 +127,42 @@ export function splitLeadHeading(body: string): LeadHeadingSplit {
   return { heading: match[1] ?? "", rest: body.slice(match[0].length) };
 }
 
+export type LeadParagraphsSplit = { lead: string; rest: string };
+
+/**
+ * Splits off the plain paragraphs that open the Markdown (after the H1), up to the first heading,
+ * quote, list, table or fenced block. A ranking post sets them in its header as the intro.
+ */
+export function splitLeadParagraphs(markdown: string): LeadParagraphsSplit {
+  // Walk paragraph by paragraph and cut at an offset, so the rest is a byte-exact slice.
+  const separator = /\n[ \t]*\n\s*/g;
+  let start = /^\s*/.exec(markdown)?.[0].length ?? 0;
+  let end = start;
+  while (start < markdown.length && !/^(#|>|```|~~~|\||[-*+] |\d+[.)] |<)/.test(markdown.slice(start))) {
+    separator.lastIndex = start;
+    const next = separator.exec(markdown);
+    end = next ? next.index : markdown.length;
+    start = next ? next.index + next[0].length : markdown.length;
+  }
+  return { lead: markdown.slice(0, end).trim(), rest: markdown.slice(start) };
+}
+
 const WORDS_PER_MINUTE = 230;
 
 /** Whole minutes to read the prose, at least one. Fenced code is skimmed, so it is not counted. */
 export function readingMinutes(body: string): number {
-  let inFence = false;
+  const countWords = (line: string) => line.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
+  let fence: { language: string; lines: string[] } | null = null;
   let words = 0;
   for (const line of body.split("\n")) {
-    if (/^(```|~~~)/.test(line)) inFence = !inFence;
-    else if (!inFence) words += line.split(/\s+/).filter((word) => /[\p{L}\p{N}]/u.test(word)).length;
+    if (/^(```|~~~)/.test(line)) {
+      // Structured blocks are prose in YAML clothing, so their reader-facing text counts.
+      if (fence && isBlogBlockLanguage(fence.language)) {
+        words += countWords(blogBlockText(parseBlogBlock(fence.language, fence.lines.join("\n"))).replace(/\n/g, " "));
+      }
+      fence = fence ? null : { language: line.replace(/^(```|~~~)\s*/, "").split(/\s/)[0] ?? "", lines: [] };
+    } else if (fence) fence.lines.push(line);
+    else words += countWords(line);
   }
   return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
 }

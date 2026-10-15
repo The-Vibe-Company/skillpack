@@ -3,7 +3,7 @@
 import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import { ArticleMarkdown } from "@/components/blog/ArticleMarkdown";
+import { ArticleMarkdown, PublishedSkillMarkdown } from "@/components/blog/ArticleMarkdown";
 import { loadBlogPosts, splitLeadHeading } from "./blog";
 import { blogTableOfContents, slugifyHeading } from "./blogMarkdown";
 
@@ -12,13 +12,13 @@ import { blogTableOfContents, slugifyHeading } from "./blogMarkdown";
 
 const roots: Root[] = [];
 
-async function renderMarkdown(body: string): Promise<HTMLElement> {
+async function renderMarkdown(body: string, component: typeof ArticleMarkdown = ArticleMarkdown): Promise<HTMLElement> {
   const container = document.createElement("div");
   document.body.appendChild(container);
   const root = createRoot(container);
   roots.push(root);
   await act(async () => {
-    root.render(React.createElement(ArticleMarkdown, { body }));
+    root.render(React.createElement(component, { body }));
   });
   return container;
 }
@@ -150,5 +150,24 @@ describe("blog code blocks", () => {
     expect(region?.getAttribute("aria-label")).toBe("Table");
     expect(region?.getAttribute("tabindex")).toBe("0");
     expect(region?.querySelector("table")).not.toBeNull();
+  });
+});
+
+describe("blog structured blocks", () => {
+  const CTA = "```cta\ntitle: Share your skills.\nprimary: { label: Sign up, href: /login }\n```\n";
+
+  it("renders a block fence in a post as its component", async () => {
+    const container = await renderMarkdown(CTA);
+
+    expect(container.querySelector(".v10-ctablock a.v10-btn--primary")?.getAttribute("href")).toBe("/login");
+    expect(container.querySelector("[data-code-block]")).toBeNull();
+  });
+
+  it("leaves the same fence as plain code in a published SKILL.md, which a workspace authors", async () => {
+    const container = await renderMarkdown(CTA, PublishedSkillMarkdown);
+
+    expect(container.querySelector(".v10-ctablock")).toBeNull();
+    expect(container.querySelector("[data-code-block] pre code")?.className).toBe("language-cta");
+    expect(container.querySelector("[data-code-block] pre code")?.textContent).toContain("href: /login");
   });
 });
