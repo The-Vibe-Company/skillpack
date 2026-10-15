@@ -91,6 +91,15 @@ describe("blog post parsing", () => {
     );
   });
 
+  it("fails the build when a heading takes a block's fixed anchor", () => {
+    const takeaways = "```takeaways\ntitle: Key Takeaways\nitems:\n  - { lead: One., text: Two. }\n```";
+    const body = `\n# Title\n\n## Key Takeaways\n\n${takeaways}\n`;
+
+    expect(() => parseBlogPost(postSource(VALID_FRONTMATTER, body), "a-post.md")).toThrow(
+      'a-post.md: two outline entries share the anchor "key-takeaways"',
+    );
+  });
+
   it("fails the build on an invalid structured block, naming the file and the field", () => {
     const body = "\n# Title\n\n```cta\ntitle: Go\nprimary: { label: Go, href: \"javascript:alert(1)\" }\n```\n";
 
@@ -189,11 +198,30 @@ describe("blog post presentation", () => {
     expect(readingMinutes(findBlogPost("what-is-skill-md")?.body ?? "")).toBeGreaterThan(3);
   });
 
-  it("counts the prose inside structured blocks toward reading time, but not their URLs or YAML keys", () => {
+  it("counts the prose inside structured blocks toward reading time, but not their commands, URLs or keys", () => {
     const words = Array.from({ length: 460 }, () => "word").join(" ");
     const faq = `\`\`\`faq\nitems:\n  - question: "Why?"\n    answer: "${words}"\n\`\`\``;
+    // 700 flags and a long URL would add three minutes if machine values were read as prose.
+    const flags = Array.from({ length: 700 }, (_, index) => `--flag${index}`).join(" ");
+    const card = [
+      "```skill-card",
+      "rank: 1",
+      "name: a-skill",
+      "maintainer: Ada",
+      "bestFor: one thing",
+      `source: { label: ada/skills, url: "https://github.com/ada/skills/tree/main/${words.replaceAll(" ", "/")}" }`,
+      'repoStars: "1K"',
+      'installs: { count: "2K", url: "https://skills.sh/ada/skills/a-skill" }',
+      "license: { name: MIT }",
+      "focus: Testing",
+      `install: "skillpack install github:ada/skills/a-skill ${flags}"`,
+      "description: Short.",
+      "suitedFor: Teams.",
+      "```",
+    ].join("\n");
 
     expect(readingMinutes(`# Title\n\n${faq}\n`)).toBe(3);
+    expect(readingMinutes(`# Title\n\n${card}\n`)).toBe(1);
   });
 
   it("splits off the opening paragraphs, leaving the rest byte for byte", () => {

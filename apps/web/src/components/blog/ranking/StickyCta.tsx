@@ -9,6 +9,8 @@ const DISMISS_KEY = "skillpack:blog-sticky-cta-dismissed";
  * A small sign-up bar pinned to the bottom of the viewport. It appears once the reader is past
  * the header, steps aside while the `hideWhenVisibleId` element (the end-of-post sign-up) is on
  * screen, and stays closed for the session once dismissed. It never covers the page on load.
+ * Dismissing it hands keyboard focus to the section being read inside `focusWithinId`, so the
+ * next Tab continues from there instead of restarting at the page footer.
  */
 export function StickyCta({
   title,
@@ -16,12 +18,14 @@ export function StickyCta({
   href,
   showAfterId,
   hideWhenVisibleId,
+  focusWithinId,
 }: {
   title: string;
   label: string;
   href: string;
   showAfterId: string;
   hideWhenVisibleId: string;
+  focusWithinId: string;
 }) {
   const [pastStart, setPastStart] = useState(false);
   const [endVisible, setEndVisible] = useState(false);
@@ -54,6 +58,14 @@ export function StickyCta({
   }, [showAfterId, hideWhenVisibleId]);
 
   function dismiss() {
+    // The section heading at the reading line (as the outline highlights it), else the first one.
+    const headings = Array.from(document.getElementById(focusWithinId)?.querySelectorAll<HTMLElement>("h2[id], h3[id]") ?? []);
+    const line = window.innerHeight / 3;
+    const current = headings.filter((heading) => heading.getBoundingClientRect().top <= line).at(-1) ?? headings[0];
+    if (current) {
+      if (!current.hasAttribute("tabindex")) current.tabIndex = -1;
+      current.focus({ preventScroll: true });
+    }
     setDismissed(true);
     try {
       window.sessionStorage.setItem(DISMISS_KEY, "1");

@@ -18,14 +18,17 @@ import { inlineMarkdownText } from "./markdownText";
  */
 
 const text = z.string().trim().min(1);
-// Links stay on this site or go to an https origin; nothing else reaches an href.
+// Links stay on this site or go to an https origin; nothing else reaches an href. Browsers drop
+// tabs and newlines from URLs and read `\` as `/`, so either would let "/\t/host" leave the site.
+const SITE_PATH_RE = /^\/(?![/\\])[^\s\\\p{Cc}]*$/u;
+const HTTPS_URL_RE = /^https:\/\/[^\s\\\p{Cc}]+$/u;
 const href = z
   .string()
   .trim()
-  .refine((value) => (value.startsWith("/") && !value.startsWith("//")) || /^https:\/\/[^\s]+$/.test(value), {
+  .refine((value) => SITE_PATH_RE.test(value) || HTTPS_URL_RE.test(value), {
     message: "must be a site path or an https URL",
   });
-const httpsUrl = z.string().trim().regex(/^https:\/\/[^\s]+$/, "must be an https URL");
+const httpsUrl = z.string().trim().regex(HTTPS_URL_RE, "must be an https URL");
 const link = z.object({ label: text, href }).strict();
 
 const takeawaysSchema = z

@@ -195,6 +195,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             href={sticky.primary.href}
             showAfterId={ARTICLE_HEADER_ID}
             hideWhenVisibleId={ARTICLE_END_ID}
+            focusWithinId={ARTICLE_BODY_ID}
           />
         ) : null}
       </div>

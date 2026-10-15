@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod";
 import { blogBlockText, extractBlogBlocks, isBlogBlockLanguage, parseBlogBlock, validateBlogBlocks } from "./blogBlocks";
+import { blogTableOfContents } from "./blogMarkdown";
 
 /** Markdown posts live beside the app, not in `src/`, so editors can add one without touching code. */
 export const BLOG_CONTENT_DIR = join(process.cwd(), "content", "blog");
@@ -80,6 +81,12 @@ export function parseBlogPost(source: string, fileName: string): BlogPost {
     validateBlogBlocks(extractBlogBlocks(body));
   } catch (error) {
     throw new Error(`${fileName}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  // Block anchors are fixed ("key-takeaways", "skill-<name>"), so a heading can claim the same one.
+  const anchors = new Set<string>();
+  for (const entry of blogTableOfContents(body)) {
+    if (anchors.has(entry.id)) throw new Error(`${fileName}: two outline entries share the anchor "${entry.id}"`);
+    anchors.add(entry.id);
   }
   return { ...frontmatter.data, body };
 }

@@ -57,6 +57,11 @@ describe("blog blocks", () => {
     expect(() => parseBlogBlock("skill-card", card({ name: "Frontend Design" }))).toThrow(/name/);
     expect(() => parseBlogBlock("cta", 'title: Go\nprimary: { label: Go, href: "javascript:alert(1)" }')).toThrow(/primary\.href/);
     expect(() => parseBlogBlock("cta", "title: Go\nprimary: { label: Go, href: //evil.example }")).toThrow(/primary\.href/);
+    // Browsers strip tabs and read backslashes as slashes, so these would leave the site too.
+    for (const bypass of ['"/\\t/evil.example"', '"/\\\\evil.example"', '"https://evil.example\\n.x"']) {
+      expect(() => parseBlogBlock("cta", `title: Go\nprimary: { label: Go, href: ${bypass} }`)).toThrow(/primary\.href/);
+    }
+    expect(parseBlogBlock("cta", "title: Go\nprimary: { label: Go, href: /blog/a-post#faq }").kind).toBe("cta");
     expect(() => parseBlogBlock("faq", "items: [")).toThrow(/faq block: invalid YAML/);
   });
 

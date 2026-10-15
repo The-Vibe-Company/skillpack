@@ -163,8 +163,19 @@ describe("sticky sign-up bar", () => {
 
   async function renderBar() {
     for (const id of ["start", "end"]) document.body.appendChild(Object.assign(document.createElement("div"), { id }));
+    const body = document.body.appendChild(Object.assign(document.createElement("div"), { id: "body" }));
+    for (const [id, top] of [["intro", -900], ["reading", 100], ["later", 2000]] as const) {
+      placeAt(body.appendChild(Object.assign(document.createElement("h2"), { id })), top);
+    }
     const container = await render(
-      React.createElement(StickyCta, { title: "Your team's skills.", label: "Sign up", href: "/login", showAfterId: "start", hideWhenVisibleId: "end" }),
+      React.createElement(StickyCta, {
+        title: "Your team's skills.",
+        label: "Sign up",
+        href: "/login",
+        showAfterId: "start",
+        hideWhenVisibleId: "end",
+        focusWithinId: "body",
+      }),
     );
     return container.querySelector<HTMLElement>(".v10-stickycta");
   }
@@ -193,7 +204,7 @@ describe("sticky sign-up bar", () => {
     expect(bar?.dataset.visible).toBe("false");
   });
 
-  it("stays closed for the session once dismissed", async () => {
+  it("stays closed for the session once dismissed and hands focus to the section being read", async () => {
     stubObserver();
     const bar = await renderBar();
     report("start", false, -400);
@@ -201,6 +212,8 @@ describe("sticky sign-up bar", () => {
     act(() => bar?.querySelector<HTMLButtonElement>("button[aria-label='Dismiss']")?.click());
 
     expect(bar?.dataset.visible).toBe("false");
+    // Keyboard focus moves to the section being read, not back to the top or the footer.
+    expect(document.activeElement?.id).toBe("reading");
     expect(window.sessionStorage.getItem("skillpack:blog-sticky-cta-dismissed")).toBe("1");
     act(() => roots.splice(0).forEach((root) => root.unmount()));
     document.body.innerHTML = "";
