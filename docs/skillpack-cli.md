@@ -56,7 +56,11 @@ skillpack sync --frozen --project . --json
 
 `--scope` defaults to `user`; tools use the configured selection (otherwise Claude Code, Codex and OpenCode). Project installs use `.agents/skills` for shared/OpenCode discovery and managed `.claude/skills` / `.codex/skills` copies. User installs use `~/.claude/skills`, `~/.codex/skills` and `~/.agents/skills`. Repository roots use `github:owner/repo`; monorepo paths select just that subtree. Omitted refs follow the default branch; branches, tags and full commit SHAs are accepted. Use `--ref` for ambiguous `/tree/` URLs, especially branches containing `/`. Conflicting suffix/flag refs fail. Use refs instead of `--version`.
 
-The CLI resolves a ref once, displays the full commit SHA, inspects the files and asks:
+Git must be installed to resolve branches and tags. The CLI runs unauthenticated `git ls-remote` once (zero GitHub API calls) with bounded output and without inherited Git configuration or credentials. Default-branch installs resolve `HEAD`; annotated tags use their peeled commit. Full commit SHAs and frozen restoration skip ref resolution.
+
+Each download uses two `api.github.com` calls: repository visibility and one recursive Git tree listing. The tree detects submodules even without `.gitmodules`, validates paths/modes, and supplies Git blob checksums. File bytes come from one streamed `https://codeload.github.com/<owner>/<repo>/tar.gz/<sha>` response; only the selected folder is retained. Truncated/oversized tree listings fail closed, without per-file API fallback. Retries may add a bounded number of requests when rate limited.
+
+The CLI displays the full commit SHA, inspects the files and asks:
 
 ```text
 WARNING: This third-party skill has not been verified by Skillpack.
@@ -86,11 +90,23 @@ GitHub entries upgrade `.companion/skills.lock.json` to v3 (user scope: `~/.comp
 }
 ```
 
-`ref: null` tracks the default branch. `--pin` or an exact SHA ref prevents updates; frozen sync always uses each target's recorded SHA and checksum, leaves the lock unchanged and never resolves the branch again. It verifies offline copies first, restores from another verified target when possible, then fetches that exact public commit. Missing commits, private/deleted repositories, mismatched bytes or incomplete locks fail without activation. `update` / `update --all` follow saved refs without Skillpack login for GitHub sources; changed content requires confirmation. Partial tool updates retain each other target's old SHA. Pins and local edits are preserved.
+`ref: null` tracks the default branch. `--pin` or an exact SHA ref prevents updates; frozen sync always uses each target's recorded SHA and checksum, leaves the lock unchanged and never resolves the branch again. It verifies offline copies first, restores from another verified target when possible, then streams the tarball for that exact public commit and verifies its files against the Git tree and lock checksums. Missing commits, private/deleted repositories, mismatched bytes or incomplete locks fail without activation. `update` / `update --all` follow saved refs without Skillpack login for GitHub sources; changed content requires confirmation. Partial tool updates retain each other target's old SHA. Pins and local edits are preserved.
 
-Unsafe or encoded traversal paths, symbolic links (including path ancestors), submodules, special files and portable filename collisions are rejected. Limits are 2,000 files, 10 MiB per file, 25 MiB total and 1 MiB for `SKILL.md`; HTTP sizes, time and request counts are also bounded. Invalid/missing `SKILL.md` and unknown refs fail before writing. A skill name already owned by another source or an untracked folder cannot be replaced with `--force`; choose another scope or remove the existing installation explicitly.
+Unsafe or encoded traversal paths, symbolic links (including path ancestors), submodules, special files and portable filename collisions are rejected. Limits are 2,000 files, 10 MiB per file, 25 MiB total and 1 MiB for `SKILL.md`. The whole repository tarball is capped at 64 MiB compressed and 256 MiB decompressed, including skipped files, headers, padding and trailing data. Tree metadata is capped at 8 MiB and 100,000 entries; time and retry counts are also bounded. Large repositories can therefore fail even when the selected skill is small. Invalid/missing `SKILL.md` and unknown refs fail before writing. A skill name already owned by another source or an untracked folder cannot be replaced with `--force`; choose another scope or remove the existing installation explicitly.
 
-GitHub rate limits may require `GITHUB_TOKEN` supplied through a private environment. It is sent only to `api.github.com`, never saved in the lock or forwarded across redirects. Rate-limit errors report retry timing; waits and retries are bounded. Private repositories remain unsupported even with a token; an anonymous 404 can mean missing or private.
+GitHub rate limits may require `GITHUB_TOKEN` supplied through a private environment. It is sent only to `api.github.com`, never sent to codeload or Git, saved in the lock, or forwarded across redirects. API and codeload redirects are refused. Rate-limit errors report retry timing; waits and retries are bounded. Private repositories remain unsupported even with a token; an anonymous 404 can mean missing or private.
+
+### GitHub download call-count measurement
+
+Measured against the pre-change resolver at `22a89394d05e23b75fe3f564cd1eb3f10fa93f54` using successful installs with an instrumented fake HTTP transport (flat valid packages, no rate-limit retries):
+
+| Skill size | Before: API calls | After: API calls | After: codeload downloads |
+| --- | ---: | ---: | ---: |
+| Small: 2 files | 5 | 2 | 1 |
+| Large: 1,000 files | 1,003 | 2 | 1 |
+
+Before: repository + commit + tree + one blob request per file; nested folders added more tree requests. After: Git ref resolution + repository + recursive tree + one streamed tarball. Run `cd runtime && go test ./internal/cli -run TestGitHubInstallAPICallCount -v` for the regression measurement. Frozen network restoration uses the same two API calls and one pinned tarball, with zero ref lookups; verified offline copies need no network.
+
 
 Organization sharing is strictly opt-in:
 

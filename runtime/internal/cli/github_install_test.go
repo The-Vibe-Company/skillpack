@@ -1,17 +1,21 @@
 package cli
 
 import (
+	"archive/tar"
 	"bytes"
+	"compress/gzip"
+	"context"
 	"crypto/sha1"
-	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -25,6 +29,8 @@ type installGitHubFixture struct {
 	offline  bool
 	private  bool
 	fallback http.RoundTripper
+	codeload *httptest.Server
+	archives []string
 	files    map[string]map[string][]byte
 }
 
@@ -45,12 +51,44 @@ func newInstallGitHubFixture(t *testing.T) (*installGitHubFixture, string) {
 	for _, commit := range []string{installGitHubCommitA, installGitHubCommitB} {
 		f.files[commit] = map[string][]byte{"SKILL.md": []byte("---\nname: review\ndescription: Review fixture\nlicense: MIT\n---\n" + commit + "\n"), "scripts/check.sh": []byte("#!/bin/sh\nexit 99\n")}
 	}
+	f.codeload = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		commit := r.URL.Path[strings.LastIndexByte(r.URL.Path, '/')+1:]
+		files := f.files[commit]
+		if files == nil {
+			w.WriteHeader(404)
+			return
+		}
+		w.Write(githubFixtureArchive(files, "review"))
+	}))
+	t.Cleanup(f.codeload.Close)
+	previousRefs := githubListRefs
+	githubListRefs = func(ctx context.Context, repository string, patterns []string) (map[string]string, error) {
+		if f.offline {
+			return nil, fmt.Errorf("offline")
+		}
+		return map[string]string{"HEAD": f.branch, "refs/heads/main": f.branch, "refs/tags/v1.2": f.branch}, nil
+	}
+	t.Cleanup(func() { githubListRefs = previousRefs })
 	http.DefaultTransport = f
 	t.Cleanup(func() { http.DefaultTransport = f.fallback })
 	return f, filepath.Join(home, "project")
 }
 
 func (f *installGitHubFixture) RoundTrip(r *http.Request) (*http.Response, error) {
+	if r.URL.Host == "codeload.github.com" {
+		f.archives = append(f.archives, r.URL.Path)
+		if f.offline {
+			return nil, fmt.Errorf("offline")
+		}
+		if r.Header.Get("Authorization") != "" {
+			return nil, fmt.Errorf("credential on codeload")
+		}
+		copy := r.Clone(r.Context())
+		base, _ := url.Parse(f.codeload.URL)
+		copy.URL.Scheme = base.Scheme
+		copy.URL.Host = base.Host
+		return f.fallback.RoundTrip(copy)
+	}
 	if r.URL.Host != "api.github.com" {
 		return f.fallback.RoundTrip(r)
 	}
@@ -67,63 +105,70 @@ func (f *installGitHubFixture) RoundTrip(r *http.Request) (*http.Response, error
 	switch {
 	case path == "":
 		write(map[string]any{"private": f.private, "visibility": "public", "default_branch": "main"})
-	case strings.HasPrefix(path, "/commits/"):
-		ref := strings.TrimPrefix(path, "/commits/")
-		sha := ref
-		if ref == "main" || ref == "v1.2" {
-			sha = f.branch
-		}
-		if f.files[sha] == nil {
-			w.WriteHeader(404)
-		} else {
-			write(map[string]any{"sha": sha})
-		}
 	case strings.HasPrefix(path, "/git/trees/"):
-		id := strings.TrimPrefix(path, "/git/trees/")
-		if f.files[id] != nil {
-			write(map[string]any{"tree": []any{map[string]any{"path": "review", "type": "tree", "mode": "040000", "sha": strings.Repeat(string(id[0]+2), 40)}}})
+		commit := strings.TrimPrefix(path, "/git/trees/")
+		if f.files[commit] == nil {
+			w.WriteHeader(404)
 			break
 		}
-		commit := ""
-		if id == strings.Repeat("3", 40) {
-			commit = installGitHubCommitA
-		}
-		if id == strings.Repeat("4", 40) {
-			commit = installGitHubCommitB
-		}
-		if commit != "" {
-			data := f.files[commit]["SKILL.md"]
-			write(map[string]any{"tree": []any{map[string]any{"path": "SKILL.md", "type": "blob", "mode": "100644", "sha": installGitHubBlob(data), "size": len(data)}, map[string]any{"path": "scripts", "type": "tree", "mode": "040000", "sha": strings.Repeat("5", 40)}}})
-			break
-		}
-		if id == strings.Repeat("5", 40) {
-			data := f.files[installGitHubCommitA]["scripts/check.sh"]
-			write(map[string]any{"tree": []any{map[string]any{"path": "check.sh", "type": "blob", "mode": "100755", "sha": installGitHubBlob(data), "size": len(data)}}})
-			break
-		}
-		w.WriteHeader(404)
-	case strings.HasPrefix(path, "/git/blobs/"):
-		id := strings.TrimPrefix(path, "/git/blobs/")
-		found := false
-		for _, files := range f.files {
-			for _, data := range files {
-				if installGitHubBlob(data) == id {
-					write(map[string]any{"size": len(data), "encoding": "base64", "content": base64.StdEncoding.EncodeToString(data)})
-					found = true
-					break
+		entries := []githubTreeEntry{{Path: "review", Type: "tree", Mode: "040000", SHA: strings.Repeat("3", 40)}}
+		dirs := map[string]bool{}
+		for name, data := range f.files[commit] {
+			parts := strings.Split(name, "/")
+			for i := 1; i < len(parts); i++ {
+				dir := "review/" + strings.Join(parts[:i], "/")
+				if !dirs[dir] {
+					entries = append(entries, githubTreeEntry{Path: dir, Type: "tree", Mode: "040000", SHA: strings.Repeat("3", 40)})
+					dirs[dir] = true
 				}
 			}
-			if found {
-				break
+			mode := "100644"
+			if strings.HasPrefix(name, "scripts/") {
+				mode = "100755"
 			}
+			entries = append(entries, githubTreeEntry{Path: "review/" + name, Type: "blob", Mode: mode, SHA: installGitHubBlob(data), Size: int64(len(data))})
 		}
-		if !found {
-			w.WriteHeader(404)
-		}
+		write(map[string]any{"tree": entries})
 	default:
 		w.WriteHeader(404)
 	}
 	return w.Result(), nil
+}
+
+func githubFixtureArchive(files map[string][]byte, selected string) []byte {
+	var output bytes.Buffer
+	gz := gzip.NewWriter(&output)
+	tw := tar.NewWriter(gz)
+	names := []string{}
+	for name := range files {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+	for _, name := range names {
+		full := "skills-" + installGitHubCommitA + "/"
+		if selected != "" {
+			full += selected + "/"
+		}
+		full += name
+		data := files[name]
+		mode := int64(0644)
+		if strings.HasPrefix(name, "scripts/") {
+			mode = 0755
+		}
+		if err := tw.WriteHeader(&tar.Header{Name: full, Mode: mode, Typeflag: tar.TypeReg, Size: int64(len(data))}); err != nil {
+			panic(err)
+		}
+		if _, err := tw.Write(data); err != nil {
+			panic(err)
+		}
+	}
+	if err := tw.Close(); err != nil {
+		panic(err)
+	}
+	if err := gz.Close(); err != nil {
+		panic(err)
+	}
+	return output.Bytes()
 }
 
 func installGitHubRun(t *testing.T, project string, extra ...string) (int, string, string) {
@@ -179,6 +224,7 @@ func TestGitHubInstallAnonymousTargetsScopesAndFrozenSHA(t *testing.T) {
 			f.offline = false
 			f.branch = installGitHubCommitB
 			f.requests = nil
+			f.archives = nil
 			for _, target := range skill.Targets {
 				p, _ := targetPath(target, "review", project)
 				os.RemoveAll(p)
@@ -191,6 +237,9 @@ func TestGitHubInstallAnonymousTargetsScopesAndFrozenSHA(t *testing.T) {
 				if strings.Contains(request, "/commits/") {
 					t.Fatal("frozen resolved a ref", request)
 				}
+			}
+			if len(f.requests) != 2 || len(f.archives) != 1 || !strings.HasSuffix(f.archives[0], "/"+installGitHubCommitA) {
+				t.Fatalf("frozen transport: API=%v archives=%v", f.requests, f.archives)
 			}
 			after, _ := os.ReadFile(lockPath)
 			if !bytes.Equal(before, after) {
@@ -560,4 +609,32 @@ func TestGitHubSourceExtensionsSurviveReinstallAndUpdate(t *testing.T) {
 		t.Fatal(code, out, diag)
 	}
 	assertExtension()
+}
+
+func TestGitHubUppercaseCommitRefRemainsPinned(t *testing.T) {
+	f, project := newInstallGitHubFixture(t)
+	commit := strings.Repeat("a", 40)
+	f.files[commit] = f.files[installGitHubCommitA]
+	githubListRefs = func(context.Context, string, []string) (map[string]string, error) {
+		t.Fatal("exact SHA looked up refs")
+		return nil, nil
+	}
+	code, out, diag := invoke(t, "", "install", "github:acme/skills/review@"+strings.ToUpper(commit), "--scope", "project", "--project", project, "--yes", "--json")
+	if code != 0 {
+		t.Fatal(code, out, diag)
+	}
+	lock, e := readLock(filepath.Join(project, ".companion", "skills.lock.json"))
+	if e != nil {
+		t.Fatal(e)
+	}
+	skill := lock.Workspaces["github:acme/skills"].Skills["review"]
+	if skill.Source.Ref == nil || *skill.Source.Ref != commit || skill.Source.Commit != commit || skill.Pinned != commit {
+		t.Fatalf("exact SHA was not pinned: %+v", skill)
+	}
+	before := len(f.requests)
+	f.offline = true
+	code, out, diag = invoke(t, "", "update", "--all", "--scope", "project", "--project", project, "--json")
+	if code != 0 || !strings.Contains(out, "pinned") || len(f.requests) != before {
+		t.Fatal("pinned update used network", code, out, diag)
+	}
 }
