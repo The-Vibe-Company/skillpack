@@ -28,6 +28,7 @@ type installedTarget struct {
 }
 type installedSkill struct {
 	Extra    map[string]json.RawMessage `json:"-"`
+	Source   *githubSource              `json:"source,omitempty"`
 	Name     string                     `json:"name"`
 	Slug     string                     `json:"slug"`
 	ID       string                     `json:"skillId"`
@@ -86,8 +87,11 @@ func readLock(path string) (installLock, error) {
 	if err != nil {
 		return l, err
 	}
-	if json.Unmarshal(b, &l) != nil || l.Version != 2 || l.Workspaces == nil {
+	if json.Unmarshal(b, &l) != nil || (l.Version != 2 && l.Version != 3) || l.Workspaces == nil {
 		return l, fail(6, "unsupported or invalid skills lockfile; import the legacy export explicitly")
+	}
+	if err := validateGitHubLock(l); err != nil {
+		return l, err
 	}
 	return l, nil
 }
@@ -489,8 +493,15 @@ func (a *app) install() (any, error) {
 		return nil, fail(2, "install requires a skill slug")
 	}
 	rootSlug := args[1]
-	catalog := strings.Contains(rootSlug, "/") && !a.options.flags["public"]
-	publicInstall := catalog || a.options.flags["public"]
+	github := isGitHubReference(rootSlug)
+	if github && (a.options.flags["public"] || a.options.values["version"] != "") {
+		return nil, fail(2, "GitHub installs use @ref or --ref, not --public or --version")
+	}
+	if !github && (a.options.flags["share-org"] || a.options.values["ref"] != "") {
+		return nil, fail(2, "--share-org and --ref require a GitHub source")
+	}
+	catalog := !github && strings.Contains(rootSlug, "/") && !a.options.flags["public"]
+	publicInstall := github || catalog || a.options.flags["public"]
 	scope := a.options.values["scope"]
 	if scope == "" {
 		scope = "user"
@@ -541,8 +552,41 @@ func (a *app) install() (any, error) {
 		return nil, err
 	}
 	var c *client
-	var workspace string
-	if catalog {
+	var workspace, api string
+	var source *githubSource
+	var executables []string
+	var nodes []installNode
+	if github {
+		parsed, e := parseGitHubReference(rootSlug, a.options.values["ref"])
+		if a.options.githubSource != nil {
+			parsed, e = *a.options.githubSource, nil
+			parsed.Commit = ""
+		}
+		if e != nil {
+			return nil, e
+		}
+		resolver := newGitHubResolver()
+		resolved, e := resolver.resolve(parsed)
+		if e != nil {
+			return nil, e
+		}
+		files, flagged, e := resolver.download(resolved)
+		if e != nil {
+			return nil, e
+		}
+		name, e := validatePackage(files)
+		if e != nil {
+			return nil, e
+		}
+		_, hash, e := canonicalPackage(files)
+		if e != nil {
+			return nil, e
+		}
+		source, executables = &resolved, flagged
+		workspace, api = "github:"+resolved.Repository, "https://api.github.com"
+		nodes = []installNode{{Slug: name, Version: resolved.Commit, Checksum: hash, Files: files}}
+		rootSlug = name
+	} else if catalog {
 		c, err = a.catalogClient()
 		workspace = "catalog:" + strings.Split(rootSlug, "/")[0]
 	} else {
@@ -556,16 +600,20 @@ func (a *app) install() (any, error) {
 	if err != nil {
 		return nil, err
 	}
+	if c != nil {
+		api = c.base
+	}
 	entry := lock.Workspaces[workspace]
-	if entry.API != "" && !sameSkillpackInstance(entry.API, c.base) {
+	if entry.API != "" && !sameSkillpackInstance(entry.API, api) {
 		return nil, fail(6, "lockfile organization belongs to another API instance")
 	}
-	entry.API = c.base
+	entry.API = api
 	if entry.Skills == nil {
 		entry.Skills = map[string]installedSkill{}
 	}
-	var nodes []installNode
-	if catalog {
+	if github {
+		lock.Version = 3
+	} else if catalog {
 		var node installNode
 		node, err = c.catalogNode(rootSlug, a.options.values["version"])
 		nodes = []installNode{node}
@@ -594,6 +642,9 @@ func (a *app) install() (any, error) {
 	for i := range nodes {
 		n := &nodes[i]
 		old := entry.Skills[n.Slug]
+		if err = checkGitHubCollision(lock, workspace, n.Slug, source); err != nil {
+			return nil, err
+		}
 		if old.ID != "" && n.ID != "" && old.ID != n.ID {
 			return nil, fail(6, "published skill identity differs from installed lock; inspect before replacing")
 		}
@@ -623,7 +674,18 @@ func (a *app) install() (any, error) {
 				stored = filepath.ToSlash(stored)
 			}
 			target := installedTarget{Tool: tool, Scope: scope, Path: stored, PackageChecksum: n.Checksum, Version: n.Version}
-			if _, err = os.Lstat(path); err == nil && !a.options.flags["force"] {
+			if _, err = os.Lstat(path); err == nil && github {
+				tracked := false
+				for _, prior := range old.Targets {
+					if prior.Path == stored {
+						tracked = true
+					}
+				}
+				if !tracked {
+					return nil, fail(6, "existing untracked skill; GitHub installation cannot replace it")
+				}
+			}
+			if _, err = os.Lstat(path); err == nil && (!a.options.flags["force"] || github) {
 				var prior *installedTarget
 				for j := range old.Targets {
 					if old.Targets[j].Path == stored {
@@ -647,9 +709,33 @@ func (a *app) install() (any, error) {
 					return nil, fail(9, "local customization detected; existing files preserved")
 				}
 			}
+			if github {
+				if target.Extra == nil {
+					target.Extra = map[string]json.RawMessage{}
+				}
+				target.Extra["githubExecutables"], _ = json.Marshal(executables)
+			}
 			targets = append(targets, target)
 		}
-		changes = append(changes, map[string]any{"slug": n.Slug, "version": n.Version, "targets": targets})
+		change := map[string]any{"slug": n.Slug, "version": n.Version, "targets": targets}
+		if github {
+			change["source"], change["previousCommit"] = source, old.Version
+			if err = a.showGitHubPlan(*source, old.Version, targets); err != nil {
+				return nil, err
+			}
+			warning := githubWarning(*source, executables)
+			change["warning"], change["executables"] = warning, executables
+			changed := old.Checksum != n.Checksum || a.options.flags["share-org"]
+			for _, target := range targets {
+				if !hasGitHubTarget(old, target) {
+					changed = true
+				}
+			}
+			if err = a.confirmGitHub(warning, changed); err != nil {
+				return nil, err
+			}
+		}
+		changes = append(changes, change)
 		if a.options.flags["dry-run"] {
 			continue
 		}
@@ -696,16 +782,22 @@ func (a *app) install() (any, error) {
 			if old.Extra == nil {
 				old.Extra = map[string]json.RawMessage{}
 			}
-			if catalog {
+			if github {
+				old.Extra["githubExecutables"], _ = json.Marshal(executables)
+				delete(old.Extra, "catalogReference")
+				delete(old.Extra, "publicToken")
+			} else if catalog {
 				old.Extra["catalogReference"], _ = json.Marshal(args[1])
 				delete(old.Extra, "publicToken")
 			} else {
 				old.Extra["publicToken"], _ = json.Marshal(args[1])
 				delete(old.Extra, "catalogReference")
 			}
-			pin = n.Version
+			if !github || source.Ref != nil && githubCommitPattern.MatchString(*source.Ref) {
+				pin = n.Version
+			}
 		}
-		entry.Skills[n.Slug] = installedSkill{Extra: old.Extra, Name: n.Slug, Slug: n.Slug, ID: n.ID, Version: n.Version, Checksum: n.Checksum, Targets: targets, Pinned: pin, Added: old.Added}
+		entry.Skills[n.Slug] = installedSkill{Source: source, Extra: old.Extra, Name: n.Slug, Slug: n.Slug, ID: n.ID, Version: n.Version, Checksum: n.Checksum, Targets: targets, Pinned: pin, Added: old.Added}
 	}
 	if a.options.flags["dry-run"] {
 		return map[string]any{"dryRun": true, "changes": changes}, nil
@@ -768,7 +860,16 @@ func (a *app) install() (any, error) {
 		_ = json.Unmarshal(nodes[0].Files["companion.json"], &m)
 		prerequisites = map[string]any{"dependencies": m["dependencies"], "environment": m["environment"], "database": m["database"]}
 	}
-	return map[string]any{"status": "installed", "changes": changes, "reports": reports, "secretProjections": secretPaths, "usageInventory": usageStatus, "prerequisites": prerequisites}, nil
+	result := map[string]any{"status": "installed", "changes": changes, "reports": reports, "secretProjections": secretPaths, "usageInventory": usageStatus, "prerequisites": prerequisites}
+	if github && a.options.flags["share-org"] {
+		shared, shareErr := a.shareGitHub(*source, nodes[0].Files)
+		result["sharing"] = shared
+		if shareErr != nil {
+			result["complete"] = false
+			return result, shareErr
+		}
+	}
+	return result, nil
 }
 
 func (a *app) stageInstallSecrets(c *client, workspace string, nodes []installNode) ([]replacement, map[string]string, error) {
@@ -848,6 +949,7 @@ func (a *app) frozenSync() (any, error) {
 	}
 	type missingTarget struct {
 		target                                                             installedTarget
+		source                                                             *githubSource
 		slug, version, hash, workspace, api, publicToken, catalogReference string
 	}
 	var missing []missingTarget
@@ -855,6 +957,7 @@ func (a *app) frozenSync() (any, error) {
 	count := 0
 	for workspaceID, workspace := range lock.Workspaces {
 		for slug, skill := range workspace.Skills {
+			warnedGitHub := map[string]bool{}
 			for _, target := range skill.Targets {
 				if target.Scope != "project" {
 					return nil, fail(6, "project lock contains a non-project destination")
@@ -874,11 +977,25 @@ func (a *app) frozenSync() (any, error) {
 				if version == "" {
 					version = skill.Version
 				}
+				if skill.Source != nil && !warnedGitHub[version] {
+					var flagged []string
+					raw := target.Extra["githubExecutables"]
+					if len(raw) == 0 {
+						raw = skill.Extra["githubExecutables"]
+					}
+					_ = json.Unmarshal(raw, &flagged)
+					pinned := *skill.Source
+					pinned.Commit = version
+					if err := a.confirmGitHub(githubWarning(pinned, flagged), false); err != nil {
+						return nil, err
+					}
+					warnedGitHub[version] = true
+				}
 				if _, err := os.Lstat(destination); os.IsNotExist(err) {
 					var publicToken, catalogReference string
 					_ = json.Unmarshal(skill.Extra["publicToken"], &publicToken)
 					_ = json.Unmarshal(skill.Extra["catalogReference"], &catalogReference)
-					missing = append(missing, missingTarget{target, slug, version, expected, workspaceID, workspace.API, publicToken, catalogReference})
+					missing = append(missing, missingTarget{target, skill.Source, slug, version, expected, workspaceID, workspace.API, publicToken, catalogReference})
 					continue
 				} else if err != nil {
 					return nil, err
@@ -891,7 +1008,7 @@ func (a *app) frozenSync() (any, error) {
 				if err != nil {
 					return nil, err
 				}
-				if hash != expected {
+				if hash != expected || target.Checksum != "" && folderChecksum(files) != target.Checksum {
 					return nil, fail(9, "locked package drift; files and lockfile preserved")
 				}
 				verified[hash] = files
@@ -905,6 +1022,27 @@ func (a *app) frozenSync() (any, error) {
 	var remoteWorkspace string
 	for _, m := range missing {
 		files := verified[m.hash]
+		if files == nil && m.source != nil {
+			pinned := *m.source
+			pinned.Commit = m.version
+			var e error
+			files, _, e = newGitHubResolver().download(pinned)
+			if e != nil {
+				return nil, e
+			}
+			name, e := validatePackage(files)
+			if e != nil {
+				return nil, e
+			}
+			_, hash, e := canonicalPackage(files)
+			if e != nil {
+				return nil, e
+			}
+			if hash != m.hash || name != m.slug {
+				return nil, fail(5, "GitHub package differs from frozen lock")
+			}
+			verified[m.hash] = files
+		}
 		if files == nil && m.catalogReference != "" {
 			catalogRemote, e := a.catalogClient()
 			if e != nil {

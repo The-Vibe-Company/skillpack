@@ -356,7 +356,10 @@ func (a *app) registerInventory(store *usage.Store) (int, error) {
 		if err != nil {
 			return 0, err
 		}
-		for _, workspace := range lock.Workspaces {
+		for workspaceID, workspace := range lock.Workspaces {
+			if strings.HasPrefix(workspaceID, "github:") {
+				continue
+			}
 			origin := strings.TrimSuffix(workspace.API, "/v1")
 			if !strings.HasPrefix(origin, "https://") {
 				continue
