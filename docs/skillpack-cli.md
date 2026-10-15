@@ -35,11 +35,70 @@ Project installs use `.agents/skills` plus managed host discovery copies and rel
 
 An exact `--version` pins a skill; `--pin` pins the current version. Updates preserve pins and local edits, and report each root independently. Each root's dependency closure, secret projections and lock change are staged before activation. Recovery rolls back an interrupted transaction before starting another. Never interpret an overall nonzero exit as success merely because another root updated.
 
-Frozen sync verifies committed copies offline and can restore a missing copy from another verified target. If every copy is missing, it needs credentials matching the locked API and organization to download the exact checksum and version. It never changes the lock. Secret and database readiness is separate from package availability.
+Frozen sync verifies committed copies offline and can restore a missing copy from another verified target. For authenticated registry skills, if every copy is missing, it needs credentials matching the locked API and organization to download the exact checksum and version. Catalog and GitHub sources restore anonymously when still publicly available. It never changes the lock. Secret and database readiness is separate from package availability.
 
 `import-lock ./companion.lock --project .` imports an old v1 export after checking its existing files. It preserves the source and refuses to overwrite an already-populated destination lock.
 
 Public installs use `install --public TOKEN --version VERSION`. The CLI checks the exact public ZIP size and checksum, then installs only its root package. It reports declared prerequisites rather than fetching private dependencies or secrets. It requires a key with public installation capability and never reports a private workspace installation for that release.
+
+## Public GitHub folders
+
+Install a public folder containing a valid `SKILL.md`; `companion.json` is optional. No Skillpack login or catalog listing is required.
+
+```sh
+skillpack install github:acme/skills/review
+skillpack install github:acme/skills/review@v1.2 --scope project --tools claude-code,codex,opencode
+skillpack install https://github.com/acme/skills/tree/main/review --scope user
+skillpack install github:acme/skills/review --ref feature/review --yes --json
+skillpack update github:acme/skills/review --scope project --yes
+skillpack sync --frozen --project . --json
+```
+
+`--scope` defaults to `user`; tools use the configured selection (otherwise Claude Code, Codex and OpenCode). Project installs use `.agents/skills` for shared/OpenCode discovery and managed `.claude/skills` / `.codex/skills` copies. User installs use `~/.claude/skills`, `~/.codex/skills` and `~/.agents/skills`. Repository roots use `github:owner/repo`; monorepo paths select just that subtree. Omitted refs follow the default branch; branches, tags and full commit SHAs are accepted. Use `--ref` for ambiguous `/tree/` URLs, especially branches containing `/`. Conflicting suffix/flag refs fail. Use refs instead of `--version`.
+
+The CLI resolves a ref once, displays the full commit SHA, inspects the files and asks:
+
+```text
+WARNING: This third-party skill has not been verified by Skillpack.
+Source: https://github.com/<owner>/<repo>/tree/<commit>/<path>
+Commit: <commit>
+Executable files: <list-or-none>
+Its instructions may cause your agent to run commands or access your files and credentials.
+Skillpack will only copy files; it will never run package scripts.
+Install this skill? [y/N]
+```
+
+`--yes` accepts without prompting and retains the warning; CI, redirected input and `--json` require it for install/update, including an unchanged reinstall. `--dry-run` only prints the plan. Frozen sync prints the warning without asking. Trust a committed lock only after reviewing its source: pinning ensures reproducibility, not safety. Scripts (Git executable mode or `scripts/` paths) are flagged and copied; Skillpack never runs them or automatically installs their dependencies, hooks, tools or secrets.
+
+GitHub entries upgrade `.companion/skills.lock.json` to v3 (user scope: `~/.companion/skills.lock.json`). v2 remains readable; older CLIs reject v3. Existing registry entries and extension metadata survive. Each virtual workspace `github:owner/repo` contains the usual skill and target checksums plus:
+
+```json
+{
+  "source": {
+    "type": "github",
+    "repository": "acme/skills",
+    "path": "review",
+    "ref": "main",
+    "commit": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "version": "0123456789abcdef0123456789abcdef01234567",
+  "pinned": false
+}
+```
+
+`ref: null` tracks the default branch. `--pin` or an exact SHA ref prevents updates; frozen sync always uses each target's recorded SHA and checksum, leaves the lock unchanged and never resolves the branch again. It verifies offline copies first, restores from another verified target when possible, then fetches that exact public commit. Missing commits, private/deleted repositories, mismatched bytes or incomplete locks fail without activation. `update` / `update --all` follow saved refs without Skillpack login for GitHub sources; changed content requires confirmation. Partial tool updates retain each other target's old SHA. Pins and local edits are preserved.
+
+Unsafe or encoded traversal paths, symbolic links (including path ancestors), submodules, special files and portable filename collisions are rejected. Limits are 2,000 files, 10 MiB per file, 25 MiB total and 1 MiB for `SKILL.md`; HTTP sizes, time and request counts are also bounded. Invalid/missing `SKILL.md` and unknown refs fail before writing. A skill name already owned by another source or an untracked folder cannot be replaced with `--force`; choose another scope or remove the existing installation explicitly.
+
+GitHub rate limits may require `GITHUB_TOKEN` supplied through a private environment. It is sent only to `api.github.com`, never saved in the lock or forwarded across redirects. Rate-limit errors report retry timing; waits and retries are bounded. Private repositories remain unsupported even with a token; an anonymous 404 can mean missing or private.
+
+Organization sharing is strictly opt-in:
+
+```sh
+skillpack install github:acme/skills/review --share-org --profile equipe
+```
+
+This publishes a copy to the connected profile's organization through the existing authenticated package API, preserving license and GitHub repo/path/ref/SHA provenance in frontmatter metadata. It creates no public release or catalog listing. Existing organization or personal slugs are refused. Server normalization does not alter the local GitHub snapshot or its lock. A sharing failure returns a partial result and a nonzero exit while retaining the successful local installation. `--yes` alone never shares; `--dry-run` never publishes.
 
 ## API, secrets and databases
 

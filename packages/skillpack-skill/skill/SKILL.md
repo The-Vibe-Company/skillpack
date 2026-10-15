@@ -12,7 +12,7 @@ Use the native `skillpack` CLI for this workflow. It runs on macOS, Linux and Wi
 
 ## Start with the requested outcome
 
-1. Run `skillpack --version` once when first using this skill in a conversation. For authenticated workspace operations, also run `skillpack auth status --json`. Anonymous catalog installs by `org/slug` can proceed without login. Reuse the selected profile when its API and organization match the request.
+1. Run `skillpack --version` once when first using this skill in a conversation. For authenticated workspace operations, also run `skillpack auth status --json`. Anonymous catalog installs by `org/slug` and public GitHub installs can proceed without login. Reuse the selected profile when its API and organization match the request.
 2. If the binary is absent, use the shell or PowerShell installer from the official Skillpack GitHub release linked by the instance's install prompt. The release installer embeds archive checksums; never run an unverified archive or improvise a Python/Node bootstrap.
 3. For authenticated workspace operations, if connection is missing or expired, launch `skillpack auth login` immediately (add `--api-url <base>` for a self-hosted instance). Keep the interactive command running while the human approves the browser URL, then wait for it to exit and rerun `skillpack auth status --json`. Continue the original task in the same conversation after approval; do not stop at merely presenting a login command or link. In CI, inject `SKILLPACK_API_KEY` from the secret store; `SKILLPACK_API_URL` is needed only for a non-default instance. A trusted pipe may use `--token-stdin`, and `--manual` retains hidden terminal entry. Never ask the user to paste a key into chat, place it in argv, or commit it.
    For a custom server: `skillpack auth login --api-url <base>`.
@@ -60,6 +60,10 @@ validated release. `sync --frozen` restores the same pinned content anonymously 
 remains validated. Report dependency, environment and database prerequisites without fetching
 private resources. A 404 means catalog access is unavailable; use authenticated workspace access
 only when the user is entitled to the skill.
+
+For a public GitHub skill folder, use `skillpack install github:<owner>/<repo>/<path>[@ref]` or its `https://github.com/<owner>/<repo>/tree/<ref>/<path>` URL with the same `--scope` and `--tools` options. Inspect the complete commit SHA and unverified third-party warning before confirming; use `--yes` only when the user has authorized that content (required in CI/JSON mode). `--ref` disambiguates branch names containing `/`. Frozen sync restores the locked SHA without prompting or following a branch. GitHub scripts are copied and flagged, never executed by Skillpack. `update github:<owner>/<repo>/<path>` follows the saved ref while preserving pins and local edits.
+
+Add `--share-org` only when the user explicitly requests an organization copy. It uses the connected profile, preserves upstream provenance and license, and refuses an existing slug. Ordinary installs and `--yes` do not publish. A sharing failure can leave a successful local install; report both outcomes. See `docs/skillpack-cli.md` in the repository for the v3 lock and safety limits.
 
 For a public share link, use its exact token and advertised version:
 

@@ -13,9 +13,11 @@ import (
 )
 
 type options struct {
-	values map[string]string
-	flags  map[string]bool
-	args   []string
+	// Internal source selection avoids re-parsing delimiter characters during update.
+	githubSource *githubSource
+	values       map[string]string
+	flags        map[string]bool
+	args         []string
 }
 
 type commandError struct {
