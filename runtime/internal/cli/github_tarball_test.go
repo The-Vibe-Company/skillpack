@@ -358,7 +358,7 @@ func TestGitHubTarballChecksSelectedLimitsBeforeAllocation(t *testing.T) {
 		wantError string
 	}{
 		{name: "file limit", rel: "file.txt", size: 0, count: maxPackageFiles, wantError: "file limit"},
-		{name: "per-file limit", rel: "file.txt", size: maxFileBytes + 1, wantError: "size limit"},
+		{name: "per-file limit", rel: "file.txt", size: maxPackageBytes + 1, wantError: "size limit"},
 		{name: "total limit", rel: "file.txt", size: 1, total: maxPackageBytes, wantError: "size limit"},
 		{name: "SKILL limit", rel: "SKILL.md", size: githubTarballSkillLimit + 1, wantError: "SKILL"},
 	}

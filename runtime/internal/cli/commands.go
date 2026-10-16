@@ -66,14 +66,14 @@ func executeCommand(args []string, in io.Reader, out, diagnostic io.Writer) (any
 		add(auth, name, strings.Title(name)+" the CLI connection", "  skillpack auth "+name, (*app).auth, nil, nil)
 	}
 	add(root, "setup", "Configure agent integrations and usage hooks", "  skillpack setup --tools codex,claude-code,opencode", (*app).setup, []string{"dry-run"}, []string{"tools"})
-	add(root, "install [slug]", "Install a registry, catalog or public GitHub skill", "  skillpack install example/plan-pr\n  skillpack install plan-pr --scope project\n  skillpack install github:acme/skills/review@v1.2 --scope project --tools claude-code,codex,opencode\n  skillpack install https://github.com/acme/skills/tree/main/review --yes\n  skillpack install github:acme/skills/review --share-org\n  skillpack install --public TOKEN --version 1.2.3", (*app).install, []string{"public", "force", "pin", "dry-run", "confirm-secrets", "yes", "share-org"}, []string{"scope", "tools", "version", "ref"})
-	add(root, "update [slug]", "Update installed skills", "  skillpack update --all --dry-run\n  skillpack update plan-pr\n  skillpack update github:acme/skills/review --yes", (*app).update, []string{"all", "dry-run", "force", "confirm-secrets", "yes"}, []string{"scope", "tools", "version"})
+	add(root, "install [slug]", "Install a registry, catalog or public GitHub skill", "  skillpack install example/plan-pr\n  skillpack install plan-pr --scope project\n  skillpack install github:acme/skills/review@v1.2 --scope project --tools claude-code,codex,opencode\n  skillpack install https://github.com/acme/skills/tree/main/review --yes\n  skillpack install github:acme/skills/review --share-org\n  skillpack install --public TOKEN --version 1.2.3", (*app).install, []string{"public", "force", "pin", "dry-run", "confirm-secrets", "yes", "share-org"}, []string{"scope", "tools", "version", "ref", "max-skill-size", "max-skill-files"})
+	add(root, "update [slug]", "Update installed skills", "  skillpack update --all --dry-run\n  skillpack update plan-pr\n  skillpack update github:acme/skills/review --yes", (*app).update, []string{"all", "dry-run", "force", "confirm-secrets", "yes"}, []string{"scope", "tools", "version", "max-skill-size", "max-skill-files"})
 	add(root, "sync", "Verify and restore pinned project skills", "  skillpack sync --frozen", func(a *app) (any, error) {
 		if !a.options.flags["frozen"] {
 			return nil, fail(2, "use sync --frozen to verify locked packages")
 		}
 		return a.frozenSync()
-	}, []string{"frozen", "dry-run"}, nil)
+	}, []string{"frozen", "dry-run"}, []string{"max-skill-size", "max-skill-files"})
 	add(root, "import-lock PATH", "Import a legacy lockfile", "  skillpack import-lock companion.lock", (*app).importLock, []string{"dry-run"}, []string{"tools"})
 	skills := add(root, "skills", "Browse, validate and publish packages", "  skillpack skills list", nil, nil, nil)
 	for _, spec := range []struct{ use, short string }{{"list", "List available skills"}, {"info SLUG", "Show skill details"}, {"versions SLUG", "List published versions"}} {
@@ -134,7 +134,7 @@ func boolFlagHelp(name string) string {
 	return map[string]string{"yes": "Accept the unverified GitHub warning without prompting (CI)", "share-org": "Explicitly publish a GitHub copy to the connected organization", "token-stdin": "Read API key from stdin", "manual": "Enter an API key in the terminal", "no-browser": "Show approval URL without opening browser", "dry-run": "Preview without changing files", "all": "Update all installed skills", "force": "Replace modified managed files", "public": "Install from a public share token", "pin": "Pin the installed version", "confirm-secrets": "Allow private secret projection", "frozen": "Require exact locked versions"}[name]
 }
 func valueFlagHelp(name string) string {
-	return map[string]string{"ref": "GitHub branch, tag or full commit SHA; disambiguates /tree/ URLs", "scope": "Installation or publication scope", "tools": "Comma-separated agent tools", "version": "Exact version", "manifest": "Package manifest path", "realm": "Database realm", "sql": "SQL statement", "params": "JSON SQL parameters"}[name]
+	return map[string]string{"max-skill-size": "Maximum extracted GitHub skill bytes (default 26214400; SKILLPACK_MAX_SKILL_BYTES)", "max-skill-files": "Maximum GitHub skill files (default 2000; SKILLPACK_MAX_SKILL_FILES)", "ref": "GitHub branch, tag or full commit SHA; disambiguates /tree/ URLs", "scope": "Installation or publication scope", "tools": "Comma-separated agent tools", "version": "Exact version", "manifest": "Package manifest path", "realm": "Database realm", "sql": "SQL statement", "params": "JSON SQL parameters"}[name]
 }
 
 func printHuman(out io.Writer, args []string, result any) error {

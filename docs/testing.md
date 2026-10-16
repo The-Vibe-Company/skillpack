@@ -7,7 +7,7 @@ providers and identities, not authorization, persistence, or tenant scoping.
 
 - Personal skills and database realms stay creator-only, including against same-org administrators.
 - All tenant APIs reject non-members, cross-tenant access, and revoked authority.
-- Archives and transfers reject unsafe paths, links, oversized files, and checksum substitution. GitHub fixtures additionally cover codeload streaming, compressed/decompressed repository caps, Git submodules, portable path collisions, token isolation, Retry-After, constant API-call counts, and SHA-pinned frozen restoration.
+- Archives and transfers reject unsafe paths, links, oversized files, and checksum substitution. GitHub fixtures additionally cover codeload streaming, large repositories with small selected folders, configurable selected byte/file limits, compressed/decompressed repository safety caps, Git submodules, portable path collisions, token isolation, Retry-After, constant API-call counts, and SHA-pinned frozen restoration.
 - Share is owner-only and includes its required private dependency closure atomically.
 - Usage reports work without credentials, deduplicate per activation, expire after 90 days, and
   reveal neither skill existence nor private usage to unauthorized callers. Reported identities

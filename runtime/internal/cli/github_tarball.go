@@ -23,8 +23,8 @@ import (
 // separate from the package limits below: skipped repository files still have
 // to be streamed and accounted for, but are never retained in memory.
 const (
-	githubMaxCompressedBytes   int64 = 64 << 20
-	githubMaxDecompressedBytes int64 = 256 << 20
+	githubMaxCompressedBytes   int64 = 2 << 30
+	githubMaxDecompressedBytes int64 = 8 << 30
 )
 
 const githubTarballSkillLimit int64 = 1 << 20
@@ -76,7 +76,7 @@ func (g *githubResolver) downloadTarballWithLimits(ctx context.Context, source g
 	gzipReader, err := gzip.NewReader(compressed)
 	if err != nil {
 		if compressed.n > compressed.limit {
-			return nil, nil, fail(5, "GitHub tarball exceeds the compressed size limit")
+			return nil, nil, githubRepositoryLimitError("compressed", compressedLimit)
 		}
 		return nil, nil, fail(5, "GitHub tarball is not valid gzip")
 	}
@@ -86,6 +86,9 @@ func (g *githubResolver) downloadTarballWithLimits(ctx context.Context, source g
 	decompressed := &githubTarballLimitReader{r: gzipReader, limit: decompressedLimit, limitErr: errGitHubTarballDecompressedLimit}
 	archive := tar.NewReader(decompressed)
 	parser := githubTarballParser{
+		limits:           g.limits.normalized(),
+		compressed:       compressed,
+		decompressed:     decompressed,
 		sourcePath:       source.Path,
 		commit:           strings.ToLower(source.Commit),
 		expectedFiles:    expectedFiles,
@@ -155,10 +158,10 @@ func (g *githubResolver) downloadTarballWithLimits(ctx context.Context, source g
 		trailingCompressed = true
 	}
 	if compressed.n > compressed.limit {
-		return nil, nil, fail(5, "GitHub tarball exceeds the compressed size limit")
+		return nil, nil, githubRepositoryLimitError("compressed", compressedLimit)
 	}
 	if decompressed.n > decompressed.limit {
-		return nil, nil, fail(5, "GitHub tarball exceeds the decompressed size limit")
+		return nil, nil, githubRepositoryLimitError("decompressed", decompressedLimit)
 	}
 	if trailingNonZero || trailingCompressed {
 		return nil, nil, fail(5, "GitHub tarball contains trailing data")
@@ -199,7 +202,7 @@ func (g *githubResolver) openGitHubTarball(ctx context.Context, source githubSou
 			return nil, func() {}, fail(8, "GitHub request budget exceeded; narrow the package path or retry later")
 		}
 		g.requests++
-		reqCtx, cancel := context.WithTimeout(ctx, githubRequestTimeout)
+		reqCtx, cancel := context.WithTimeout(ctx, githubOperationTimeout)
 		req, reqErr := http.NewRequestWithContext(reqCtx, http.MethodGet, requestURL, nil)
 		if reqErr != nil {
 			cancel()
@@ -211,6 +214,7 @@ func (g *githubResolver) openGitHubTarball(ctx context.Context, source githubSou
 		req.Header.Set("Accept-Encoding", "identity")
 
 		clientCopy := *client
+		clientCopy.Timeout = githubOperationTimeout
 		clientCopy.CheckRedirect = func(*http.Request, []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
@@ -229,7 +233,7 @@ func (g *githubResolver) openGitHubTarball(ctx context.Context, source githubSou
 				_ = resp.Body.Close()
 			}
 			cancel()
-			return nil, func() {}, fail(5, "GitHub tarball exceeds the compressed size limit")
+			return nil, func() {}, githubRepositoryLimitError("compressed", compressedLimit)
 		}
 		if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 			if resp.Body == nil {
@@ -311,10 +315,12 @@ func (r *githubTarballLimitReader) ReadByte() (byte, error) {
 }
 
 type githubTarballParser struct {
-	sourcePath    string
-	commit        string
-	archiveRoot   string
-	packagePrefix string
+	compressed, decompressed *githubTarballLimitReader
+	limits                   githubSkillLimits
+	sourcePath               string
+	commit                   string
+	archiveRoot              string
+	packagePrefix            string
 
 	expectedFiles map[string]githubTreeEntry
 	expectedDirs  map[string]githubTreeEntry
@@ -446,19 +452,16 @@ func (p *githubTarballParser) entry(h *tar.Header, archive io.Reader) error {
 	if h.Size != expected.Size {
 		return fail(5, "GitHub tarball file size differs from Git tree")
 	}
-	if h.Size > maxFileBytes || h.Size > maxPackageBytes-p.selectedTotal {
-		return fail(5, "GitHub package exceeds the size limit")
+	if err := p.limits.check(h.Size, p.selectedTotal, p.selectedCount); err != nil {
+		return err
 	}
 	if rel == "SKILL.md" && h.Size > githubTarballSkillLimit {
-		return fail(5, "SKILL.md exceeds the size limit")
-	}
-	if p.selectedCount >= maxPackageFiles {
-		return fail(5, "GitHub package exceeds the file limit")
+		return fail(5, "SKILL.md exceeds the fixed size limit (1048576 bytes); move supporting content to separate files")
 	}
 
 	data := make([]byte, int(h.Size))
 	if _, err := io.ReadFull(archive, data); err != nil {
-		return p.archiveError(err, nil, nil)
+		return p.archiveError(err, p.compressed, p.decompressed)
 	}
 	if !githubTarballBlobMatches(data, expected.SHA) {
 		return fail(5, "GitHub tarball file checksum differs from Git tree")
@@ -511,10 +514,18 @@ func (p *githubTarballParser) finish() error {
 
 func (p *githubTarballParser) archiveError(err error, compressed, decompressed *githubTarballLimitReader) error {
 	if errors.Is(err, errGitHubTarballCompressedLimit) || compressed != nil && compressed.n > compressed.limit {
-		return fail(5, "GitHub tarball exceeds the compressed size limit")
+		limit := githubMaxCompressedBytes
+		if compressed != nil {
+			limit = compressed.limit
+		}
+		return githubRepositoryLimitError("compressed", limit)
 	}
 	if errors.Is(err, errGitHubTarballDecompressedLimit) || decompressed != nil && decompressed.n > decompressed.limit {
-		return fail(5, "GitHub tarball exceeds the decompressed size limit")
+		limit := githubMaxDecompressedBytes
+		if decompressed != nil {
+			limit = decompressed.limit
+		}
+		return githubRepositoryLimitError("decompressed", limit)
 	}
 	if errors.Is(err, gzip.ErrChecksum) {
 		return fail(5, "GitHub tarball checksum mismatch")
@@ -582,4 +593,8 @@ func portablePathKey(name string) string {
 	// portablePaths uses the same normalization and case folding for collision
 	// checks. Keeping this key local makes exact duplicate directories fail too.
 	return strings.ToLower(norm.NFC.String(name))
+}
+
+func githubRepositoryLimitError(kind string, limit int64) error {
+	return fail(5, fmt.Sprintf("GitHub tarball exceeds the %s size limit (%d bytes, fixed repository safety cap); use a smaller repository or publish the skill separately. --max-skill-size only raises the selected skill limit", kind, limit))
 }
