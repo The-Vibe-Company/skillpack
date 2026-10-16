@@ -199,12 +199,12 @@ func folderChecksum(files map[string][]byte) string {
 	}
 	return "sha256:" + hex.EncodeToString(h.Sum(nil))
 }
-func currentPackage(path string) (string, string, error) {
-	files, err := scanPackage(path)
+func currentPackage(path string, configured ...githubSkillLimits) (string, string, error) {
+	files, err := scanPackage(path, configured...)
 	if err != nil {
 		return "", "", err
 	}
-	_, pkg, err := canonicalPackage(files)
+	_, pkg, err := canonicalPackage(files, configured...)
 	if err != nil {
 		return "", "", err
 	}
@@ -488,6 +488,10 @@ func (c *client) downloadNode(n *installNode) error {
 }
 
 func (a *app) install() (any, error) {
+	limits, limitErr := a.options.githubLimits()
+	if limitErr != nil {
+		return nil, limitErr
+	}
 	args := a.options.args
 	if len(args) != 2 {
 		return nil, fail(2, "install requires a skill slug")
@@ -556,6 +560,10 @@ func (a *app) install() (any, error) {
 	var source *githubSource
 	var executables []string
 	var nodes []installNode
+	var configured []githubSkillLimits
+	if github {
+		configured = []githubSkillLimits{limits}
+	}
 	if github {
 		parsed, e := parseGitHubReference(rootSlug, a.options.values["ref"])
 		if a.options.githubSource != nil {
@@ -566,6 +574,7 @@ func (a *app) install() (any, error) {
 			return nil, e
 		}
 		resolver := newGitHubResolver()
+		resolver.limits = limits
 		resolved, e := resolver.resolve(parsed)
 		if e != nil {
 			return nil, e
@@ -578,7 +587,7 @@ func (a *app) install() (any, error) {
 		if e != nil {
 			return nil, e
 		}
-		_, hash, e := canonicalPackage(files)
+		_, hash, e := canonicalPackage(files, limits)
 		if e != nil {
 			return nil, e
 		}
@@ -703,13 +712,13 @@ func (a *app) install() (any, error) {
 					}
 				}
 				if prior == nil {
-					pkg, dir, e := currentPackage(path)
+					pkg, dir, e := currentPackage(path, configured...)
 					if e != nil || pkg != n.Checksum && !(n.Local && n.Slug == "skillpack" && cleanLegacyManagement(path)) {
 						return nil, fail(6, "existing untracked skill; review before using --force")
 					}
 					prior = &installedTarget{PackageChecksum: pkg, Checksum: dir}
 				}
-				pkg, dir, err := currentPackage(path)
+				pkg, dir, err := currentPackage(path, configured...)
 				if err != nil {
 					return nil, err
 				}
@@ -921,6 +930,10 @@ func (a *app) stageInstallSecrets(c *client, workspace string, nodes []installNo
 }
 
 func (a *app) frozenSync() (any, error) {
+	limits, limitErr := a.options.githubLimits()
+	if limitErr != nil {
+		return nil, limitErr
+	}
 	project, err := projectRoot(a.options.values["project"])
 	if err != nil {
 		return nil, err
@@ -1009,11 +1022,15 @@ func (a *app) frozenSync() (any, error) {
 				} else if err != nil {
 					return nil, err
 				}
-				files, err := scanPackage(destination)
+				var configured []githubSkillLimits
+				if skill.Source != nil {
+					configured = []githubSkillLimits{limits}
+				}
+				files, err := scanPackage(destination, configured...)
 				if err != nil {
 					return nil, err
 				}
-				_, hash, err := canonicalPackage(files)
+				_, hash, err := canonicalPackage(files, configured...)
 				if err != nil {
 					return nil, err
 				}
@@ -1035,7 +1052,9 @@ func (a *app) frozenSync() (any, error) {
 			pinned := *m.source
 			pinned.Commit = m.version
 			var e error
-			files, _, e = newGitHubResolver().download(pinned)
+			resolver := newGitHubResolver()
+			resolver.limits = limits
+			files, _, e = resolver.download(pinned)
 			if e != nil {
 				return nil, e
 			}
@@ -1043,7 +1062,7 @@ func (a *app) frozenSync() (any, error) {
 			if e != nil {
 				return nil, e
 			}
-			_, hash, e := canonicalPackage(files)
+			_, hash, e := canonicalPackage(files, limits)
 			if e != nil {
 				return nil, e
 			}

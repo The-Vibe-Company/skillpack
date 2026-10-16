@@ -98,7 +98,13 @@ func (p portablePaths) add(name string, dir bool) error {
 	}
 	return nil
 }
-func scanPackage(root string) (map[string][]byte, error) {
+func scanPackage(root string, configured ...githubSkillLimits) (map[string][]byte, error) {
+	byteLimit, fileLimit, singleLimit := int64(maxPackageBytes), maxPackageFiles, int64(maxFileBytes)
+	if len(configured) > 0 {
+		l := configured[0].normalized()
+		byteLimit, fileLimit, singleLimit = l.bytes, l.files, l.bytes
+	}
+
 	files := map[string][]byte{}
 	seen := portablePaths{}
 	total := 0
@@ -140,7 +146,12 @@ func scanPackage(root string) (map[string][]byte, error) {
 		if !info.Mode().IsRegular() {
 			return fail(5, "packages cannot contain symbolic links or special files")
 		}
-		if info.Size() > maxFileBytes || total+int(info.Size()) > maxPackageBytes || len(files) >= maxPackageFiles {
+		if len(configured) > 0 {
+			if err := configured[0].check(info.Size(), int64(total), len(files)); err != nil {
+				return err
+			}
+		}
+		if info.Size() > singleLimit || int64(total)+info.Size() > byteLimit || len(files) >= fileLimit {
 			return fail(5, "package exceeds size or entry limit")
 		}
 		b, err := os.ReadFile(path)
@@ -148,7 +159,7 @@ func scanPackage(root string) (map[string][]byte, error) {
 			return err
 		}
 		total += len(b)
-		if total > maxPackageBytes || len(b) > maxFileBytes {
+		if int64(total) > byteLimit || int64(len(b)) > singleLimit {
 			return fail(5, "package changed beyond size limit")
 		}
 		files[rel] = b
@@ -312,7 +323,13 @@ func isASCII(s string) bool {
 	}
 	return true
 }
-func canonicalPackage(files map[string][]byte) ([]byte, string, error) {
+func canonicalPackage(files map[string][]byte, configured ...githubSkillLimits) ([]byte, string, error) {
+	byteLimit, fileLimit, singleLimit := int64(maxPackageBytes), maxPackageFiles, int64(maxFileBytes)
+	if len(configured) > 0 {
+		l := configured[0].normalized()
+		byteLimit, fileLimit, singleLimit = l.bytes, l.files, l.bytes
+	}
+
 	if _, ok := files["SKILL.md"]; !ok {
 		return nil, "", fail(5, "SKILL.md is required")
 	}
@@ -325,13 +342,18 @@ func canonicalPackage(files map[string][]byte) ([]byte, string, error) {
 		if excludedPackagePath(name) {
 			continue
 		}
-		if len(b) > maxFileBytes {
+		if len(configured) > 0 {
+			if err := configured[0].check(int64(len(b)), int64(total), len(names)); err != nil {
+				return nil, "", err
+			}
+		}
+		if int64(len(b)) > singleLimit {
 			return nil, "", fail(5, "package file too large")
 		}
 		total += len(b)
 		names = append(names, name)
 	}
-	if total > maxPackageBytes || len(names) > maxPackageFiles {
+	if int64(total) > byteLimit || len(names) > fileLimit {
 		return nil, "", fail(5, "package too large")
 	}
 	sort.Strings(names)

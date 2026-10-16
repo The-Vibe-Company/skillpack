@@ -46,6 +46,7 @@ type githubSource struct {
 type githubResolver struct {
 	// Keep this field injectable for package tests. A nil Transport still uses
 	// http.DefaultTransport. Request origins are fixed to GitHub API/codeload.
+	limits   githubSkillLimits
 	listRefs githubRefReader
 	http     *http.Client
 	token    string
@@ -525,7 +526,7 @@ func (g *githubResolver) download(source githubSource) (map[string][]byte, []str
 	if err != nil {
 		return nil, nil, err
 	}
-	expected, err := githubSelectedTree(tree.Tree, source.Path)
+	expected, err := githubSelectedTree(tree.Tree, source.Path, g.limits)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -552,7 +553,11 @@ func (g *githubResolver) getTree(ctx context.Context, repository, sha string) (g
 	return tree, nil
 }
 
-func githubSelectedTree(entries []githubTreeEntry, selected string) (map[string]githubTreeEntry, error) {
+func githubSelectedTree(entries []githubTreeEntry, selected string, configured ...githubSkillLimits) (map[string]githubTreeEntry, error) {
+	limits := githubSkillLimits{}.normalized()
+	if len(configured) > 0 {
+		limits = configured[0].normalized()
+	}
 	result := map[string]githubTreeEntry{}
 	seen := portablePaths{}
 	exact := map[string]bool{}
@@ -605,11 +610,14 @@ func githubSelectedTree(entries []githubTreeEntry, selected string) (map[string]
 			continue
 		}
 		if entry.Type == "blob" {
+			if err := limits.check(entry.Size, total, count); err != nil {
+				return nil, err
+			}
+			if rel == "SKILL.md" && entry.Size > githubTarballSkillLimit {
+				return nil, fail(5, "SKILL.md exceeds the fixed size limit (1048576 bytes); move supporting content to separate files")
+			}
 			count++
 			total += entry.Size
-			if count > maxPackageFiles || entry.Size > maxFileBytes || total > maxPackageBytes || rel == "SKILL.md" && entry.Size > 1<<20 {
-				return nil, fail(5, "GitHub package exceeds the size or file limit")
-			}
 		}
 		result[rel] = entry
 	}

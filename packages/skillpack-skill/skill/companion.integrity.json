@@ -1,9 +1,9 @@
 {
   "files": {
     "SKILL.md": "sha256:249aae459566b327a9f6e99be632cca23e02fe72701b0d3bbcee81e882319029",
-    "companion.json": "sha256:ffc35e6b643387ab47977afad9aa9c71bd62f4ec880d93e3094fccd7b60a6975",
+    "companion.json": "sha256:f6e2679278edcc4f51fd036833009555ed0b5a3e6b29e35600444dfeaa1a809b",
     "evals/evals.json": "sha256:1f982c55ef761723ffaa3b669973fca9a262852c32fc07e6d9decf28037a59ce",
-    "runtime-release.json": "sha256:25ba50f20e43350b5aa8ca0c1156d2227900dabfffe17bd627c75eee4b9ccbea",
+    "runtime-release.json": "sha256:a070911597c47b034c643cfa500c320e54e0e63912d05a90f1afb31131cf1e73",
     "scripts/bootstrap.py": "sha256:f4f4cad2ab05b2ef97e1119430bb272a4012d2bd8fc8db7ddd5bec7b0e57e0f5",
     "scripts/bootstrap_integrity.py": "sha256:1714d5207340b1a617c7bce4ace7252c3d4af3dad72d8749efd09805fd1460fa",
     "scripts/bootstrap_update.py": "sha256:d8af6d52b777433df4ca30330e439ac1a108c7a561b35d690ccad137905b543a",
@@ -30,5 +30,5 @@
     "scripts/verify-runtime-release.mjs": "sha256:b43631b99763441bf2a5b1a72a268ff29d1bc31ac71caa6b538b1d4faeddc93e"
   },
   "schemaVersion": 1,
-  "version": "1.120.8"
+  "version": "1.120.9"
 }
