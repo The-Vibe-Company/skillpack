@@ -309,6 +309,64 @@
 @keyframes lp-rise { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes lp-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
+/* --- hero shine, ambient aurora, CTA sheen, card glow ----------------------------- */
+/* Inspired by React Bits (Shiny Text, Aurora, Spotlight Card), re-implemented in
+   CSS. Text stays real server-rendered text; motion is transform/opacity except
+   the two-pass text sheen, and every animation is gated on reduced motion. */
+.lp-em--shine {
+  /* A light band parked off the right edge rides over the brand gradient. */
+  background-image: linear-gradient(105deg, transparent 42%, oklch(1 0 0 / 0.6) 50%, transparent 58%), var(--lp-grad);
+  background-size: 250% 100%, 100% 100%;
+  background-position: 0% 0, 0 0;
+  background-repeat: no-repeat;
+}
+@keyframes lp-shine { from { background-position: 100% 0, 0 0; } to { background-position: 0% 0, 0 0; } }
+
+.lp-ambient::before, .lp-ambient::after {
+  content: ""; position: absolute; pointer-events: none;
+  --lp-aurora: max(320px, min(62vw, 760px));
+  width: var(--lp-aurora); aspect-ratio: 1; border-radius: 50%;
+}
+.lp-hero__bg.lp-ambient::before { top: calc(var(--lp-aurora) * -0.5); left: -14%; background: radial-gradient(closest-side, oklch(0.7 0.19 45 / 0.13), transparent); }
+.lp-hero__bg.lp-ambient::after { top: calc(var(--lp-aurora) * -0.42); right: -16%; background: radial-gradient(closest-side, oklch(0.84 0.16 82 / 0.2), transparent); }
+.lp-finale__bg.lp-ambient::before { bottom: calc(var(--lp-aurora) * -0.55); left: 2%; background: radial-gradient(closest-side, oklch(0.7 0.19 45 / 0.12), transparent); }
+.lp-finale__bg.lp-ambient::after { bottom: calc(var(--lp-aurora) * -0.5); right: 0; background: radial-gradient(closest-side, oklch(0.84 0.16 82 / 0.18), transparent); }
+.lp-ambient.lp-ambient--paused::before, .lp-ambient.lp-ambient--paused::after { animation-play-state: paused; }
+@keyframes lp-aurora-a { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(12%, 8%, 0) scale(1.12); } }
+@keyframes lp-aurora-b { from { transform: translate3d(0, 0, 0) scale(1.08); opacity: 0.75; } to { transform: translate3d(-10%, 10%, 0) scale(0.95); opacity: 1; } }
+
+.lp-cta { position: relative; overflow: hidden; isolation: isolate; }
+.lp-cta::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, oklch(1 0 0 / 0.5) 50%, transparent 70%);
+  transform: translateX(-110%);
+}
+
+.lp-glow { position: relative; }
+.lp-glow::before {
+  content: ""; position: absolute; inset: -1px; padding: 1px; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(240px circle at var(--lp-mx, 50%) var(--lp-my, 0%), oklch(0.72 0.18 55 / 0.85), transparent 70%);
+  /* Show only the 1px ring: the content box is cut out of the padding box. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lp-em--shine { animation: lp-shine 1.8s var(--ease-out-quint) 1.1s 2 both; }
+  .lp-ambient::before, .lp-ambient::after { will-change: transform; }
+  .lp-ambient::before { animation: lp-aurora-a 18s ease-in-out infinite alternate; }
+  .lp-ambient::after { animation: lp-aurora-b 23s ease-in-out -6s infinite alternate; }
+  .lp-cta:focus-visible::after { transform: translateX(110%); transition: transform 700ms var(--ease-out-quint); }
+  .lp-cta:active { transform: scale(0.98); }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .lp-cta:hover::after { transform: translateX(110%); transition: transform 700ms var(--ease-out-quint); }
+  .lp-glow::before { transition: opacity var(--duration-slow) var(--ease-out-quint); }
+  .lp-glow:hover::before { opacity: 1; }
+}
+
 /* --- agents strip ------------------------------------------------------------------ */
 .lp-agents-strip { border-top: 1px solid var(--v10-line); background: var(--v10-bg-dim); }
 .lp-agents-strip__inner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--space-4) var(--space-6); padding-block: var(--space-6); }

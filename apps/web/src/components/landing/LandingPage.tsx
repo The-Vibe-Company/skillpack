@@ -3,7 +3,9 @@
    shared with the organization, installed into every coding agent, and its
    activations are measured. Display type is Inter Tight; highlighted phrases
    use the brand-mark gradient. The page renders on the server; the portal
-   demo (PortalCapture, lazy-loaded) and the scroll reveal are client islands. */
+   demo (PortalCapture, lazy-loaded) and the scroll reveal are client islands.
+   Hero text shine, ambient aurora and CTA sheen are CSS; LandingReveal only
+   pauses off-screen ambience and feeds the pointer position to card glows. */
 
 import { Avatar } from "./Avatar";
 import { LandingReveal } from "./LandingReveal";
@@ -132,9 +134,10 @@ const SCATTER = [
 
 /* ------------------------------------------------------------ utilities --- */
 
-/** Brand-gradient phrase used for the one highlighted idea in each headline. */
-function Em({ children }: { children: React.ReactNode }) {
-  return <em className="lp-em">{children}</em>;
+/** Brand-gradient phrase used for the one highlighted idea in each headline.
+    `shine` adds the hero's one-shot light sweep (CSS only, reduced-motion gated). */
+function Em({ children, shine = false }: { children: React.ReactNode; shine?: boolean }) {
+  return <em className={shine ? "lp-em lp-em--shine" : "lp-em"}>{children}</em>;
 }
 
 function Mark({ size = 28 }: { size?: number }) {
@@ -187,7 +190,7 @@ function Nav({ c }: { c: Copy }) {
 function Hero({ c }: { c: Copy }) {
   return (
     <section className="lp-hero" id="top" data-screen-label="hero">
-      <div className="lp-hero__bg" aria-hidden="true"></div>
+      <div className="lp-hero__bg lp-ambient" aria-hidden="true"></div>
       <div className="v10-wrap lp-hero__inner">
         <span className="lp-badge lp-rise">
           <span className="lp-badge__dot" aria-hidden="true"></span>
@@ -195,12 +198,12 @@ function Hero({ c }: { c: Copy }) {
         </span>
         <h1 className="lp-h1 lp-rise lp-rise--2">
           {c.heroTitlePre}
-          <Em>{c.heroTitleMark}</Em>
+          <Em shine>{c.heroTitleMark}</Em>
           {c.heroTitlePost}
         </h1>
         <p className="lp-hero__sub lp-rise lp-rise--3">{c.heroSub}</p>
         <div className="lp-hero__ctas lp-rise lp-rise--4">
-          <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg">
+          <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg lp-cta">
             {c.ctaPrimary}
           </Link>
           <a className="v10-btn v10-btn--ghost v10-btn--lg" href="#problem">
@@ -371,7 +374,7 @@ function How({ c }: { c: Copy }) {
         </h2>
         <ol className="lp-steps">
           {c.steps.map((s) => (
-            <li className="lp-step v5-reveal" key={s.n}>
+            <li className="lp-step lp-glow v5-reveal" key={s.n}>
               <div className="lp-step__text">
                 <span className="lp-step__n">{s.n}</span>
                 <h3>{s.title}</h3>
@@ -469,7 +472,7 @@ function Trust({ c }: { c: Copy }) {
         <p className="lp-sub lp-sub--center v5-reveal">{c.trustText}</p>
         <div className="lp-facts">
           {c.trustFacts.map((f) => (
-            <div className="lp-fact v5-reveal" key={f.title}>
+            <div className="lp-fact lp-glow v5-reveal" key={f.title}>
               <span className="lp-pic" aria-hidden="true">
                 <Icon name={f.icon} size={15} />
               </span>
@@ -486,7 +489,7 @@ function Trust({ c }: { c: Copy }) {
 function Finale({ c }: { c: Copy }) {
   return (
     <section className="lp-finale" id="start" data-screen-label="finale">
-      <div className="lp-finale__bg" aria-hidden="true"></div>
+      <div className="lp-finale__bg lp-ambient" aria-hidden="true"></div>
       <div className="v10-wrap lp-finale__inner">
         <Mark size={56} />
         <h2 className="lp-h2 lp-h2--center lp-h2--xl">
@@ -495,7 +498,7 @@ function Finale({ c }: { c: Copy }) {
         </h2>
         <p className="lp-sub lp-sub--center">{c.finaleSub}</p>
         <div className="lp-hero__ctas">
-          <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg">
+          <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg lp-cta">
             {c.finaleCta}
           </Link>
           <a className="v10-btn v10-btn--ghost v10-btn--lg" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
