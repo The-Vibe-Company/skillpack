@@ -12,6 +12,8 @@ Most coding agents can write code. The useful ones know how your team works: the
 
 Here's what a SKILL.md file is, how the format works, and what a good one looks like. Then we'll cover how to keep skills from rotting in gists and Slack threads once your team starts writing them.
 
+Want to build one right away? Follow [How to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill), a step-by-step walkthrough with a working example.
+
 ## The short answer
 
 A skill is a folder that teaches an AI agent how to do one specific task. At minimum, that folder contains a `SKILL.md` file: YAML frontmatter (a name and a description) followed by Markdown instructions. It can also bundle scripts, reference docs and templates the agent loads only when needed ([Agent Skills specification](https://agentskills.io/specification)).
