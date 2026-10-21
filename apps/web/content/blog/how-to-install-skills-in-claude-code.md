@@ -61,6 +61,8 @@ skillpack update --all --dry-run
 skillpack update --all
 ```
 
+Using Codex too? [Codex skills: how to install, use and create them](/blog/how-to-use-skills-in-codex) covers where Codex looks for skills and how one install serves both agents. Looking for skills to start with? See [the best Claude Code skills for video and motion design](/blog/best-claude-code-skills-video-motion-design).
+
 ## Troubleshooting
 
 - Claude doesn't use the skill: Claude matches on the `description` in the frontmatter. Make it say when to use the skill.
