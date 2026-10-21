@@ -280,6 +280,8 @@ rows:
     why: "A single-file artifact that doesn't look templated"
 ```
 
+Working on animation or product videos rather than layouts? See [the best Claude Code skills for video and motion design](/blog/best-claude-code-skills-video-motion-design).
+
 ## How to install and share these skills with your team
 
 Each command above installs a public GitHub folder with the Skillpack CLI, without an account. The CLI resolves the branch or tag to an exact commit, shows you the source and any executable files, and asks before copying anything. It never runs package scripts. With `--scope project`, the skill lands in `.agents/skills/`, which OpenCode reads, with managed copies in `.claude/skills/` for Claude Code and `.codex/skills/` for Codex. The exact commit is recorded in `.companion/skills.lock.json`. Commit that lockfile, and `skillpack sync --frozen` gives every teammate and every CI run the same files ([full install guide](/blog/how-to-install-skills-in-claude-code)).
