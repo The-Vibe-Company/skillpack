@@ -12,7 +12,7 @@ Most coding agents can write code. The useful ones know how your team works: the
 
 Here's what a SKILL.md file is, how the format works, and what a good one looks like. Then we'll cover how to keep skills from rotting in gists and Slack threads once your team starts writing them.
 
-Want to build one right away? Follow [How to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill), a step-by-step walkthrough with a working example.
+Want to build one right away? Follow [How to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill), a step-by-step walkthrough with a working example. Looking for ready-made skills instead? See [the best Claude Code skills in 2026](/blog/best-claude-code-skills), ranked by installs.
 
 ## The short answer
 

@@ -155,7 +155,7 @@ There's also `allowed-tools`, which pre-approves tools for the turn that invokes
 
 ## Step 7: make it work in Codex and OpenCode too
 
-The `SKILL.md` format isn't Claude Code-only. Codex reads the same files: it requires `name` and `description`, scans `.agents/skills` from your working directory up to the repo root, and uses `$HOME/.agents/skills` for personal skills ([Codex docs](https://developers.openai.com/codex/skills)). You call a skill there with `$writing-release-notes` or `/skills`.
+The `SKILL.md` format isn't Claude Code-only. Codex reads the same files: it requires `name` and `description`, scans `.agents/skills` from your working directory up to the repo root, and uses `$HOME/.agents/skills` for personal skills ([Codex docs](https://developers.openai.com/codex/skills)). You call a skill there with `$writing-release-notes` or `/skills`. More in [our Codex skills guide](/blog/how-to-use-skills-in-codex).
 
 To keep a skill portable:
 
@@ -200,7 +200,7 @@ secondary: { label: "How to share skills with your team", href: /blog/how-to-sha
 
 ## Before you copy someone else's skill
 
-Writing your own isn't always the fastest route. For common jobs, plenty of public skills already exist. We compared the most-installed ones for [code review](/blog/best-claude-code-skills-code-review) and [frontend design](/blog/best-claude-code-skills-frontend-design). Read any third-party skill before installing it, scripts and `allowed-tools` included, the same way you'd read a new dependency.
+Writing your own isn't always the fastest route. For common jobs, plenty of public skills already exist. We compared the most-installed ones for [code review](/blog/best-claude-code-skills-code-review) and [frontend design](/blog/best-claude-code-skills-frontend-design), plus [the best Claude Code skills overall](/blog/best-claude-code-skills). Read any third-party skill before installing it, scripts and `allowed-tools` included, the same way you'd read a new dependency.
 
 ```faq
 items:
