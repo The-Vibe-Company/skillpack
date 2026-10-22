@@ -80,7 +80,7 @@ An MCP server is configured once and everyone connects to it. Skills are files. 
 skillpack install <slug> --scope project --tools claude-code,codex,opencode
 ```
 
-The skill lands in the repo for all three agents, and its version and sha256 checksum go into `.companion/skills.lock.json`. Commit that file, and `skillpack sync --frozen` gives every teammate and every CI run the same skills. Step by step: [How to install skills in Claude Code](/blog/how-to-install-skills-in-claude-code). For the full team setup, see [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team).
+The skill lands in the repo for all three agents, and its version and sha256 checksum go into `.companion/skills.lock.json`. Commit that file, and `skillpack sync --frozen` gives every teammate and every CI run the same skills. Step by step: [How to install skills in Claude Code](/blog/how-to-install-skills-in-claude-code). For the full team setup, see [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team). Not sure which skills to start with? Here are [the most-installed Claude Code skills](/blog/best-claude-code-skills), ranked.
 
 ## FAQ
 
