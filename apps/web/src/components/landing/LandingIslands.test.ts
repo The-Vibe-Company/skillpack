@@ -18,7 +18,12 @@ describe("LandingPage server rendering", () => {
   it("server-renders the static copy with a hidden placeholder in place of the lazy demo", () => {
     const html = renderToStaticMarkup(React.createElement(LandingPage));
 
-    expect(html).toContain('<h1 class="lp-h1 lp-rise lp-rise--2">The open-source <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
+    expect(html).toContain('<h1 class="lp-h1 lp-rise lp-rise--2">The open-source <em class="lp-em lp-em--shine">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
+    // Motion polish is CSS on server-rendered markup: real text, decorative layers hidden from assistive tech.
+    expect(html).toContain('<div class="lp-hero__bg lp-ambient" aria-hidden="true"></div>');
+    expect(html).toContain('<div class="lp-finale__bg lp-ambient" aria-hidden="true"></div>');
+    expect(html.match(/class="v10-btn v10-btn--primary v10-btn--lg lp-cta"/g)).toHaveLength(2);
+    expect(html.match(/class="lp-(step|fact) lp-glow v5-reveal"/g)).toHaveLength(10);
     expect(html).toContain('id="problem"');
     expect(html).toContain('id="start"');
     expect(html).toContain('id="faq"');
