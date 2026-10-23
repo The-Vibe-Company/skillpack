@@ -112,7 +112,7 @@ The spec contrasts a good description ("Extracts text and tables from PDF files,
 
 ## Where skills live in each agent
 
-Each agent discovers skills from its own locations (project folders, user folders, plugins). Claude Code, Codex, Cursor and OpenCode all read SKILL.md, but paths and install mechanics differ, so check each tool's docs, for example [Cursor's skills documentation](https://cursor.com/docs/skills). This is where it gets messy for teams. The same skill ends up copied into several folders on several laptops, and the copies drift.
+Each agent discovers skills from its own locations (project folders, user folders, plugins). Claude Code, Codex, Cursor and OpenCode all read SKILL.md, but paths and install mechanics differ, so check each tool's docs, for example [Cursor's skills documentation](https://cursor.com/docs/skills) or our [Cursor skills guide](/blog/how-to-use-skills-in-cursor). This is where it gets messy for teams. The same skill ends up copied into several folders on several laptops, and the copies drift.
 
 ## The team problem: skills don't travel
 
