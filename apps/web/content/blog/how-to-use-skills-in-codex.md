@@ -219,7 +219,7 @@ To keep one skill working in both:
 - Keep the folder name equal to the skill `name`.
 - Avoid paths that only exist in one agent's setup.
 
-Then either symlink one folder to the other, or install with a tool that writes both. The Skillpack command above did exactly that with `--tools codex,claude-code`. For teams, [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) compares the options, from git submodules to a shared registry.
+Then either symlink one folder to the other, or install with a tool that writes both. The Skillpack command above did exactly that with `--tools codex,claude-code`. For teams, [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) compares the options, from git submodules to a shared registry. Cursor reads both folders too, as our [Cursor skills guide](/blog/how-to-use-skills-in-cursor) explains.
 
 ## Troubleshooting: my Codex skill doesn't show up
 
