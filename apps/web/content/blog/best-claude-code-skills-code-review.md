@@ -297,7 +297,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/engineering/code-review --scope project --share-org
 ```
 
-Skillpack is open source (MIT) and self-hostable. The Free plan includes up to 20 organization skills, and Pro costs $10 per seat per month.
+Skillpack is open source (MIT) and self-hostable. The Free plan includes up to 20 organization skills, and Pro costs $10 per seat per month. For the skills that write the tests a review checks, see [the best Claude Code skills for testing](/blog/best-claude-code-skills-testing).
 
 ## FAQ
 
