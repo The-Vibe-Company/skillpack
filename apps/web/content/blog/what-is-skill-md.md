@@ -22,6 +22,8 @@ Anthropic introduced Agent Skills for Claude and explained the design in [Equipp
 
 In practice, one SKILL.md can work across several agents. You don't rewrite it for each vendor's prompt format.
 
+A skill is not the same thing as a Claude Code subagent, which runs a task in its own context window and reports back a summary ([subagents vs skills](/blog/claude-code-subagents-vs-skills) explains when to reach for each).
+
 ## Why skills exist: progressive disclosure
 
 Stuffing every procedure into a system prompt wastes context and confuses the model. Skills fix this with progressive disclosure ([Anthropic](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)):
