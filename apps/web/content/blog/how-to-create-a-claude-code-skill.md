@@ -38,7 +38,7 @@ Good first skills are boring. They're the instructions you already give in code 
 - a checklist for database migrations
 - how your team writes tests
 
-A skill fits when the steps are mostly the same each time and the agent keeps getting one detail wrong. If the task needs live access to a system, like your issue tracker, a skill alone won't do it. Pair it with an MCP server ([Agent Skills vs MCP](/blog/agent-skills-vs-mcp) covers the split).
+A skill fits when the steps are mostly the same each time and the agent keeps getting one detail wrong. If the task needs live access to a system, like your issue tracker, a skill alone won't do it. Pair it with an MCP server ([Agent Skills vs MCP](/blog/agent-skills-vs-mcp) covers the split). And if the job is self-contained and mostly produces output you'll never read again, a separate worker may be the better home for it ([subagents vs skills](/blog/claude-code-subagents-vs-skills) covers the choice).
 
 Before writing anything, write down three prompts you'd expect to trigger the skill, and what a good answer looks like. Anthropic's [best practices for skills](https://docs.claude.com/en/docs/agents-and-tools/agent-skills/best-practices) recommend exactly this: build the evaluations first, then write just enough instructions to pass them. There's no built-in runner for these checks, so a short list in a text file is enough.
 
