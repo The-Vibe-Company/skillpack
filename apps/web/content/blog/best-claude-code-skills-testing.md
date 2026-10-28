@@ -324,7 +324,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/engineering/tdd --scope project --share-org
 ```
 
-Skillpack is open source (MIT) and can run on your own infrastructure. For other use cases, see our rankings for [code review](/blog/best-claude-code-skills-code-review) and [frontend design](/blog/best-claude-code-skills-frontend-design), the [overall top Claude Code skills](/blog/best-claude-code-skills), or [write your own skill](/blog/how-to-create-a-claude-code-skill).
+Skillpack is open source (MIT) and can run on your own infrastructure. For other use cases, see our rankings for [code review](/blog/best-claude-code-skills-code-review), [frontend design](/blog/best-claude-code-skills-frontend-design), and [planning](/blog/best-claude-code-skills-planning), the [overall top Claude Code skills](/blog/best-claude-code-skills), or [write your own skill](/blog/how-to-create-a-claude-code-skill).
 
 ## FAQ
 

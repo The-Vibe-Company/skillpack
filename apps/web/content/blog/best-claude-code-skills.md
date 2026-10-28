@@ -227,7 +227,7 @@ description: |
 
   It's part of a chain. Once the design is approved, it calls the `writing-plans` skill from the same repository, so install that too or use the whole Superpowers set. The folder also ships a small local server for an optional visual companion, which the Skillpack CLI lists as executable files.
 suitedFor: |
-  teams who want a written design for every feature. It overlaps with grill-me, so most people pick one of the two.
+  teams who want a written design for every feature. It overlaps with grill-me, so most people pick one of the two. See our [ranking of planning skills](/blog/best-claude-code-skills-planning).
 ```
 
 ```skill-card
