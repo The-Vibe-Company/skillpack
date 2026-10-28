@@ -1,5 +1,5 @@
 ---
-title: "Best Claude Code Skills for Code Review in 2026: 7 Skills Compared | Skillpack"
+title: "Best Claude Code Skills for Code Review (2026)"
 description: "The 7 most-installed Claude Code skills for code review in 2026, ranked on public install counts, with maintainer, license, scope and a one-line install command for each."
 slug: best-claude-code-skills-code-review
 date: 2026-10-16
