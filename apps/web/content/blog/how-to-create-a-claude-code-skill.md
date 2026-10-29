@@ -153,6 +153,8 @@ Release notes are harmless to draft, so leave the default. A `publishing-release
 
 There's also `allowed-tools`, which pre-approves tools for the turn that invokes the skill. Be careful with it in shared repos: Claude Code's docs warn that a project skill's `allowed-tools` applies even in folders you haven't trusted, so review it like code.
 
+Already have prompts in `.claude/commands/`? [Here is how they compare to skills and how to move them](/blog/claude-code-skills-vs-slash-commands).
+
 ## Step 7: make it work in Codex and OpenCode too
 
 The `SKILL.md` format isn't Claude Code-only. Codex reads the same files: it requires `name` and `description`, scans `.agents/skills` from your working directory up to the repo root, and uses `$HOME/.agents/skills` for personal skills ([Codex docs](https://developers.openai.com/codex/skills)). You call a skill there with `$writing-release-notes` or `/skills`. More in [our Codex skills guide](/blog/how-to-use-skills-in-codex).
