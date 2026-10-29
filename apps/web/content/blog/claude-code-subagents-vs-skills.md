@@ -33,7 +33,7 @@ items:
 
 A skill is a folder with a `SKILL.md` file. The frontmatter gives it a name and a description, and the body holds the instructions. Claude keeps every skill's description in context, loads the full body when your request matches, and you can also call it yourself with `/skill-name`.
 
-Anthropic's docs suggest writing a skill when you keep pasting the same checklist or procedure into chat. The body only loads on use, so a long skill costs almost nothing until it runs. Custom commands have been merged into skills: `.claude/commands/deploy.md` and `.claude/skills/deploy/SKILL.md` both create `/deploy`.
+Anthropic's docs suggest writing a skill when you keep pasting the same checklist or procedure into chat. The body only loads on use, so a long skill costs almost nothing until it runs. Custom commands have been merged into skills: `.claude/commands/deploy.md` and `.claude/skills/deploy/SKILL.md` both create `/deploy`. For when to keep a command, write a skill or ship a plugin, see [Claude Code skills vs slash commands vs plugins](/blog/claude-code-skills-vs-slash-commands).
 
 Project skills live in `.claude/skills/<name>/SKILL.md`, personal ones in `~/.claude/skills/`. Skills follow the [Agent Skills](https://agentskills.io) open standard, so the same file can work in other agents. More on the format in [What is SKILL.md](/blog/what-is-skill-md), and on writing one in [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill).
 
