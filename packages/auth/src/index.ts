@@ -19,6 +19,7 @@ import {
   type AgentTenantCapability,
 } from "./agent-auth";
 import { postgresAgentAuthStorage } from "./postgres-secondary-storage";
+import { betterAuthIpAddressHeaders } from "./ip-address";
 import {
   authorizationUsesRemoteAgentJwks,
   canonicalAgentAuthHeaders,
@@ -255,6 +256,9 @@ const configuredAuth = betterAuth({
     skillpackMcpVerificationPlugin,
   ],
   advanced: {
+    // Railway's public edge sets a single X-Real-IP. Do not trust arbitrary forwarded
+    // chains or vendor headers on the publicly reachable API (see deploy/railway/README.md).
+    ipAddress: { ipAddressHeaders: betterAuthIpAddressHeaders() },
     cookiePrefix: process.env.BETTER_AUTH_COOKIE_PREFIX ?? "better-auth",
     database: {
       generateId: () => crypto.randomUUID(),

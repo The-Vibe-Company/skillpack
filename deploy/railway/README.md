@@ -9,6 +9,40 @@ configuration. Worker receives its own restricted DATABASE_URL and only configur
 and Skill Database cleanup credentials. Web receives the API origin and public client settings.
 No service needs Box, Pi, APNs, provider MCP, or desktop-HMAC credentials.
 
+## Authentication client IPs
+
+The API defaults Better Auth's `advanced.ipAddress.ipAddressHeaders` to `["x-real-ip"]`.
+[Railway's public edge](https://docs.railway.com/networking/public-networking/specs-and-limits#technical-specifications)
+sets `X-Real-IP` to the remote client's address, including for the custom API domain
+`api.thecompanion.sh`. Send public auth traffic through that edge; private-network or direct
+container callers bypass its header sanitization and must be trusted separately.
+
+Better Auth 1.7.14 defaults to `x-forwarded-for` and accepts only single IP values unless
+`trustedProxies` is configured. A comma-separated forwarded chain therefore causes its
+shared per-path rate-limit bucket and warning. Hono's Node adapter preserves incoming headers
+in `c.req.raw`, which the API passes to the auth handler; it does not supply the socket peer
+to Better Auth. We leave `trustedProxies` unset: it only parses a header chain and does not
+authenticate the sender, and we have no verified stable Railway/Vercel proxy CIDRs.
+
+`skillpack.app` uses Vercel external rewrites for `/auth/*` and `/mcp` to the public API.
+[Vercel documents](https://vercel.com/docs/headers/request-headers) the visitor's address in
+`x-vercel-forwarded-for`, `x-forwarded-for`, and `x-real-ip` at its ingress. At Railway's
+ingress, `x-real-ip` identifies the peer reaching Railway, which can be Vercel's egress
+instead of the visitor. Such visitors can share a proxy-IP bucket; this fix does not
+guarantee per-visitor limits through Vercel. Do not prefer `x-vercel-forwarded-for` on the
+public API: a caller can bypass Vercel and forge it. Host, Origin, and `x-vercel-id` do not
+authenticate that hop. Preserving visitor IPs safely requires an authenticated proxy path
+that overwrites the selected header and prevents direct callers from supplying it.
+
+For another trusted ingress, set **API-only** `BETTER_AUTH_IP_HEADERS` to an ordered,
+comma-separated list of header names. It replaces the default; names are trimmed,
+lowercased and deduplicated. Unset/blank uses `x-real-ip`; invalid names fail startup.
+Only select headers the ingress overwrites and only when callers cannot bypass it.
+No `x-forwarded-for` or vendor-header fallback is enabled by default. Invalid, missing,
+or multi-value `x-real-ip` still fails closed to Better Auth's shared bucket and warning
+in production. Development/test retains Better Auth's localhost fallback; rate limiting
+and durable secondary-storage counters remain enabled in every environment.
+
 For historical migration replay, release receives DATABASE_MIGRATION_URL, DATABASE_API_ROLE,
 DATABASE_WORKER_ROLE, and DATABASE_COMPANION_RUNTIME_ROLE. The last variable identifies only a
 legacy compatibility role; no hosted runtime service is deployed. A retired union role may additionally

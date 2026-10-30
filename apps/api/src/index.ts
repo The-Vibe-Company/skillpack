@@ -1,4 +1,5 @@
 import { publicReleaseFileList } from "./publicReleaseFiles";
+import { authLoginRequest } from "./authLoginRequest";
 import { createCatalogReportingRoutes } from "./catalogReportingRoutes";
 import { createPublicCatalogRoutes } from "./publicCatalogRoutes";
 import { createCatalogModerationRoutes } from "./catalogModerationRoutes";
@@ -1093,17 +1094,10 @@ app.post("/v1/auth/login-redirect", async (c) => {
   const password = String(form.get("password") ?? "");
   const name = String(form.get("name") || email.split("@")[0] || email);
 
-  const url = new URL(c.req.url);
-  url.pathname = mode === "signup" ? "/auth/sign-up/email" : "/auth/sign-in/email";
   const response = await auth.handler(
-    new Request(url, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        origin: c.req.header("origin") ?? process.env.COMPANION_WEB_URL ?? process.env.COMPANION_API_URL ?? url.origin,
-      },
-      body: JSON.stringify({ email, password, name }),
-      redirect: "manual",
+    authLoginRequest(c.req.raw, {
+      mode, email, password, name,
+      fallbackOrigin: process.env.COMPANION_WEB_URL ?? process.env.COMPANION_API_URL ?? new URL(c.req.url).origin,
     }),
   );
 
