@@ -5,6 +5,7 @@ import {
   catalogSkillPath,
   fetchPublicCatalogPage,
   fetchPublicCatalogSkill,
+  fetchPublicCatalogSearch,
   isCatalogLicense,
   isPublicCatalogEnabled,
   listAllPublicCatalogSkills,
@@ -84,7 +85,7 @@ describe("catalog API reads", () => {
     const page = await fetchPublicCatalogPage(2);
     expect(fetchMock).toHaveBeenCalledWith(
       "http://127.0.0.1:55001/v1/public/catalog/skills?limit=21&offset=20",
-      { cache: "no-store" },
+      { cache: "no-store", signal: expect.any(AbortSignal) },
     );
     expect(page?.skills).toHaveLength(20);
     expect(page?.hasNextPage).toBe(true);
@@ -111,7 +112,7 @@ describe("catalog API reads", () => {
     const skill = await fetchPublicCatalogSkill("acme", "release-helper");
     expect(fetchMock).toHaveBeenCalledWith(
       "http://127.0.0.1:55001/v1/public/catalog/skills/acme/release-helper",
-      { cache: "no-store" },
+      { cache: "no-store", signal: expect.any(AbortSignal) },
     );
     expect(skill).toEqual(catalogSkill());
     expect(JSON.stringify(skill)).not.toContain("secret-token");
@@ -139,5 +140,37 @@ describe("catalog API reads", () => {
       "?limit=50&offset=0",
       "?limit=50&offset=50",
     ]);
+  });
+});
+
+describe("public agent catalog search", () => {
+  it("fails closed while the public catalog is disabled", async () => {
+    vi.stubEnv("SKILLPACK_PUBLIC_CATALOG", "false");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await fetchPublicCatalogSearch({ query: "release" })).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("filters a single anonymous page and retains the cursor even with no matches", async () => {
+    vi.stubEnv("SKILLPACK_PUBLIC_CATALOG", "true");
+    const fetchMock = vi.fn(async (_url: string, _options?: RequestInit) => Response.json({ skills: [catalogSkill()], next_offset: 20 }));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await fetchPublicCatalogSearch({ query: "RELEASE" })).toEqual({ skills: [catalogSkill()], next_offset: 20 });
+    expect(await fetchPublicCatalogSearch({ query: "absent" })).toEqual({ skills: [], next_offset: 20 });
+    expect(fetchMock.mock.calls).toHaveLength(2);
+    const options = fetchMock.mock.calls[0]![1]!;
+    expect(options).toEqual({ cache: "no-store", signal: expect.any(AbortSignal) });
+    expect(options.headers).toBeUndefined();
+    expect(options.credentials).toBeUndefined();
+  });
+
+  it("rejects out-of-bound pages before any network call", async () => {
+    vi.stubEnv("SKILLPACK_PUBLIC_CATALOG", "true");
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(fetchPublicCatalogSearch({ limit: 51 })).rejects.toThrow();
+    await expect(fetchPublicCatalogSearch({ offset: 10001 })).rejects.toThrow();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

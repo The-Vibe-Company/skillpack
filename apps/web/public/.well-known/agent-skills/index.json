@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "install-skillpack-cli",
+      "type": "skill-md",
+      "description": "Install the native Skillpack CLI, verify its setup, and use frozen skill packages in CI.",
+      "url": "/.well-known/agent-skills/install-skillpack-cli/SKILL.md",
+      "digest": "sha256:5e5f3ed11f01584c8d59dce51f3e9b3d5809bf5081ed71c9a9382cc8c3577832"
+    },
+    {
+      "name": "browse-skillpack-blog",
+      "type": "skill-md",
+      "description": "Discover and read Skillpack blog articles through llms.txt, the sitemap, and Markdown content negotiation.",
+      "url": "/.well-known/agent-skills/browse-skillpack-blog/SKILL.md",
+      "digest": "sha256:afed74f64f4e16358fb2a14d9905d2808eca3671a6086ce74fb6565a804c21f9"
+    }
+  ]
+}

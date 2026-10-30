@@ -36,6 +36,9 @@
       "fflate@>=0.4.5 <0.4.9": "0.4.9",
       "brace-expansion@<1.1.21": "1.1.21",
       "js-yaml@>=4.0.0 <4.3.2": "4.3.2"
+    },
+    "patchedDependencies": {
+      "next@15.5.28": "patches/next@15.5.28.patch"
     }
   },
   "scripts": {

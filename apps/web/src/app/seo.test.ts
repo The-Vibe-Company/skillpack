@@ -3,7 +3,7 @@ import { loadBlogPosts } from "@/lib/blog";
 import { catalogSkill, catalogSkills } from "../../test/publicCatalogFixtures";
 import { metadata } from "./layout";
 import { metadata as notFoundMetadata } from "./not-found";
-import robots from "./robots";
+import { GET as robots } from "./robots.txt/route";
 import sitemap from "./sitemap";
 
 describe("technical SEO routes", () => {
@@ -12,14 +12,15 @@ describe("technical SEO routes", () => {
     vi.unstubAllGlobals();
   });
 
-  it("lets every crawler in and points robots.txt at the production sitemap", () => {
+  it("lets every crawler in and points robots.txt at the production sitemap", async () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("COMPANION_WEB_URL", "");
 
-    expect(robots()).toEqual({
-      rules: { userAgent: "*", allow: "/" },
-      sitemap: "https://skillpack.app/sitemap.xml",
-    });
+    const body = await robots().text();
+    for (const agent of ["*", "GPTBot", "OAI-SearchBot", "ClaudeBot", "Claude-SearchBot", "PerplexityBot", "Google-Extended"]) {
+      expect(body).toContain(`User-agent: ${agent}\nAllow: /\nContent-Signal: search=yes, ai-input=yes, ai-train=yes`);
+    }
+    expect(body).toContain("Sitemap: https://skillpack.app/sitemap.xml");
   });
 
   it("lists the public pages and every blog post on the configured origin", async () => {

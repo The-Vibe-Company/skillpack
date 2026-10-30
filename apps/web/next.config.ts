@@ -24,6 +24,10 @@ const config: NextConfig = {
     "/blog/[slug]": ["./content/blog/**/*"],
     "/blog/[slug]/opengraph-image": ["./content/blog/**/*", "./assets/fonts/**/*"],
     "/sitemap.xml": ["./content/blog/**/*"],
+    "/llms.txt": ["./content/blog/**/*"],
+    "/md/[[...path]]": ["./content/blog/**/*"],
+    "/mcp/public": ["./content/blog/**/*"],
+    "/a2a": ["./content/blog/**/*"],
   },
   async rewrites() {
     const api = process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";

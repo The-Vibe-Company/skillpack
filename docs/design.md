@@ -55,6 +55,12 @@ target. Possession remains bearer authority until expiry or revocation.
 
 ## MCP connections
 
+The anonymous `/mcp/public` endpoint is separate from workspace connections: it serves only
+explicitly listed public catalogue snapshots and published blog articles through read-only tools.
+It forwards no client credentials and grants no workspace access. The catalogue's default-off
+flag still applies. Public discovery, Markdown representations and the synchronous A2A adapter
+are documented in [Public agent discovery](agent-discovery.md).
+
 Skillpack is also an OAuth 2.1 authorization server and an MCP server, so a hosted agent platform
 can reach the Skills Hub without a personal access token. Better Auth's `@better-auth/mcp`
 provider serves authorization, token and dynamic registration endpoints under `/auth/oauth2/*`.
