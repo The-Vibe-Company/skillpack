@@ -213,6 +213,16 @@ BEGIN
       'public.companion_revoke_mcp_connection(text,text)'::regprocedure
     ];
   END IF;
+  -- Better Auth 1.7 separates refresh grants and protected-resource policy from access tokens.
+  IF pg_catalog.to_regclass('public.oauth_refresh_token') IS NOT NULL THEN
+    api_unprotected_tables := api_unprotected_tables || ARRAY[
+      'public.oauth_refresh_token'::regclass,
+      'public.oauth_resource'::regclass,
+      'public.oauth_client_resource'::regclass,
+      'public.oauth_client_assertion'::regclass,
+      'public.jwks'::regclass
+    ];
+  END IF;
   IF pg_catalog.to_regclass('public.skill_usage_events') IS NOT NULL THEN
     api_capability_managed_tables := api_capability_managed_tables || ARRAY['public.skill_usage_events'::regclass];
     IF pg_catalog.to_regprocedure('public.skillpack_report_skill_usage(jsonb)') IS NOT NULL THEN

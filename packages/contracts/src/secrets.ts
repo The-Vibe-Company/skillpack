@@ -26,8 +26,8 @@ export const secretRecipientSchema = secretOwnerSchema;
 
 /** Metadata-only read model. Secret values are deliberately absent. */
 export const secretRowSchema = z.object({
-  id: z.string().uuid(),
-  org_id: z.string().uuid(),
+  id: z.guid(),
+  org_id: z.guid(),
   name: z.string(),
   key: z.string(),
   audience: secretAudienceSchema,
@@ -98,7 +98,7 @@ export const secretSlotStatusSchema = z.enum([
 ]);
 
 export const secretCandidateSchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   name: z.string(),
   key: z.string(),
   owner: secretOwnerSchema,
@@ -107,7 +107,7 @@ export const secretCandidateSchema = z.object({
 });
 
 export const skillSecretSlotSchema = z.object({
-  slot_id: z.string().uuid(),
+  slot_id: z.guid(),
   env_key: z.string().regex(SKILL_REQUIREMENT_KEY_RE),
   description: z.string(),
   required: z.boolean(),
@@ -119,7 +119,7 @@ export const skillSecretSlotSchema = z.object({
 });
 
 export const skillSecretConfigurationSchema = z.object({
-  skill_id: z.string().uuid(),
+  skill_id: z.guid(),
   slug: z.string().regex(SKILL_NAME_RE),
   version: z.string().regex(SEMVER_RE).nullable(),
   slots: z.array(skillSecretSlotSchema),
@@ -129,8 +129,8 @@ export const skillSecretConfigurationSchema = z.object({
 });
 export type SkillSecretConfiguration = z.infer<typeof skillSecretConfigurationSchema>;
 
-export const setSecretBindingInputSchema = z.object({ secret_id: z.string().uuid() });
-export const setSecretSuggestionInputSchema = z.object({ secret_id: z.string().uuid() });
+export const setSecretBindingInputSchema = z.object({ secret_id: z.guid() });
+export const setSecretSuggestionInputSchema = z.object({ secret_id: z.guid() });
 
 export const secretRetrievalSkillInputSchema = z.object({
   slug: z.string().regex(SKILL_NAME_RE),
@@ -138,14 +138,14 @@ export const secretRetrievalSkillInputSchema = z.object({
 });
 
 export const secretRetrievalDirectInputSchema = z.object({
-  secret_id: z.string().uuid(),
+  secret_id: z.guid(),
   env_key: z.string().regex(SKILL_REQUIREMENT_KEY_RE),
   profile: z.string().regex(SKILL_NAME_RE),
 });
 
 export const secretRetrievalPreflightInputSchema = z
   .object({
-    operation_id: z.string().uuid(),
+    operation_id: z.guid(),
     skills: z.array(secretRetrievalSkillInputSchema).max(64).default([]),
     direct: z.array(secretRetrievalDirectInputSchema).max(64).default([]),
   })
@@ -153,25 +153,25 @@ export const secretRetrievalPreflightInputSchema = z
 export type SecretRetrievalPreflightInput = z.infer<typeof secretRetrievalPreflightInputSchema>;
 
 export const secretRetrievalItemSchema = z.object({
-  projection_id: z.string().uuid(),
+  projection_id: z.guid(),
   skill: z.string(),
   skill_version: z.string().nullable(),
-  slot_id: z.string().uuid().nullable(),
+  slot_id: z.guid().nullable(),
   env_key: z.string(),
   required: z.boolean(),
   status: secretSlotStatusSchema,
-  secret_id: z.string().uuid().nullable(),
+  secret_id: z.guid().nullable(),
   secret_version: z.number().int().positive().nullable(),
   secret_name: z.string().nullable(),
   owner_name: z.string().nullable(),
 });
 
 export const secretRetrievalPreflightSchema = z.object({
-  plan_id: z.string().uuid(),
-  operation_id: z.string().uuid(),
+  plan_id: z.guid(),
+  operation_id: z.guid(),
   expires_at: z.string(),
   items: z.array(secretRetrievalItemSchema),
-  tombstones: z.array(z.object({ projection_id: z.string().uuid(), skill: z.string() })),
+  tombstones: z.array(z.object({ projection_id: z.guid(), skill: z.string() })),
   blockers: z.number().int().nonnegative(),
   warnings: z.number().int().nonnegative(),
 });
@@ -188,19 +188,19 @@ export const redeemSecretGrantInputSchema = z.object({ grant: z.string().startsW
 
 /** Dedicated plaintext response. No other contract may include `value`. */
 export const redeemedSecretGrantSchema = z.object({
-  operation_id: z.string().uuid(),
+  operation_id: z.guid(),
   items: z.array(
     z.object({
-      projection_id: z.string().uuid(),
+      projection_id: z.guid(),
       skill: z.string(),
       skill_version: z.string().nullable(),
-      slot_id: z.string().uuid().nullable(),
+      slot_id: z.guid().nullable(),
       env_key: z.string(),
-      secret_id: z.string().uuid(),
+      secret_id: z.guid(),
       secret_version: z.number().int().positive(),
       value: z.string(),
     }),
   ),
-  tombstones: z.array(z.object({ projection_id: z.string().uuid(), skill: z.string() })),
+  tombstones: z.array(z.object({ projection_id: z.guid(), skill: z.string() })),
 });
 export type RedeemedSecretGrant = z.infer<typeof redeemedSecretGrantSchema>;

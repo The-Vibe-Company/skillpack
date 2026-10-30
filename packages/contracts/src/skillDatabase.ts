@@ -198,7 +198,7 @@ export const skillDatabaseStatementInputSchema = z
   .object({
     audience: skillDatabaseAudienceSchema.default("organization"),
     /** Opaque selector for a materialized personal realm shared with the caller. */
-    realm_id: z.string().uuid().optional(),
+    realm_id: z.guid().optional(),
     sql: z.string().min(1).max(SKILL_DB_MAX_SQL_LENGTH),
     params: z.array(skillDatabaseParamSchema).max(SKILL_DB_MAX_PARAMS).default([]),
   })
@@ -308,20 +308,21 @@ export function gateSkillDatabaseSql(sql: string, mode: SkillDatabaseStatementMo
     : new Set(["insert", "update", "delete"]);
   if (!keyword || !allowed.has(keyword)) throw new Error(`SQL statement is not allowed in ${mode} mode`);
   return {
+    // SAFETY: the mode-specific allowlist above contains only SQL gate keywords.
     keyword: keyword as SkillDatabaseSqlGateResult["keyword"],
     readOnly: keyword === "select" || keyword === "values" || (keyword === "with" && mode === "read"),
     sql: withoutTerminalSemicolon,
   };
 }
 
-const SQLITE_TYPE_BY_DECLARATION: Record<SkillDatabaseColumnType, string> = {
+const SQLITE_TYPE_BY_DECLARATION = {
   text: "TEXT",
   integer: "INTEGER",
   real: "REAL",
   boolean: "INTEGER",
   json: "TEXT",
   timestamp: "TEXT",
-};
+} satisfies Record<SkillDatabaseColumnType, string>;
 
 export function quoteSkillDatabaseIdentifier(identifier: string): string {
   if (!validDatabaseName(identifier) || SQLITE_RESERVED_COLUMN_NAMES.has(identifier)) {
@@ -332,9 +333,11 @@ export function quoteSkillDatabaseIdentifier(identifier: string): string {
 
 function sqliteDefault(value: SkillDatabaseDefault): string {
   if (value === null) return "NULL";
-  if (typeof value === "boolean") return value ? "1" : "0";
-  if (typeof value === "number") return String(value);
-  return `'${value.replaceAll("'", "''")}'`;
+  const booleanValue = z.boolean().safeParse(value);
+  if (booleanValue.success) return booleanValue.data ? "1" : "0";
+  const numberValue = z.number().safeParse(value);
+  if (numberValue.success) return String(numberValue.data);
+  return `'${z.string().parse(value).replaceAll("'", "''")}'`;
 }
 
 export function skillDatabaseColumnSql(name: string, column: SkillDatabaseColumn): string {
@@ -404,7 +407,7 @@ export const skillDatabaseRealmAccessSchema = z.enum(["organization", "owner", "
 export type SkillDatabaseRealmAccess = z.infer<typeof skillDatabaseRealmAccessSchema>;
 
 export const skillDatabaseDescribeRealmSchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   audience: skillDatabaseAudienceSchema,
   owner: skillDatabaseMemberSchema.nullable(),
   access: skillDatabaseRealmAccessSchema,
@@ -446,7 +449,7 @@ export const skillDatabaseSharesInputSchema = z
 export type SkillDatabaseSharesInput = z.infer<typeof skillDatabaseSharesInputSchema>;
 
 export const skillDatabaseSharesResponseSchema = z.object({
-  realm_id: z.string().uuid().nullable(),
+  realm_id: z.guid().nullable(),
   members: z.array(skillDatabaseMemberSchema.extend({ shared: z.boolean() })),
 });
 export type SkillDatabaseSharesResponse = z.infer<typeof skillDatabaseSharesResponseSchema>;

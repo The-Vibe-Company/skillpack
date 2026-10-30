@@ -40,7 +40,7 @@ export const githubInstallationSchema = z.object({
 export type GitHubInstallation = z.infer<typeof githubInstallationSchema>;
 
 export const githubSyncDestinationSchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   installation_id: z.string(),
   repository_id: z.string(),
   owner: z.string(),
@@ -50,7 +50,7 @@ export const githubSyncDestinationSchema = z.object({
   default_branch: z.string(),
   private: z.boolean(),
   mode: githubSyncModeSchema,
-  selected_skill_ids: z.array(z.string().uuid()),
+  selected_skill_ids: z.array(z.guid()),
   resolved_skill_count: z.number().int().nonnegative(),
   status: githubSyncStatusSchema,
   desired_revision: z.number().int().nonnegative(),
@@ -72,13 +72,13 @@ export const githubSkillInclusionSchema = z.enum(["all", "selected", "dependency
 export type GitHubSkillInclusion = z.infer<typeof githubSkillInclusionSchema>;
 
 export const githubSkillSyncDestinationSchema = z.object({
-  destination_id: z.string().uuid(),
+  destination_id: z.guid(),
   inclusion: githubSkillInclusionSchema,
 });
 export type GitHubSkillSyncDestination = z.infer<typeof githubSkillSyncDestinationSchema>;
 
 export const githubSkillSyncRowSchema = z.object({
-  skill_id: z.string().uuid(),
+  skill_id: z.guid(),
   slug: z.string(),
   display_name: z.string(),
   current_version: z.string().nullable(),
@@ -114,7 +114,7 @@ export const createGitHubDestinationInputSchema = z.object({
   default_branch: z.string().min(1).max(255).default("main"),
   private: z.boolean(),
   mode: githubSyncModeSchema,
-  selected_skill_ids: z.array(z.string().uuid()).max(500).default([]),
+  selected_skill_ids: z.array(z.guid()).max(500).default([]),
   overwrite_confirmation: z.string().optional(),
   repository_empty: z.boolean().default(false),
 }).superRefine((value, ctx) => {
@@ -129,7 +129,7 @@ export type CreateGitHubDestinationInput = z.infer<typeof createGitHubDestinatio
 
 export const updateGitHubDestinationInputSchema = z.object({
   mode: githubSyncModeSchema,
-  selected_skill_ids: z.array(z.string().uuid()).max(500).default([]),
+  selected_skill_ids: z.array(z.guid()).max(500).default([]),
 }).superRefine((value, ctx) => {
   if (value.mode === "selected" && value.selected_skill_ids.length === 0) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["selected_skill_ids"], message: "select at least one skill" });
