@@ -35,7 +35,8 @@ for (const path of ["/", "/blog", "/blog/what-is-skill-md"]) {
       assert.match(response.headers.get("content-type") ?? "", /^text\/html/);
       assert.match(text, /<!DOCTYPE html>/i);
       assert.match(response.headers.get("vary") ?? "", /rsc/i);
-      assert.match(response.headers.get("link") ?? "", /rel=preload/);
+      // The dynamic home emits preload headers; prerendered blog pages embed their links in HTML.
+      if (path === "/") assert.match(response.headers.get("link") ?? "", /rel=preload/);
     } else {
       assert.equal(response.headers.get("content-type"), "text/markdown; charset=utf-8");
       assert.match(text, /^\s*# /);
@@ -53,6 +54,9 @@ for (const skill of index.skills) {
 const catalog = await get("/.well-known/api-catalog");
 assert.equal(catalog.headers.get("content-type"), "application/linkset+json");
 assert.ok((await catalog.json()).linkset.length > 0);
+const catalogHead = await fetch(new URL("/.well-known/api-catalog", site), { method: "HEAD" });
+assert.equal(catalogHead.status, 200);
+assert.match(catalogHead.headers.get("link") ?? "", /<\/\.well-known\/api-catalog>; rel="api-catalog"/);
 const card = await (await get("/.well-known/mcp/server-card.json")).json();
 assert.equal(new URL(card.remotes[0].url).pathname, "/mcp/public");
 const agentCard = await (await get("/.well-known/agent-card.json")).json();

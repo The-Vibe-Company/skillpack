@@ -1,5 +1,5 @@
 /** Append this value; Next.js also emits Link entries for resource preloads. */
-export const AGENT_DISCOVERY_LINKS = '</llms.txt>; rel="describedby"; type="text/markdown", </sitemap.xml>; rel="sitemap", </.well-known/agent-skills/index.json>; rel="service-desc"';
+export const AGENT_DISCOVERY_LINKS = '</llms.txt>; rel="describedby"; type="text/markdown", </sitemap.xml>; rel="sitemap", </.well-known/agent-skills/index.json>; rel="service-desc", </.well-known/api-catalog>; rel="api-catalog"';
 
 export function hasMarkdownRepresentation(pathname: string): boolean {
   return pathname === "/" || pathname === "/blog" || /^\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(pathname);
