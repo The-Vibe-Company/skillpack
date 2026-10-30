@@ -73,10 +73,28 @@ function apiBaseUrl(): string {
 
 /** Anonymous by construction: no cookies or credentials are forwarded to the catalog API. */
 async function fetchCatalogJson(path: string): Promise<Response | null> {
-  const response = await fetch(`${apiBaseUrl()}${path}`, { cache: "no-store" });
+  const response = await fetch(`${apiBaseUrl()}${path}`, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Public catalog request failed: ${response.status}`);
   return response;
+}
+
+/** Search one bounded public page; next_offset lets callers continue without unbounded API work. */
+export async function fetchPublicCatalogSearch(input: { query?: string; limit?: number; offset?: number }) {
+  if (!isPublicCatalogEnabled()) return null;
+  const limit = input.limit ?? 20;
+  const offset = input.offset ?? 0;
+  if (!Number.isInteger(limit) || limit < 1 || limit > 50 || !Number.isInteger(offset) || offset < 0 || offset > CATALOG_MAX_OFFSET) {
+    throw new Error("Invalid public catalog page");
+  }
+  const response = await fetchCatalogJson(`/v1/public/catalog/skills?limit=${limit}&offset=${offset}`);
+  if (!response) return null;
+  const page = publicCatalogListSchema.parse(await response.json());
+  const query = input.query?.trim().toLowerCase() ?? "";
+  return {
+    skills: page.skills.filter((skill) => `${skill.name}\n${skill.skill_slug}\n${skill.description}`.toLowerCase().includes(query)),
+    next_offset: page.next_offset,
+  };
 }
 
 async function fetchCatalogRows(limit: number, offset: number): Promise<PublicCatalogSkill[] | null> {

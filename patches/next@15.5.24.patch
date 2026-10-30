@@ -1,0 +1,28 @@
+diff --git a/dist/build/templates/app-page.js b/dist/build/templates/app-page.js
+index e69cf2b2c0496351f73255552fe07acd306f6f22..0cae51ca580a7e7589392529fcccfac11c970bad 100644
+--- a/dist/build/templates/app-page.js
++++ b/dist/build/templates/app-page.js
+@@ -290,7 +290,8 @@ async function handler(req, res, ctx) {
+     const activeSpan = tracer.getActiveScopeSpan();
+     try {
+         const varyHeader = routeModule.getVaryHeader(resolvedPathname, interceptionRoutePatterns);
+-        res.setHeader('Vary', varyHeader);
++        // Preserve representation negotiation headers supplied by middleware.
++        res.appendHeader('Vary', varyHeader);
+         const invokeRouteModule = async (span, context)=>{
+             const nextReq = new _node.NodeNextRequest(req);
+             const nextRes = new _node.NodeNextResponse(res);
+diff --git a/dist/esm/build/templates/app-page.js b/dist/esm/build/templates/app-page.js
+index 608080693a2ee86c94438eacaa7ca0345c79de61..a0f43b98e96a857944832380f55b64b18568e8be 100644
+--- a/dist/esm/build/templates/app-page.js
++++ b/dist/esm/build/templates/app-page.js
+@@ -212,7 +212,8 @@ export async function handler(req, res, ctx) {
+     const activeSpan = tracer.getActiveScopeSpan();
+     try {
+         const varyHeader = routeModule.getVaryHeader(resolvedPathname, interceptionRoutePatterns);
+-        res.setHeader('Vary', varyHeader);
++        // Preserve representation negotiation headers supplied by middleware.
++        res.appendHeader('Vary', varyHeader);
+         const invokeRouteModule = async (span, context)=>{
+             const nextReq = new NodeNextRequest(req);
+             const nextRes = new NodeNextResponse(res);

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { POSTHOG_PROXY_PATH } from "@/lib/posthogHosts";
+import { acceptsMarkdown, AGENT_DISCOVERY_LINKS, hasMarkdownRepresentation } from "@/lib/agentDiscovery";
 
 /**
  * `skipTrailingSlashRedirect` keeps PostHog's slash-terminated API paths intact behind the /ingest
@@ -119,5 +120,17 @@ export function middleware(request: NextRequest) {
   const catalogDestination = legacyCatalogRedirect(request);
   if (catalogDestination) return NextResponse.redirect(catalogDestination, 301);
   const headers = posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request);
-  return headers ? NextResponse.next({ request: { headers } }) : NextResponse.next();
+  const markdownPage = hasMarkdownRepresentation(request.nextUrl.pathname);
+  let response: NextResponse;
+  if (markdownPage && ["GET", "HEAD"].includes(request.method) && acceptsMarkdown(request.headers.get("accept"))) {
+    const markdownUrl = request.nextUrl.clone();
+    markdownUrl.pathname = request.nextUrl.pathname === "/" ? "/md" : `/md${request.nextUrl.pathname}`;
+    response = NextResponse.rewrite(markdownUrl);
+  } else {
+    response = headers ? NextResponse.next({ request: { headers } }) : NextResponse.next();
+  }
+  // Append rather than replace: framework preloads and other discovery entries must survive.
+  response.headers.append("Link", AGENT_DISCOVERY_LINKS);
+  if (markdownPage) response.headers.append("Vary", "Accept");
+  return response;
 }
