@@ -88,7 +88,7 @@ export type SkillpackSecretDeclaration = SkillpackEnvironmentDeclaration & { slo
 
 export const skillpackSecretDeclarationSchema = z
   .object({
-    slotId: z.string().uuid("secret slotId must be a UUID").optional(),
+    slotId: z.guid("secret slotId must be a UUID").optional(),
     required: z.boolean().default(true),
     description: z.string().max(2000, "environment description must be at most 2000 characters").default(""),
   })
@@ -147,7 +147,7 @@ export type SkillpackChangelogEntry = z.infer<typeof skillpackChangelogEntrySche
 
 export const skillRuntimeUsageSchema = z.object({
   schemaVersion: z.literal(1),
-  skillId: z.string().uuid(),
+  skillId: z.guid(),
   version: z.string().regex(SEMVER_RE),
   origin: z.string().url().regex(/^https?:\/\/[^/?#@]+$/, "usage origin must be an HTTP(S) origin without credentials"),
   migration: z.object({ parentVersion: z.string().regex(SEMVER_RE), parentChecksum: z.string().regex(/^sha256:[a-f0-9]{64}$/) }).optional(),
@@ -156,7 +156,7 @@ export type SkillRuntimeUsage = z.infer<typeof skillRuntimeUsageSchema>;
 
 export const skillpackMetadataSchema = z
   .object({
-    companionSkillId: z.string().uuid("companionSkillId must be a UUID").optional(),
+    companionSkillId: z.guid("companionSkillId must be a UUID").optional(),
     usage: skillRuntimeUsageSchema.optional(),
     changelog: z.array(skillpackChangelogEntrySchema).max(200, "at most 200 changelog entries are allowed").default([]),
   })
@@ -212,7 +212,7 @@ const legacyDependencySchema = z
 const dependencyMapSchema = z
   .record(
     z.string().regex(SKILL_NAME_RE, "dependency name must be kebab-case"),
-    z.string().uuid("dependency id must be a UUID"),
+    z.guid("dependency id must be a UUID"),
   );
 
 const legacyDependencyArraySchema = z
@@ -234,7 +234,7 @@ const skillpackDependenciesInputSchema = z
       }
       return;
     }
-    for (const issue of parsed.error.issues) ctx.addIssue(issue);
+    for (const issue of parsed.error.issues) ctx.addIssue({ ...issue });
   })
   .transform((value) => {
     const parsed = Array.isArray(value) ? legacyDependencyArraySchema.parse(value) : dependencyMapSchema.parse(value);

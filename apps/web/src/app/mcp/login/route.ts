@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  */
 export function GET(request: NextRequest): NextResponse {
   const query = request.nextUrl.search.replace(/^\?/, "");
-  const authorize = query ? `/auth/mcp/authorize?${query}` : "/auth/mcp/authorize";
+  const authorize = query ? `/auth/oauth2/authorize?${query}` : "/auth/oauth2/authorize";
   // A relative Location keeps the browser on the exact host it arrived on. Rebuilding an absolute
   // URL from the request origin can switch `127.0.0.1` to `localhost`, which would drop the session
   // cookie the authorize endpoint is about to read.

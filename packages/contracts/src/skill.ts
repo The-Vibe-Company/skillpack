@@ -218,7 +218,7 @@ export const skillListRowSchema = z.object({
   can_manage_public: z.boolean().default(false),
   license: z.string().nullable(),
   compatibility: z.string().nullable(),
-  metadata: z.record(z.string()),
+  metadata: z.record(z.string(), z.string()),
   checksum: z.string().nullable(),
   size_bytes: z.number().nullable(),
   tools: z.array(z.string()),
@@ -426,7 +426,7 @@ export const skillVersionRowSchema = z.object({
   tools: z.array(z.string()),
   license: z.string().nullable(),
   compatibility: z.string().nullable().optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: z.record(z.string(), z.string()).optional(),
   display: skillpackDisplaySchema.default({}),
   requirements: z.array(skillRequirementSchema).default([]),
   size_bytes: z.number().int().nonnegative(),
@@ -445,7 +445,7 @@ export type SkillVersionRow = z.infer<typeof skillVersionRowSchema>;
 
 /** Argument shape for the `publish_skill_version` RPC (web route + CLI share this). */
 export const publishSkillInputSchema = z.object({
-  skill_id: z.string().uuid().optional(),
+  skill_id: z.guid().optional(),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   /**
    * Library to publish into on first create. Omitted = 'org' (preserves CLI/bundled-skill behavior:

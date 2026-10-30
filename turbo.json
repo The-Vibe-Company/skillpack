@@ -1,10 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "concurrency": "100%",
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "!.next/cache/**"],
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**"
+      ],
       "env": [
         "BETTER_AUTH_URL",
         "COMPANION_API_URL",
@@ -36,7 +43,9 @@
     },
     "coverage": {
       "cache": false,
-      "outputs": ["coverage/**"]
+      "outputs": [
+        "coverage/**"
+      ]
     }
   }
 }

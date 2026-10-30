@@ -62,19 +62,20 @@ async function recordConsent(clientId: string, userId: string): Promise<void> {
     id: randomUUID(),
     clientId,
     userId,
-    scopes: "openid offline_access",
-    consentGiven: true,
+    scopes: ["openid", "offline_access"],
   });
 }
 
 async function registerOAuthClient(clientId: string): Promise<void> {
-  await integrationDb.insert(schema.oauthApplication).values({
+  await integrationDb.insert(schema.oauthClient).values({
     id: randomUUID(),
     name: "Companion",
     clientId,
     clientSecret: "",
-    redirectUrls: "https://companions.build/oauth/callback",
-    type: "public",
+    redirectUris: ["https://companions.build/oauth/callback"],
+    tokenEndpointAuthMethod: "none",
+    grantTypes: ["authorization_code", "refresh_token"],
+    requirePKCE: true,
     disabled: false,
   });
 }
@@ -378,9 +379,9 @@ describe("MCP connections stay bound to their consented workspace", () => {
     expect(await resolveMcpConnection({ clientId, userId: fixture.owner.id })).not.toBeNull();
 
     await integrationDb
-      .update(schema.oauthApplication)
+      .update(schema.oauthClient)
       .set({ disabled: true })
-      .where(eq(schema.oauthApplication.clientId, clientId));
+      .where(eq(schema.oauthClient.clientId, clientId));
 
     expect(await resolveMcpConnection({ clientId, userId: fixture.owner.id })).toBeNull();
 
@@ -402,8 +403,8 @@ describe("MCP connections stay bound to their consented workspace", () => {
     expect(mappings).toHaveLength(0);
     const clients = await integrationDb
       .select()
-      .from(schema.oauthApplication)
-      .where(eq(schema.oauthApplication.clientId, developerClientId));
+      .from(schema.oauthClient)
+      .where(eq(schema.oauthClient.clientId, developerClientId));
     expect(clients).toHaveLength(0);
   });
 });
@@ -449,13 +450,11 @@ describe("0187 MCP OAuth schema", () => {
     await registerOAuthClient(clientId);
     await integrationDb.insert(schema.oauthAccessToken).values({
       id: randomUUID(),
-      accessToken: `access-${clientId}`,
-      refreshToken: `refresh-${clientId}`,
-      accessTokenExpiresAt: new Date(Date.now() + 60 * 60_000),
-      refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60_000),
+      token: `access-${clientId}`,
+      expiresAt: new Date(Date.now() + 60 * 60_000),
       clientId,
       userId: fixture.owner.id,
-      scopes: "openid offline_access",
+      scopes: ["openid", "offline_access"],
     });
     await bindMcpClientWorkspace({ actor: fixture.owner, orgId: fixture.orgA, clientId });
     await recordConsent(clientId, fixture.owner.id);

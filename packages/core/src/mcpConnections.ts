@@ -47,7 +47,7 @@ export async function bindMcpClientWorkspace(input: {
   actor: ActorContext;
   orgId: string;
   clientId: string;
-}): Promise<void> {
+}): Promise<boolean> {
   // A binding in another organization is invisible inside the tenant transaction below, so the
   // upsert there could only fail obscurely. The reconnect path documented for reaching a second
   // workspace runs straight into this when a client reuses its registered id, so name it first.
@@ -60,23 +60,23 @@ export async function bindMcpClientWorkspace(input: {
       "this connection is already bound to another workspace; revoke it first, or connect again as a new client",
     );
   }
-  await withTenantContext({ orgId: input.orgId, userId: input.actor.id }, async (database) => {
+  return withTenantContext({ orgId: input.orgId, userId: input.actor.id }, async (database) => {
     await assertMember(database, input.actor, input.orgId);
-    // `setWhere` keeps one member from re-pointing another member's connection. PostgreSQL treats a
-    // failed DO UPDATE predicate as "nothing happened" rather than an error, so read the row back:
-    // reporting a successful connection that no token can ever resolve is worse than refusing it.
-    const [bound] = await database
-      .insert(schema.mcpClientWorkspaces)
+    // Bind once, even before consent lands. Concurrent requests must never repoint a client.
+    const [bound] = await database.insert(schema.mcpClientWorkspaces)
       .values({ clientId: input.clientId, orgId: input.orgId, userId: input.actor.id })
-      .onConflictDoUpdate({
-        target: schema.mcpClientWorkspaces.clientId,
-        set: { orgId: input.orgId, userId: input.actor.id, updatedAt: new Date() },
-        setWhere: eq(schema.mcpClientWorkspaces.userId, input.actor.id),
-      })
+      .onConflictDoNothing({ target: schema.mcpClientWorkspaces.clientId })
       .returning({ clientId: schema.mcpClientWorkspaces.clientId });
-    if (!bound) {
-      throw new Error("this client is already connected by another member; start a new connection");
-    }
+    if (bound) return true;
+    const [sameBinding] = await database.select({ clientId: schema.mcpClientWorkspaces.clientId })
+      .from(schema.mcpClientWorkspaces).where(and(
+        eq(schema.mcpClientWorkspaces.clientId, input.clientId),
+        eq(schema.mcpClientWorkspaces.userId, input.actor.id),
+        eq(schema.mcpClientWorkspaces.orgId, input.orgId),
+      )).limit(1);
+    if (!sameBinding) throw new Error("this client is already connected by another member or workspace; start a new connection");
+    // The caller must unwind only a newly inserted mapping on failure, preserving prior approvals.
+    return false;
   });
 }
 

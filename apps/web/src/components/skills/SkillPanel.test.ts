@@ -59,7 +59,7 @@ function skill(overrides: Partial<SkillVM> = {}): SkillVM {
 
 async function mount(overrides: Partial<SkillVM> = {}, props: {
   onOpen?: (slug: string) => void;
-  onAction?: ReturnType<typeof vi.fn>;
+  onAction?: React.ComponentProps<typeof SkillPanel>["onAction"];
   onClose?: () => void;
 } = {}) {
   const container = document.createElement("div");

@@ -54,7 +54,7 @@ export const skillPublicListingStatusSchema = z.object({
   listed_publicly: z.boolean(),
   listed_at: z.string().datetime().nullable(),
   latest_submission: z.object({
-    id: z.string().uuid(),
+    id: z.guid(),
     status: catalogSubmissionStatusSchema,
     kind: catalogSubmissionKindSchema,
   }).strip().nullable(),

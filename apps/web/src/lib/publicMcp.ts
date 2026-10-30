@@ -208,7 +208,7 @@ const a2aMessageSchema = z.object({
 });
 const publicCommandSchema = z.object({
   tool: z.enum(["search_skills", "read_skill", "list_articles", "read_article"]),
-  arguments: z.union([searchInput, skillInput, articleListInput, articleInput]).default({}),
+  arguments: z.union([searchInput, skillInput, articleListInput, articleInput]).prefault({}),
 }).strict();
 
 /** Bounded reader for the small, non-streaming A2A message adapter. */

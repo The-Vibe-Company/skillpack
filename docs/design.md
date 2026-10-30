@@ -62,35 +62,46 @@ flag still applies. Public discovery, Markdown representations and the synchrono
 are documented in [Public agent discovery](agent-discovery.md).
 
 Skillpack is also an OAuth 2.1 authorization server and an MCP server, so a hosted agent platform
-can reach the Skills Hub without a personal access token. Better Auth's `mcp` plugin serves
-authorization, token and dynamic client registration endpoints under `/auth/mcp/*`, with metadata at
-`/auth/.well-known/oauth-*` and the resource itself at `/mcp`. Every URL lives on the one public
-origin, so a deployment sets `BETTER_AUTH_URL` to that origin. PKCE S256 is required, there are no
-static client secrets, and registration is dynamic.
+can reach the Skills Hub without a personal access token. Better Auth's `@better-auth/mcp`
+provider serves authorization, token and dynamic registration endpoints under `/auth/oauth2/*`.
+The previous `/auth/mcp/authorize`, `/auth/mcp/token` and `/auth/mcp/register` URLs remain aliases.
+Discovery uses issuer `/auth`, authorization-server metadata at
+`/.well-known/oauth-authorization-server/auth`, and protected-resource metadata at
+`/.well-known/oauth-protected-resource/mcp`; the original `/auth/.well-known/*` metadata URLs
+remain available. Every URL lives on the one public origin configured by `BETTER_AUTH_URL`.
+PKCE S256 is required. Unauthenticated dynamic registration is explicitly enabled; registered
+clients receive only authorization-code and refresh-token grants, never machine credentials.
+Provider administration and managed-client endpoints are not published; global resource policy
+cannot be changed by workspace members.
 
 An MCP connection carries session-equivalent rights, not Agent Auth capabilities: it acts as the
-member who consented, with exactly the access that member already has. What bounds it is the
-workspace. The consent screen makes the member choose one organization, and `mcp_client_workspaces`
-records that choice for the registered client. No tool accepts a workspace argument, so one
-connection can never reach a second organization; connecting another workspace means connecting the
-app again.
+member who consented, inside the one workspace selected on the consent screen. The
+`mcp_client_workspaces` mapping fixes that workspace; no tool accepts a workspace argument.
 
-Consent is not optional and is not the client's decision. Better Auth only routes to a consent page
-when the client asks for `prompt=consent`, so the API rewrites every `/auth/mcp/authorize` request
-to carry it — dynamic registration is open, which makes the client exactly the party that must not
-be trusted to ask. For the same reason the two plugin endpoints this product does not publish are
-closed: `/auth/mcp/get-session` would trade a one-hour access token for the thirty-day refresh
-token, and `/auth/oauth2/consent` would approve a grant without binding a workspace or checking that
-the session owns the request. `POST /v1/mcp/consent` is the only approval path.
+Every browser authorization forces `prompt=consent`, including requests to the legacy alias;
+authorization POSTs are rejected. The provider's signed OAuth query is exchanged server-side for
+an opaque, ten-minute consent ticket tied to the current member and browser session. The consent
+screen receives only that ticket. `POST /v1/mcp/consent` rechecks ownership and membership, binds
+the workspace, consumes the ticket atomically, and invokes provider consent in-process. Direct
+`/auth/oauth2/consent` and legacy `/auth/mcp/get-session` remain closed. Provider login returns
+through the web sign-in screen and resumes browser authorization before requesting consent.
 
-Resolution requires the mapping *and* the recorded consent, so a binding whose approval never landed
-is inert; the consent route also unwinds its own binding when approval fails. The pre-tenant
-resolver re-proves membership on every request, so a removed member's connection fails closed, and
-revocation deletes the OAuth client — cascading its tokens, consent and workspace mapping away.
+Resolution requires both the workspace mapping and approved consent, and re-proves membership on
+every request. Approval failures unwind their binding. Revocation deletes the client and cascades
+its access tokens, refresh tokens, consents and workspace mapping. Token validation also checks
+client disabling and any linked browser session; refresh rotation rejects replay without a reuse
+window. New authorizations pin the exact `/mcp` resource audience.
 
-Better Auth stores MCP access and refresh tokens in plaintext, unlike every other bearer credential
-in this schema. That is inherent to delegating the token lifecycle to the plugin, which looks tokens
-up by equality; it is recorded here as a known deviation rather than an oversight.
+Migration 0198 upgrades the existing identity tables in place, retains client IDs and exact-workspace
+mappings, splits refresh grants from access tokens, hashes the formerly plaintext credentials, and copies
+live browser sessions from the PostgreSQL cache into the now-required durable session table.
+Existing opaque access and refresh tokens retain their original expiries and authorization checks;
+legacy access tokens have no audience claim and remain confined by the same client/workspace mapping.
+The cutover requires stopping old API instances before applying the migration and deploying the
+new API. In-flight 1.6 authorization/consent requests must restart; issued credentials and approved
+connections survive. Migrated confidential clients retain both Basic and body-secret authentication;
+new clients use their registered authentication method. OAuth/JWKS tables remain global, API-only identity data; worker roles have no
+access. Pending consent tickets use the atomic PostgreSQL secondary store.
 
 Tools mirror the REST surface through the same `@skillpack/core` services, so authorization, audit
 rows and tenancy behave identically on both. Skillpack has no hard delete, so `skill_archive` is

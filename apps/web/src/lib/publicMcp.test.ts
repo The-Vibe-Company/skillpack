@@ -126,6 +126,14 @@ function a2aRequest(command: TestJson, overrides: Record<string, TestJson> = {},
 }
 
 describe("A2A read-only message adapter", () => {
+  it("applies pagination defaults when a command omits arguments", async () => {
+    const response = await handlePublicA2aRequest(a2aRequest({ tool: "list_articles" }));
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.result.metadata.isError).toBe(false);
+    expect(JSON.parse(body.result.parts[0].text).articles).toHaveLength(Math.min(20, loadBlogPosts().length));
+  });
+
   it("answers the advertised message/send command with an immediate agent message", async () => {
     const response = await handlePublicA2aRequest(a2aRequest({ tool: "list_articles", arguments: { limit: 1 } }));
     expect(response.status).toBe(200);

@@ -8,7 +8,7 @@ explicitly allows the named AI crawlers with the requested Content Signals.
 Home, `/blog`, and `/blog/<slug>` support `Accept: text/markdown`. Middleware rewrites
 to independently pre-generated `/md/...` routes. Both representations vary on Accept;
 HTML continues to use its existing static rendering and cache policy. The pinned
-Next.js 15.5.24 package patches its CommonJS and ESM templates to append
+Next.js 15.5.28 package patches its CommonJS and ESM templates to append
 framework Vary tokens. Its response-header adapter also merges subsequent Vary
 writes with existing tokens (case-insensitively), preserving Accept when a render
 replaces the header. Recheck

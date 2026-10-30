@@ -18,7 +18,7 @@
     "@skillpack/github": "workspace:*",
     "@skillpack/skills": "workspace:*",
     "@skillpack/storage": "workspace:*",
-    "@sentry/node": "^10.70.0",
+    "@sentry/node": "^10.78.0",
     "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.5",
     "stripe": "^18.5.0"
@@ -28,6 +28,6 @@
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "3.2.7"
+    "vitest": "4.1.12"
   }
 }

@@ -6,7 +6,7 @@ export const catalogModerationQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).max(10_000).default(0),
 }).strict();
 export const catalogModerationTargetSchema = z.object({
-  orgId: z.string().uuid(), submissionId: z.string().uuid(),
+  orgId: z.guid(), submissionId: z.guid(),
 });
 export const catalogModerationReasonSchema = z.object({
   reason: z.string().trim().min(1).max(2000),
@@ -18,9 +18,9 @@ export const catalogModerationReasonSchema = z.object({
  * identity and a small status/reason projection when it reads that report.
  */
 export const catalogModerationCheckReportSchema = z.object({
-  orgId: z.string().uuid(),
-  submissionId: z.string().uuid(),
-  skillVersionId: z.string().uuid(),
+  orgId: z.guid(),
+  submissionId: z.guid(),
+  skillVersionId: z.guid(),
   packageChecksum: z.string().regex(/^sha256:[0-9a-f]{64}$/),
   status: z.enum(["pending", "passed", "failed"]),
   reason: z.string().max(2000).nullable(),

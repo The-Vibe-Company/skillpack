@@ -5,7 +5,7 @@ import { isAbsolute, join, relative, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { z } from "zod";
 
-const manifestIdentity = z.object({ version: z.string(), metadata: z.object({ companionSkillId: z.string().uuid() }) });
+const manifestIdentity = z.object({ version: z.string(), metadata: z.object({ companionSkillId: z.guid() }) });
 function stateDirectory() {
   return process.env.SKILLPACK_RUNTIME_HOME || (process.platform === "darwin" ? join(homedir(), "Library/Application Support/skillpack")
     : process.platform === "win32" ? join(process.env.APPDATA || join(homedir(), "AppData/Roaming"), "skillpack")
