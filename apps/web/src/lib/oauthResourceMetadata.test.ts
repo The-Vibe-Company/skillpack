@@ -12,6 +12,24 @@ const metadata = {
 };
 
 describe("RFC 9728 resource discovery", () => {
+  it.each([{ scopes_supported: [] }, { scopes_supported: ["custom-public-scope"] }])("preserves an explicit upstream scope list $scopes_supported", async ({ scopes_supported }) => {
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ ...metadata, scopes_supported })));
+    for (const handler of [rootMetadata, mcpMetadata]) {
+      const response = await handler(new Request("https://skillpack.app/.well-known/oauth-protected-resource"));
+      expect(response.status).toBe(200);
+      expect((await response.json()).scopes_supported).toEqual(scopes_supported);
+    }
+  });
+
+  it("publishes the existing public scopes at both paths when upstream omits them", async () => {
+    const { scopes_supported: _scopes, ...withoutScopes } = metadata;
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json(withoutScopes)));
+    for (const handler of [rootMetadata, mcpMetadata]) {
+      const response = await handler(new Request("https://skillpack.app/.well-known/oauth-protected-resource"));
+      expect((await response.json()).scopes_supported).toEqual(["openid", "profile", "email", "offline_access"]);
+    }
+  });
+
   it.each(["https://skillpack.app", "https://skillpack-preview.vercel.app", "http://127.0.0.1:3000"])(
     "matches both discovery paths to the requested origin %s while preserving server metadata",
     async (origin) => {

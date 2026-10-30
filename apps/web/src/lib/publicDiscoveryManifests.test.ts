@@ -9,6 +9,7 @@ describe("public capability manifests", () => {
     const response = catalog(new Request(`https://${host}/.well-known/ai-catalog.json`));
     expect(response.headers.get("content-type")).toBe("application/json");
     const body = await response.json();
+    expect(body.specVersion).toBe("0.91");
     expect(body.entries).toHaveLength(5);
     expect(body.entries.map((entry: { url: string }) => entry.url)).toEqual([
       "/.well-known/mcp/server-card.json", "/.well-known/agent-card.json", "/.well-known/agent-skills/index.json", "/.well-known/api-catalog", "/llms.txt",
@@ -22,13 +23,13 @@ describe("public capability manifests", () => {
     }
   });
 
-  it("publishes Poppy's required organization fields and the existing issuer, with ordinary website browsing only", async () => {
+  it.each(["skillpack.app", "preview.vercel.app"])("publishes Poppy organization %s and the existing issuer, with ordinary website browsing only", async (host) => {
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ authorization_servers: ["https://skillpack.app"] })));
-    const response = await poppy(new Request("https://preview.vercel.app/.well-known/poppy.json"));
+    const response = await poppy(new Request(`https://${host}/.well-known/poppy.json`));
     expect(response.headers.get("content-type")).toBe("application/json");
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(await response.json()).toEqual({
-      protocol_version: "0.3", organization: { name: "Skillpack", domain: "preview.vercel.app" },
+      protocol_version: "0.3", organization: { name: "Skillpack", domain: host },
       auth: { issuer: "https://skillpack.app" }, web: {},
     });
   });

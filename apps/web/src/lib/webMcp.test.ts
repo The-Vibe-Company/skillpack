@@ -1,9 +1,22 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { publicCatalogPathSchema } from "@skillpack/contracts";
 import { publicWebMcpTools, registerPublicWebMcpTools, type WebMcpTool } from "./webMcp";
 
 afterEach(() => { vi.unstubAllGlobals(); });
 
 describe("public WebMCP", () => {
+  it("advertises the public endpoint's skill identifier boundaries", () => {
+    const schema = publicWebMcpTools().find((tool) => tool.name === "get_skill")!.inputSchema;
+    for (const field of ["orgSlug", "skillSlug"] as const) {
+      const property = schema.properties[field]!;
+      for (const value of ["a", "valid-skill9", "a".repeat(128), "a".repeat(129), "", "Upper", "a_b", "a--b", "-a", "a "]) {
+        const advertisedValid = (property.maxLength === undefined || value.length <= property.maxLength)
+          && (property.pattern === undefined || new RegExp(property.pattern).test(value));
+        expect(advertisedValid, `${field}: ${value}`).toBe(publicCatalogPathSchema.safeParse({ orgSlug: "acme", skillSlug: "valid-skill", [field]: value }).success);
+      }
+    }
+  });
+
   it("does nothing without browser support", () => {
     expect(() => registerPublicWebMcpTools()()).not.toThrow();
   });

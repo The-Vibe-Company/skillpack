@@ -1,3 +1,4 @@
+import { AppPageRouteModule } from "next/dist/server/route-modules/app-page/module.compiled";
 import { describe, expect, it } from "vitest";
 import { patchSetHeaderWithCookieSupport } from "next/dist/server/lib/patch-set-header";
 import { IncomingMessage, ServerResponse } from "node:http";
@@ -31,5 +32,16 @@ describe("Next response Vary merging", () => {
     response.setHeader("Vary", "*");
     response.setHeader("Vary", "Accept");
     expect(response.getHeader("vary")).toBe("*");
+  });
+});
+
+describe("compiled app-page deployment headers", () => {
+  it.each([false, true])("retains representation and router dimensions with interception=%s", (interception) => {
+    const vary = AppPageRouteModule.prototype.getVaryHeader("/", interception ? [/^\//] : []);
+    const tokens = vary.toLowerCase().split(",").map((token) => token.trim());
+    for (const token of ["accept", "rsc", "next-router-state-tree", "next-router-prefetch", "next-router-segment-prefetch"]) {
+      expect(tokens).toContain(token);
+    }
+    expect(tokens.includes("next-url")).toBe(interception);
   });
 });

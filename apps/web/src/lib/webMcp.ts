@@ -41,6 +41,7 @@ const pagination = {
   limit: { type: "integer", minimum: 1, maximum: 50 },
   offset: { type: "integer", minimum: 0, maximum: 10_000 },
 };
+const publicSlug = { type: "string", maxLength: 128, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" };
 const definitions: { name: string; method: string; description: string; inputSchema: ToolSchema }[] = [
   {
     name: "search_skills", method: "search_skills",
@@ -50,7 +51,7 @@ const definitions: { name: string; method: string; description: string; inputSch
   {
     name: "get_skill", method: "read_skill",
     description: "Read one explicitly listed public skill by organization and skill slug. Private libraries are unavailable.",
-    inputSchema: { type: "object", properties: { orgSlug: { type: "string" }, skillSlug: { type: "string" } }, required: ["orgSlug", "skillSlug"], additionalProperties: false },
+    inputSchema: { type: "object", properties: { orgSlug: publicSlug, skillSlug: publicSlug }, required: ["orgSlug", "skillSlug"], additionalProperties: false },
   },
   {
     name: "list_blog_posts", method: "list_articles", description: "List published Skillpack blog posts with bounded pagination.",
@@ -58,7 +59,7 @@ const definitions: { name: string; method: string; description: string; inputSch
   },
   {
     name: "read_blog_post", method: "read_article", description: "Read the complete Markdown of one published Skillpack blog post by slug.",
-    inputSchema: { type: "object", properties: { slug: { type: "string", maxLength: 128, pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$" } }, required: ["slug"], additionalProperties: false },
+    inputSchema: { type: "object", properties: { slug: publicSlug }, required: ["slug"], additionalProperties: false },
   },
 ];
 

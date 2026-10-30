@@ -15,8 +15,12 @@ replaces the header. Recheck
 HTTP variants when upgrading Next.js and remove the patch when upstream preserves
 custom Vary values. The patch also appends Accept to the generated RSC route
 manifest: Vercel uses that value to override app-route and prerender response
-headers, independently of the Node response adapter. The web build asserts that
-the deployment manifest preserves Accept and all framework dimensions. Article bodies
+headers, independently of the Node response adapter. The compiled app-page development and production runtimes
+also append Accept to their own Vary value, preserving interception-route Next-URL
+behavior; dynamic serverless pages externalize these runtimes directly.
+The web build asserts that
+both the deployment manifest and the built home runtime preserve Accept and all
+framework dimensions. Article bodies
 come directly from `content/blog`, including structured YAML fences. Home and
 `/llms.txt` share the same overview and article list.
 
@@ -48,6 +52,13 @@ metadata. The web proxy forwards the request origin only for the MCP discovery
 challenge, keeping it independent of the configured token issuer. MCP 401
 challenges link to the MCP-specific document on that origin; successful public
 pages do not advertise a challenge. Anonymous `/mcp/public` requires no OAuth.
+When upstream PRM omits scopes, both documents publish Better Auth's existing public
+OIDC scopes: `openid`, `profile`, `email`, `offline_access`. An explicit upstream
+scope list is preserved. Requests with an Authorization header retain the existing
+external MCP transport, including large uploads, through a before-files rewrite.
+The API still validates every token. The `/mcp` web handler relays requests without
+an Authorization header, preserving bodies, status and protocol headers; only a 401 challenge's
+discovery URL is adapted. This also works while previews use an older deployed API.
 The A2A card includes `supportedInterfaces` for the existing JSONRPC `/a2a`
 interface at protocol version 0.3.0, alongside its legacy URL and transport fields.
 
@@ -77,7 +88,8 @@ page content, session state, workspace APIs and write tools are never exposed.
 When the API is absent, the component renders nothing and does no work. Registration
 is scoped to the component lifetime and supports cancellation.
 
-`/.well-known/ai-catalog.json` uses the ARD v0.91 `entries` envelope and domain-anchored
+`/.well-known/ai-catalog.json` uses the ARD v0.91 `entries` envelope, a `specVersion`
+compatibility marker of `"0.91"`, and domain-anchored
 `urn:air:` identifiers. Its five public resources are the MCP server card, A2A card,
 Agent Skills index, RFC 9727 API catalog and `llms.txt`. The root head links it with
 `rel="ai-catalog"`; `robots.txt` includes an `Agentmap` using the configured site origin.
@@ -90,6 +102,14 @@ ordinary signed-out browsing. It does not claim Poppy sessions, API token suppor
 conversations, browser-session endpoints or sign-in extensions; the existing auth
 flow is unchanged. Publishing this discovery document is not a claim of full Poppy
 session or OAuth-profile conformance.
+Both `/.well-known/oauth-authorization-server` and the RFC 8414 issuer-path form
+`/.well-known/oauth-authorization-server/auth` preserve upstream OAuth metadata and
+add `poppy_domains` for the existing issuer's hostname. In production that is
+`["skillpack.app"]`, matching `poppy.json`'s organization domain `skillpack.app`.
+Preview manifests identify the preview host but retain the production issuer; the
+production authorization server does not bind arbitrary preview domains. Full Poppy
+domain binding is therefore only expected on the production host. This metadata
+extension changes no issuer, endpoint, scope grant, token, consent or session flow.
 
 Schema sources: [ARD](https://github.com/ards-project/ard-spec/blob/main/spec/schemas/ard-entry.schema.json),
 [Poppy](https://github.com/personal-agent-protocol/personal-agent-protocol/blob/main/kit/company/schemas/poppy.schema.json),

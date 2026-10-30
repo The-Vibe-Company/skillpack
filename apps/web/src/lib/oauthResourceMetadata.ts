@@ -3,6 +3,8 @@ import { requestOrigin } from "./requestOrigin";
 
 const metadataSchema = z.object({
   authorization_servers: z.array(z.string().url()).min(1),
+  // Better Auth's MCP discovery can omit these existing public OIDC scopes.
+  scopes_supported: z.array(z.string().min(1)).default(["openid", "profile", "email", "offline_access"]),
 }).passthrough();
 
 /** Adapt only resource discovery metadata; Better Auth remains the authorization server. */

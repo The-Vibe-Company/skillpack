@@ -30,6 +30,7 @@ assert.match(robots, /Agentmap: https?:\/\/[^\s]+\/\.well-known\/ai-catalog\.jso
 const ardResponse = await get("/.well-known/ai-catalog.json");
 assert.match(ardResponse.headers.get("content-type"), /^application\/json/);
 const ard = await ardResponse.json();
+assert.equal(ard.specVersion, "0.91");
 assert.equal(ard.entries.length, 5);
 for (const entry of ard.entries) {
   assert.ok(entry.identifier.startsWith(`urn:air:${site.hostname}:`));
@@ -45,6 +46,14 @@ assert.equal(poppy.organization.domain, site.hostname);
 assert.deepEqual(poppy.web, {});
 assert.equal(poppy.apis, undefined);
 assert.equal(poppy.agent, undefined);
+const authorizationMetadata = await (await get("/.well-known/oauth-authorization-server/auth")).json();
+assert.equal(authorizationMetadata.issuer, poppy.auth.issuer);
+assert.ok(authorizationMetadata.poppy_domains.includes(new URL(poppy.auth.issuer).hostname));
+assert.deepEqual(await (await get("/.well-known/oauth-authorization-server")).json(), authorizationMetadata);
+// Previews keep their own identity; the production AS intentionally binds only its issuer domain.
+if (site.hostname === new URL(poppy.auth.issuer).hostname) {
+  assert.ok(authorizationMetadata.poppy_domains.includes(poppy.organization.domain));
+}
 
 for (const path of ["/", "/blog", "/blog/what-is-skill-md"]) {
   // Alternate representations on the same URL to expose cache contamination in either direction.
@@ -121,6 +130,7 @@ for (const path of ["", "/mcp"]) {
   assert.equal(oauth.resource, `${site.origin}${path}`);
   assert.ok(oauth.authorization_servers.length > 0);
   assert.ok(oauth.authorization_servers.includes(poppy.auth.issuer));
+  assert.ok(Array.isArray(oauth.scopes_supported) && oauth.scopes_supported.length > 0);
 }
 const unauthorized = await fetch(new URL("/mcp", site));
 assert.equal(unauthorized.status, 401);

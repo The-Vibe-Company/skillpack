@@ -82,3 +82,31 @@ diff --git a/dist/esm/build/index.js b/dist/esm/build/index.js
                          prefetchHeader: NEXT_ROUTER_PREFETCH_HEADER,
                          didPostponeHeader: NEXT_DID_POSTPONE_HEADER,
                          contentTypeHeader: RSC_CONTENT_TYPE_HEADER,
+diff --git a/dist/compiled/next-server/app-page.runtime.prod.js b/dist/compiled/next-server/app-page.runtime.prod.js
+--- a/dist/compiled/next-server/app-page.runtime.prod.js
++++ b/dist/compiled/next-server/app-page.runtime.prod.js
+@@ -25 +25,8 @@
+-//# sourceMappingURL=app-page.runtime.prod.js.map
+\ No newline at end of file
++//# sourceMappingURL=app-page.runtime.prod.js.map
++// Preserve representation negotiation in the runtime used by dynamic serverless pages.
++const pageRoutePrototype = module.exports.AppPageRouteModule.prototype;
++const originalVaryHeader = pageRoutePrototype.getVaryHeader;
++pageRoutePrototype.getVaryHeader = function(resolvedPathname, interceptionRoutePatterns) {
++    const vary = originalVaryHeader.call(this, resolvedPathname, interceptionRoutePatterns);
++    return vary.split(',').some((token)=>token.trim().toLowerCase() === 'accept') ? vary : `${vary}, Accept`;
++};
+diff --git a/dist/compiled/next-server/app-page.runtime.dev.js b/dist/compiled/next-server/app-page.runtime.dev.js
+--- a/dist/compiled/next-server/app-page.runtime.dev.js
++++ b/dist/compiled/next-server/app-page.runtime.dev.js
+@@ -43 +43,8 @@
+-//# sourceMappingURL=app-page.runtime.dev.js.map
+\ No newline at end of file
++//# sourceMappingURL=app-page.runtime.dev.js.map
++// Preserve representation negotiation in the runtime used by dynamic serverless pages.
++const pageRoutePrototype = module.exports.AppPageRouteModule.prototype;
++const originalVaryHeader = pageRoutePrototype.getVaryHeader;
++pageRoutePrototype.getVaryHeader = function(resolvedPathname, interceptionRoutePatterns) {
++    const vary = originalVaryHeader.call(this, resolvedPathname, interceptionRoutePatterns);
++    return vary.split(',').some((token)=>token.trim().toLowerCase() === 'accept') ? vary : `${vary}, Accept`;
++};

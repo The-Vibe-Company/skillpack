@@ -9,6 +9,7 @@ export function publicArdCatalog(origin: string) {
     { id: "llms", name: "Skillpack public overview", type: "text/markdown", path: "/llms.txt", queries: ["Learn what Skillpack does", "Find Skillpack's published articles"] },
   ];
   return {
+    specVersion: "0.91",
     entries: resources.map(({ id, name, type, path, queries }) => ({
       identifier: `urn:air:${publisher}:skillpack:${id}`,
       displayName: name, type, url: new URL(path, origin).href,
