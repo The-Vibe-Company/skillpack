@@ -58,3 +58,27 @@ diff --git a/dist/esm/server/lib/patch-set-header.js b/dist/esm/server/lib/patch
          }
          if (name.toLowerCase() === 'set-cookie') {
              const middlewareValue = getRequestMeta(req, 'middlewareCookie');
+diff --git a/dist/build/index.js b/dist/build/index.js
+--- a/dist/build/index.js
++++ b/dist/build/index.js
+@@ -782,7 +782,7 @@
+                         header: _approuterheaders.RSC_HEADER,
+                         // This vary header is used as a default. It is technically re-assigned in `base-server`,
+                         // and may include an additional Vary option for `Next-URL`.
+-                        varyHeader: `${_approuterheaders.RSC_HEADER}, ${_approuterheaders.NEXT_ROUTER_STATE_TREE_HEADER}, ${_approuterheaders.NEXT_ROUTER_PREFETCH_HEADER}, ${_approuterheaders.NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}`,
++                        varyHeader: `${_approuterheaders.RSC_HEADER}, ${_approuterheaders.NEXT_ROUTER_STATE_TREE_HEADER}, ${_approuterheaders.NEXT_ROUTER_PREFETCH_HEADER}, ${_approuterheaders.NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}, Accept`,
+                         prefetchHeader: _approuterheaders.NEXT_ROUTER_PREFETCH_HEADER,
+                         didPostponeHeader: _approuterheaders.NEXT_DID_POSTPONE_HEADER,
+                         contentTypeHeader: _approuterheaders.RSC_CONTENT_TYPE_HEADER,
+diff --git a/dist/esm/build/index.js b/dist/esm/build/index.js
+--- a/dist/esm/build/index.js
++++ b/dist/esm/build/index.js
+@@ -714,7 +714,7 @@
+                         header: RSC_HEADER,
+                         // This vary header is used as a default. It is technically re-assigned in `base-server`,
+                         // and may include an additional Vary option for `Next-URL`.
+-                        varyHeader: `${RSC_HEADER}, ${NEXT_ROUTER_STATE_TREE_HEADER}, ${NEXT_ROUTER_PREFETCH_HEADER}, ${NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}`,
++                        varyHeader: `${RSC_HEADER}, ${NEXT_ROUTER_STATE_TREE_HEADER}, ${NEXT_ROUTER_PREFETCH_HEADER}, ${NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}, Accept`,
+                         prefetchHeader: NEXT_ROUTER_PREFETCH_HEADER,
+                         didPostponeHeader: NEXT_DID_POSTPONE_HEADER,
+                         contentTypeHeader: RSC_CONTENT_TYPE_HEADER,

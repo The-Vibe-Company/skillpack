@@ -13,7 +13,10 @@ framework Vary tokens. Its response-header adapter also merges subsequent Vary
 writes with existing tokens (case-insensitively), preserving Accept when a render
 replaces the header. Recheck
 HTTP variants when upgrading Next.js and remove the patch when upstream preserves
-custom Vary values. Article bodies
+custom Vary values. The patch also appends Accept to the generated RSC route
+manifest: Vercel uses that value to override app-route and prerender response
+headers, independently of the Node response adapter. The web build asserts that
+the deployment manifest preserves Accept and all framework dimensions. Article bodies
 come directly from `content/blog`, including structured YAML fences. Home and
 `/llms.txt` share the same overview and article list.
 
