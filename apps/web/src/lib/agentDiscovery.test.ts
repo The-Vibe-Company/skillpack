@@ -13,6 +13,10 @@ import { GET as catalog } from "../app/.well-known/api-catalog/route";
 import { parse as parseYaml } from "yaml";
 
 describe("agent discovery and content", () => {
+  it("identifies auth.md with its required H1", () => {
+    expect(readFileSync(join(process.cwd(), "public/auth.md"), "utf8")).toMatch(/^# Auth\.md\n/);
+  });
+
   it("binds every advertised skill to its exact served bytes and frontmatter", () => {
     const root = join(process.cwd(), "public/.well-known/agent-skills");
     const index = JSON.parse(readFileSync(join(root, "index.json"), "utf8"));

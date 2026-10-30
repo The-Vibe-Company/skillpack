@@ -21,6 +21,7 @@ describe("technical SEO routes", () => {
       expect(body).toContain(`User-agent: ${agent}\nAllow: /\nContent-Signal: search=yes, ai-input=yes, ai-train=yes`);
     }
     expect(body).toContain("Sitemap: https://skillpack.app/sitemap.xml");
+    expect(body).toContain("Agentmap: https://skillpack.app/.well-known/ai-catalog.json");
   });
 
   it("lists the public pages and every blog post on the configured origin", async () => {

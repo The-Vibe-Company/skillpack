@@ -26,3 +26,87 @@ index 608080693a2ee86c94438eacaa7ca0345c79de61..a0f43b98e96a857944832380f55b64b1
          const invokeRouteModule = async (span, context)=>{
              const nextReq = new NodeNextRequest(req);
              const nextRes = new NodeNextResponse(res);
+diff --git a/dist/server/lib/patch-set-header.js b/dist/server/lib/patch-set-header.js
+--- a/dist/server/lib/patch-set-header.js
++++ b/dist/server/lib/patch-set-header.js
+@@ -16,6 +16,12 @@
+         // headers after headers.
+         if ('headersSent' in res && res.headersSent) {
+             return res;
++        }
++        if (name.toLowerCase() === 'vary') {
++            // Rendering can replace middleware Vary values; keep every cache dimension.
++            const existing = res.getHeader('vary');
++            const tokens = [existing, value].flat().filter((item)=>item !== undefined).flatMap((item)=>String(item).split(',')).map((item)=>item.trim()).filter(Boolean);
++            value = tokens.includes('*') ? '*' : [...new Map(tokens.map((token)=>[token.toLowerCase(), token])).values()].join(', ');
+         }
+         if (name.toLowerCase() === 'set-cookie') {
+             const middlewareValue = (0, _requestmeta.getRequestMeta)(req, 'middlewareCookie');
+diff --git a/dist/esm/server/lib/patch-set-header.js b/dist/esm/server/lib/patch-set-header.js
+--- a/dist/esm/server/lib/patch-set-header.js
++++ b/dist/esm/server/lib/patch-set-header.js
+@@ -12,6 +12,12 @@
+         // headers after headers.
+         if ('headersSent' in res && res.headersSent) {
+             return res;
++        }
++        if (name.toLowerCase() === 'vary') {
++            // Rendering can replace middleware Vary values; keep every cache dimension.
++            const existing = res.getHeader('vary');
++            const tokens = [existing, value].flat().filter((item)=>item !== undefined).flatMap((item)=>String(item).split(',')).map((item)=>item.trim()).filter(Boolean);
++            value = tokens.includes('*') ? '*' : [...new Map(tokens.map((token)=>[token.toLowerCase(), token])).values()].join(', ');
+         }
+         if (name.toLowerCase() === 'set-cookie') {
+             const middlewareValue = getRequestMeta(req, 'middlewareCookie');
+diff --git a/dist/build/index.js b/dist/build/index.js
+--- a/dist/build/index.js
++++ b/dist/build/index.js
+@@ -782,7 +782,7 @@
+                         header: _approuterheaders.RSC_HEADER,
+                         // This vary header is used as a default. It is technically re-assigned in `base-server`,
+                         // and may include an additional Vary option for `Next-URL`.
+-                        varyHeader: `${_approuterheaders.RSC_HEADER}, ${_approuterheaders.NEXT_ROUTER_STATE_TREE_HEADER}, ${_approuterheaders.NEXT_ROUTER_PREFETCH_HEADER}, ${_approuterheaders.NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}`,
++                        varyHeader: `${_approuterheaders.RSC_HEADER}, ${_approuterheaders.NEXT_ROUTER_STATE_TREE_HEADER}, ${_approuterheaders.NEXT_ROUTER_PREFETCH_HEADER}, ${_approuterheaders.NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}, Accept`,
+                         prefetchHeader: _approuterheaders.NEXT_ROUTER_PREFETCH_HEADER,
+                         didPostponeHeader: _approuterheaders.NEXT_DID_POSTPONE_HEADER,
+                         contentTypeHeader: _approuterheaders.RSC_CONTENT_TYPE_HEADER,
+diff --git a/dist/esm/build/index.js b/dist/esm/build/index.js
+--- a/dist/esm/build/index.js
++++ b/dist/esm/build/index.js
+@@ -714,7 +714,7 @@
+                         header: RSC_HEADER,
+                         // This vary header is used as a default. It is technically re-assigned in `base-server`,
+                         // and may include an additional Vary option for `Next-URL`.
+-                        varyHeader: `${RSC_HEADER}, ${NEXT_ROUTER_STATE_TREE_HEADER}, ${NEXT_ROUTER_PREFETCH_HEADER}, ${NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}`,
++                        varyHeader: `${RSC_HEADER}, ${NEXT_ROUTER_STATE_TREE_HEADER}, ${NEXT_ROUTER_PREFETCH_HEADER}, ${NEXT_ROUTER_SEGMENT_PREFETCH_HEADER}, Accept`,
+                         prefetchHeader: NEXT_ROUTER_PREFETCH_HEADER,
+                         didPostponeHeader: NEXT_DID_POSTPONE_HEADER,
+                         contentTypeHeader: RSC_CONTENT_TYPE_HEADER,
+diff --git a/dist/compiled/next-server/app-page.runtime.prod.js b/dist/compiled/next-server/app-page.runtime.prod.js
+--- a/dist/compiled/next-server/app-page.runtime.prod.js
++++ b/dist/compiled/next-server/app-page.runtime.prod.js
+@@ -25 +25,8 @@
+-//# sourceMappingURL=app-page.runtime.prod.js.map
+\ No newline at end of file
++//# sourceMappingURL=app-page.runtime.prod.js.map
++// Preserve representation negotiation in the runtime used by dynamic serverless pages.
++const pageRoutePrototype = module.exports.AppPageRouteModule.prototype;
++const originalVaryHeader = pageRoutePrototype.getVaryHeader;
++pageRoutePrototype.getVaryHeader = function(resolvedPathname, interceptionRoutePatterns) {
++    const vary = originalVaryHeader.call(this, resolvedPathname, interceptionRoutePatterns);
++    return vary.split(',').some((token)=>token.trim().toLowerCase() === 'accept') ? vary : `${vary}, Accept`;
++};
+diff --git a/dist/compiled/next-server/app-page.runtime.dev.js b/dist/compiled/next-server/app-page.runtime.dev.js
+--- a/dist/compiled/next-server/app-page.runtime.dev.js
++++ b/dist/compiled/next-server/app-page.runtime.dev.js
+@@ -43 +43,8 @@
+-//# sourceMappingURL=app-page.runtime.dev.js.map
+\ No newline at end of file
++//# sourceMappingURL=app-page.runtime.dev.js.map
++// Preserve representation negotiation in the runtime used by dynamic serverless pages.
++const pageRoutePrototype = module.exports.AppPageRouteModule.prototype;
++const originalVaryHeader = pageRoutePrototype.getVaryHeader;
++pageRoutePrototype.getVaryHeader = function(resolvedPathname, interceptionRoutePatterns) {
++    const vary = originalVaryHeader.call(this, resolvedPathname, interceptionRoutePatterns);
++    return vary.split(',').some((token)=>token.trim().toLowerCase() === 'accept') ? vary : `${vary}, Accept`;
++};

@@ -165,6 +165,11 @@ export function publicA2aAgentCard() {
     description: "Read-only public catalog and published articles. Send one JSON command as a text part: {\"tool\":\"list_articles\",\"arguments\":{}}. Queries use the documented MCP tool arguments; no natural-language execution, private libraries, task storage or streaming.",
     url: new URL(PUBLIC_A2A_PATH, publicProtocolSiteUrl()).href,
     preferredTransport: "JSONRPC",
+    supportedInterfaces: [{
+      url: new URL(PUBLIC_A2A_PATH, publicProtocolSiteUrl()).href,
+      protocolBinding: "JSONRPC",
+      protocolVersion: "0.3.0",
+    }],
     version: PUBLIC_SERVER_INFO.version,
     capabilities: { streaming: false, pushNotifications: false, stateTransitionHistory: false },
     defaultInputModes: ["text/plain"],

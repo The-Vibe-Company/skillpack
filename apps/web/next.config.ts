@@ -31,37 +31,27 @@ const config: NextConfig = {
   },
   async rewrites() {
     const api = process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";
-    return [
+    const afterFiles = [
       // Agent Auth discovery must live at the public instance root. In local development Web and
       // API use separate origins, so expose the API document through the same URL users copy.
       { source: "/.well-known/agent-configuration", destination: `${api}/.well-known/agent-configuration` },
       { source: "/schemas/:path*", destination: `${api}/v1/schemas/:path*` },
       // The MCP server and its OAuth metadata live on the single public origin. Better Auth serves
-      // the metadata under `/auth/.well-known/…`; RFC 8414 discovery for this issuer looks at the
-      // root, so both paths resolve to the same documents.
-      { source: "/mcp", destination: `${api}/mcp` },
-      {
-        source: "/.well-known/oauth-authorization-server",
-        destination: `${api}/auth/.well-known/oauth-authorization-server`,
-      },
-      {
-        source: "/.well-known/oauth-protected-resource",
-        destination: `${api}/auth/.well-known/oauth-protected-resource`,
-      },
-      {
-        source: "/.well-known/oauth-authorization-server/auth",
-        destination: `${api}/auth/.well-known/oauth-authorization-server`,
-      },
-      {
-        source: "/.well-known/oauth-protected-resource/mcp",
-        destination: `${api}/auth/.well-known/oauth-protected-resource`,
-      },
+      // the metadata under `/auth/.well-known/…`; RFC 8414 issuer discovery is proxied here.
+      // Local handlers adapt only OAuth discovery metadata and the MCP 401 discovery header.
       { source: "/auth/:path*", destination: `${api}/auth/:path*` },
       { source: "/v1/:path*", destination: `${api}/v1/:path*` },
       { source: "/trpc/:path*", destination: `${api}/trpc/:path*` },
       // First-party PostHog proxy so tracking-domain blockers do not drop product analytics.
       ...posthogRewrites(posthogHosts(process.env.NEXT_PUBLIC_POSTHOG_HOST)),
     ];
+    return {
+      // Keep authenticated MCP on its existing external transport, including large uploads.
+      // Credential presence selects transport only; the API still validates every token.
+      beforeFiles: [{ source: "/mcp", has: [{ type: "header", key: "authorization" }], destination: `${api}/mcp` }],
+      afterFiles,
+      fallback: [],
+    };
   },
 };
 

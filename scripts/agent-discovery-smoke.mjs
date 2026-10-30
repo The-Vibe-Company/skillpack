@@ -24,12 +24,44 @@ for (const agent of ["*", "GPTBot", "OAI-SearchBot", "ClaudeBot", "Claude-Search
 }
 assert.ok(robots.includes("Sitemap:"));
 const llms = await (await get("/llms.txt")).text();
+const publicHome = await (await get("/")).text();
+assert.match(publicHome, /<link[^>]+rel="ai-catalog"[^>]+href="\/\.well-known\/ai-catalog\.json"/);
+assert.match(robots, /Agentmap: https?:\/\/[^\s]+\/\.well-known\/ai-catalog\.json/);
+const ardResponse = await get("/.well-known/ai-catalog.json");
+assert.match(ardResponse.headers.get("content-type"), /^application\/json/);
+const ard = await ardResponse.json();
+assert.equal(ard.specVersion, "0.91");
+assert.equal(ard.entries.length, 5);
+for (const entry of ard.entries) {
+  assert.ok(entry.identifier.startsWith(`urn:air:${site.hostname}:`));
+  assert.ok(entry.displayName && entry.type && entry.url);
+  assert.equal(new URL(entry.url).origin, site.origin);
+  await get(new URL(entry.url).pathname);
+}
+const poppyResponse = await get("/.well-known/poppy.json");
+assert.match(poppyResponse.headers.get("content-type"), /^application\/json/);
+const poppy = await poppyResponse.json();
+assert.equal(poppy.protocol_version, "0.3");
+assert.equal(poppy.organization.domain, site.hostname);
+assert.deepEqual(poppy.web, {});
+assert.equal(poppy.apis, undefined);
+assert.equal(poppy.agent, undefined);
+const authorizationMetadata = await (await get("/.well-known/oauth-authorization-server/auth")).json();
+assert.equal(authorizationMetadata.issuer, poppy.auth.issuer);
+assert.ok(authorizationMetadata.poppy_domains.includes(new URL(poppy.auth.issuer).hostname));
+assert.deepEqual(await (await get("/.well-known/oauth-authorization-server")).json(), authorizationMetadata);
+// Previews keep their own identity; the production AS intentionally binds only its issuer domain.
+if (site.hostname === new URL(poppy.auth.issuer).hostname) {
+  assert.ok(authorizationMetadata.poppy_domains.includes(poppy.organization.domain));
+}
+
 for (const path of ["/", "/blog", "/blog/what-is-skill-md"]) {
   // Alternate representations on the same URL to expose cache contamination in either direction.
   for (const accept of ["text/html", "text/markdown", "text/html"]) {
     const response = await get(path, accept);
     checkDiscovery(response);
     checkVary(response);
+    assert.equal(response.headers.has("www-authenticate"), false);
     const text = await response.text();
     if (accept === "text/html") {
       assert.match(response.headers.get("content-type") ?? "", /^text\/html/);
@@ -61,6 +93,18 @@ const card = await (await get("/.well-known/mcp/server-card.json")).json();
 assert.equal(new URL(card.remotes[0].url).pathname, "/mcp/public");
 const agentCard = await (await get("/.well-known/agent-card.json")).json();
 assert.equal(new URL(agentCard.url).pathname, "/a2a");
+assert.deepEqual(agentCard.supportedInterfaces, [{
+  url: agentCard.url, protocolBinding: agentCard.preferredTransport, protocolVersion: agentCard.protocolVersion,
+}]);
+assert.match(await (await get("/auth.md")).text(), /^# Auth\.md\n/);
+for (const path of ["/", "/blog", "/blog/what-is-skill-md"]) {
+  for (const accept of ["text/html", "text/markdown"]) {
+    const response = await fetch(new URL(path, site), { method: "HEAD", headers: { Accept: accept } });
+    assert.equal(response.status, 200);
+    checkVary(response);
+    if (accept === "text/html") assert.match(response.headers.get("vary") ?? "", /rsc/i);
+  }
+}
 for (const message of [
   { method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "smoke", version: "1" } } },
   { method: "tools/list", params: {} },
@@ -79,7 +123,17 @@ for (const message of [
     assert.ok(result.result.tools.every((tool) => tool.annotations.readOnlyHint));
   }
 }
-const oauth = await (await get("/.well-known/oauth-protected-resource")).json();
-assert.equal(new URL(oauth.resource).pathname, "/mcp");
-assert.ok(oauth.authorization_servers.length > 0);
+for (const path of ["", "/mcp"]) {
+  const response = await get(`/.well-known/oauth-protected-resource${path}`);
+  assert.match(response.headers.get("content-type"), /^application\/json/);
+  const oauth = await response.json();
+  assert.equal(oauth.resource, `${site.origin}${path}`);
+  assert.ok(oauth.authorization_servers.length > 0);
+  assert.ok(oauth.authorization_servers.includes(poppy.auth.issuer));
+  assert.ok(Array.isArray(oauth.scopes_supported) && oauth.scopes_supported.length > 0);
+}
+const unauthorized = await fetch(new URL("/mcp", site));
+assert.equal(unauthorized.status, 401);
+assert.equal(unauthorized.headers.get("www-authenticate"),
+  `Bearer resource_metadata="${site.origin}/.well-known/oauth-protected-resource/mcp"`);
 console.log(`Agent discovery smoke passed: ${site.origin}`);
