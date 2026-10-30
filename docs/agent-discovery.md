@@ -52,6 +52,14 @@ metadata. The web proxy forwards the request origin only for the MCP discovery
 challenge, keeping it independent of the configured token issuer. MCP 401
 challenges link to the MCP-specific document on that origin; successful public
 pages do not advertise a challenge. Anonymous `/mcp/public` requires no OAuth.
+The API honors the MCP discovery-origin marker only for exact configured public
+origins, `https://skillpack.app`, `https://www.skillpack.app`, and HTTPS Vercel
+hosts matching `skillpack-<deployment>-the-vibe-company.vercel.app`. Other markers
+fall back to the configured web origin. Explicit configured HTTP origins remain
+supported for local development; HTTP production aliases and HTTP previews are
+not implicitly trusted. Web middleware removes client-supplied MCP markers on
+every route, including Markdown and external API rewrites, and computes a fresh
+marker only for `/mcp`. Token validation and authenticated transport are unchanged.
 When upstream PRM omits scopes, both documents publish Better Auth's existing public
 OIDC scopes: `openid`, `profile`, `email`, `offline_access`. An explicit upstream
 scope list is preserved. Requests with an Authorization header retain the existing

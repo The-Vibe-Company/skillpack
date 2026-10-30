@@ -14,17 +14,42 @@ import {
 describe("canonical host middleware", () => {
   it("overwrites the MCP discovery origin for previews without changing auth-origin markers", () => {
     const request = new NextRequest("http://localhost:3000/mcp", { headers: {
-      host: "preview.vercel.app", "x-forwarded-proto": "https",
+      host: "skillpack-x-the-vibe-company.vercel.app", "x-forwarded-proto": "https",
       "x-companion-mcp-resource-origin": "https://spoofed.example",
       authorization: "Bearer token",
+      cookie: "test-session=value",
     } });
     const headers = mcpDiscoveryProxyHeaders(request);
-    expect(headers?.get("x-companion-mcp-resource-origin")).toBe("https://preview.vercel.app");
+    expect(headers?.get("x-companion-mcp-resource-origin")).toBe("https://skillpack-x-the-vibe-company.vercel.app");
     expect(headers?.get("authorization")).toBe("Bearer token");
+    expect(headers?.get("cookie")).toBe("test-session=value");
     expect(headers?.has("x-companion-agent-auth-origin")).toBe(false);
     expect(mcpDiscoveryProxyHeaders(new NextRequest("https://preview.vercel.app/mcp/public"))).toBeNull();
     expect(middleware(request).headers.get("x-middleware-request-x-companion-mcp-resource-origin"))
-      .toBe("https://preview.vercel.app");
+      .toBe("https://skillpack-x-the-vibe-company.vercel.app");
+    expect(middleware(request).headers.get("x-middleware-request-authorization")).toBe("Bearer token");
+    expect(middleware(request).headers.get("x-middleware-request-cookie")).toBe("test-session=value");
+  });
+
+  it.each(["/", "/auth/oauth2/authorize", "/auth/host/create", "/v1/skills", "/mcp/public", "/ingest/e/"])(
+    "strips client MCP origin markers before handling %s", (path) => {
+      const response = middleware(new NextRequest(`https://skillpack.app${path}`, { headers: {
+        "x-companion-mcp-resource-origin": "https://evil.test", authorization: "Bearer test-token", cookie: "test-session=value",
+      } }));
+      expect(response.headers.has("x-middleware-override-headers")).toBe(true);
+      expect(response.headers.get("x-middleware-override-headers")?.split(",")).not.toContain("x-companion-mcp-resource-origin");
+      expect(response.headers.get("x-middleware-request-x-companion-mcp-resource-origin")).toBeNull();
+    },
+  );
+
+  it("strips client MCP origin markers on negotiated Markdown rewrites", () => {
+    const response = middleware(new NextRequest("https://skillpack.app/blog/what-is-skill-md", { headers: {
+      accept: "text/markdown", "x-companion-mcp-resource-origin": "https://evil.test",
+    } }));
+    expect(response.headers.get("x-middleware-rewrite")).toContain("/md/blog/what-is-skill-md");
+    expect(response.headers.get("x-middleware-override-headers")?.split(",")).not.toContain("x-companion-mcp-resource-origin");
+    expect(response.headers.get("x-middleware-request-x-companion-mcp-resource-origin")).toBeNull();
+    expect(response.headers.has("x-middleware-override-headers")).toBe(true);
   });
 
   it.each(["/projects", "/projects/legacy/session", "/runs/legacy"])(

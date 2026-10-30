@@ -76,14 +76,17 @@ export function isUnpublishedAuthPath(pathname: string): boolean {
 }
 
 /** The RFC 9728 challenge that points an MCP client at this instance's protected-resource metadata. */
-export function mcpAuthenticateChallenge(origin: string, requestOrigin?: string): string {
-  // The web proxy overwrites this metadata-only marker with its public request origin.
-  // Keep the configured issuer/token audience independent of the discovery document's host.
+export function mcpAuthenticateChallenge(origin: string, requestOrigin?: string, configuredOrigins: readonly string[] = []): string {
+  // Direct API callers can supply this marker too. Trust only configured origins and our deployments.
+  // This allowlist affects discovery metadata only, never issuer or token validation.
   if (requestOrigin) {
     const parsed = z.string().url().safeParse(requestOrigin);
     if (parsed.success) {
       const url = new URL(parsed.data);
-      if (["https:", "http:"].includes(url.protocol) && url.origin === requestOrigin) origin = url.origin;
+      const allowedOrigins = [origin, ...configuredOrigins, "https://skillpack.app", "https://www.skillpack.app"];
+      const configured = allowedOrigins.some((allowed) => new URL(allowed).origin === requestOrigin);
+      const projectPreview = /^https:\/\/skillpack-[a-z0-9]+(?:-[a-z0-9]+)*-the-vibe-company\.vercel\.app$/.test(requestOrigin);
+      if (["https:", "http:"].includes(url.protocol) && url.origin === requestOrigin && (configured || projectPreview)) origin = url.origin;
     }
   }
   return `Bearer resource_metadata="${new URL("/.well-known/oauth-protected-resource/mcp", origin).toString()}"`;

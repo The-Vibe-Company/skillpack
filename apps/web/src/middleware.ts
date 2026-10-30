@@ -111,11 +111,13 @@ export function posthogProxyHeaders(request: NextRequest): Headers | null {
   return headers;
 }
 
-/** Forward only a discovery origin; it never participates in bearer-token validation. */
-export function mcpDiscoveryProxyHeaders(request: NextRequest): Headers | null {
-  if (request.nextUrl.pathname !== "/mcp") return null;
-  const headers = new Headers(request.headers);
-  headers.set("x-companion-mcp-resource-origin", requestOrigin(request));
+/** Strip client markers on every route; only /mcp receives a server-computed discovery origin. */
+export function mcpDiscoveryProxyHeaders(request: NextRequest, sourceHeaders: Headers | null = null): Headers | null {
+  const isMcp = request.nextUrl.pathname === "/mcp";
+  if (!isMcp && !sourceHeaders && !request.headers.has("x-companion-mcp-resource-origin")) return null;
+  const headers = new Headers(sourceHeaders ?? request.headers);
+  headers.delete("x-companion-mcp-resource-origin");
+  if (isMcp) headers.set("x-companion-mcp-resource-origin", requestOrigin(request));
   return headers;
 }
 
@@ -128,13 +130,13 @@ export function middleware(request: NextRequest) {
   if (skillsDestination) return NextResponse.redirect(skillsDestination, 308);
   const catalogDestination = legacyCatalogRedirect(request);
   if (catalogDestination) return NextResponse.redirect(catalogDestination, 301);
-  const headers = posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request) ?? mcpDiscoveryProxyHeaders(request);
+  const headers = mcpDiscoveryProxyHeaders(request, posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request));
   const markdownPage = hasMarkdownRepresentation(request.nextUrl.pathname);
   let response: NextResponse;
   if (markdownPage && ["GET", "HEAD"].includes(request.method) && acceptsMarkdown(request.headers.get("accept"))) {
     const markdownUrl = request.nextUrl.clone();
     markdownUrl.pathname = request.nextUrl.pathname === "/" ? "/md" : `/md${request.nextUrl.pathname}`;
-    response = NextResponse.rewrite(markdownUrl);
+    response = NextResponse.rewrite(markdownUrl, headers ? { request: { headers } } : undefined);
   } else {
     response = headers ? NextResponse.next({ request: { headers } }) : NextResponse.next();
   }

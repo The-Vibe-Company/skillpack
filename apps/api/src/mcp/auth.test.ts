@@ -68,15 +68,37 @@ describe("MCP request authentication", () => {
     expect(resolved).toBeNull();
   });
 
-  it("uses the proxied web origin for discovery while keeping token validation separate", () => {
-    expect(mcpAuthenticateChallenge("https://skillpack.app", "https://preview.vercel.app")).toBe(
-      'Bearer resource_metadata="https://preview.vercel.app/.well-known/oauth-protected-resource/mcp"',
+  it.each([
+    "https://evil.test", "http://skillpack.app", "http://www.skillpack.app",
+    "https://skillpack-x.evil.vercel.app", "https://skillpack-x-another-team.vercel.app",
+    "http://skillpack-x-the-vibe-company.vercel.app", "https://skillpack-x-the-vibe-company.vercel.app:8443",
+    "https://skillpack-x-the-vibe-company.vercel.app.evil.test", "https://skillpack--the-vibe-company.vercel.app",
+    "not a URL", "javascript:alert(1)", "https://user:password@skillpack.app", "https://skillpack.app/path", 'https://evil.test/"',
+  ])("ignores an untrusted discovery origin %s", (marker) => {
+    expect(mcpAuthenticateChallenge("https://skillpack.app", marker)).toBe(
+      'Bearer resource_metadata="https://skillpack.app/.well-known/oauth-protected-resource/mcp"',
     );
-    for (const invalid of ["not a URL", "javascript:alert(1)", "https://user:password@evil.test", "https://evil.test/path", 'https://evil.test/"']) {
-      expect(mcpAuthenticateChallenge("https://skillpack.app", invalid)).toBe(
-        'Bearer resource_metadata="https://skillpack.app/.well-known/oauth-protected-resource/mcp"',
+  });
+
+  it.each([
+    "https://skillpack.app", "https://www.skillpack.app",
+    "https://skillpack-x-the-vibe-company.vercel.app",
+    "https://skillpack-git-codex-agent-ready-metadat-72e112-the-vibe-company.vercel.app",
+  ])("honors an allowed production or project-preview origin %s", (marker) => {
+    expect(mcpAuthenticateChallenge("https://configured.example", marker)).toBe(
+      `Bearer resource_metadata="${marker}/.well-known/oauth-protected-resource/mcp"`,
+    );
+  });
+
+  it("honors exact configured web and public-instance origins, including local development", () => {
+    for (const marker of ["https://hub.example.test", "https://issuer.example.test"]) {
+      expect(mcpAuthenticateChallenge("https://hub.example.test", marker, ["https://issuer.example.test"])).toBe(
+        `Bearer resource_metadata="${marker}/.well-known/oauth-protected-resource/mcp"`,
       );
     }
+    expect(mcpAuthenticateChallenge("http://127.0.0.1:3000", "http://127.0.0.1:3001", ["http://127.0.0.1:3001"])).toBe(
+      'Bearer resource_metadata="http://127.0.0.1:3001/.well-known/oauth-protected-resource/mcp"',
+    );
   });
 
   it("points an unauthenticated client at this instance's protected-resource metadata", () => {
