@@ -142,7 +142,7 @@ describe("public blog post page", () => {
         "@type": "BlogPosting",
         headline: "What is SKILL.md? The complete guide to Agent Skills (2026)",
         description:
-          "SKILL.md explained: the Agent Skills format, frontmatter fields, examples, and how to version, share and install skills across Claude Code, Codex and MCP clients.",
+          "SKILL.md explained: the Agent Skills format, frontmatter fields, examples, and how to version, share and install skills in Claude Code and Codex.",
         datePublished: "2026-10-13",
         url: "https://skillpack.app/blog/what-is-skill-md",
         mainEntityOfPage: "https://skillpack.app/blog/what-is-skill-md",

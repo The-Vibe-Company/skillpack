@@ -136,6 +136,8 @@ Frozen sync checks the committed skills against the lockfile, offline. If a copy
 
 If someone edited a skill locally, frozen sync fails instead of quietly accepting it. It leaves the files and the lockfile alone, and it never rewrites the lockfile. That's the check you want. The skill CI runs is the one the team agreed on.
 
+For a full CI setup with exit codes and a GitHub Actions example, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
+
 ### 6. Ship updates through a pull request
 
 When the author improves the skill, they publish again:
