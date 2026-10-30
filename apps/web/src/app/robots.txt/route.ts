@@ -8,7 +8,7 @@ export function GET() {
   const rules = agents.map((agent) =>
     `User-agent: ${agent}\nAllow: /\nContent-Signal: search=yes, ai-input=yes, ai-train=yes`,
   );
-  return new Response(`${rules.join("\n\n")}\n\nSitemap: ${new URL("/sitemap.xml", resolveSiteUrl()).href}\n`, {
+  return new Response(`${rules.join("\n\n")}\n\nSitemap: ${new URL("/sitemap.xml", resolveSiteUrl()).href}\nAgentmap: ${new URL("/.well-known/ai-catalog.json", resolveSiteUrl()).href}\n`, {
     headers: { "Content-Type": "text/plain; charset=utf-8" },
   });
 }

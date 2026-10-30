@@ -750,7 +750,10 @@ app.all(
     onError: (c) => c.json({ error: "request exceeds the 12 MB MCP limit" }, 413),
   }),
   async (c) => {
-    const challenge = mcpAuthenticateChallenge(publicInstanceOrigin());
+    const challenge = mcpAuthenticateChallenge(
+      process.env.COMPANION_WEB_URL ?? publicInstanceOrigin(),
+      c.req.header("x-companion-mcp-resource-origin"),
+    );
     let connection: Awaited<ReturnType<typeof authenticateMcpRequest>>;
     try {
       connection = await authenticateMcpRequest(c.req.raw.headers);

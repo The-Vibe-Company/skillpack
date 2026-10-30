@@ -68,9 +68,20 @@ describe("MCP request authentication", () => {
     expect(resolved).toBeNull();
   });
 
+  it("uses the proxied web origin for discovery while keeping token validation separate", () => {
+    expect(mcpAuthenticateChallenge("https://skillpack.app", "https://preview.vercel.app")).toBe(
+      'Bearer resource_metadata="https://preview.vercel.app/.well-known/oauth-protected-resource/mcp"',
+    );
+    for (const invalid of ["not a URL", "javascript:alert(1)", "https://user:password@evil.test", "https://evil.test/path", 'https://evil.test/"']) {
+      expect(mcpAuthenticateChallenge("https://skillpack.app", invalid)).toBe(
+        'Bearer resource_metadata="https://skillpack.app/.well-known/oauth-protected-resource/mcp"',
+      );
+    }
+  });
+
   it("points an unauthenticated client at this instance's protected-resource metadata", () => {
     expect(mcpAuthenticateChallenge("https://skillpack.app")).toBe(
-      'Bearer resource_metadata="https://skillpack.app/auth/.well-known/oauth-protected-resource"',
+      'Bearer resource_metadata="https://skillpack.app/.well-known/oauth-protected-resource/mcp"',
     );
   });
 });

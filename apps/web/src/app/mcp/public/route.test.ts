@@ -95,7 +95,11 @@ describe("public MCP transport", () => {
     expect(mcp.status).toBe(200);
     expect((await mcp.json()).remotes[0].url).toBe("https://skills.example.com/mcp/public");
     expect(a2a.status).toBe(200);
-    expect((await a2a.json()).url).toBe("https://skills.example.com/a2a");
+    const agent = await a2a.json();
+    expect(agent.url).toBe("https://skills.example.com/a2a");
+    expect(agent.supportedInterfaces).toEqual([{
+      url: agent.url, protocolBinding: agent.preferredTransport, protocolVersion: agent.protocolVersion,
+    }]);
     expect(mcp.headers.get("cache-control")).toBe("no-store");
   });
 });

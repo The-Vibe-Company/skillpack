@@ -37,16 +37,12 @@ const config: NextConfig = {
       { source: "/.well-known/agent-configuration", destination: `${api}/.well-known/agent-configuration` },
       { source: "/schemas/:path*", destination: `${api}/v1/schemas/:path*` },
       // The MCP server and its OAuth metadata live on the single public origin. Better Auth serves
-      // the metadata under `/auth/.well-known/…`; RFC 8414 discovery for this issuer looks at the
-      // root, so both paths resolve to the same documents.
+      // the metadata under `/auth/.well-known/…`; RFC 8414 issuer discovery is proxied here.
+      // RFC 9728 resource discovery uses local route handlers to match the requested resource.
       { source: "/mcp", destination: `${api}/mcp` },
       {
         source: "/.well-known/oauth-authorization-server",
         destination: `${api}/auth/.well-known/oauth-authorization-server`,
-      },
-      {
-        source: "/.well-known/oauth-protected-resource",
-        destination: `${api}/auth/.well-known/oauth-protected-resource`,
       },
       { source: "/auth/:path*", destination: `${api}/auth/:path*` },
       { source: "/v1/:path*", destination: `${api}/v1/:path*` },

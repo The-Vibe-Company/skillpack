@@ -26,3 +26,35 @@ index 608080693a2ee86c94438eacaa7ca0345c79de61..a0f43b98e96a857944832380f55b64b1
          const invokeRouteModule = async (span, context)=>{
              const nextReq = new NodeNextRequest(req);
              const nextRes = new NodeNextResponse(res);
+diff --git a/dist/server/lib/patch-set-header.js b/dist/server/lib/patch-set-header.js
+--- a/dist/server/lib/patch-set-header.js
++++ b/dist/server/lib/patch-set-header.js
+@@ -16,6 +16,12 @@
+         // headers after headers.
+         if ('headersSent' in res && res.headersSent) {
+             return res;
++        }
++        if (name.toLowerCase() === 'vary') {
++            // Rendering can replace middleware Vary values; keep every cache dimension.
++            const existing = res.getHeader('vary');
++            const tokens = [existing, value].flat().filter((item)=>item !== undefined).flatMap((item)=>String(item).split(',')).map((item)=>item.trim()).filter(Boolean);
++            value = tokens.includes('*') ? '*' : [...new Map(tokens.map((token)=>[token.toLowerCase(), token])).values()].join(', ');
+         }
+         if (name.toLowerCase() === 'set-cookie') {
+             const middlewareValue = (0, _requestmeta.getRequestMeta)(req, 'middlewareCookie');
+diff --git a/dist/esm/server/lib/patch-set-header.js b/dist/esm/server/lib/patch-set-header.js
+--- a/dist/esm/server/lib/patch-set-header.js
++++ b/dist/esm/server/lib/patch-set-header.js
+@@ -12,6 +12,12 @@
+         // headers after headers.
+         if ('headersSent' in res && res.headersSent) {
+             return res;
++        }
++        if (name.toLowerCase() === 'vary') {
++            // Rendering can replace middleware Vary values; keep every cache dimension.
++            const existing = res.getHeader('vary');
++            const tokens = [existing, value].flat().filter((item)=>item !== undefined).flatMap((item)=>String(item).split(',')).map((item)=>item.trim()).filter(Boolean);
++            value = tokens.includes('*') ? '*' : [...new Map(tokens.map((token)=>[token.toLowerCase(), token])).values()].join(', ');
+         }
+         if (name.toLowerCase() === 'set-cookie') {
+             const middlewareValue = getRequestMeta(req, 'middlewareCookie');

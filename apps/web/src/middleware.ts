@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { requestOrigin } from "@/lib/requestOrigin";
 import { POSTHOG_PROXY_PATH } from "@/lib/posthogHosts";
 import { acceptsMarkdown, AGENT_DISCOVERY_LINKS, hasMarkdownRepresentation } from "@/lib/agentDiscovery";
 
@@ -110,6 +111,14 @@ export function posthogProxyHeaders(request: NextRequest): Headers | null {
   return headers;
 }
 
+/** Forward only a discovery origin; it never participates in bearer-token validation. */
+export function mcpDiscoveryProxyHeaders(request: NextRequest): Headers | null {
+  if (request.nextUrl.pathname !== "/mcp") return null;
+  const headers = new Headers(request.headers);
+  headers.set("x-companion-mcp-resource-origin", requestOrigin(request));
+  return headers;
+}
+
 export function middleware(request: NextRequest) {
   const slashless = trailingSlashRedirect(request);
   if (slashless) return NextResponse.redirect(slashless, 308);
@@ -119,7 +128,7 @@ export function middleware(request: NextRequest) {
   if (skillsDestination) return NextResponse.redirect(skillsDestination, 308);
   const catalogDestination = legacyCatalogRedirect(request);
   if (catalogDestination) return NextResponse.redirect(catalogDestination, 301);
-  const headers = posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request);
+  const headers = posthogProxyHeaders(request) ?? agentAuthProxyHeaders(request) ?? mcpDiscoveryProxyHeaders(request);
   const markdownPage = hasMarkdownRepresentation(request.nextUrl.pathname);
   let response: NextResponse;
   if (markdownPage && ["GET", "HEAD"].includes(request.method) && acceptsMarkdown(request.headers.get("accept"))) {

@@ -6,11 +6,27 @@ import {
   legacyCatalogRedirect,
   legacyRuntimeRedirect,
   middleware,
+  mcpDiscoveryProxyHeaders,
   posthogProxyHeaders,
   trailingSlashRedirect,
 } from "./middleware";
 
 describe("canonical host middleware", () => {
+  it("overwrites the MCP discovery origin for previews without changing auth-origin markers", () => {
+    const request = new NextRequest("http://localhost:3000/mcp", { headers: {
+      host: "preview.vercel.app", "x-forwarded-proto": "https",
+      "x-companion-mcp-resource-origin": "https://spoofed.example",
+      authorization: "Bearer token",
+    } });
+    const headers = mcpDiscoveryProxyHeaders(request);
+    expect(headers?.get("x-companion-mcp-resource-origin")).toBe("https://preview.vercel.app");
+    expect(headers?.get("authorization")).toBe("Bearer token");
+    expect(headers?.has("x-companion-agent-auth-origin")).toBe(false);
+    expect(mcpDiscoveryProxyHeaders(new NextRequest("https://preview.vercel.app/mcp/public"))).toBeNull();
+    expect(middleware(request).headers.get("x-middleware-request-x-companion-mcp-resource-origin"))
+      .toBe("https://preview.vercel.app");
+  });
+
   it.each(["/projects", "/projects/legacy/session", "/runs/legacy"])(
     "permanently redirects removed runtime URL %s to Skills without preserving runtime state",
     (path) => {

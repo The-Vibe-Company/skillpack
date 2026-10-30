@@ -8,8 +8,10 @@ explicitly allows the named AI crawlers with the requested Content Signals.
 Home, `/blog`, and `/blog/<slug>` support `Accept: text/markdown`. Middleware rewrites
 to independently pre-generated `/md/...` routes. Both representations vary on Accept;
 HTML continues to use its existing static rendering and cache policy. The pinned
-Next.js 15.5.24 package has a two-line patch (CommonJS and ESM templates) to append
-its framework Vary tokens rather than overwrite the middleware header. Recheck
+Next.js 15.5.24 package patches its CommonJS and ESM templates to append
+framework Vary tokens. Its response-header adapter also merges subsequent Vary
+writes with existing tokens (case-insensitively), preserving Accept when a render
+replaces the header. Recheck
 HTTP variants when upgrading Next.js and remove the patch when upstream preserves
 custom Vary values. Article bodies
 come directly from `content/blog`, including structured YAML fences. Home and
@@ -35,9 +37,16 @@ at `/.well-known/agent-card.json`. The A2A endpoint supports synchronous read-on
 commands only, as described in its card. `/.well-known/api-catalog` serves an RFC 9727
 `application/linkset+json` document linking these public discovery resources.
 
-The existing authenticated `/mcp` and OAuth routes retain their behavior. The existing
-`/.well-known/oauth-protected-resource` rewrite continues to serve Better Auth's
-metadata for that protected resource; anonymous `/mcp/public` requires no OAuth.
+The existing authenticated `/mcp` and OAuth routes retain their behavior. RFC 9728
+resource discovery returns JSON: `/.well-known/oauth-protected-resource` identifies
+the request origin, and `/.well-known/oauth-protected-resource/mcp` identifies
+`<origin>/mcp`. Both preserve Better Auth's authorization servers, scopes and other
+metadata. The web proxy forwards the request origin only for the MCP discovery
+challenge, keeping it independent of the configured token issuer. MCP 401
+challenges link to the MCP-specific document on that origin; successful public
+pages do not advertise a challenge. Anonymous `/mcp/public` requires no OAuth.
+The A2A card includes `supportedInterfaces` for the existing JSONRPC `/a2a`
+interface at protocol version 0.3.0, alongside its legacy URL and transport fields.
 
 ## Web Bot Auth
 
@@ -54,3 +63,32 @@ With the application running, run
 It alternates HTML and Markdown requests to catch cache contamination, verifies
 Vary and additive Link headers, checks served digests, and exercises MCP discovery
 and article reads. Run against a production build when upgrading Next.js.
+
+## Browser tools and capability manifests
+
+The root layout feature-detects the current `document.modelContext` WebMCP API and
+its earlier `navigator.modelContext` form. It registers `search_skills`, `get_skill`,
+`list_blog_posts`, and `read_blog_post` as read-only tools. They map only to the
+existing anonymous `/mcp/public` tools and always omit browser credentials. Private
+page content, session state, workspace APIs and write tools are never exposed.
+When the API is absent, the component renders nothing and does no work. Registration
+is scoped to the component lifetime and supports cancellation.
+
+`/.well-known/ai-catalog.json` uses the ARD v0.91 `entries` envelope and domain-anchored
+`urn:air:` identifiers. Its five public resources are the MCP server card, A2A card,
+Agent Skills index, RFC 9727 API catalog and `llms.txt`. The root head links it with
+`rel="ai-catalog"`; `robots.txt` includes an `Agentmap` using the configured site origin.
+The robots route remains statically generated, preserving its existing behavior.
+
+`/.well-known/poppy.json` follows the Poppy draft 0.3 discovery schema: organization
+identity matches the request host, and `auth.issuer` repeats an existing authorization
+server from the root protected-resource metadata. It advertises only `web: {}` for
+ordinary signed-out browsing. It does not claim Poppy sessions, API token support,
+conversations, browser-session endpoints or sign-in extensions; the existing auth
+flow is unchanged. Publishing this discovery document is not a claim of full Poppy
+session or OAuth-profile conformance.
+
+Schema sources: [ARD](https://github.com/ards-project/ard-spec/blob/main/spec/schemas/ard-entry.schema.json),
+[Poppy](https://github.com/personal-agent-protocol/personal-agent-protocol/blob/main/kit/company/schemas/poppy.schema.json),
+[WebMCP](https://webmachinelearning.github.io/webmcp/).
+DNS-AID records are proposed in the PR description only; this change performs no DNS writes.
