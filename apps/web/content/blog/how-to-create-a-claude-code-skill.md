@@ -1,6 +1,6 @@
 ---
 title: "How to Create a Claude Code Skill: Step-by-Step Guide (2026)"
-description: "Build a working Claude Code skill from scratch: pick the task, write SKILL.md, test that it triggers, add scripts and references, then validate it and make it work in Codex too."
+description: "Build a working Claude Code skill: write SKILL.md, test that it triggers, add scripts and references, then validate it and reuse it in Codex."
 slug: how-to-create-a-claude-code-skill
 date: 2026-10-19
 tags: ["Claude Code", "Agent Skills", "SKILL.md", "Skillpack CLI"]

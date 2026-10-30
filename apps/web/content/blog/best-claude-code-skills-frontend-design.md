@@ -1,6 +1,6 @@
 ---
 title: "Best Claude Code Skills for Frontend Design (2026)"
-description: "The 7 widely installed Claude Code skills for frontend design in 2026, ranked on public install counts, maintainer, license and scope, with one-line install commands."
+description: "7 widely installed Claude Code skills for frontend design in 2026, ranked by public installs, with maintainer, license, scope and install commands."
 slug: best-claude-code-skills-frontend-design
 date: 2026-10-15
 tags: ["Claude Code", "Agent Skills", "Frontend"]
