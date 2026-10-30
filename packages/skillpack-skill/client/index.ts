@@ -33,7 +33,7 @@ import {
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue | undefined };
 const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() => z.union([
-  z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(jsonValueSchema),
+  z.string(), z.number(), z.boolean(), z.null(), z.array(jsonValueSchema), z.record(z.string(), jsonValueSchema),
 ]));
 const workspaceId = z.string().optional();
 const clientInputSchema = z.discriminatedUnion("action", [
@@ -634,7 +634,7 @@ async function secretRedeem(input: Extract<ClientInput, { action: "secret-redeem
     contentType: "application/json",
   });
   if (!redeemResponse.ok) return responseError(redeemResponse, true);
-  const parsedRedemption = z.record(jsonValueSchema).safeParse(await redeemResponse.json());
+  const parsedRedemption = z.record(z.string(), jsonValueSchema).safeParse(await redeemResponse.json());
   if (!parsedRedemption.success) throw new Error("Skillpack returned an invalid secret redemption");
   const redeemed = parsedRedemption.data;
   try {

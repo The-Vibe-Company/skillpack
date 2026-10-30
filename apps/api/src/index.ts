@@ -724,7 +724,14 @@ app.get("/health", (c) => c.json({
   release_id: deploymentReleaseId(),
 }));
 
-app.on(["GET", "POST"], "/auth/*", (c) => {
+app.on(["GET", "HEAD"], [
+  "/.well-known/oauth-authorization-server",
+  "/.well-known/oauth-authorization-server/auth",
+  "/.well-known/oauth-protected-resource",
+  "/.well-known/oauth-protected-resource/mcp",
+], (c) => auth.handler(c.req.raw));
+
+app.on(["GET", "POST", "HEAD"], "/auth/*", (c) => {
   if (isUnpublishedAuthPath(new URL(c.req.url).pathname)) {
     return c.json({ ok: false, error: "Not Found" }, 404);
   }
@@ -823,16 +830,19 @@ app.post("/v1/mcp/consent", async (c) => {
     // workspace, which would authorize a connection that can never be scoped. The reverse order
     // fails the other way — an approval that never got its workspace would leave a live mapping for
     // a grant the member never completed — so undo the binding if the approval does not land.
-    await bindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId });
+    let bindingWritten = false;
     let approved: Awaited<ReturnType<typeof decideMcpConsent>>;
     try {
       approved = await decideMcpConsent({
         headers: c.req.raw.headers,
         accept: true,
         consentCode: body.consent_code,
+        beforeApprove: async () => {
+          bindingWritten = await bindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId });
+        },
       });
     } catch (error) {
-      await unbindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId })
+      if (bindingWritten) await unbindMcpClientWorkspace({ actor, orgId: body.workspace_id, clientId: pending.clientId })
         .catch((cleanupError: unknown) => {
           captureServerError(cleanupError, { operation: "mcp.consent.unbind", level: "warning" });
         });

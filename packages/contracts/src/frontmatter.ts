@@ -31,7 +31,7 @@ export const skillRequirementSchema = z
       .regex(SKILL_REQUIREMENT_KEY_RE, "requirement key must look like an environment variable (letters, digits, underscores)"),
     type: z.enum(["secret", "env"]).default("secret"),
     /** Stable identity for a secret declaration across skill versions and env-key renames. */
-    slot_id: z.string().uuid().nullable().optional(),
+    slot_id: z.guid().nullable().optional(),
     required: z.boolean().default(true),
     note: z.string().max(2000, "requirement note must be at most 2000 characters").default(""),
   })
@@ -120,7 +120,7 @@ const skillFrontmatterFields = z
       .min(1, "compatibility must not be empty")
       .max(500, "compatibility must be at most 500 characters")
       .optional(),
-    metadata: z.record(z.string()).default({}),
+    metadata: z.record(z.string(), z.string()).default({}),
     "allowed-tools": z.string().optional(),
     /** Legacy Skillpack location. New packages declare these in companion.json. */
     requirements: z.array(skillRequirementSchema).max(64, "at most 64 requirements are allowed").default([]),
@@ -200,13 +200,16 @@ export function parseStoredSkillFrontmatter(value: string | null | undefined): S
     if (parsed.data.requirements.length) {
       stored.requirements = [...parsed.data.requirements]
         .sort((a, b) => a.key.localeCompare(b.key))
-        .map((requirement) => ({
-          key: requirement.key,
-          type: requirement.type,
-          ...(requirement.slot_id ? { slot_id: requirement.slot_id } : {}),
-          required: requirement.required,
-          note: requirement.note,
-        }));
+        .map((requirement) => {
+          const storedRequirement: NonNullable<StoredSkillFrontmatter["requirements"]>[number] = {
+            key: requirement.key,
+            type: requirement.type,
+            required: requirement.required,
+            note: requirement.note,
+          };
+          if (requirement.slot_id) storedRequirement.slot_id = requirement.slot_id;
+          return storedRequirement;
+        });
     }
     return stored;
   } catch {

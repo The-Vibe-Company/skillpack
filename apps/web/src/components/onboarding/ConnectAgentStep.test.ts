@@ -77,7 +77,7 @@ const skill: LocalSkillRow = {
 };
 
 const roots: Root[] = [];
-let onFinish: ReturnType<typeof vi.fn>;
+let onFinish: ReturnType<typeof vi.fn<() => void>>;
 let writeText: ReturnType<typeof vi.fn>;
 
 async function flush() {

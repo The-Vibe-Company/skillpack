@@ -1387,6 +1387,13 @@
       "when": 1793450000000,
       "tag": "0197_catalog_reporting",
       "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1793453600000,
+      "tag": "0198_better_auth_17_mcp",
+      "breakpoints": true
     }
   ]
 }

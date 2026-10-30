@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, vi } from "vitest";
 
-let implicitFetch: ReturnType<typeof vi.fn>;
+let implicitFetch: ReturnType<typeof vi.fn<(input: RequestInfo | URL) => Promise<never>>>;
 
 /**
  * The refusal happy-dom reports for every framed document once `disableIframePageLoading` is on. That
@@ -13,18 +13,21 @@ const EXPECTED_IFRAME_REFUSAL = "Iframe page loading is disabled";
 const consoleError = console.error.bind(console);
 console.error = (...args: unknown[]) => {
   const first = args[0];
-  const message = first instanceof Error ? first.message : typeof first === "string" ? first : "";
+  const message = first instanceof Error ? first.message : String(first ?? "");
   if (message.includes(EXPECTED_IFRAME_REFUSAL)) return;
   consoleError(...args);
 };
 
 beforeEach(() => {
+  // Happy DOM 21 omits native dialogs; confirmation tests control the user decision.
+  vi.stubGlobal("confirm", vi.fn(() => false));
   implicitFetch = vi.fn(async (input: RequestInfo | URL) => {
     throw new Error(
       `Unexpected network request in a web unit test: ${String(input)}. Mock the client boundary explicitly.`,
     );
   });
-  vi.stubGlobal("fetch", implicitFetch);
+  // Keep the guard behind a real function so Vitest spies can replace fetch without reusing it.
+  vi.stubGlobal("fetch", (input: RequestInfo | URL) => implicitFetch(input));
 });
 
 afterEach(() => {

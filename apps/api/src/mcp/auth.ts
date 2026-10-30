@@ -65,14 +65,14 @@ const UNPUBLISHED_AUTH_PATHS: ReadonlySet<string> = new Set(["/auth/mcp/get-sess
 export function forceMcpConsentPrompt(request: Request): Request {
   if (request.method !== "GET") return request;
   const url = new URL(request.url);
-  if (url.pathname !== "/auth/mcp/authorize") return request;
+  if (url.pathname !== "/auth/mcp/authorize" && url.pathname !== "/auth/oauth2/authorize") return request;
   url.searchParams.set("prompt", "consent");
   return new Request(url, request);
 }
 
 /** True for a Better Auth endpoint this product deliberately does not publish. */
 export function isUnpublishedAuthPath(pathname: string): boolean {
-  return UNPUBLISHED_AUTH_PATHS.has(pathname);
+  return UNPUBLISHED_AUTH_PATHS.has(pathname.replace(/\/+$/, ""));
 }
 
 /** The RFC 9728 challenge that points an MCP client at this instance's protected-resource metadata. */
@@ -87,6 +87,6 @@ export function mcpAuthenticateChallenge(origin: string): string {
 export const mcpConsentInputSchema = z.object({
   consent_code: z.string().trim().min(1).max(200),
   accept: z.boolean(),
-  workspace_id: z.string().uuid(),
+  workspace_id: z.guid(),
 });
 export type McpConsentInput = z.infer<typeof mcpConsentInputSchema>;

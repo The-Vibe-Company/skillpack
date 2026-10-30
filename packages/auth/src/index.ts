@@ -1,6 +1,9 @@
 /* oxlint-disable anti-slop/no-unknown-returns, anti-slop/no-chained-type-assertions, anti-slop/require-safety-comment-for-type-assertion, anti-slop/no-unsafe-dictionary-type -- Better Auth's existing inferred Agent Auth plugin boundary exposes private and unknown response types; the stable public facade below predates the incremental anti-slop gate. */
 import { betterAuth } from "better-auth";
-import { emailOTP, mcp } from "better-auth/plugins";
+import { createAuthEndpoint } from "better-auth/api";
+import { emailOTP, jwt } from "better-auth/plugins";
+import { mcp } from "@better-auth/mcp";
+import { getOAuthProviderApi, verifyOAuthQueryParams } from "@better-auth/oauth-provider";
 import { agentAuth, type AgentSession } from "@better-auth/agent-auth";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
@@ -118,20 +121,23 @@ function mcpWebPage(path: string): string {
  * browser to `/mcp/consent`, where that workspace is chosen and recorded.
  */
 export const skillpackMcpPlugin: ReturnType<typeof mcp> = mcp({
-  // Better Auth appends `?<authorize query>` to this URL, so it cannot be `/login?next=…`. The web
-  // route re-frames the query as a `next` target and clears the plugin's resume cookie.
   loginPage: mcpWebPage("/mcp/login"),
+  consentPage: mcpWebPage("/mcp/consent"),
   resource: mcpResourceUrl(),
-  oidcConfig: {
-    // The plugin overwrites this from the outer option; `OIDCOptions` still requires it.
-    loginPage: mcpWebPage("/mcp/login"),
-    allowDynamicClientRegistration: true,
-    requirePKCE: true,
-    allowPlainCodeChallengeMethod: false,
-    consentPage: mcpWebPage("/mcp/consent"),
-    accessTokenExpiresIn: MCP_ACCESS_TOKEN_TTL_SECONDS,
-    refreshTokenExpiresIn: MCP_REFRESH_TOKEN_TTL_SECONDS,
-  },
+  allowDynamicClientRegistration: true,
+  allowUnauthenticatedClientRegistration: true,
+  // Global resource policy is operator configuration, never a tenant member's authority.
+  resourcePrivileges: () => false,
+  clientPrivileges: ({ action }) => action === "create",
+  grantTypes: ["authorization_code", "refresh_token"],
+  clientRegistrationDefaultScopes: ["openid", "profile", "email", "offline_access"],
+  clientRegistrationAllowedScopes: ["openid", "profile", "email", "offline_access"],
+  clientRegistrationAllowedResources: [mcpResourceUrl()],
+  // The instance exposes one MCP resource. Existing 1.6 clients have no resource linkage yet.
+  enforcePerClientResources: false,
+  refreshTokenReuseInterval: 0,
+  accessTokenExpiresIn: MCP_ACCESS_TOKEN_TTL_SECONDS,
+  refreshTokenExpiresIn: MCP_REFRESH_TOKEN_TTL_SECONDS,
 });
 
 export const skillpackAgentAuthPlugin: ReturnType<typeof agentAuth> = agentAuth({
@@ -174,6 +180,19 @@ export const skillpackAgentAuthPlugin: ReturnType<typeof agentAuth> = agentAuth(
   onEvent: emitAgentAuthEvent,
 });
 
+// Server-only endpoint gives the provider a complete Better Auth endpoint context without
+// publishing token introspection or accepting unverified JWT payloads at the MCP boundary.
+const skillpackMcpVerificationPlugin = {
+  id: "skillpack-mcp-verification",
+  endpoints: {
+    verifySkillpackMcpAccessToken: createAuthEndpoint.serverOnly({
+      method: "POST",
+      body: z.object({ token: z.string().min(1) }),
+    }, async (context) => getOAuthProviderApi(context, skillpackMcpPlugin.options)
+      .requireActiveAccessToken(context.body.token)),
+  },
+};
+
 const configuredAuth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL ?? process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001",
   basePath: "/auth",
@@ -195,11 +214,8 @@ const configuredAuth = betterAuth({
     requireEmailVerification: true,
   },
   verification: {
-    // Secondary storage keys verification values by their identifier, and the OAuth consent step
-    // re-issues the authorization code by *renaming* a pending value's identifier. That rename only
-    // reaches the database row, so a cache-only value would leave the new code unresolvable and
-    // every MCP token exchange would fail with `invalid_grant`. Keeping verification values in the
-    // database as well makes the authorize → consent → token chain read and write the same record.
+    // Authorization codes and replay tombstones must remain durable alongside the provider's
+    // database-backed sessions and refresh grants, even when secondary storage is configured.
     storeInDatabase: true,
   },
   emailVerification: {
@@ -210,6 +226,7 @@ const configuredAuth = betterAuth({
   },
   socialProviders: googleSocialProvider(),
   session: {
+    storeSessionInDatabase: true,
     // Keep active devices signed in for 30 days. Better Auth refreshes the database expiry and
     // session-token cookie at most once per day; the API middleware forwards that Set-Cookie to
     // browser-facing responses so this remains a true rolling window.
@@ -233,7 +250,9 @@ const configuredAuth = betterAuth({
       },
     }),
     skillpackAgentAuthPlugin,
+    jwt(),
     skillpackMcpPlugin,
+    skillpackMcpVerificationPlugin,
   ],
   advanced: {
     cookiePrefix: process.env.BETTER_AUTH_COOKIE_PREFIX ?? "better-auth",
@@ -292,6 +311,78 @@ interface PublicAuth {
 
 const publicConfiguredAuth = configuredAuth as unknown as PublicAuth;
 
+/** 1.6 did not persist confidential clients' chosen secret transport; preserve both legacy forms. */
+async function normalizeMcpTokenRequest(request: Request, url: URL, headers: Headers): Promise<Request | Response> {
+  const reader = request.clone().body?.getReader();
+  const decoder = new TextDecoder();
+  let text = "";
+  let bytes = 0;
+  if (reader) while (true) {
+    const { done, value } = await reader.read();
+    if (done) { text += decoder.decode(); break; }
+    bytes += value.byteLength;
+    if (bytes > 64 * 1024) {
+      await reader.cancel().catch(() => undefined);
+      return Response.json({ error: "request_too_large" }, { status: 413 });
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  const form = new URLSearchParams(text);
+  if (!form.has("resource")) form.set("resource", mcpResourceUrl());
+  const clientId = form.get("client_id");
+  const clientSecret = form.get("client_secret");
+  if (!headers.has("authorization") && clientId && clientSecret
+    && form.getAll("client_id").length === 1 && form.getAll("client_secret").length === 1) {
+    const [client] = await db.select({ referenceId: schema.oauthClient.referenceId })
+      .from(schema.oauthClient).where(eq(schema.oauthClient.clientId, clientId)).limit(1);
+    // DCR cannot set reference_id. This private marker is written only by migration 0198.
+    if (client?.referenceId === "skillpack:mcp-1.6-confidential") {
+      headers.set("authorization", `Basic ${Buffer.from(`${encodeURIComponent(clientId)}:${encodeURIComponent(clientSecret)}`).toString("base64")}`);
+      form.delete("client_secret");
+      form.delete("client_id");
+    }
+  }
+  headers.delete("content-length");
+  return new Request(url, { method: "POST", headers, body: form.toString() });
+}
+
+/** Retain published 1.6 endpoint URLs while discovery advertises the provider's 1.7 routes. */
+async function canonicalizeMcpRequest(request: Request): Promise<Request | Response> {
+  const url = new URL(request.url);
+  url.pathname = url.pathname.replace(/\/+$/, "");
+  url.pathname = url.pathname.replace(/^\/auth\/mcp\/(authorize|token|register)$/, "/auth/oauth2/$1");
+  if (url.pathname === "/auth/oauth2/consent" || url.pathname === "/auth/mcp/get-session") {
+    return Response.json({ error: "Not Found" }, { status: 404 });
+  }
+  if (url.pathname.startsWith("/auth/admin/oauth2")
+    || (url.pathname.startsWith("/auth/oauth2/")
+      && !["/auth/oauth2/authorize", "/auth/oauth2/token", "/auth/oauth2/register",
+        "/auth/oauth2/userinfo", "/auth/oauth2/introspect", "/auth/oauth2/revoke",
+        "/auth/oauth2/end-session", "/auth/oauth2/end-session/confirm"].includes(url.pathname))) {
+    return Response.json({ error: "Not Found" }, { status: 404 });
+  }
+  const isAuthorize = url.pathname === "/auth/oauth2/authorize";
+  if (isAuthorize && request.method !== "GET") return new Response(null, { status: 405, headers: { allow: "GET" } });
+  if (isAuthorize) {
+    url.searchParams.set("prompt", "consent");
+    if (!url.searchParams.has("resource")) url.searchParams.set("resource", mcpResourceUrl());
+  }
+  // OAuth provider redirects and proof validation must observe the canonical public origin.
+  if (!url.pathname.startsWith("/auth/oauth2/") && !url.pathname.includes("/.well-known/")) return request;
+  if (url.pathname === "/.well-known/oauth-authorization-server") url.pathname = "/auth/.well-known/oauth-authorization-server";
+  if (url.pathname === "/auth/.well-known/oauth-protected-resource") url.pathname = "/.well-known/oauth-protected-resource";
+  const publicUrl = new URL(url.pathname + url.search, publicInstanceOrigin());
+  const headers = new Headers(request.headers);
+  headers.set("host", publicUrl.host);
+  headers.set("x-forwarded-host", publicUrl.host);
+  headers.set("x-forwarded-proto", publicUrl.protocol.slice(0, -1));
+  if (url.pathname === "/auth/oauth2/token" && request.method === "POST"
+    && headers.get("content-type")?.split(";")[0]?.trim() === "application/x-www-form-urlencoded") {
+    return normalizeMcpTokenRequest(request, publicUrl, headers);
+  }
+  return new Request(new Request(publicUrl, request), { headers });
+}
+
 async function hardenedAuthHandler(request: Request): Promise<Response> {
   const remoteKeyGuard = await guardAgentAuthRemoteKeys(request);
   if (remoteKeyGuard !== "allowed") {
@@ -318,7 +409,9 @@ async function hardenedAuthHandler(request: Request): Promise<Response> {
       { status: 400 },
     );
   }
-  return configuredAuth.handler(canonical);
+  const oauthRequest = await canonicalizeMcpRequest(canonical);
+  if (oauthRequest instanceof Response) return oauthRequest;
+  return bindMcpConsentRedirect(await configuredAuth.handler(oauthRequest), oauthRequest);
 }
 
 export const auth: PublicAuth = {
@@ -399,37 +492,27 @@ export interface McpTokenSession {
   scopes: string[];
 }
 
-/**
- * The stored access-token row Better Auth returns for a bearer credential. Expiry is re-checked
- * here so a stale row can never authorize a call.
- */
-const mcpAccessTokenSchema = z.object({
-  userId: z.string().min(1),
-  clientId: z.string().min(1),
-  scopes: z.string().default(""),
-  accessTokenExpiresAt: z.coerce.date(),
-});
-
-/**
- * Validate an MCP bearer access token. Better Auth owns the token lookup; this facade narrows the
- * row to the identity the MCP server needs and re-checks expiry. The workspace binding lives in
- * `mcp_client_workspaces`, not in the token.
- */
+/** Validate through the provider in-process, including signature, expiry, client and session revocation. */
 export async function getMcpTokenSession(headers: Headers): Promise<McpTokenSession | null> {
-  let row: unknown;
+  const authorization = headers.get("authorization");
+  const match = /^Bearer ([^\s]+)$/i.exec(authorization ?? "");
+  if (!match) return null;
   try {
-    row = await configuredAuth.api.getMcpSession({ headers });
+    const claims = await configuredAuth.api.verifySkillpackMcpAccessToken({ body: { token: match[1]! } });
+    const parsed = z.object({
+      sub: z.string().min(1), azp: z.string().min(1), exp: z.number(),
+      scope: z.string().default(""), aud: z.union([z.string().transform((value) => [value]), z.array(z.string())]).optional(),
+      cnf: z.unknown().optional(),
+    }).safeParse(claims);
+    if (!parsed.success || parsed.data.exp * 1000 <= Date.now() || parsed.data.cnf) return null;
+    const audiences = parsed.data.aud;
+    if (audiences && !audiences.includes(mcpResourceUrl())) return null;
+    // Only migrated opaque tokens can lack an audience. New authorization always pins /mcp.
+    if (!audiences && match[1]!.includes(".")) return null;
+    return { userId: parsed.data.sub, clientId: parsed.data.azp, scopes: parsed.data.scope.split(" ").filter(Boolean) };
   } catch {
-    // Keep verification failures indistinguishable at the MCP boundary.
     return null;
   }
-  const parsed = mcpAccessTokenSchema.safeParse(row);
-  if (!parsed.success || parsed.data.accessTokenExpiresAt.getTime() <= Date.now()) return null;
-  return {
-    userId: parsed.data.userId,
-    clientId: parsed.data.clientId,
-    scopes: parsed.data.scopes.split(" ").filter(Boolean),
-  };
 }
 
 /** The pending authorization behind one consent code, read before the decision is recorded. */
@@ -446,62 +529,73 @@ export interface McpPendingAuthorization {
   redirectOrigin: string | null;
 }
 
-/**
- * The authorization Better Auth stores against a consent code. Parsed here rather than trusted:
- * only the fields the consent screen and the workspace binding depend on are accepted.
- */
 const storedMcpAuthorizationSchema = z.object({
-  value: z
-    .string()
-    .transform((value, ctx) => {
-      try {
-        return JSON.parse(value);
-      } catch {
-        ctx.addIssue({ code: "custom", message: "stored authorization is not JSON" });
-        return z.NEVER;
-      }
-    })
-    .pipe(
-      z.object({
-        clientId: z.string().min(1),
-        userId: z.string().min(1),
-        scope: z.array(z.string()).default([]),
-        redirectURI: z.string().min(1),
-        requireConsent: z.literal(true),
-      }),
-    ),
-  expiresAt: z.coerce.date(),
+  userId: z.string().min(1),
+  sessionId: z.string().min(1),
+  oauthQuery: z.string().min(1),
 });
 
-/**
- * Resolve the client and member a consent code belongs to. The MCP consent route needs both before
- * it writes a workspace mapping, and Better Auth replaces the code with a fresh one once the
- * decision is recorded, so this must run first.
- *
- * The lookup goes through Better Auth's own verification adapter rather than the `verification`
- * table: this instance configures secondary storage, so pending authorizations live there.
- */
+async function readMcpConsentTicket(consentCode: string) {
+  if (!/^[a-f0-9-]{36}$/.test(consentCode)) return null;
+  const stored = await postgresAgentAuthStorage.get(`mcp-consent:${consentCode}`);
+  if (!stored) return null;
+  try {
+    const parsed = storedMcpAuthorizationSchema.safeParse(JSON.parse(stored));
+    if (!parsed.success || !await verifyOAuthQueryParams(parsed.data.oauthQuery, getBetterAuthSecret())) return null;
+    return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+/** The opaque ticket binds the provider's signed query to the member and browser session. */
 export async function getMcpPendingAuthorization(consentCode: string): Promise<McpPendingAuthorization | null> {
-  if (!consentCode) return null;
-  const context = await configuredAuth.$context;
-  const pending = storedMcpAuthorizationSchema.safeParse(
-    await context.internalAdapter.findVerificationValue(consentCode),
-  );
-  if (!pending.success || pending.data.expiresAt.getTime() <= Date.now()) return null;
-  const authorization = pending.data.value;
-  const [client] = await db
-    .select({ name: schema.oauthApplication.name, disabled: schema.oauthApplication.disabled })
-    .from(schema.oauthApplication)
-    .where(eq(schema.oauthApplication.clientId, authorization.clientId))
-    .limit(1);
+  const ticket = await readMcpConsentTicket(consentCode);
+  if (!ticket) return null;
+  const query = new URLSearchParams(ticket.oauthQuery);
+  const clientId = query.get("client_id");
+  if (!clientId) return null;
+  const [client] = await db.select({ name: schema.oauthClient.name, disabled: schema.oauthClient.disabled })
+    .from(schema.oauthClient).where(eq(schema.oauthClient.clientId, clientId)).limit(1);
   if (!client || client.disabled) return null;
   return {
-    clientId: authorization.clientId,
-    userId: authorization.userId,
-    scopes: authorization.scope,
-    clientName: client.name || null,
-    redirectOrigin: safeOrigin(authorization.redirectURI),
+    clientId, userId: ticket.userId,
+    scopes: (query.get("scope") ?? "").split(" ").filter(Boolean),
+    clientName: client.name || null, redirectOrigin: safeOrigin(query.get("redirect_uri") ?? ""),
   };
+}
+
+/** Replace a provider consent redirect with a short-lived, session-owned, single-use ticket. */
+async function bindMcpConsentRedirect(response: Response, request: Request): Promise<Response> {
+  const location = response.headers.get("location");
+  let body: { redirect?: boolean; url?: string } | undefined;
+  if (!location && response.headers.get("content-type")?.includes("application/json")) {
+    try { body = z.object({ redirect: z.boolean().optional(), url: z.string().optional() }).parse(await response.clone().json()); } catch { return response; }
+  }
+  const target = location ?? body?.url;
+  if (!target) return response;
+  const url = new URL(target, publicInstanceOrigin());
+  if (url.origin !== new URL(mcpWebPage("/mcp/consent")).origin || url.pathname !== "/mcp/consent") return response;
+  const oauthQuery = url.search.slice(1);
+  if (!await verifyOAuthQueryParams(oauthQuery, getBetterAuthSecret())) {
+    return Response.json({ error: "invalid_consent_request" }, { status: 400 });
+  }
+  const session = await configuredAuth.api.getSession({ headers: request.headers });
+  if (!session) return Response.json({ error: "invalid_consent_session" }, { status: 401 });
+  const code = crypto.randomUUID();
+  const ttl = Math.min(600, Number(url.searchParams.get("exp")) - Math.floor(Date.now() / 1000));
+  if (!Number.isFinite(ttl) || ttl <= 0) return Response.json({ error: "expired_consent_request" }, { status: 400 });
+  await postgresAgentAuthStorage.set(`mcp-consent:${code}`, JSON.stringify({
+    userId: session.user.id, sessionId: session.session.id, oauthQuery,
+  }), ttl);
+  url.search = new URLSearchParams({ consent_code: code }).toString();
+  const headers = new Headers(response.headers);
+  if (location) {
+    headers.set("location", url.toString());
+    return new Response(response.body, { status: response.status, headers });
+  }
+  headers.delete("content-length");
+  return Response.json({ ...body, url: url.toString() }, { status: response.status, headers });
 }
 
 /** The origin of a stored redirect URI, or null when it is not a URL this screen should echo. */
@@ -514,21 +608,27 @@ function safeOrigin(redirectUri: string): string | null {
   }
 }
 
-const mcpConsentResultSchema = z.object({ redirectURI: z.string().min(1) });
-
-/** Record the member's MCP consent decision and return the URL to hand back to the client. */
+/** Consume the session-owned consent ticket before asking the provider to issue a code. */
 export async function decideMcpConsent(input: {
-  headers: Headers;
-  accept: boolean;
-  consentCode: string;
+  headers: Headers; accept: boolean; consentCode: string;
+  beforeApprove?: () => Promise<void>;
 }): Promise<{ redirectURI: string }> {
-  const result = await configuredAuth.api.oAuthConsent({
-    headers: input.headers,
-    body: { accept: input.accept, consent_code: input.consentCode },
+  const ticket = await readMcpConsentTicket(input.consentCode);
+  const session = await configuredAuth.api.getSession({ headers: input.headers });
+  if (!ticket || !session || ticket.userId !== session.user.id || ticket.sessionId !== session.session.id) {
+    throw new Error("this authorization request belongs to a different or expired session");
+  }
+  const consumed = await postgresAgentAuthStorage.getAndDelete(`mcp-consent:${input.consentCode}`);
+  if (!consumed) throw new Error("this authorization request has already been decided");
+  if (input.accept) await input.beforeApprove?.();
+  const result = await configuredAuth.api.oauth2Consent({
+    asResponse: false,
+    headers: input.headers, body: { accept: input.accept, oauth_query: ticket.oauthQuery },
+    request: new Request(new URL("/auth/oauth2/consent", publicInstanceOrigin()), { method: "POST", headers: input.headers }),
   });
-  const parsed = mcpConsentResultSchema.safeParse(result);
+  const parsed = z.object({ url: z.string().min(1) }).safeParse(result);
   if (!parsed.success) throw new Error("the authorization server did not return a redirect target");
-  return { redirectURI: parsed.data.redirectURI };
+  return { redirectURI: new URL(parsed.data.url, publicInstanceOrigin()).toString() };
 }
 
 export interface AuthenticatedAgentRequest {
