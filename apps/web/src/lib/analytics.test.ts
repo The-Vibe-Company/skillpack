@@ -60,7 +60,12 @@ function urlRecorder(tab: ReturnType<typeof fakeTab>) {
   const seen: Array<[string, string]> = [];
   const record = (name: string) => vi.fn().mockImplementation(() => void seen.push([name, tab.url]));
   const capture = vi.fn().mockImplementation((event: string) => void seen.push([event, tab.url]));
-  const client: AnalyticsClient = { init: record("init"), identify: record("identify"), capture, reset: record("reset") };
+  const client: AnalyticsClient = {
+    init: record("init"),
+    identify: record("identify"),
+    capture,
+    reset: record("reset"),
+  };
   return { client, seen };
 }
 
@@ -106,13 +111,17 @@ describe("analytics", () => {
 
     expect(load).toHaveBeenCalledTimes(1);
     expect(client.init).toHaveBeenCalledTimes(1);
-    expect(client.init).toHaveBeenCalledWith("phc_test", {
-      api_host: "/ingest",
-      ui_host: "https://us.posthog.com",
-      defaults: "2026-05-30",
-      capture_pageview: false,
-      capture_pageleave: true,
-    });
+    expect(client.init).toHaveBeenCalledWith(
+      "phc_test",
+      {
+        api_host: "/ingest",
+        ui_host: "https://us.posthog.com",
+        defaults: "2026-05-30",
+        capture_pageview: false,
+        capture_pageleave: true,
+      },
+      undefined,
+    );
   });
 
   it("stays silent in production until initialized", async () => {
@@ -448,6 +457,41 @@ describe("analytics before PostHog arrives", () => {
   });
 });
 
+describe("analytics replaying on the real address bar", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("shows each call's URL with the native history API, then restores the URL and router state", async () => {
+    window.history.replaceState({ __NA: true, tree: "landing" }, "", "/?utm_source=linkedin");
+    const seen: string[] = [];
+    const shownPath = () => void seen.push(window.location.pathname + window.location.search);
+    const client: AnalyticsClient = {
+      ...recorder(),
+      init: vi.fn().mockImplementation(shownPath),
+      capture: vi.fn().mockImplementation(shownPath),
+    };
+    let arrive: (client: AnalyticsClient) => void = () => {};
+    const analytics = createAnalytics(() => new Promise((resolve) => (arrive = resolve)), production);
+
+    analytics.pageview();
+    analytics.init();
+    window.history.pushState({ __NA: true, tree: "blog" }, "", "/blog");
+    const patched = vi.fn();
+    const routerPatchedReplaceState = window.history.replaceState;
+    window.history.replaceState = patched;
+    analytics.pageview();
+    arrive(client);
+    await settle();
+    window.history.replaceState = routerPatchedReplaceState;
+
+    expect(seen).toEqual(["/?utm_source=linkedin", "/?utm_source=linkedin", "/blog"]);
+    expect(patched).not.toHaveBeenCalled();
+    expect(window.location.pathname).toBe("/blog");
+    expect(window.history.state).toEqual({ __NA: true, tree: "blog" });
+  });
+});
+
 describe("analytics when PostHog fails to load", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -475,22 +519,29 @@ describe("analytics when PostHog fails to load", () => {
     expect(client.capture).toHaveBeenCalledWith("$pageview", expect.anything(), expect.anything());
   });
 
-  it("retries when PostHog throws while initializing", async () => {
+  it("retries a throwing init on a fresh named instance, which posthog-js requires", async () => {
     const tab = fakeTab();
-    const { client } = urlRecorder(tab);
-    vi.mocked(client.init).mockImplementationOnce(() => {
-      throw new Error("init failed");
-    });
+    const retried = recorder();
+    const init = vi
+      .fn()
+      .mockImplementationOnce(() => {
+        throw new Error("init failed");
+      })
+      .mockImplementationOnce(() => retried);
+    const client: AnalyticsClient = { ...recorder(), init };
     const load = vi.fn(async () => client);
     const analytics = createAnalytics(load, production, undefined, queueOptions(tab));
 
     analytics.init();
     analytics.identify(member);
     await settle();
+    analytics.reset();
 
     expect(load).toHaveBeenCalledTimes(2);
-    expect(client.init).toHaveBeenCalledTimes(2);
-    expect(client.identify).toHaveBeenCalledTimes(1);
+    expect(init.mock.calls.map((call) => call[2])).toEqual([undefined, "skillpack_retry_1"]);
+    expect(client.identify).not.toHaveBeenCalled();
+    expect(retried.identify).toHaveBeenCalledTimes(1);
+    expect(retried.reset).toHaveBeenCalledTimes(1);
   });
 
   it("gives up after the last attempt: drops the queue, warns once, and never loads again", async () => {

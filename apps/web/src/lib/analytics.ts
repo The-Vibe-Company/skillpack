@@ -151,20 +151,34 @@ export function createAnalytics(
   };
 
   const loadWithRetry = async (projectToken: string): Promise<AnalyticsClient | null> => {
+    let failedInits = 0;
     for (let attempt = 1; ; attempt++) {
       try {
         const posthog = await loadClient();
-        atUrlsOf(pending, () =>
-          posthog.init(projectToken, {
-            api_host: POSTHOG_PROXY_PATH,
-            ui_host: config.uiHost,
-            defaults: "2026-05-30",
-            // Pageviews go through `pageview` so one made before PostHog arrives keeps its own URL.
-            capture_pageview: false,
-            capture_pageleave: true,
-          }),
-        );
-        return posthog;
+        // posthog-js marks an instance loaded before initializing it, so once an init has thrown that
+        // instance ignores every later init; a retry starts a fresh named one sharing the same storage.
+        const instanceName = failedInits === 0 ? undefined : `skillpack_retry_${failedInits}`;
+        let initialized: AnalyticsClient | undefined;
+        try {
+          atUrlsOf(pending, () => {
+            initialized = posthog.init(
+              projectToken,
+              {
+                api_host: POSTHOG_PROXY_PATH,
+                ui_host: config.uiHost,
+                defaults: "2026-05-30",
+                // Pageviews go through `pageview` so one made before PostHog arrives keeps its own URL.
+                capture_pageview: false,
+                capture_pageleave: true,
+              },
+              instanceName,
+            );
+          });
+        } catch (error) {
+          failedInits += 1;
+          throw error;
+        }
+        return initialized ?? posthog;
       } catch (error) {
         if (attempt >= maxAttempts) {
           console.warn(`PostHog failed to load after ${attempt} attempts; analytics are off for this page.`, error);
