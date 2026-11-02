@@ -152,7 +152,7 @@ describe("blog post loading", () => {
     });
     expect(post?.body).toBe(fileBody);
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
-      "f912805c6f2dc98740a4f43222ac697d502b14a3909cac3430756b53481cfd38",
+      "416d8d5b6a72ecc20ebc3191b67b7a89944b45647ee0b1683f8091258440f445",
     );
   });
 

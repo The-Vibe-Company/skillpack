@@ -163,17 +163,17 @@ Skillpack is MIT-licensed. If your skills encode sensitive internal processes, r
 
 ## FAQ
 
-**Is SKILL.md only for Claude?**
-No. The format started at Anthropic but is now an open standard at [agentskills.io](https://agentskills.io), supported by several agents including Codex, Cursor and OpenCode.
-
-**What's the difference between a skill and an MCP server?**
-An MCP server exposes tools and data (APIs, databases). A skill is instructions and resources that teach the agent how to do a task, often with those tools. You'll usually want both.
-
-**How long should a SKILL.md be?**
-Keep the body focused on the procedure, and move extra detail into `references/` files that load on demand.
-
-**Can I keep skills private?**
-Yes. In Skillpack, personal skills are visible only to their creator, and organization skills are shared with members. You can also self-host the whole hub.
+```faq
+items:
+  - question: "Is SKILL.md only for Claude?"
+    answer: "No. The format started at Anthropic but is now an open standard at [agentskills.io](https://agentskills.io), supported by several agents including Codex, Cursor and OpenCode."
+  - question: "What's the difference between a skill and an MCP server?"
+    answer: "An MCP server exposes tools and data (APIs, databases). A skill is instructions and resources that teach the agent how to do a task, often with those tools. You'll usually want both."
+  - question: "How long should a SKILL.md be?"
+    answer: "Keep the body focused on the procedure, and move extra detail into `references/` files that load on demand."
+  - question: "Can I keep skills private?"
+    answer: "Yes. In Skillpack, personal skills are visible only to their creator, and organization skills are shared with members. You can also self-host the whole hub."
+```
 
 ## Start your skill library
 
