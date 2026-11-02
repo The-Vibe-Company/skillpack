@@ -6,7 +6,7 @@ import { armSignupMarker } from "@/lib/signupMarker";
 import { ANALYTICS_FALLBACK_DELAY_MS, afterFirstInteraction, reportSignupFromLocation } from "./PostHogProvider";
 
 function fakeAnalytics(enabled: boolean): Analytics {
-  return { enabled, init: vi.fn(() => enabled), identify: vi.fn(), signedUp: vi.fn(), reset: vi.fn() };
+  return { enabled, init: vi.fn(() => enabled), pageview: vi.fn(), identify: vi.fn(), signedUp: vi.fn(), reset: vi.fn() };
 }
 
 const whoami = {
