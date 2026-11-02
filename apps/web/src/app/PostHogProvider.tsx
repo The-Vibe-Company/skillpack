@@ -31,20 +31,39 @@ export async function reportSignupFromLocation(target: Analytics): Promise<void>
   target.signedUp(await loadSignedInUser(), marker);
 }
 
-/** Run `task` once the browser is idle, so loading analytics never competes with the first render. */
-function whenIdle(task: () => void): () => void {
-  if ("requestIdleCallback" in window) {
-    const handle = window.requestIdleCallback(task, { timeout: 4000 });
-    return () => window.cancelIdleCallback(handle);
-  }
-  const handle = setTimeout(task, 1);
-  return () => clearTimeout(handle);
+/** Latest start for analytics when the visitor has not interacted yet, counted from the page load. */
+export const ANALYTICS_FALLBACK_DELAY_MS = 8000;
+const FIRST_INTERACTION = ["pointerdown", "keydown", "scroll", "wheel", "touchstart"] as const;
+
+/**
+ * Run `task` once, on the visitor's first interaction or a while after the page has loaded, whichever
+ * comes first. PostHog, its session recorder and its extensions cost several hundred milliseconds of
+ * main thread; keeping them out of the load leaves that time to rendering and hydration.
+ */
+export function afterFirstInteraction(task: () => void, fallbackMs = ANALYTICS_FALLBACK_DELAY_MS): () => void {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const run = () => {
+    cancel();
+    task();
+  };
+  const startFallback = () => {
+    timer = setTimeout(run, fallbackMs);
+  };
+  const cancel = () => {
+    clearTimeout(timer);
+    window.removeEventListener("load", startFallback);
+    for (const type of FIRST_INTERACTION) window.removeEventListener(type, run);
+  };
+  for (const type of FIRST_INTERACTION) window.addEventListener(type, run, { once: true, passive: true });
+  if (document.readyState === "complete") startFallback();
+  else window.addEventListener("load", startFallback, { once: true });
+  return cancel;
 }
 
 export function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void reportSignupFromLocation(analytics);
-    return whenIdle(() => analytics.init());
+    return afterFirstInteraction(() => analytics.init());
   }, []);
 
   return <>{children}</>;

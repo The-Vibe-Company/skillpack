@@ -3,7 +3,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Analytics } from "@/lib/analytics";
 import { armSignupMarker } from "@/lib/signupMarker";
-import { reportSignupFromLocation } from "./PostHogProvider";
+import { ANALYTICS_FALLBACK_DELAY_MS, afterFirstInteraction, reportSignupFromLocation } from "./PostHogProvider";
 
 function fakeAnalytics(enabled: boolean): Analytics {
   return { enabled, init: vi.fn(() => enabled), identify: vi.fn(), signedUp: vi.fn(), reset: vi.fn() };
@@ -112,3 +112,60 @@ describe("reportSignupFromLocation", () => {
     expect(window.location.hash).toBe("#profile");
   });
 });
+
+describe("afterFirstInteraction", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("starts on the first interaction, once", () => {
+    const task = vi.fn();
+    afterFirstInteraction(task);
+
+    expect(task).not.toHaveBeenCalled();
+    window.dispatchEvent(new Event("scroll"));
+    window.dispatchEvent(new Event("pointerdown"));
+    vi.advanceTimersByTime(ANALYTICS_FALLBACK_DELAY_MS);
+
+    expect(task).toHaveBeenCalledTimes(1);
+  });
+
+  it("starts a while after the load when the visitor never interacts", () => {
+    const task = vi.fn();
+    afterFirstInteraction(task);
+
+    vi.advanceTimersByTime(ANALYTICS_FALLBACK_DELAY_MS - 1);
+    expect(task).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(task).toHaveBeenCalledTimes(1);
+  });
+
+  it("waits for the load event before counting down", () => {
+    const readyState = vi.spyOn(document, "readyState", "get").mockReturnValue("interactive");
+    const task = vi.fn();
+    afterFirstInteraction(task);
+
+    vi.advanceTimersByTime(ANALYTICS_FALLBACK_DELAY_MS * 2);
+    expect(task).not.toHaveBeenCalled();
+    window.dispatchEvent(new Event("load"));
+    vi.advanceTimersByTime(ANALYTICS_FALLBACK_DELAY_MS);
+    expect(task).toHaveBeenCalledTimes(1);
+    readyState.mockRestore();
+  });
+
+  it("never starts once cancelled by an unmount", () => {
+    const task = vi.fn();
+    const cancel = afterFirstInteraction(task);
+
+    cancel();
+    window.dispatchEvent(new Event("keydown"));
+    vi.advanceTimersByTime(ANALYTICS_FALLBACK_DELAY_MS);
+
+    expect(task).not.toHaveBeenCalled();
+  });
+});
+
