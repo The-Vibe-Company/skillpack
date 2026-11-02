@@ -41,6 +41,9 @@ Before adding a CI workflow, job, required check, or trigger, obtain explicit re
 Apple Quality retains only the Darwin-specific bundled skill guards. Never install or invoke XcodeBuildMCP in CI.
 PR titles use Commitizen style, for example `feat(skills): add package validation`.
 
+For IndexNow notifications, key rotation, or URL selection, read `docs/indexnow.md`. Inspect
+production payloads with `pnpm indexnow:submit-all --dry-run`; agents must never submit real notifications.
+
 ## Agent references
 
 Issues live in Linear, project Companions; confirm the team with the user on first write.

@@ -1,0 +1,53 @@
+name: IndexNow
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+  deployments: read
+
+concurrency:
+  group: indexnow-${{ github.event.deployment.sha }}
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Production' &&
+      github.event.deployment.creator.login == 'vercel[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Vercel puts a SHA in deployment.ref. Prove main ancestry before running code.
+      - name: Verify deployment belongs to main
+        id: main
+        env:
+          DEPLOYED_SHA: ${{ github.event.deployment.sha }}
+        run: |
+          if git merge-base --is-ancestor "$DEPLOYED_SHA" origin/main; then
+            echo "verified=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "IndexNow: skipped (not production main)"
+          fi
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        if: steps.main.outputs.verified == 'true'
+        with:
+          node-version: 22
+
+      - name: Notify changed canonical URLs after production is live
+        if: steps.main.outputs.verified == 'true'
+        env:
+          VERCEL_ENV: production
+          VERCEL_GIT_COMMIT_REF: main
+          GH_TOKEN: ${{ github.token }}
+        run: node --experimental-strip-types scripts/indexnow.ts --deployment || true
