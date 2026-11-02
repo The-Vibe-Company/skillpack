@@ -68,6 +68,23 @@ Using Codex too? [Codex skills: how to install, use and create them](/blog/how-t
 - Claude doesn't use the skill: Claude matches on the `description` in the frontmatter. Make it say when to use the skill.
 - Skill not found: check the path is `.claude/skills/<name>/SKILL.md`. If you created the `skills` folder after the session started, run `/reload-skills`.
 - Something's off with the setup: run `skillpack doctor`. It checks setup and connectivity.
+- Still stuck? See [Claude Code skills not working? 8 causes and fixes](/blog/claude-code-skills-not-working).
+
+## FAQ
+
+```faq
+items:
+  - question: "Where do Claude Code skills go?"
+    answer: "In `~/.claude/skills/<skill-name>/` for you, in every project, or in `.claude/skills/<skill-name>/` for everyone who clones the repo. `SKILL.md` must sit directly inside the skill folder."
+  - question: "Do I need to restart Claude Code after installing a skill?"
+    answer: "No. Claude Code picks up the new skill in the current session. If the `skills` folder didn't exist when the session started, run `/reload-skills` once."
+  - question: "What does skillpack install write?"
+    answer: "With `--scope project --tools claude-code`, it writes the skill into `.claude/skills/` and records it in `.companion/skills.lock.json` with its version and a sha256 checksum. Use `--scope user` for `~/.claude/skills/`."
+  - question: "Can I install a specific version of a skill?"
+    answer: "Yes. `--version 1.2.3` installs a specific version and `--pin` keeps it there. Add `--dry-run` to see what would change without writing anything."
+  - question: "How do teammates get the same skills?"
+    answer: "Commit `.companion/skills.lock.json`, then have them (or CI) run `skillpack sync --frozen`. It restores missing copies and fails instead of overwriting a local edit."
+```
 
 ## Get started
 

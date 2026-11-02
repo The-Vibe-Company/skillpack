@@ -189,15 +189,19 @@ If you keep pasting the same instructions into prompts, that's a skill waiting t
 
 ## FAQ
 
-**Can I share a skill without any tool?** Yes. Commit it to `.claude/skills/` in the repo. For a skill that belongs to one repo, that's the right call.
-
-**Do personal skills work in Claude Code cloud sessions?** Not from `~/.claude/skills/` on your machine, per Claude Code's docs. Commit the skill to the repo's `.claude/skills/`, or enable it on your claude.ai account.
-
-**What file should I commit with Skillpack?** The installed skill folders and `.companion/skills.lock.json`.
-
-**Does Skillpack work with Codex and OpenCode?** Yes. `--tools claude-code,codex,opencode` installs the same skill for all three.
-
-**What happens if someone edits a shared skill locally?** `skillpack sync --frozen` reports the drift and fails, without touching the files or the lockfile. `skillpack update` preserves local edits instead of overwriting them.
+```faq
+items:
+  - question: "Can I share a skill without any tool?"
+    answer: "Yes. Commit it to `.claude/skills/` in the repo. For a skill that belongs to one repo, that's the right call."
+  - question: "Do personal skills work in Claude Code cloud sessions?"
+    answer: "Not from `~/.claude/skills/` on your machine, per Claude Code's docs. Commit the skill to the repo's `.claude/skills/`, or enable it on your claude.ai account."
+  - question: "What file should I commit with Skillpack?"
+    answer: "The installed skill folders and `.companion/skills.lock.json`."
+  - question: "Does Skillpack work with Codex and OpenCode?"
+    answer: "Yes. `--tools claude-code,codex,opencode` installs the same skill for all three."
+  - question: "What happens if someone edits a shared skill locally?"
+    answer: "`skillpack sync --frozen` reports the drift and fails, without touching the files or the lockfile. `skillpack update` preserves local edits instead of overwriting them."
+```
 
 ## Get started
 
