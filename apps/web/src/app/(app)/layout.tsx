@@ -4,6 +4,7 @@ import { SessionKeepAlive } from "@/components/auth/SessionKeepAlive";
 import { AuthUnavailable } from "@/components/org/WorkspaceLoadError";
 import type { AnalyticsUser } from "@/lib/analytics";
 import { loadServerAuth } from "@/lib/serverAuth";
+import "@/styles/product.css";
 
 export default async function AppLayout({
   children,

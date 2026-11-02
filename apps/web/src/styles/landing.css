@@ -303,10 +303,13 @@
   .lp-rise--3 { animation-delay: 180ms; }
   .lp-rise--4 { animation-delay: 260ms; }
   .lp-rise--5 { animation-delay: 380ms; animation-duration: 1200ms; }
+  /* The hero H1 is the LCP element: it must paint on the first frame, so it only slides. */
+  .lp-h1.lp-rise { animation-name: lp-rise-h1; }
   .lp-float--release { animation: lp-bob 7s ease-in-out 1.6s infinite; }
   .lp-float--term { animation: lp-bob 8s ease-in-out 2.2s infinite reverse; }
 }
 @keyframes lp-rise { from { opacity: 0; transform: translateY(18px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes lp-rise-h1 { from { transform: translateY(18px); } to { transform: none; } }
 @keyframes lp-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
 /* --- agents strip ------------------------------------------------------------------ */

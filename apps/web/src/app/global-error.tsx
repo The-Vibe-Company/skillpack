@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { Button, EmptyState } from "@/components/cds";
 import "./globals.css";
+import "@/styles/product.css";
 
 const NO_FOUC_SCRIPT = `(function(){try{var r=document.documentElement;var p={theme:"light",accent:"yellow"};try{var s=localStorage.getItem("sx_prefs");if(s){var o=JSON.parse(s);if(o){if(o.theme)p.theme=o.theme;if(o.accent)p.accent=o.accent;}}}catch(e){}var t=p.theme;if(t==="system")t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";if(t==="dark")r.setAttribute("data-theme","dark");else r.removeAttribute("data-theme");if(p.accent&&p.accent!=="yellow")r.setAttribute("data-accent",p.accent);else r.removeAttribute("data-accent");}catch(e){}})();`;
 
