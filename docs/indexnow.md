@@ -67,6 +67,7 @@ Check the running app's key path for HTTP 200, `text/plain`, exact bytes, and no
 redirect, including with `Accept: text/markdown`. No test sends real notifications.
 
 To rotate the public key, update `INDEXNOW_KEY` in `apps/web/src/lib/indexnow.ts`,
-the matching file in `apps/web/public`, tests and this document. The Next header
+the matching file in `apps/web/public`, the exact public-value exception in
+`.gitleaks.toml`, tests and this document. The Next header
 uses the exported `INDEXNOW_KEY_PATH` automatically.
 Deploy the proof before expecting notifications; missing proof skips POSTs.
