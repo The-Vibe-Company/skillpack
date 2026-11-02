@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { preloadDisplayFont } from "@/lib/displayFont";
 
 /* Public blog chrome. Reuses the marketing (v10) page shell so posts read as part of the
    landing site. Post bodies render through ./ArticleMarkdown, kept apart so pages that only need
@@ -7,6 +8,7 @@ import Link from "next/link";
 export const BLOG_CONTENT_ID = "blog-content";
 
 export function BlogShell({ children, footerLabel = "Skillpack blog" }: { children: React.ReactNode; footerLabel?: string }) {
+  preloadDisplayFont();
   return (
     <div className="v10-landing v10-blog">
       <a className="v10-skip" href={`#${BLOG_CONTENT_ID}`}>Skip to content</a>

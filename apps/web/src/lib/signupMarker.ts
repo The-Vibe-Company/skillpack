@@ -1,12 +1,15 @@
-import { z } from "zod";
-
 /**
  * A completed signup is announced to the next page load through a URL fragment. Fragments never reach
  * the server and survive its redirects (for example `/skills` → `/onboarding`), so the marker arrives
  * wherever the new member lands. It carries no identity: the landing page reads that from the session.
  */
-const signupMethod = z.enum(["email", "google"]);
-export type SignupMethod = z.infer<typeof signupMethod>;
+// A plain guard rather than a zod enum: every page reads the marker, so this module stays dependency-free.
+const SIGNUP_METHODS = ["email", "google"] as const;
+export type SignupMethod = (typeof SIGNUP_METHODS)[number];
+
+function isSignupMethod(value: string | null): value is SignupMethod {
+  return SIGNUP_METHODS.some((method) => method === value);
+}
 
 export interface SignupMarker {
   method: SignupMethod;
@@ -71,8 +74,8 @@ export function takeSignupArming(storage: () => Pick<Storage, "getItem" | "remov
 /** Parse a marker from `location.hash`. Anything else in the fragment means it is not ours. */
 export function readSignupMarker(hash: string): SignupMarker | null {
   const params = new URLSearchParams(hash.replace(/^#/, ""));
-  const method = signupMethod.safeParse(params.get(METHOD_KEY));
-  if (!method.success) return null;
+  const method = params.get(METHOD_KEY);
+  if (!isSignupMethod(method)) return null;
   if ([...params.keys()].some((key) => key !== METHOD_KEY && key !== PAGE_KEY)) return null;
-  return { method: method.data, signupPage: signupPagePath(params.get(PAGE_KEY)) ?? "/login" };
+  return { method, signupPage: signupPagePath(params.get(PAGE_KEY)) ?? "/login" };
 }

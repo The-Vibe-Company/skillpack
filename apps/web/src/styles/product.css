@@ -1,0 +1,20 @@
+/* ============================================================================
+   Product surfaces: sign-in, the Skills Hub app, settings, onboarding, approvals,
+   shares, secrets and moderation. Imported by the product routes only (see
+   styles/stylesheet-split.test.ts), so the public landing, blog and catalog do not
+   download and parse these sheets before their first paint. Everything a page
+   rendered under the root layout needs (tokens, cds, the base reset and app shell
+   in skills.css, org.css for the error shells, the marketing sheets) stays in
+   app/globals.css, which loads first on every route.
+   ============================================================================ */
+@import "./auth.css";
+@import "./app.css";
+@import "./skill-databases.css";
+@import "./settings.css";
+@import "./upload.css";
+@import "./deps.css";
+@import "./agents.css";
+@import "./onboarding.css";
+@import "./share.css";
+@import "./secrets.css";
+@import "./moderation.css";

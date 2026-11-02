@@ -18,6 +18,9 @@ describe("root WebMCP registration", () => {
     if (target === "navigator") navigator.modelContext = context;
     try {
       await act(async () => { root.render(React.createElement(PublicWebMcp)); });
+      // The tool definitions load on demand, only where the API exists.
+      if (target === "absent") await new Promise((resolve) => setTimeout(resolve, 0));
+      else await vi.waitFor(() => expect(registerTool).toHaveBeenCalledTimes(4));
       expect(registerTool).toHaveBeenCalledTimes(target === "absent" ? 0 : 4);
       expect(container.innerHTML).toBe("");
       await act(async () => { root.unmount(); });
@@ -25,6 +28,22 @@ describe("root WebMCP registration", () => {
     } finally {
       delete document.modelContext;
       delete navigator.modelContext;
+    }
+  });
+
+  it("never registers tools when unmounted before the definitions load", async () => {
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    const registerTool = vi.fn();
+    document.modelContext = { registerTool, unregisterTool: vi.fn() };
+    try {
+      act(() => { root.render(React.createElement(PublicWebMcp)); });
+      act(() => { root.unmount(); });
+      await import("@/lib/webMcp");
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(registerTool).not.toHaveBeenCalled();
+    } finally {
+      delete document.modelContext;
     }
   });
 });
