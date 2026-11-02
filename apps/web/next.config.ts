@@ -3,6 +3,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { posthogHosts, posthogRewrites } from "./src/lib/posthogHosts";
+import { INDEXNOW_KEY_PATH } from "./src/lib/indexnow";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -28,6 +29,12 @@ const config: NextConfig = {
     "/md/[[...path]]": ["./content/blog/**/*"],
     "/mcp/public": ["./content/blog/**/*"],
     "/a2a": ["./content/blog/**/*"],
+  },
+  async headers() {
+    return [{
+      source: INDEXNOW_KEY_PATH,
+      headers: [{ key: "Content-Type", value: "text/plain; charset=utf-8" }],
+    }];
   },
   async rewrites() {
     const api = process.env.COMPANION_API_URL ?? "http://127.0.0.1:3001";
