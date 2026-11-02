@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
  * selector, so reading the route files and the sheets is the lowest deterministic boundary.
  *
  * Failure proof:
- * Dropping the product import from a product route, importing it from a marketing route, leaving a
+ * Dropping the product import from a product route, importing it from a public route, leaving a
  * sheet out of both bundles, or adding an element-wide rule to a product sheet fails a case below.
  */
 
@@ -76,7 +76,11 @@ describe("stylesheet split between public and product routes", () => {
     expect([...shared, ...product].sort()).toEqual(sheets.sort());
   });
 
-  it("styles only product classes from the product sheets, so loading them last cannot win a tie", () => {
+  // Loading the product sheets last could only flip a cascade tie through a selector that matches
+  // public markup too; element-wide rules are the broad way in, so none may live there. Class-level
+  // overlaps were checked when the split landed and need a manual look when a product sheet reuses a
+  // shared class.
+  it("keeps element-wide rules out of the product sheets", () => {
     const elementWide = imports(join(stylesDir, "product.css")).flatMap((sheet) => {
       const css = readFileSync(join(stylesDir, sheet), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
       const selectors = Array.from(css.matchAll(/(?:^|[{};])\s*([^{};@]+?)\s*\{/g), (match) => match[1]!)
