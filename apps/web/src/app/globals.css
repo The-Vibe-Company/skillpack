@@ -1,21 +1,12 @@
+/* Loaded on every route. Product-only sheets live in styles/product.css, which product routes import
+   on top of this file, so public pages render without them. */
 @import "../styles/tokens.css";
 @import "../styles/cds.css";
-@import "../styles/auth.css";
 @import "../styles/skills.css";
-@import "../styles/app.css";
-@import "../styles/skill-databases.css";
 @import "../styles/org.css";
-@import "../styles/settings.css";
-@import "../styles/upload.css";
-@import "../styles/deps.css";
-@import "../styles/agents.css";
-@import "../styles/onboarding.css";
 @import "../styles/landing.css";
 @import "../styles/blog.css";
 @import "../styles/catalog.css";
-@import "../styles/share.css";
-@import "../styles/secrets.css";
-@import "../styles/moderation.css";
 
 /* iOS zooms the page when a focused form control computes below 16px. Keep text-entry controls at
    that floor on every touch-capable device, including phones in landscape and tablets. This lives

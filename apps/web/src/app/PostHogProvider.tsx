@@ -1,16 +1,15 @@
 "use client";
 
-import { PostHogProvider as PHProvider } from "@posthog/react";
-import posthog from "posthog-js";
 import { useEffect, type ReactNode } from "react";
-import { analytics, analyticsUser, type Analytics, type AnalyticsUser } from "@/lib/analytics";
+import { analytics, type Analytics, type AnalyticsUser } from "@/lib/analytics";
 import { readSignupMarker, takeSignupArming } from "@/lib/signupMarker";
 
 async function loadSignedInUser(): Promise<AnalyticsUser | null> {
   try {
     const response = await fetch("/v1/auth/whoami", { cache: "no-store", credentials: "same-origin" });
     if (!response.ok) return null;
-    const user = analyticsUser.safeParse(await response.json());
+    const [{ analyticsUser }, body] = await Promise.all([import("@/lib/analyticsUser"), response.json()]);
+    const user = analyticsUser.safeParse(body);
     return user.success ? user.data : null;
   } catch {
     return null;
@@ -32,13 +31,21 @@ export async function reportSignupFromLocation(target: Analytics): Promise<void>
   target.signedUp(await loadSignedInUser(), marker);
 }
 
+/** Run `task` once the browser is idle, so loading analytics never competes with the first render. */
+function whenIdle(task: () => void): () => void {
+  if ("requestIdleCallback" in window) {
+    const handle = window.requestIdleCallback(task, { timeout: 4000 });
+    return () => window.cancelIdleCallback(handle);
+  }
+  const handle = setTimeout(task, 1);
+  return () => clearTimeout(handle);
+}
+
 export function PostHogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    analytics.init();
     void reportSignupFromLocation(analytics);
+    return whenIdle(() => analytics.init());
   }, []);
 
-  if (!analytics.enabled) return <>{children}</>;
-
-  return <PHProvider client={posthog}>{children}</PHProvider>;
+  return <>{children}</>;
 }
