@@ -72,7 +72,12 @@ jobs:
         id: pr
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/perf-github.mjs
+        run: |
+          if [ -f scripts/perf-github.mjs ]; then
+            node scripts/perf-github.mjs
+          else
+            echo "::warning::Trusted guardrail tooling is not on the default branch yet; preview measurement is neutral."
+          fi
 
   report:
     name: Mobile Lighthouse and sticky report

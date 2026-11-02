@@ -88,11 +88,12 @@ Automation token. Missing or rejected bypass credentials leave protected preview
 public previews need no secret. `GITHUB_TOKEN` is supplied automatically by Actions for
 SHA resolution, comments and checks. No Lighthouse CI server token is required.
 
-New `deployment_status` and `pull_request_target` workflows become active only after
-the workflow and trusted scripts exist on the default branch. This draft's ordinary
-PR job exercises the scripts and blocking fixtures immediately; an existing preview
-alone cannot activate a workflow absent from the default branch. After rollout,
-redeploy a PR preview to exercise measurements and sticky publication. GitHub must
+Trusted preview measurements and metadata reporting need the scripts on the default
+branch. A deployment event can arrive while this draft introduces the workflow;
+resolution detects missing trusted tooling and returns a neutral warning instead of
+executing PR scripts. This draft's ordinary PR job exercises the scripts and blocking
+fixtures immediately. After rollout, redeploy a PR preview to exercise measurements
+and sticky publication. GitHub must
 allow this trusted `pull_request_target` workflow under its workflow execution policies.
 
 ```bash
