@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   diff:
-    name: Asset, preload and leftovers guardrails
+    name: ${{ github.event_name == 'pull_request' && 'Asset, preload and leftovers guardrails' || 'Asset checks (not a PR event)' }}
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 12

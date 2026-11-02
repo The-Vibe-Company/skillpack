@@ -48,6 +48,8 @@ name, so no code changes are needed. CLS always blocks when at least three valid
 samples exist. No branch-protection setting is changed by this PR; an owner can select
 `Performance guardrails` and `Asset, preload and leftovers guardrails` as required checks
 when the rollout is approved.
+The static check name is emitted only for PR events; skipped deployment jobs use a
+different name to keep their status separate from the actual diff verdict.
 
 ## Measurements and reporting
 
