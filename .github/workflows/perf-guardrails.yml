@@ -1,0 +1,121 @@
+name: Performance guardrails
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  diff:
+    name: ${{ github.event_name == 'pull_request' && 'Asset, preload and leftovers guardrails' || 'Asset checks (not a PR event)' }}
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    concurrency:
+      group: perf-diff-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Install pinned tooling (no package scripts)
+        id: tooling
+        continue-on-error: true
+        run: |
+          for attempt in 1 2; do
+            echo "Dependency installation attempt $attempt"
+            timeout 240s corepack pnpm install --frozen-lockfile --ignore-scripts --filter skillpack && exit 0
+          done
+          exit 1
+      - name: Unit tests, including blocking fixtures
+        if: steps.tooling.outcome == 'success'
+        run: node --test scripts/perf-*.test.mjs
+      - name: Inspect only the PR diff
+        run: node scripts/perf-guardrails.mjs --static
+
+  resolve:
+    name: Resolve current preview PR
+    if: >-
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'deployment_status' &&
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment != 'Production' &&
+      github.event.deployment.creator.login == 'vercel[bot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      number: ${{ steps.pr.outputs.number }}
+      sha: ${{ steps.pr.outputs.sha }}
+      preview: ${{ steps.pr.outputs.preview }}
+    steps:
+      # Trusted default-branch tooling only, including for fork PRs and deployments.
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Match deployment SHA to exactly one current open PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f scripts/perf-github.mjs ]; then
+            node scripts/perf-github.mjs
+          else
+            echo "::warning::Trusted guardrail tooling is not on the default branch yet; preview measurement is neutral."
+          fi
+
+  report:
+    name: Mobile Lighthouse and sticky report
+    needs: resolve
+    if: needs.resolve.outputs.number != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      group: perf-report-pr-${{ needs.resolve.outputs.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          # Read-only token used solely by git fetch. No PR code is checked out.
+          persist-credentials: true
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Install pinned tooling (network failures remain neutral)
+        continue-on-error: true
+        run: |
+          for attempt in 1 2; do
+            echo "Dependency installation attempt $attempt"
+            timeout 240s corepack pnpm install --frozen-lockfile --ignore-scripts --filter skillpack && exit 0
+          done
+          exit 1
+      - name: Measure and publish guardrails on the PR head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PERF_PR: ${{ needs.resolve.outputs.number }}
+          PERF_SHA: ${{ needs.resolve.outputs.sha }}
+          PERF_PREVIEW: ${{ needs.resolve.outputs.preview }}
+          PERF_REGRESSION_BLOCKING: ${{ vars.PERF_REGRESSION_BLOCKING || 'false' }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: node scripts/perf-guardrails.mjs
