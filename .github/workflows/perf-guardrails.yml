@@ -32,6 +32,7 @@ jobs:
         continue-on-error: true
         run: |
           for attempt in 1 2; do
+            echo "Dependency installation attempt $attempt"
             timeout 240s corepack pnpm install --frozen-lockfile --ignore-scripts --filter skillpack && exit 0
           done
           exit 1
@@ -100,6 +101,7 @@ jobs:
         continue-on-error: true
         run: |
           for attempt in 1 2; do
+            echo "Dependency installation attempt $attempt"
             timeout 240s corepack pnpm install --frozen-lockfile --ignore-scripts --filter skillpack && exit 0
           done
           exit 1
