@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { analytics, type Analytics, type AnalyticsUser } from "@/lib/analytics";
 import { readSignupMarker, takeSignupArming } from "@/lib/signupMarker";
@@ -61,10 +62,16 @@ export function afterFirstInteraction(task: () => void, fallbackMs = ANALYTICS_F
 }
 
 export function PostHogProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   useEffect(() => {
     void reportSignupFromLocation(analytics);
     return afterFirstInteraction(() => analytics.init());
   }, []);
+  // One pageview per path, recorded as it renders so it keeps its URL while PostHog is still loading.
+  // It follows the effect above, which has already taken a signup marker out of the address bar.
+  useEffect(() => {
+    analytics.pageview();
+  }, [pathname]);
 
   return <>{children}</>;
 }
