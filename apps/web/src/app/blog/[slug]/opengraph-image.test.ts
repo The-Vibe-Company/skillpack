@@ -56,15 +56,20 @@ function decodePng(bytes: Uint8Array) {
   return { width, height, pixels };
 }
 
-/** The right-most column holding grey ink (pill borders, tag or date text) in the card's lower part. */
-function footerInkRightEdge(png: ReturnType<typeof decodePng>): number {
+/**
+ * The right-most column of the lower half that holds a pill's pure-white fill or neutral grey ink
+ * (tag, date or title text). The card's ground is off-white (#fbfbfd) and the mark's strokes are
+ * saturated orange and amber, so neither counts.
+ */
+function footerRightEdge(png: ReturnType<typeof decodePng>): number {
   let right = -1;
-  for (let y = 440; y < png.height; y++) {
+  for (let y = png.height / 2; y < png.height; y++) {
     for (let x = 0; x < png.width; x++) {
       const i = (y * png.width + x) * 4;
       const [r, g, b] = [png.pixels[i]!, png.pixels[i + 1]!, png.pixels[i + 2]!];
-      // The mark's strokes are saturated orange and amber; ink is a neutral grey.
-      if (Math.max(r, g, b) - Math.min(r, g, b) < 40 && (r + g + b) / 3 < 170) right = Math.max(right, x);
+      const pillFill = r === 255 && g === 255 && b === 255;
+      const ink = Math.max(r, g, b) - Math.min(r, g, b) < 40 && (r + g + b) / 3 < 170;
+      if (pillFill || ink) right = Math.max(right, x);
     }
   }
   return right;
@@ -93,7 +98,7 @@ describe("blog post share image", () => {
     });
   });
 
-  // The large mark's left-most stroke starts at x = 955; tags and date keep a visible gap from it.
+  // The large mark's left-most stroke starts at x = 955; pills and date stay within x = 940.
   it.each([
     ["how-to-check-agent-skills-in-ci (5 tags)", () => render("how-to-check-agent-skills-in-ci")],
     ["claude-code-skills-not-working (6 tags)", () => render("claude-code-skills-not-working")],
@@ -102,6 +107,8 @@ describe("blog post share image", () => {
     const png = decodePng(new Uint8Array(await (await draw()).arrayBuffer()));
 
     expect(png.width).toBe(size.width);
-    expect(footerInkRightEdge(png)).toBeLessThanOrEqual(940);
+    const right = footerRightEdge(png);
+    expect(right).toBeGreaterThan(size.width / 2);
+    expect(right).toBeLessThanOrEqual(940);
   });
 });
