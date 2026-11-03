@@ -93,6 +93,19 @@ describe("stylesheet split between public and product routes", () => {
     }
   });
 
+  // Page sheets reuse label.css selectors at equal specificity, so label.css must come first.
+  it("imports label.css before the page sheets that build on it", () => {
+    for (const route of ROUTE_SHEETS["label.css"]) {
+      const source = read(route);
+      const label = source.indexOf('import "@/styles/label.css";');
+      for (const sheet of ["home.css", "blog-label.css"]) {
+        const page = source.indexOf(`import "@/styles/${sheet}";`);
+        if (page !== -1) expect(label).toBeLessThan(page);
+      }
+      expect(label).toBeGreaterThan(-1);
+    }
+  });
+
   // Loading the product sheets last could only flip a cascade tie through a selector that matches
   // public markup too; element-wide rules are the broad way in, so none may live there. Class-level
   // overlaps were checked when the split landed and need a manual look when a product sheet reuses a

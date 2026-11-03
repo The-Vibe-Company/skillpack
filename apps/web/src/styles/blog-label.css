@@ -7,8 +7,10 @@
    no glow or gradient, numbered field labels, one signal-yellow seal.
    ============================================================================ */
 
-/* The marketing tokens blog.css reads, re-pointed to the label palette. */
-.lp-label.v10-blog {
+/* The marketing tokens blog.css reads, re-pointed to the label palette (also on the inner .lp
+   wrapper, which landing.css gives its own copies). */
+.lp-label.v10-blog,
+.lp-label.v10-blog .lp {
   --lp-radius: 4px;
   --lp-shadow: none;
   --lp-card: var(--hm-paper);
@@ -46,7 +48,7 @@
   color: var(--hm-ink-2); font-size: 12px; letter-spacing: 0.08em;
 }
 .lp-label .v10-bloghome__intro .lp-kick::before {
-  content: "00"; width: auto; height: 24px; min-width: 30px; padding: 0 5px; border-radius: 0;
+  content: "00"; content: "00" / ""; width: auto; height: 24px; min-width: 30px; padding: 0 5px; border-radius: 0;
   display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--hm-rule); background: var(--hm-paper);
   font: 600 12px/1 var(--font-mono); color: var(--hm-ink); letter-spacing: 0;
@@ -61,6 +63,7 @@
 .lp-label .v10-postcard__cover { border: none; border-bottom: 1px solid var(--hm-rule); border-radius: 0; box-shadow: none; }
 .lp-label .v10-postcard__body { padding: 18px 20px 20px; }
 .lp-label .v10-postcard__title a::after { inset: 0; border-radius: 0; }
+.lp-label .v10-postcard__title a:focus-visible { outline: none; }
 .lp-label .v10-postcard__title a:focus-visible::after { outline: 2px solid var(--hm-ink); outline-offset: 2px; }
 .lp-label .v10-postcard:hover .v10-postcard__title a { text-decoration-color: var(--hm-seal); }
 .lp-label .v10-postcard--featured { gap: 0; align-items: stretch; }
@@ -121,6 +124,7 @@
 
 /* Prose: the reading measure and rhythm of blog.css, links underlined in the seal colour. */
 .lp-label .v10-post .v10-blog__prose a { color: var(--hm-ink); text-decoration-color: var(--hm-seal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.lp-label .v10-post .v10-blog__prose a:hover { text-decoration-color: var(--hm-ink); }
 .lp-label .v10-blog__prose :not(pre) > code { border-radius: 0; overflow-wrap: anywhere; }
 .lp-label .v10-blog__tablewrap { border-radius: 0; border-color: var(--hm-rule); }
 .lp-label .v10-blog__prose thead th { background: var(--hm-paper-2); border-bottom: 1px solid var(--hm-rule); }
@@ -138,6 +142,8 @@
 .lp-label .v10-toc__item a[aria-current] { border-left-color: var(--hm-seal-ink); }
 .lp-label .v10-toc--disclosure { border-color: var(--hm-rule); border-radius: 0; }
 .lp-label .v10-toc--disclosure summary:focus-visible { border-radius: 0; }
+/* The sidebar scrolls, so its focus ring stays inside the link. */
+.lp-label .v10-toc a:focus-visible { outline-offset: -2px; }
 
 /* --- end of article: the sign-up label and the related posts ------------------------ */
 .lp-label .v10-postcta { border-color: var(--hm-rule); border-radius: 0; box-shadow: none; }
@@ -156,3 +162,6 @@
 .lp-label .v10-stickycta,
 .lp-label .v10-stickycta__close { border-radius: 0; box-shadow: none; }
 .lp-label .v10-post .v10-blog__prose .v10-ctablock { background: var(--hm-paper-2); }
+@media (max-width: 760px) {
+  .lp-label .v10-post .v10-blog__prose .v10-rtable tbody tr { border-radius: 0; background: var(--hm-paper); }
+}
