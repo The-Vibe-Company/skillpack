@@ -24,6 +24,12 @@ import { describe, expect, it } from "vitest";
 const appDir = new URL("../app/", import.meta.url).pathname;
 const stylesDir = new URL("./", import.meta.url).pathname;
 const PRODUCT_IMPORT = 'import "@/styles/product.css";';
+/** Sheets that public routes import themselves instead of through globals.css, with their importers. */
+const ROUTE_SHEETS = {
+  "label.css": ["blog/[slug]/page.tsx", "blog/page.tsx", "page.tsx"],
+  "home.css": ["page.tsx"],
+  "blog-label.css": ["blog/[slug]/page.tsx", "blog/page.tsx"],
+} as const;
 
 /** Routes rendered with the root stylesheet alone; everything else is a product route. */
 const PUBLIC_ROUTES = [/^page\.tsx$/, /^blog\//, /^catalog\//, /^privacy\//, /^not-found\.tsx$/, /^layout\.tsx$/];
@@ -73,7 +79,31 @@ describe("stylesheet split between public and product routes", () => {
     const product = imports(join(stylesDir, "product.css"));
     const sheets = readdirSync(stylesDir).filter((name) => name.endsWith(".css") && name !== "product.css");
 
-    expect([...shared, ...product].sort()).toEqual(sheets.sort());
+    expect([...shared, ...product, ...Object.keys(ROUTE_SHEETS)].sort()).toEqual(sheets.sort());
+  });
+
+  // The label direction (home and blog) loads with its routes only, so catalog, privacy and product
+  // pages skip it.
+  it("loads each route sheet from its own public routes alone", () => {
+    for (const [sheet, expected] of Object.entries(ROUTE_SHEETS)) {
+      const importers = routes.filter((route) => read(route).includes(`import "@/styles/${sheet}";`));
+
+      expect(importers.sort()).toEqual([...expected].sort());
+      expect(imports(join(appDir, "globals.css"))).not.toContain(sheet);
+    }
+  });
+
+  // Page sheets reuse label.css selectors at equal specificity, so label.css must come first.
+  it("imports label.css before the page sheets that build on it", () => {
+    for (const route of ROUTE_SHEETS["label.css"]) {
+      const source = read(route);
+      const label = source.indexOf('import "@/styles/label.css";');
+      for (const sheet of ["home.css", "blog-label.css"]) {
+        const page = source.indexOf(`import "@/styles/${sheet}";`);
+        if (page !== -1) expect(label).toBeLessThan(page);
+      }
+      expect(label).toBeGreaterThan(-1);
+    }
   });
 
   // Loading the product sheets last could only flip a cascade tie through a selector that matches

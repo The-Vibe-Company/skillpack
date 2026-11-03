@@ -187,18 +187,32 @@ describe("LandingPage portal preview", () => {
     expect(container.textContent).not.toContain("your data never leave the building");
   });
 
-  it("keeps one H1 and gives every section a descriptive H2", async () => {
+  it("keeps one H1 and gives every section its search-intent H2, in reading order", async () => {
     const container = await renderLanding();
     const sectionHeading = (id: string) => container.querySelector(`#${id} h2`)?.textContent;
 
     expect(container.querySelectorAll("h1")).toHaveLength(1);
+    expect(container.querySelector("h1")?.textContent).toBe("The open-source Skills Hub for Claude Code, Codex & OpenCode");
     expect(container.querySelector('[data-screen-label="agents-strip"] h2')?.textContent).toBe(
-      "Install skills into Claude Code, Codex and OpenCode",
+      "Install agent skills in Claude Code, Codex and OpenCode",
     );
+    expect(sectionHeading("agents")).toBe("Install agent skills in Claude Code, Codex and OpenCode");
     expect(sectionHeading("problem")).toBe("Why teams need a private skills registry");
-    expect(sectionHeading("how")).toBe("How Skillpack versions and installs SKILL.md packages");
-    expect(sectionHeading("agents")).toBe("Connect Claude Code, Codex and OpenCode securely");
-    expect(sectionHeading("open-source")).toBe("Open-source, self-hosted skills hub");
+    expect(sectionHeading("how")).toBe("How Skillpack versions SKILL.md packages");
+    expect(sectionHeading("use-cases")).toBe("Claude skills examples teams actually ship");
+    expect(sectionHeading("open-source")).toBe("Open-source, self-hosted, private by default");
+    expect(sectionHeading("compare")).toBe("Skillpack vs public skills directories");
+    expect(sectionHeading("faq")).toBe("Frequently asked questions");
+    expect(Array.from(container.querySelectorAll("h2")).map((h2) => h2.textContent)).toEqual([
+      "Install agent skills in Claude Code, Codex and OpenCode",
+      "Why teams need a private skills registry",
+      "How Skillpack versions SKILL.md packages",
+      "Claude skills examples teams actually ship",
+      "Open-source, self-hosted, private by default",
+      "Skillpack vs public skills directories",
+      "Frequently asked questions",
+      "Build a skill once. Every agent uses it.",
+    ]);
   });
 
   it("keeps landing claims verifiable: no demo metrics, real CLI install flow and only supported --tools agents", async () => {
@@ -208,16 +222,21 @@ describe("LandingPage portal preview", () => {
     const installStep = Array.from(container.querySelectorAll<HTMLElement>(".lp-step")).find(
       (step) => step.querySelector("h3")?.textContent === "Install everywhere",
     );
+    const terminal = container.querySelector<HTMLElement>("#agents figure");
+    const tools = /--tools (\S+)/.exec(terminal?.textContent ?? "")?.[1]?.split(",");
 
     expect(agents).toEqual(["Claude Code", "Codex", "OpenCode"]);
-    expect(container.textContent).not.toContain("Any MCP client");
-    expect(Array.from(container.querySelectorAll(".lp-hub__node strong")).map((node) => node.textContent)).toEqual([
-      "Claude Code",
-      "OpenCode",
-      "Codex",
+    expect(Array.from(strip?.querySelectorAll(".lp-agent code") ?? []).map((tool) => tool.textContent)).toEqual([
+      "claude-code",
+      "codex",
+      "opencode",
     ]);
+    expect(terminal?.getAttribute("aria-label")).toBeTruthy();
+    expect(tools).toEqual(["claude-code", "codex", "opencode"]);
+    expect(container.textContent).not.toContain("Any MCP client");
     expect(container.textContent).not.toContain("12,480");
     expect(container.textContent).not.toContain("last 30 days");
+    expect(container.textContent).not.toMatch(/SOC ?2/i);
     expect(installStep?.textContent).toContain("--tools");
     expect(installStep?.textContent).toContain("sha256");
     expect(installStep?.textContent).toContain("--pin");
@@ -235,7 +254,8 @@ describe("LandingPage portal preview", () => {
       "@context": "https://schema.org",
       "@graph": [
         { "@type": "SoftwareApplication", name: "Skillpack", applicationCategory: "DeveloperApplication" },
-        { "@type": "Organization", name: "Skillpack", url: "https://skillpack.app" },
+        { "@type": "Organization", "@id": "https://skillpack.app/#org", name: "Skillpack", url: "https://skillpack.app" },
+        { "@type": "WebSite", "@id": "https://skillpack.app/#website", publisher: { "@id": "https://skillpack.app/#org" } },
       ],
     });
   });

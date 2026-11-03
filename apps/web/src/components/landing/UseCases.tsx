@@ -97,13 +97,19 @@ function Snippet({ useCase }: { useCase: UseCase }) {
 
 export function UseCases() {
   return (
-    <section className="lp-sec" id="use-cases" data-screen-label="use-cases">
-      <div className="v10-wrap">
-        <p className="lp-kick lp-kick--center">Use cases</p>
-        <h2 className="lp-h2 lp-h2--center v5-reveal">
-          What teams put in <em className="lp-em">their skills.</em>
+    <section className="hm-sec" id="use-cases" data-screen-label="use-cases">
+      <div className="hm-field">
+        <span className="hm-field__n">04</span>
+        <span className="hm-field__label">Use cases</span>
+        <span className="hm-field__meta" aria-hidden="true">
+          {USE_CASES.length} × SKILL.md
+        </span>
+      </div>
+      <div className="hm-sec__body">
+        <h2 className="lp-h2 v5-reveal">
+          Claude skills examples <em className="lp-em">teams actually ship</em>
         </h2>
-        <p className="lp-sub lp-sub--center v5-reveal">
+        <p className="lp-sub v5-reveal">
           A skill is a folder with a SKILL.md file: a name, a description that says what it does and when to use it, then
           the instructions. These are common places to start. Most snippets are illustrative; adapt them to how your team
           works.
@@ -111,8 +117,10 @@ export function UseCases() {
         <div className="lp-cases">
           {USE_CASES.map((u) => (
             <article className="lp-case v5-reveal" key={u.name}>
-              <h3>{u.title}</h3>
-              <p>{u.desc}</p>
+              <div className="lp-case__text">
+                <h3>{u.title}</h3>
+                <p>{u.desc}</p>
+              </div>
               <Snippet useCase={u} />
             </article>
           ))}

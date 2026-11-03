@@ -29,8 +29,9 @@ test-results/
 supabase/.branches/
 supabase/.temp/
 
-# CLI local state (when run inside the repo)
-.companion/
+# CLI local state (when run inside the repo); the project skills lock is committed
+.companion/*
+!.companion/skills.lock.json
 companion.lock
 
 # Conductor workspace context

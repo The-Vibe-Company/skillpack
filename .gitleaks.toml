@@ -25,4 +25,10 @@ regexes = [
   # Public IndexNow proof served verbatim at /<key>.txt, not a credential.
   # Value-specific so history scans also accept its original introduction.
   '''498a19c36795d0a81cb9c7d2a398d449''',
+  # sha256 digests of public Stageshow files (kit/brands/1password*.svg, kit/keys.*) in the portable
+  # usage inventory: their file names contain "password"/"key", which trips generic-api-key.
+  '''ad593cc8ca4fb8e3ae066fdd4dd3d86cb9084cad8b9092275e3ecd27fb35cc65''',
+  '''36ef31dc8e1ea5a2a7f4a1a53dc874c61170056bdacacd24ea4fa4c8cd050af8''',
+  '''929ef94999bfd7fd6bc78c5026c98f5b4ff8483c8aecfa3bc87cfb2e466cfc3c''',
+  '''ab45f610aa1c2ccac54a966e8e8c804ed601258cc4e8071278d48cb8bc4f6c59''',
 ]

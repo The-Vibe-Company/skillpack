@@ -12,13 +12,18 @@ describe("LandingPage server rendering", () => {
     expect(source).not.toMatch(/\buse(State|Effect|Ref|Reducer|LayoutEffect)\b/);
     expect(readFileSync(new URL("./PortalDemo.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
     expect(readFileSync(new URL("./LandingReveal.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
+    // Motion code loads lazily, in its own chunk, after hydration.
+    const motion = readFileSync(new URL("./LandingMotion.tsx", import.meta.url), "utf8");
+    expect(motion).toMatch(/^"use client";/);
+    expect(motion).toMatch(/dynamic\(\(\) => import\("\.\/LandingReveal"\)[\s\S]*ssr: false/);
+    expect(source).not.toContain('from "./LandingReveal"');
     expect(readFileSync(new URL("./FaqSection.tsx", import.meta.url), "utf8")).not.toMatch(/^\s*["']use client["']/);
   });
 
   it("server-renders the static copy with a hidden placeholder in place of the lazy demo", () => {
     const html = renderToStaticMarkup(React.createElement(LandingPage));
 
-    expect(html).toContain('<h1 class="lp-h1 lp-rise lp-rise--2">The open-source <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
+    expect(html).toContain('<h1 class="lp-h1" id="hero-title">The <span class="hm-nowrap">open-source</span> <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
     expect(html).toContain('id="problem"');
     expect(html).toContain('id="start"');
     expect(html).toContain('id="faq"');

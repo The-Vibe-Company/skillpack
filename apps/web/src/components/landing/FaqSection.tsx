@@ -74,11 +74,17 @@ function FaqAnswer({ answer }: { answer: string }) {
 
 export function FaqSection() {
   return (
-    <section className="lp-sec" id="faq" data-screen-label="faq" aria-labelledby="faq-title">
+    <section className="hm-sec" id="faq" data-screen-label="faq" aria-labelledby="faq-title">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(HOME_FAQ_STRUCTURED_DATA) }} />
-      <div className="v10-wrap">
-        <p className="lp-kick lp-kick--center">FAQ</p>
-        <h2 className="lp-h2 lp-h2--center v5-reveal" id="faq-title">
+      <div className="hm-field">
+        <span className="hm-field__n">07</span>
+        <span className="hm-field__label">FAQ</span>
+        <span className="hm-field__meta" aria-hidden="true">
+          {HOME_FAQ.length} questions
+        </span>
+      </div>
+      <div className="hm-sec__body">
+        <h2 className="lp-h2 v5-reveal" id="faq-title">
           Frequently asked <em className="lp-em">questions</em>
         </h2>
         <div className="lp-faq">

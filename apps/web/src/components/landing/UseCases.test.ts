@@ -20,22 +20,22 @@ function frontmatter(markdown: string): Record<string, string> {
 }
 
 describe("UseCases", () => {
-  it("renders the section after How it works and before Agents in the server HTML", () => {
+  it("renders the section after How it works and before Open source in the server HTML", () => {
     const html = renderToStaticMarkup(React.createElement(LandingPage));
     const how = html.indexOf('id="how"');
     const useCases = html.indexOf('id="use-cases"');
-    const agents = html.indexOf('id="agents"');
+    const openSource = html.indexOf('id="open-source"');
 
     expect(how).toBeGreaterThan(-1);
     expect(useCases).toBeGreaterThan(how);
-    expect(agents).toBeGreaterThan(useCases);
+    expect(openSource).toBeGreaterThan(useCases);
   });
 
   it("renders one H3 and one SKILL.md snippet per use case as static markup", () => {
     const html = renderToStaticMarkup(React.createElement(UseCases));
 
     expect(html).toContain("<h2");
-    expect(html).toContain("What teams put in");
+    expect(html).toContain("Claude skills examples");
     expect(USE_CASES.map((u) => u.title)).toEqual([
       "Code review",
       "Deploy and release",
