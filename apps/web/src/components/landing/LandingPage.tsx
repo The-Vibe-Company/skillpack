@@ -380,6 +380,14 @@ function AgentsTerminal() {
             </span>
           ))}
           <span className="hm-term__line hm-term__dim">locked .companion/skills.lock.json · sha256</span>
+          {"\n\n"}
+          <span className="hm-term__line">
+            <span className="hm-prompt">$ </span>skillpack sync --frozen
+          </span>
+          {"\n"}
+          <span className="hm-term__line hm-term__ok">
+            <span className="hm-term__tick">✓</span> code-review@1.3.0 matches its locked checksum
+          </span>
         </code>
       </pre>
     </figure>
@@ -624,26 +632,21 @@ function Finale({ c }: { c: Copy }) {
   );
 }
 
-function IndexRail() {
+/** The label's index: a numbered field block at the head of the sheet, one link per section. */
+function IndexStrip() {
   return (
-    <nav className="hm-rail" aria-label="On this page">
-      <div className="hm-rail__inner">
-        <span className="hm-rail__title">Index</span>
-        <ol>
-          {INDEX.map((item, i) => (
-            <li key={item.href}>
-              <a href={item.href}>
-                <span className="hm-rail__n">{String(i + 1).padStart(2, "0")}</span>
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ol>
-        <Barcode className="hm-rail__code" />
-        <span className="hm-rail__meta" aria-hidden="true">
-          MIT · sha256
-        </span>
-      </div>
+    <nav className="hm-index" aria-label="On this page">
+      <span className="hm-index__title">Index</span>
+      <ol className="hm-index__list">
+        {INDEX.map((item, i) => (
+          <li key={item.href}>
+            <a href={item.href}>
+              <span className="hm-index__n">{String(i + 1).padStart(2, "0")}</span>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ol>
     </nav>
   );
 }
@@ -708,10 +711,9 @@ export function LandingPage() {
         Skip to content
       </a>
       <Nav c={c} catalog={catalog} />
-      {/* One grid: the hero spans it, then the index rail sits beside the label's sections. */}
       <main id="main-content" className="hm-main">
         <Hero c={c} />
-        <IndexRail />
+        <IndexStrip />
         <Agents c={c} />
         <Problem c={c} />
         <How c={c} />
