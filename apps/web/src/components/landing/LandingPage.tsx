@@ -172,6 +172,7 @@ const SCATTER = [
 /* Posts on main that extend the page's topics; slugs are checked against content/blog in tests. */
 export const HOME_BLOG_LINKS = [
   { slug: "what-is-skill-md", title: "What is SKILL.md? The complete guide to Agent Skills" },
+  { slug: "claude-skills-examples", title: "Claude skills examples that aren't toy demos" },
   { slug: "claude-code-subagents-vs-skills", title: "Claude Code subagents vs skills: when to use each" },
   { slug: "best-claude-code-skills-planning", title: "Best Claude Code skills for planning and specs" },
   { slug: "how-to-check-agent-skills-in-ci", title: "How to check agent skills in CI: validate, lock, sync" },

@@ -79,7 +79,15 @@ describe("LandingPage server HTML", () => {
 
     expect(block?.textContent).toContain("From the blog");
     expect(hrefs).toEqual(HOME_BLOG_LINKS.map((post) => `/blog/${post.slug}`));
-    expect(hrefs).toContain("/blog/what-is-skill-md");
+    expect(hrefs).toEqual(
+      expect.arrayContaining([
+        "/blog/what-is-skill-md",
+        "/blog/claude-skills-examples",
+        "/blog/claude-code-subagents-vs-skills",
+        "/blog/best-claude-code-skills-planning",
+        "/blog/how-to-check-agent-skills-in-ci",
+      ]),
+    );
     for (const post of HOME_BLOG_LINKS) {
       expect(existsSync(join(BLOG_DIR, `${post.slug}.md`))).toBe(true);
     }
