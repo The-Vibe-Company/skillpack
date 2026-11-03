@@ -102,6 +102,7 @@ describe("blog post share image", () => {
   it.each([
     ["how-to-check-agent-skills-in-ci (5 tags)", () => render("how-to-check-agent-skills-in-ci")],
     ["claude-code-skills-not-working (6 tags)", () => render("claude-code-skills-not-working")],
+    ["claude-skills-examples (5 tags)", () => render("claude-skills-examples")],
     ["six long tags", () => renderBlogPostOpenGraphImage(LONG_TAGS_POST)],
   ])("keeps the tags and date of %s clear of the large brand mark", async (_name, draw) => {
     const png = decodePng(new Uint8Array(await (await draw()).arrayBuffer()));
