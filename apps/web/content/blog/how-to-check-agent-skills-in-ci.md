@@ -152,7 +152,7 @@ secondary: { label: "How to install skills in Claude Code", href: /blog/how-to-i
 
 ## A GitHub Actions example
 
-Here's a minimal workflow with the two checks. Install the Skillpack CLI with the installer from the official release page; we left that step as a placeholder rather than guess the URL.
+Here's a minimal workflow with the two checks. The first step installs the Skillpack CLI with the official installer.
 
 ```yaml
 name: skills
@@ -171,7 +171,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Skillpack CLI
-        run: echo "use the installer from the Skillpack CLI release page"
+        run: |
+          cd "$RUNNER_TEMP"
+          base=https://github.com/The-Vibe-Company/skillpack/releases/download/runtime-v0.3.5
+          curl -fsSLO "$base/install.sh"
+          curl -fsSLO "$base/SHA256SUMS"
+          grep ' install.sh$' SHA256SUMS | sha256sum -c -
+          sh install.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Validate authored skills
         run: |
           set -e
