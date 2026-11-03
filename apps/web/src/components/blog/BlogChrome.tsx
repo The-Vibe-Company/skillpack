@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingMotion } from "@/components/landing/LandingMotion";
 import { preloadDisplayFont } from "@/lib/displayFont";
 
 /* Public blog chrome. Reuses the marketing (v10) page shell so posts read as part of the
@@ -7,10 +8,22 @@ import { preloadDisplayFont } from "@/lib/displayFont";
 
 export const BLOG_CONTENT_ID = "blog-content";
 
-export function BlogShell({ children, footerLabel = "Skillpack blog" }: { children: React.ReactNode; footerLabel?: string }) {
+/**
+ * `label` dresses the page in the home page's "Release label" direction (styles/label.css and
+ * styles/blog-label.css, imported by the blog routes) and adds the lazy one-time reveal island.
+ */
+export function BlogShell({
+  children,
+  footerLabel = "Skillpack blog",
+  label = false,
+}: {
+  children: React.ReactNode;
+  footerLabel?: string;
+  label?: boolean;
+}) {
   preloadDisplayFont();
   return (
-    <div className="v10-landing v10-blog">
+    <div className={label ? "v10-landing v10-blog lp lp-label" : "v10-landing v10-blog"}>
       <a className="v10-skip" href={`#${BLOG_CONTENT_ID}`}>Skip to content</a>
       <header className="v10-nav">
         <div className="v10-wrap v10-nav__inner">
@@ -44,6 +57,7 @@ export function BlogShell({ children, footerLabel = "Skillpack blog" }: { childr
           </span>
         </div>
       </footer>
+      {label ? <LandingMotion /> : null}
     </div>
   );
 }

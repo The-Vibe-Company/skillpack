@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { BlogShell } from "@/components/blog/BlogChrome";
 import { PostCard } from "@/components/blog/PostCard";
 import { BLOG_SHARE_IMAGE, loadBlogPosts } from "@/lib/blog";
+// The "Release label" direction shared with the home page; only the blog routes load it.
+import "@/styles/label.css";
+import "@/styles/blog-label.css";
 
 // The root layout template turns the page title into "Blog · Skillpack"; social titles are not
 // templated, so they carry the suffix themselves.
@@ -33,7 +36,7 @@ export default function BlogIndexPage() {
   // Newest first: the latest post leads the page and the rest follow as a grid.
   const [latest, ...older] = loadBlogPosts();
   return (
-    <BlogShell>
+    <BlogShell label>
       <div className="lp v10-bloghome">
         <header className="v10-bloghome__hero">
           <div className="v10-bloghome__bg" aria-hidden="true" />
@@ -59,7 +62,7 @@ export default function BlogIndexPage() {
               </h2>
               <ul className="v10-postgrid">
                 {older.map((post) => (
-                  <li key={post.slug}>
+                  <li key={post.slug} className="v5-reveal">
                     <PostCard post={post} headingLevel={3} />
                   </li>
                 ))}

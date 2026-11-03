@@ -705,7 +705,7 @@ export function LandingPage() {
   const catalog = isPublicCatalogEnabled();
 
   return (
-    <div className="v10-landing lp lp-home">
+    <div className="v10-landing lp lp-label lp-home">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(HOME_STRUCTURED_DATA) }} />
       <a className="v10-skip" href="#main-content">
         Skip to content

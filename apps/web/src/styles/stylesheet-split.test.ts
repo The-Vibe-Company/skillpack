@@ -24,8 +24,12 @@ import { describe, expect, it } from "vitest";
 const appDir = new URL("../app/", import.meta.url).pathname;
 const stylesDir = new URL("./", import.meta.url).pathname;
 const PRODUCT_IMPORT = 'import "@/styles/product.css";';
-/** Sheets a single public route imports itself instead of through globals.css. */
-const HOME_ONLY = ["home.css"];
+/** Sheets that public routes import themselves instead of through globals.css, with their importers. */
+const ROUTE_SHEETS = {
+  "label.css": ["blog/[slug]/page.tsx", "blog/page.tsx", "page.tsx"],
+  "home.css": ["page.tsx"],
+  "blog-label.css": ["blog/[slug]/page.tsx", "blog/page.tsx"],
+} as const;
 
 /** Routes rendered with the root stylesheet alone; everything else is a product route. */
 const PUBLIC_ROUTES = [/^page\.tsx$/, /^blog\//, /^catalog\//, /^privacy\//, /^not-found\.tsx$/, /^layout\.tsx$/];
@@ -75,15 +79,18 @@ describe("stylesheet split between public and product routes", () => {
     const product = imports(join(stylesDir, "product.css"));
     const sheets = readdirSync(stylesDir).filter((name) => name.endsWith(".css") && name !== "product.css");
 
-    expect([...shared, ...product, ...HOME_ONLY].sort()).toEqual(sheets.sort());
+    expect([...shared, ...product, ...Object.keys(ROUTE_SHEETS)].sort()).toEqual(sheets.sort());
   });
 
-  // The home page's layout loads with its route only, so blog, catalog and privacy pages skip it.
-  it("loads the home sheet from the home route alone", () => {
-    const importers = routes.filter((route) => read(route).includes('import "@/styles/home.css";'));
+  // The label direction (home and blog) loads with its routes only, so catalog, privacy and product
+  // pages skip it.
+  it("loads each route sheet from its own public routes alone", () => {
+    for (const [sheet, expected] of Object.entries(ROUTE_SHEETS)) {
+      const importers = routes.filter((route) => read(route).includes(`import "@/styles/${sheet}";`));
 
-    expect(importers).toEqual(["page.tsx"]);
-    expect(imports(join(appDir, "globals.css"))).not.toContain("home.css");
+      expect(importers.sort()).toEqual([...expected].sort());
+      expect(imports(join(appDir, "globals.css"))).not.toContain(sheet);
+    }
   });
 
   // Loading the product sheets last could only flip a cascade tie through a selector that matches

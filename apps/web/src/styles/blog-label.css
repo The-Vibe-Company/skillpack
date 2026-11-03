@@ -1,0 +1,158 @@
+/* ============================================================================
+   Skillpack blog in the "Release label" direction (see label.css), for the
+   blog index and the article pages only: app/blog/* import this sheet, so the
+   catalog and privacy pages that share the blog shell keep their look.
+   Content, markup and the reading rhythm of blog.css stay as they are; this
+   sheet only re-dresses them: ruled paper on the cool ground, square corners,
+   no glow or gradient, numbered field labels, one signal-yellow seal.
+   ============================================================================ */
+
+/* The marketing tokens blog.css reads, re-pointed to the label palette. */
+.lp-label.v10-blog {
+  --lp-radius: 4px;
+  --lp-shadow: none;
+  --lp-card: var(--hm-paper);
+  --lp-grad-bright: var(--hm-seal);
+  --v10-ink: var(--hm-ink);
+  --v10-ink-muted: var(--hm-ink-2);
+  --v10-ink-faint: var(--hm-ink-2);
+  --v10-line: var(--hm-line);
+  --v10-line-strong: var(--hm-rule);
+  --v10-bg: var(--hm-paper);
+  --v10-bg-dim: var(--hm-paper-2);
+}
+
+/* --- section labels: a ruled field bar ------------------------------------------- */
+.lp-label.v10-blog .v10-section-label {
+  display: flex; align-items: center; min-height: 40px; margin: 0 0 var(--space-6);
+  border-top: 1px solid var(--hm-rule);
+  color: var(--hm-ink-2); font-size: 12px; letter-spacing: 0.08em;
+}
+
+/* --- index hero: the label's header block ------------------------------------------- */
+.lp-label .v10-bloghome__hero { overflow: visible; padding-block: clamp(24px, 4vw, 48px) 0; border-bottom: none; }
+.lp-label .v10-bloghome__bg { display: none; }
+.lp-label .v10-bloghome__intro {
+  max-width: calc(var(--content-max) - 2 * var(--space-5));
+  padding: 0 var(--hm-pad) clamp(32px, 5vw, 48px);
+  background: var(--hm-paper); border: 1px solid var(--hm-rule);
+}
+@media (max-width: 1120px) { .lp-label .v10-bloghome__intro { margin-inline: var(--space-5); } }
+@media (max-width: 560px) { .lp-label .v10-bloghome__intro { margin-inline: var(--space-4); } }
+.lp-label .v10-bloghome__intro .lp-kick {
+  display: flex; align-items: center; gap: 14px; min-height: 48px;
+  margin: 0 calc(-1 * var(--hm-pad)) clamp(28px, 4vw, 40px); padding: 0 var(--hm-pad);
+  background: var(--hm-paper-2); border-bottom: 1px solid var(--hm-line);
+  color: var(--hm-ink-2); font-size: 12px; letter-spacing: 0.08em;
+}
+.lp-label .v10-bloghome__intro .lp-kick::before {
+  content: "00"; width: auto; height: 24px; min-width: 30px; padding: 0 5px; border-radius: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--hm-rule); background: var(--hm-paper);
+  font: 600 12px/1 var(--font-mono); color: var(--hm-ink); letter-spacing: 0;
+}
+.lp-label .v10-bloghome__title { color: var(--hm-ink); letter-spacing: -0.04em; }
+.lp-label .v10-bloghome__intro .lp-sub { color: var(--hm-ink-2); }
+
+/* --- post cards: ruled labels ---------------------------------------------------- */
+.lp-label .v10-postcard {
+  gap: 0; background: var(--hm-paper); border: 1px solid var(--hm-rule);
+}
+.lp-label .v10-postcard__cover { border: none; border-bottom: 1px solid var(--hm-rule); border-radius: 0; box-shadow: none; }
+.lp-label .v10-postcard__body { padding: 18px 20px 20px; }
+.lp-label .v10-postcard__title a::after { inset: 0; border-radius: 0; }
+.lp-label .v10-postcard__title a:focus-visible::after { outline: 2px solid var(--hm-ink); outline-offset: 2px; }
+.lp-label .v10-postcard:hover .v10-postcard__title a { text-decoration-color: var(--hm-seal); }
+.lp-label .v10-postcard--featured { gap: 0; align-items: stretch; }
+.lp-label .v10-postcard--featured .v10-postcard__cover { border-bottom: none; border-right: 1px solid var(--hm-rule); }
+.lp-label .v10-postcard--featured .v10-postcard__body { justify-content: center; padding: clamp(24px, 4vw, 40px); }
+@media (max-width: 860px) {
+  .lp-label .v10-postcard--featured .v10-postcard__cover { border-right: none; border-bottom: 1px solid var(--hm-rule); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lp-label .v10-postcard__cover { transition: none; }
+  .lp-label .v10-postcard:hover .v10-postcard__cover { transform: none; box-shadow: none; }
+}
+.lp-label.v10-blog .v10-postgrid { gap: clamp(20px, 2.5vw, 28px); }
+
+/* Topics: square chips; the meta line keeps its separators. */
+.lp-label.v10-blog .v10-tags li { border-radius: 0; border-color: var(--hm-line); background: var(--hm-paper-2); color: var(--hm-ink-2); }
+
+/* --- covers: the post's title on ruled paper, a barcode instead of the glow --------- */
+.lp-label .v10-cover { background: var(--hm-paper); }
+.lp-label .v10-cover__bg {
+  background:
+    var(--hm-barcode) calc(100% - 6cqi) 5.3cqi / 16cqi 4cqi no-repeat,
+    linear-gradient(var(--hm-line), var(--hm-line)) 0 0 / 100% 1px no-repeat;
+}
+.lp-label .v10-cover__tags span { border-radius: 0; border-color: var(--hm-line); background: var(--hm-paper-2); }
+.lp-label .v10-cover--banner .v10-cover__bg { background: none; }
+
+/* --- reading progress: one solid seal line -------------------------------------- */
+.lp-label .v10-progress__fill { background: var(--hm-seal); }
+
+/* --- article: a label header, then the text on one ruled sheet --------------------- */
+.lp-label .v10-post__header {
+  margin-top: clamp(24px, 4vw, 48px); padding-top: 0; padding-bottom: clamp(28px, 4vw, 40px);
+  max-width: calc(var(--content-max) - 2 * var(--space-5));
+  background: var(--hm-paper); border: 1px solid var(--hm-rule);
+}
+.lp-label .v10-post__header .v10-crumbs ol {
+  min-height: 48px; margin: 0 calc(-1 * var(--space-5)) clamp(24px, 4vw, 36px); padding: 0 var(--space-5);
+  background: var(--hm-paper-2); border-bottom: 1px solid var(--hm-line);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.lp-label .v10-crumbs a { color: var(--hm-ink-2); }
+.lp-label .v10-post__title { color: var(--hm-ink); letter-spacing: -0.04em; }
+.lp-label .v10-post__cover { max-width: calc(var(--content-max) - 2 * var(--space-5)); margin-top: 0; padding-inline: 0; }
+.lp-label .v10-post__cover .v10-cover { border: 1px solid var(--hm-rule); border-top: none; border-radius: 0; box-shadow: none; }
+.lp-label .v10-post__layout {
+  max-width: calc(var(--content-max) - 2 * var(--space-5));
+  padding-bottom: clamp(40px, 6vw, 64px);
+  background: var(--hm-paper); border: 1px solid var(--hm-rule); border-top: none;
+}
+@media (max-width: 1120px) {
+  .lp-label .v10-post__header, .lp-label .v10-post__cover, .lp-label .v10-post__layout { margin-inline: var(--space-5); }
+}
+@media (max-width: 560px) {
+  .lp-label .v10-post__header, .lp-label .v10-post__cover, .lp-label .v10-post__layout { margin-inline: var(--space-4); }
+  .lp-label .v10-post__header .v10-crumbs ol { margin-inline: calc(-1 * var(--space-4)); padding-inline: var(--space-4); }
+}
+
+/* Prose: the reading measure and rhythm of blog.css, links underlined in the seal colour. */
+.lp-label .v10-post .v10-blog__prose a { color: var(--hm-ink); text-decoration-color: var(--hm-seal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.lp-label .v10-blog__prose :not(pre) > code { border-radius: 0; overflow-wrap: anywhere; }
+.lp-label .v10-blog__tablewrap { border-radius: 0; border-color: var(--hm-rule); }
+.lp-label .v10-blog__prose thead th { background: var(--hm-paper-2); border-bottom: 1px solid var(--hm-rule); }
+.lp-label .v10-code { border-radius: 4px; box-shadow: none; }
+.lp-label .v10-code__copy { border-radius: 3px; }
+
+/* Callouts: a tinted box with a full rule, no coloured side stripe. */
+.lp-label .v10-callout {
+  border: 1px solid color-mix(in oklch, var(--callout) 45%, transparent);
+  border-radius: 0;
+}
+
+/* Table of contents: a ruled list, the current section marked in ink. */
+.lp-label .v10-toc__list { border-left-color: var(--hm-rule); }
+.lp-label .v10-toc__item a[aria-current] { border-left-color: var(--hm-seal-ink); }
+.lp-label .v10-toc--disclosure { border-color: var(--hm-rule); border-radius: 0; }
+.lp-label .v10-toc--disclosure summary:focus-visible { border-radius: 0; }
+
+/* --- end of article: the sign-up label and the related posts ------------------------ */
+.lp-label .v10-postcta { border-color: var(--hm-rule); border-radius: 0; box-shadow: none; }
+.lp-label .v10-postcta__bg { display: none; }
+
+/* --- ranking posts: the same squares and rules ------------------------------------ */
+.lp-label .v10-rankhead__bg { display: none; }
+.lp-label .v10-rankhead__eyebrow { border-radius: 0; border-color: var(--hm-rule); }
+.lp-label .v10-post .v10-blog__prose .v10-takeaways,
+.lp-label .v10-post .v10-blog__prose .v10-skillcard,
+.lp-label .v10-post .v10-blog__prose .v10-skillcard__rank,
+.lp-label .v10-post .v10-blog__prose .v10-skillcard__suited,
+.lp-label .v10-post .v10-blog__prose .v10-rtable,
+.lp-label .v10-post .v10-blog__prose .v10-rtable__rank,
+.lp-label .v10-post .v10-blog__prose .v10-ctablock,
+.lp-label .v10-stickycta,
+.lp-label .v10-stickycta__close { border-radius: 0; box-shadow: none; }
+.lp-label .v10-post .v10-blog__prose .v10-ctablock { background: var(--hm-paper-2); }

@@ -29,6 +29,9 @@ import { blogTableOfContents } from "@/lib/blogMarkdown";
 import { inlineMarkdownText } from "@/lib/markdownText";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 import { blogPostingStructuredData, faqPageStructuredData, serializeJsonLd } from "@/lib/structuredData";
+// The "Release label" direction shared with the home page; only the blog routes load it.
+import "@/styles/label.css";
+import "@/styles/blog-label.css";
 
 type BlogPostPageProps = { params: Promise<{ slug: string }> };
 
@@ -107,7 +110,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     blogUrl: new URL("/blog", siteUrl).href,
   });
   return (
-    <BlogShell>
+    <BlogShell label>
       <div className={ranking ? "lp v10-post v10-post--ranking" : "lp v10-post"}>
         <ReadingProgress targetId={ARTICLE_BODY_ID} />
         <article>
@@ -181,7 +184,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </h2>
             <ul className="v10-postgrid">
               {related.map((other) => (
-                <li key={other.slug}>
+                <li key={other.slug} className="v5-reveal">
                   <PostCard post={other} headingLevel={3} />
                 </li>
               ))}
