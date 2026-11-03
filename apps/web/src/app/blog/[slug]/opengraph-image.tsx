@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 import { BRAND_MARK_STROKES } from "@/components/blog/BrandMark";
-import { findBlogPost, formatBlogDate, loadBlogPosts } from "@/lib/blog";
+import { type BlogPost, findBlogPost, formatBlogDate, loadBlogPosts } from "@/lib/blog";
 
 // One share card per post, drawn from its own title, tags and date, so nothing on it is invented.
 // It matches the post's cover on the site: brand mark, dotted ground and a warm glow.
@@ -20,6 +20,8 @@ export function generateStaticParams(): { slug: string }[] {
 const INK = "#262a35";
 const INK_MUTED = "#5b5f6b";
 const LINE = "rgba(38, 42, 53, 0.12)";
+// Tags and date share the title's column, which ends left of the large mark in the bottom-right corner.
+const FOOTER_MAX_WIDTH = 868;
 
 // Dotted ground and warm glow, as on the home hero; satori draws these reliably only from SVG.
 const BACKGROUND = `data:image/svg+xml,${encodeURIComponent(
@@ -51,6 +53,11 @@ function Mark({ size: markSize }: { size: number }) {
 export default async function BlogPostOpenGraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const post = findBlogPost((await params).slug);
   if (!post) notFound();
+  return renderBlogPostOpenGraphImage(post);
+}
+
+/** Draws the card for any post's title, tags and date; the route above supplies a published post. */
+export async function renderBlogPostOpenGraphImage(post: Pick<BlogPost, "title" | "tags" | "date">) {
   const [semibold, regular] = await Promise.all([
     loadFont("inter-tight-semibold-latin.ttf"),
     loadFont("inter-tight-regular-latin.ttf"),
@@ -96,13 +103,29 @@ export default async function BlogPostOpenGraphImage({ params }: { params: Promi
           {post.title}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, color: INK_MUTED }}>
-          {post.tags.map((tag) => (
+        {/* The row stays clear of the large mark: once tags and date outgrow the title's column, whole
+            pills and then the date move to a new line instead of shrinking under the mark. */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 14,
+            maxWidth: FOOTER_MAX_WIDTH,
+            fontSize: 24,
+            color: INK_MUTED,
+          }}
+        >
+          {post.tags.map((tag, index) => (
             <span
               key={tag}
               style={{
                 display: "flex",
+                flexShrink: 0,
+                maxWidth: "100%",
                 padding: "8px 18px",
+                // The extra space before the date rides on the last pill, so a wrapped date starts flush left.
+                marginRight: index === post.tags.length - 1 ? 10 : 0,
                 border: `1.5px solid ${LINE}`,
                 borderRadius: 999,
                 background: "#ffffff",
@@ -112,7 +135,7 @@ export default async function BlogPostOpenGraphImage({ params }: { params: Promi
               {tag}
             </span>
           ))}
-          <span style={{ marginLeft: post.tags.length > 0 ? 10 : 0 }}>{formatBlogDate(post.date)}</span>
+          <span style={{ display: "flex", flexShrink: 0 }}>{formatBlogDate(post.date)}</span>
         </div>
       </div>
     ),
