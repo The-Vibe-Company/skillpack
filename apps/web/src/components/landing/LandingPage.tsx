@@ -5,7 +5,7 @@
    primary button. Product pictures follow the Stageshow rules (a believable miniature of the real
    UI, real words only where the story is, cropped with intent); the "How it works" tiles sit on a
    ruled bento grid. The page renders on the server; the portal demo (PortalCapture, lazy-loaded)
-   and the scroll reveal are the only client islands. Every word on the page is in the server HTML. */
+   and the lazy motion island (LandingMotion -> LandingReveal) are the only client islands. Every word on the page is in the server HTML. */
 
 import Link from "next/link";
 import { Fragment } from "react";
@@ -15,7 +15,7 @@ import { HOME_STRUCTURED_DATA, SKILLPACK_GITHUB_URL, serializeJsonLd } from "@/l
 import { Avatar } from "./Avatar";
 import { Comparison } from "./Comparison";
 import { FaqSection } from "./FaqSection";
-import { LandingReveal } from "./LandingReveal";
+import { LandingMotion } from "./LandingMotion";
 import { PortalDemo } from "./PortalDemo";
 import { UseCases } from "./UseCases";
 
@@ -724,7 +724,7 @@ export function LandingPage() {
         <Finale c={c} />
       </main>
       <Footer c={c} catalog={catalog} />
-      <LandingReveal />
+      <LandingMotion />
     </div>
   );
 }

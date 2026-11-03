@@ -12,6 +12,11 @@ describe("LandingPage server rendering", () => {
     expect(source).not.toMatch(/\buse(State|Effect|Ref|Reducer|LayoutEffect)\b/);
     expect(readFileSync(new URL("./PortalDemo.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
     expect(readFileSync(new URL("./LandingReveal.tsx", import.meta.url), "utf8")).toMatch(/^"use client";/);
+    // Motion code loads lazily, in its own chunk, after hydration.
+    const motion = readFileSync(new URL("./LandingMotion.tsx", import.meta.url), "utf8");
+    expect(motion).toMatch(/^"use client";/);
+    expect(motion).toMatch(/dynamic\(\(\) => import\("\.\/LandingReveal"\)[\s\S]*ssr: false/);
+    expect(source).not.toContain('from "./LandingReveal"');
     expect(readFileSync(new URL("./FaqSection.tsx", import.meta.url), "utf8")).not.toMatch(/^\s*["']use client["']/);
   });
 
