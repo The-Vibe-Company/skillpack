@@ -1,0 +1,28 @@
+{
+  "lockfileVersion": 2,
+  "workspaces": {
+    "430850df-2b12-4437-95bf-ec7045879843": {
+      "apiUrl": "https://skillpack.app/v1",
+      "skills": {
+        "stageshow": {
+          "checksum": "sha256:297d0be1cbf8a79020db0c71a0488c91915fc80785c1a54ecb53d035d6a6843c",
+          "name": "stageshow",
+          "pinned": null,
+          "skillId": "ca7b9955-74f6-4777-b54b-f4f680a88255",
+          "slug": "stageshow",
+          "targets": [
+            {
+              "checksum": "sha256:7609226e9885394a7beb86f0f5c950c72070f8ec5e1a257ef67be4a3f635b517",
+              "packageChecksum": "sha256:297d0be1cbf8a79020db0c71a0488c91915fc80785c1a54ecb53d035d6a6843c",
+              "path": ".agents/skills/stageshow",
+              "scope": "project",
+              "tool": "shared",
+              "version": "1.0.1"
+            }
+          ],
+          "version": "1.0.1"
+        }
+      }
+    }
+  }
+}

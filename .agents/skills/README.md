@@ -24,3 +24,15 @@ For this bundle, `.agents/skills/` is canonical
 and `.claude/skills/` contains relative links. Its `tdd` and `grilling` packages are the
 Skillpack adaptations; exclude them from the generic Matt Pocock copy update
 above and update them with the full Plan PR dependency closure instead.
+
+## Skillpack: Stageshow
+
+`stageshow` (Skillpack organization skill, version 1.0.1, package checksum
+`sha256:297d0be1cbf8a79020db0c71a0488c91915fc80785c1a54ecb53d035d6a6843c`, MIT, from
+<https://github.com/benjitaylor/skills>) was installed with
+`skillpack install stageshow --scope project --tools opencode`, which writes the shared copy in
+`.agents/skills/stageshow` and records it in `.companion/skills.lock.json`; `.claude/skills/stageshow`
+is a relative link to it. Verify with `skillpack sync --frozen --project .`. It is reference material
+for faux product UI on marketing pages: never install its `package.json` or run its scripts, and copy
+only the patterns a page needs into `apps/web`. The folder is outside every workspace and tsconfig,
+and oxlint ignores `.agents/**` and `.claude/**`.

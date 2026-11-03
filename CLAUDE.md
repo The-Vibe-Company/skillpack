@@ -35,6 +35,8 @@ PostgreSQL +2, MinIO +3/+4, SMTP +5, Mailpit +6. Internal services bind loopback
 Follow `docs/testing.md`. Authorization tests cover non-members, cross-tenant access, revocation,
 and personal privacy. Run `pnpm verify:change`; exit 2 means its printed gates remain required.
 Frontend changes require `APP_URL=http://127.0.0.1:<port> pnpm browser:smoke` and manual agent-browser checks.
+Faux product UI on marketing pages follows the Stageshow skill (`.agents/skills/stageshow`, see its README entry):
+reference only, never install its `package.json` or run its scripts; copy only the patterns a page needs.
 Changes under `packages/skillpack-skill/skill/` require a version bump, top changelog entry, and
 `pnpm --filter @skillpack/skillpack-skill update:integrity`.
 Before adding a CI workflow, job, required check, or trigger, obtain explicit repository-owner approval.
