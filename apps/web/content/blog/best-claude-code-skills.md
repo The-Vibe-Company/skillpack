@@ -342,7 +342,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/productivity/grill-me --scope project --share-org
 ```
 
-Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source (MIT) and can run on your own infrastructure.
+Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill), and borrow patterns from [these Claude skills examples](/blog/claude-skills-examples). Skillpack is open source (MIT) and can run on your own infrastructure.
 
 ## FAQ
 
