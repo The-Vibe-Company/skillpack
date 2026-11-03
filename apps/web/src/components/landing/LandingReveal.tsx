@@ -8,17 +8,27 @@ import { useEffect } from "react";
  * Everything is visible in the server HTML and before hydration. After hydration, and only when the
  * visitor accepts motion, blocks still below the fold wait (transform and opacity only, so nothing
  * moves the layout) and play once as they scroll in. Blocks already on screen never animate.
- * It also closes the phone menu when one of its links is followed.
+ * It also dismisses the phone menu (followed link, outside click, Escape).
  */
 export function LandingReveal() {
   useEffect(() => {
-    const closeMenu = (event: MouseEvent) => {
+    // The phone menu is a native <details>: it opens without script; once hydrated it also closes on
+    // a followed link, a click or tap outside it, and Escape (which returns focus to its button).
+    const openMenu = () => document.querySelector<HTMLDetailsElement>(".hm-menu[open]");
+    const onClick = (event: MouseEvent) => {
+      const menu = openMenu();
       const target = event.target;
-      if (!(target instanceof Element)) return;
-      const menu = target.closest(".hm-menu");
-      if (menu && target.closest("a")) menu.removeAttribute("open");
+      if (!menu || !(target instanceof Element)) return;
+      if (!menu.contains(target) || target.closest("a")) menu.removeAttribute("open");
     };
-    document.addEventListener("click", closeMenu);
+    const onKeyDown = (event: KeyboardEvent) => {
+      const menu = openMenu();
+      if (event.key !== "Escape" || !menu) return;
+      menu.removeAttribute("open");
+      menu.querySelector<HTMLElement>("summary")?.focus();
+    };
+    document.addEventListener("click", onClick);
+    document.addEventListener("keydown", onKeyDown);
 
     let io: IntersectionObserver | null = null;
     let fallback: ReturnType<typeof setTimeout> | undefined;
@@ -54,7 +64,8 @@ export function LandingReveal() {
       }, 700);
     }
     return () => {
-      document.removeEventListener("click", closeMenu);
+      document.removeEventListener("click", onClick);
+      document.removeEventListener("keydown", onKeyDown);
       clearTimeout(fallback);
       io?.disconnect();
     };

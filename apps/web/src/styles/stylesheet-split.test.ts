@@ -24,6 +24,8 @@ import { describe, expect, it } from "vitest";
 const appDir = new URL("../app/", import.meta.url).pathname;
 const stylesDir = new URL("./", import.meta.url).pathname;
 const PRODUCT_IMPORT = 'import "@/styles/product.css";';
+/** Sheets a single public route imports itself instead of through globals.css. */
+const HOME_ONLY = ["home.css"];
 
 /** Routes rendered with the root stylesheet alone; everything else is a product route. */
 const PUBLIC_ROUTES = [/^page\.tsx$/, /^blog\//, /^catalog\//, /^privacy\//, /^not-found\.tsx$/, /^layout\.tsx$/];
@@ -73,7 +75,15 @@ describe("stylesheet split between public and product routes", () => {
     const product = imports(join(stylesDir, "product.css"));
     const sheets = readdirSync(stylesDir).filter((name) => name.endsWith(".css") && name !== "product.css");
 
-    expect([...shared, ...product].sort()).toEqual(sheets.sort());
+    expect([...shared, ...product, ...HOME_ONLY].sort()).toEqual(sheets.sort());
+  });
+
+  // The home page's layout loads with its route only, so blog, catalog and privacy pages skip it.
+  it("loads the home sheet from the home route alone", () => {
+    const importers = routes.filter((route) => read(route).includes('import "@/styles/home.css";'));
+
+    expect(importers).toEqual(["page.tsx"]);
+    expect(imports(join(appDir, "globals.css"))).not.toContain("home.css");
   });
 
   // Loading the product sheets last could only flip a cascade tie through a selector that matches

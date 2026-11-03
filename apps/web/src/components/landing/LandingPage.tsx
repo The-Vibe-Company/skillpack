@@ -270,7 +270,10 @@ function Nav({ c, catalog }: { c: Copy; catalog: boolean }) {
           </Link>
           {/* Native disclosure: the phone menu needs no script to open. */}
           <details className="hm-menu">
-            <summary className="hm-menu__toggle">{c.menu}</summary>
+            <summary className="hm-menu__toggle">
+              <span className="hm-menu__bars" aria-hidden="true"></span>
+              <span className="hm-menu__label">{c.menu}</span>
+            </summary>
             <nav className="hm-menu__panel" aria-label="Menu">
               {links}
               <a className="v10-nav__link" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
@@ -514,16 +517,16 @@ function StepVisual({ n }: { n: string }) {
   if (n === "03") {
     return (
       <div className="hm-vis hm-vis--lock" aria-hidden="true">
-        <div className="hm-vis__file">.companion/skills.lock.json</div>
+        <div className="hm-vis__file">.companion/skills.lock.json · excerpt</div>
         <pre className="hm-vis__code">
-          {"{"}
-          {"\n  "}
           <span className="lp-tok-k">&quot;code-review&quot;</span>: {"{"}
-          {"\n    "}
-          <span className="lp-tok-k">&quot;version&quot;</span>: <span className="lp-tok-s">&quot;1.3.0&quot;</span>,{"\n    "}
-          <span className="lp-tok-k">&quot;sha256&quot;</span>: <span className="lp-tok-s">&quot;9f3c…a71e&quot;</span>,{"\n    "}
-          <span className="lp-tok-k">&quot;pinned&quot;</span>: <span className="lp-tok-n">true</span>
-          {"\n  }\n}"}
+          {"\n  "}
+          <span className="lp-tok-k">&quot;version&quot;</span>: <span className="lp-tok-s">&quot;1.3.0&quot;</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;checksum&quot;</span>: <span className="lp-tok-s">&quot;sha256:9f3c…a71e&quot;</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;pinned&quot;</span>: <span className="lp-tok-n">null</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;targets&quot;</span>: [{"{ "}
+          <span className="lp-tok-k">&quot;tool&quot;</span>: <span className="lp-tok-s">&quot;codex&quot;</span>, …{" }"}, …]
+          {"\n}"}
         </pre>
       </div>
     );

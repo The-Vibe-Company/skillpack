@@ -9,10 +9,6 @@
    never runs under prefers-reduced-motion.
    ============================================================================ */
 
-/* The CSS pipeline drops the first rule of an @imported file (see landing.css), so this one is a
-   harmless repeat of the rule below it. */
-.hm-main { display: block; }
-
 /* Tokens */
 .lp-home {
   --hm-paper: oklch(0.99 0.002 265);
@@ -91,8 +87,23 @@
   box-shadow: 0 16px 40px -16px oklch(0.22 0.018 265 / 0.35);
 }
 .hm-menu__panel .v10-nav__link { display: flex; align-items: center; min-height: 44px; font-size: var(--text-base); }
-@media (max-width: 760px) { .hm-menu { display: block; } }
-@media (max-width: 400px) { .lp-home .v10-nav__inner { gap: var(--space-2); } }
+.lp-home .v10-nav__link { white-space: nowrap; }
+/* The section links need about 900px beside the actions; below that they move into the menu. */
+@media (max-width: 960px) {
+  .lp-home .v10-nav__links { display: none; }
+  .hm-menu { display: block; }
+}
+.hm-menu__bars { display: none; width: 18px; height: 12px; background: linear-gradient(var(--hm-ink) 0 0) 0 0 / 100% 2px no-repeat, linear-gradient(var(--hm-ink) 0 0) 0 50% / 100% 2px no-repeat, linear-gradient(var(--hm-ink) 0 0) 0 100% / 100% 2px no-repeat; }
+/* Small phones: a smaller wordmark and an icon-only menu button keep the bar inside 320px. */
+@media (max-width: 400px) {
+  .lp-home .v10-nav__inner { gap: var(--space-2); }
+  .lp-home .v10-nav__inner .v10-wordmark { height: 24px; }
+  .lp-home .v10-nav__actions { gap: var(--space-2); }
+  .hm-menu__toggle { width: 44px; padding: 0; justify-content: center; }
+  .hm-menu__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hm-menu__bars { display: block; }
+}
+@media (max-width: 360px) { .lp-home .v10-nav__inner { padding-inline: var(--space-4); } }
 
 /* --- shared label parts ------------------------------------------------------------ */
 .hm-barcode { display: block; height: 36px; background: var(--hm-barcode); }
@@ -121,7 +132,8 @@
 
 /* --- page grid ------------------------------------------------------------------- */
 .hm-main { display: block; }
-.hm-sec { position: relative; max-width: 960px; margin: 0 auto; background: var(--hm-paper); }
+.hm-sec { position: relative; max-width: 960px; margin: 0 auto; background: var(--hm-paper); scroll-margin-top: var(--topbar-height); }
+.hm-hero { scroll-margin-top: var(--topbar-height); }
 .hm-sec__body { padding: clamp(40px, 6vw, 64px) var(--hm-pad) clamp(48px, 7vw, 80px); }
 .hm-rail { display: none; }
 @media (min-width: 761px) {
@@ -195,7 +207,8 @@
 .hm-release__code { height: 30px; margin: 12px 14px 0; }
 .hm-release__foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; }
 .hm-release__foot code { font-size: 12px; color: var(--hm-ink-2); white-space: nowrap; }
-@media (max-width: 900px) { .hm-release { display: none; } }
+/* Shown only where the demo is wide enough that the card clears its centred caption text. */
+@media (max-width: 999px) { .hm-release { display: none; } }
 
 /* --- 01 agents ------------------------------------------------------------------ */
 .hm-ports { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: var(--space-7) 0 0; padding: 0; list-style: none; border: 1px solid var(--hm-rule); }
@@ -261,6 +274,7 @@
 .hm-tile p code, .lp-home .lp-sub code { padding: 0.05em 0.3em; background: var(--hm-paper-2); border: 1px solid var(--hm-line); font-size: 0.86em; color: var(--hm-ink); }
 .hm-vis { margin-top: auto; padding: 0 24px 24px; }
 .hm-vis__code { margin: 0; padding: 14px 16px; background: var(--hm-paper-2); border: 1px solid var(--hm-line); font: 13px/1.7 var(--font-mono); overflow-x: auto; white-space: pre; }
+.hm-vis--lock .hm-vis__code { white-space: pre-wrap; overflow-wrap: anywhere; }
 .hm-vis__file { padding: 8px 16px; border: 1px solid var(--hm-line); border-bottom: none; background: var(--hm-paper); font: 12px/1.4 var(--font-mono); color: var(--hm-ink-2); }
 .hm-checks { display: grid; gap: 8px; margin: 14px 0 0; padding: 0; list-style: none; font-size: var(--text-sm); }
 .hm-checks li { display: flex; align-items: center; gap: 8px; }
