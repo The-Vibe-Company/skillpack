@@ -12,7 +12,7 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 Skills are code now. A [`SKILL.md`](/blog/what-is-skill-md) folder tells Claude Code or Codex how to run your migrations, write your release notes or review your pull requests. If someone breaks the frontmatter, the skill stops loading. If someone tweaks the committed copy by hand, the agent acts differently on the next run and nobody notices.
 
-CI can catch both. This guide sets up three checks: every skill in the repo is valid, every installed skill matches a lockfile, and skill updates arrive as reviewable pull requests. Every command and exit code below was run with Skillpack CLI 0.3.5 on October 30, 2026, in a fresh git repo with one public skill installed for Claude Code and Codex.
+CI can catch both. This guide sets up three checks: every skill in the repo is valid, every installed skill matches a lockfile, and skill updates arrive as reviewable pull requests. Every command and exit code below was run with Skillpack CLI 0.3.5 on October 30, 2026, in a fresh git repo with one public skill installed for Claude Code and Codex. Path wording for where Codex reads skills was corrected on November 3, 2026 to match current Codex docs (`.agents/skills`, with `~/.codex/skills` as legacy).
 
 ```takeaways
 title: Key Takeaways
@@ -34,7 +34,7 @@ items:
 Once a team commits skills to a repo, the same three failures keep coming back:
 
 - **A broken skill.** Someone edits `SKILL.md` and deletes the YAML frontmatter, or renames the skill to something with spaces. The agent may simply stop picking it up. Nothing errors.
-- **Drift between copies.** Claude Code reads `.claude/skills/`, Codex reads `.codex/skills/`, and a shared copy can live in `.agents/skills/`. Someone fixes a typo in one of them. Now two agents follow two different instructions.
+- **Drift between copies.** Claude Code reads `.claude/skills/`. Codex reads `.agents/skills/` (and still scans `~/.codex/skills` for legacy compatibility). Skillpack's project install for Codex also writes a managed `.codex/skills/` copy. Someone fixes a typo in one folder. Now two agents, or two copies, disagree.
 - **Unreviewed updates.** A skill installed from GitHub gets refreshed on someone's laptop and the new version lands in a big commit. Nobody reads what the skill now tells the agent to do.
 
 None of these break the build. That's exactly why you want a check.
@@ -77,7 +77,7 @@ for f in $(git ls-files 'skills/**/SKILL.md'); do
 done
 ```
 
-Point the pattern at wherever you keep source skills. Skip the copies that the CLI installs into `.claude/skills/` and `.codex/skills/`; those are covered by the next step. If you're writing your first one, [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill) covers the frontmatter fields.
+Point the pattern at wherever you keep source skills. Skip the copies the CLI installs into `.agents/skills/`, `.claude/skills/` and `.codex/skills/`; frozen sync covers those. If you're writing your first one, [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill) covers the frontmatter fields.
 
 ## Step 2: install skills with a lockfile and commit it
 
@@ -92,7 +92,7 @@ In our test repo this wrote:
 
 - `.agents/skills/webapp-testing/` (the shared copy)
 - `.claude/skills/webapp-testing/` for Claude Code
-- `.codex/skills/webapp-testing/` for Codex (more on paths in [how to use skills in Codex](/blog/how-to-use-skills-in-codex))
+- `.codex/skills/webapp-testing/` as the managed Codex-targeted copy Skillpack CLI 0.3.5 still writes (Codex itself reads `.agents/skills/`; more on paths in [how to use skills in Codex](/blog/how-to-use-skills-in-codex))
 - `.companion/skills.lock.json`
 
 The lockfile records the source repository, path and commit, a package checksum, and one entry per target folder with its own checksum. For a GitHub skill it also lists the executable files it found, here `scripts/with_server.py`.
@@ -227,9 +227,9 @@ items:
   - question: "Does frozen sync need network access or an API key?"
     answer: "Not when at least one verified copy of each skill is committed; it runs offline. If every copy of a skill is missing, it downloads the locked version, which needs credentials for your Skillpack organization, passed as SKILLPACK_API_KEY from your CI secrets."
   - question: "Which files should I commit?"
-    answer: "The installed skill folders (.agents/skills, .claude/skills, .codex/skills, depending on your tools) and .companion/skills.lock.json. Don't commit the temporary .skillpack-stage-* or .skillpack-backup-* files."
+    answer: "The installed skill folders (.agents/skills, .claude/skills, and the .codex/skills copy Skillpack writes for Codex, depending on your tools) and .companion/skills.lock.json. Codex reads .agents/skills; keep the managed .codex/skills copy in sync via the lockfile. Don't commit the temporary .skillpack-stage-* or .skillpack-backup-* files."
   - question: "How do I update locked skills safely?"
     answer: "Run skillpack update --all --dry-run to see what would change, apply the update, and commit the skill folders and lockfile in a pull request so the frozen sync job and a reviewer both check it."
   - question: "Does this work for Codex as well as Claude Code?"
-    answer: "Yes. Install with --tools claude-code,codex and the CLI writes a copy for each tool and tracks all of them in the same lockfile, so frozen sync checks every copy."
+    answer: "Yes. Install with --tools claude-code,codex and the CLI writes .claude/skills for Claude Code, .agents/skills as the shared copy Codex reads, and a managed .codex/skills copy. Frozen sync checks every copy in the lockfile."
 ```
