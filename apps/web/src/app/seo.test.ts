@@ -87,11 +87,11 @@ describe("technical SEO routes", () => {
 
   it("titles the home page and appends the brand once to every other page title", () => {
     expect(metadata.title).toEqual({
-      default: "Skillpack: Open-Source Skills Hub for Claude Code & Codex",
+      default: "Skillpack: Agent Skills Hub for Claude Code, Codex & more",
       template: "%s · Skillpack",
     });
-    expect(metadata.openGraph?.title).toBe("Skillpack: Open-Source Skills Hub for Claude Code & Codex");
-    expect(metadata.twitter?.title).toBe("Skillpack: Open-Source Skills Hub for Claude Code & Codex");
+    expect(metadata.openGraph?.title).toBe("Skillpack: Agent Skills Hub for Claude Code, Codex & more");
+    expect(metadata.twitter?.title).toBe("Skillpack: Agent Skills Hub for Claude Code, Codex & more");
   });
 
   it("titles the 404 page itself and does not canonicalize the missing URL", () => {

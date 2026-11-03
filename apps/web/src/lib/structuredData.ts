@@ -6,10 +6,14 @@ export type JsonLdValue = string | number | JsonLdValue[] | JsonLdNode;
 type JsonLdNode = { [key: string]: JsonLdValue };
 export type JsonLdDocument = { "@context": "https://schema.org"; "@graph": JsonLdNode[] };
 
-const ORGANIZATION_ID = `${PRODUCTION_SITE_URL}/#organization`;
+const ORGANIZATION_ID = `${PRODUCTION_SITE_URL}/#org`;
+const WEBSITE_ID = `${PRODUCTION_SITE_URL}/#website`;
+/** The one external profile the organization node may claim: the public source repository. */
+export const SKILLPACK_GITHUB_URL = "https://github.com/The-Vibe-Company/skillpack";
 
 // Facts about the Skillpack product itself, so they stay pinned to skillpack.app even on
-// self-hosted deployments. Only add properties the product can back up (no ratings or prices).
+// self-hosted deployments. Only add properties the product can back up: no ratings and no prices
+// (skillpack.app bills workspaces, so no free offer is claimed), and only the GitHub repository as a profile.
 export const HOME_STRUCTURED_DATA: JsonLdDocument = {
   "@context": "https://schema.org",
   "@graph": [
@@ -27,6 +31,15 @@ export const HOME_STRUCTURED_DATA: JsonLdDocument = {
       "@id": ORGANIZATION_ID,
       name: "Skillpack",
       url: PRODUCTION_SITE_URL,
+      logo: `${PRODUCTION_SITE_URL}/brand/skillpack-favicon.svg`,
+      sameAs: [SKILLPACK_GITHUB_URL],
+    },
+    {
+      "@type": "WebSite",
+      "@id": WEBSITE_ID,
+      name: "Skillpack",
+      url: PRODUCTION_SITE_URL,
+      publisher: { "@id": ORGANIZATION_ID },
     },
   ],
 };

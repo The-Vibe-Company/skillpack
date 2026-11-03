@@ -151,7 +151,7 @@ describe("public blog post page", () => {
         author: { "@type": "Organization", name: "The Vibe Company", url: "https://thevibecompany.co" },
         publisher: {
           "@type": "Organization",
-          "@id": "https://skillpack.app/#organization",
+          "@id": "https://skillpack.app/#org",
           name: "Skillpack",
           url: "https://skillpack.app",
         },

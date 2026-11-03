@@ -18,7 +18,7 @@ describe("LandingPage server rendering", () => {
   it("server-renders the static copy with a hidden placeholder in place of the lazy demo", () => {
     const html = renderToStaticMarkup(React.createElement(LandingPage));
 
-    expect(html).toContain('<h1 class="lp-h1 lp-rise lp-rise--2">The open-source <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
+    expect(html).toContain('<h1 class="lp-h1" id="hero-title">The <span class="hm-nowrap">open-source</span> <em class="lp-em">Skills Hub</em> for Claude Code, Codex &amp; OpenCode</h1>');
     expect(html).toContain('id="problem"');
     expect(html).toContain('id="start"');
     expect(html).toContain('id="faq"');

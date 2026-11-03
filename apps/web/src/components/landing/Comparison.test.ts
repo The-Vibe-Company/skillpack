@@ -70,7 +70,7 @@ describe("Landing comparison", () => {
     const table = compare.querySelector("table");
     const region = compare.querySelector('[role="region"]');
 
-    expect(compare.querySelector("h2")?.textContent).toBe("Skillpack vs public skills directories vs gists and Slack");
+    expect(compare.querySelector("h2")?.textContent).toBe("Skillpack vs public skills directories");
     expect(table?.querySelector("caption")?.textContent).toContain("Varies");
     expect(region?.getAttribute("aria-labelledby")).toBe(table?.querySelector("caption")?.id);
     expect(region?.getAttribute("tabindex")).toBe("0");
