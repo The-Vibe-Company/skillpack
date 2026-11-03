@@ -145,7 +145,12 @@
   .hm-hero { grid-column: 1 / -1; }
   .hm-hero > .v10-wrap { max-width: none; padding-inline: 0; }
   .hm-sec { grid-column: 2; max-width: none; margin: 0; }
-  .hm-rail { display: block; grid-column: 1; grid-row: 2 / span 8; padding: 0 32px 0 0; }
+  /* The rail is part of the same sheet: its rule sits on the hero's left edge, its text on the release card's. */
+  .hm-rail { display: block; grid-column: 1; grid-row: 2 / span 8; padding: 0 24px 0 23px; background: var(--hm-paper); border-left: 1px solid var(--hm-rule); border-top: 1px solid var(--hm-rule); }
+  .hm-rail { border-bottom: 1px solid var(--hm-rule); }
+  /* The space under the sheet belongs to the grid, so the rail ends on the finale's bottom rule. */
+  .hm-main { padding-bottom: clamp(48px, 6vw, 88px); }
+  .lp-home .hm-finale { margin-bottom: 0; }
   .hm-rail__inner { position: sticky; top: calc(var(--topbar-height) + 24px); }
 }
 .hm-rail__title { display: flex; align-items: center; min-height: 48px; padding-bottom: 0; border-bottom: 1px solid var(--hm-rule); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--hm-ink-2); }
