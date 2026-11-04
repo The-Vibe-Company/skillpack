@@ -10,7 +10,7 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 # Agent Skills open standard vs vendor folders
 
-The [Agent Skills](https://agentskills.io/) open standard defines one package shape: a folder with a `SKILL.md` file. That package is portable. Claude Code, Codex and Cursor still look for it in their own directories. This is a low-volume research query, and it is the question that decides whether you write a skill once or three times.
+The [Agent Skills](https://agentskills.io/) open standard defines one package shape: a folder with a `SKILL.md` file. That package is portable. Claude Code, Codex and Cursor still look for it in their own directories. Where they look decides whether you write a skill once or three times.
 
 Paths and progressive-disclosure wording below come from agentskills.io, Claude Code, Codex and Cursor docs scraped on November 4, 2026. CLI targets come from a Skillpack CLI 0.3.5 dry-run the same day. Skillpack is built by The Vibe Company; the CLI notes are install behavior, not a ranking.
 
@@ -24,7 +24,7 @@ items:
   - lead: "Claude Code uses .claude/skills."
     text: "User skills live in ~/.claude/skills/. Project skills live in .claude/skills/."
   - lead: "Codex prefers .agents/skills."
-    text: "Repo, user and admin scopes all use .agents/skills (plus /etc/codex/skills for ADMIN)."
+    text: "Repo and user scopes use .agents/skills. The ADMIN scope uses /etc/codex/skills."
   - lead: "Cursor reads both shared and compat paths."
     text: "It loads .agents/skills and .cursor/skills, and also Claude and Codex folders for compatibility."
 ```
