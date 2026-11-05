@@ -44,7 +44,7 @@ A Claude Code skill is a folder with a `SKILL.md` file. It holds instructions, a
 We started from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026. Then we applied five filters, in this order:
 
 1. **One skill per repository.** Otherwise a single author fills the list. Matt Pocock alone has 16 skills above 750K installs.
-2. **One skill per job.** Design, video and code review each have a dedicated ranking page, so they get one entry here.
+2. **One skill per job.** Design, video, code review and [marketing / SEO](/blog/best-claude-code-skills-marketing-seo) each have a dedicated ranking page, so they get one entry here.
 3. **Works in any project.** We skipped skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
 4. **Believable numbers.** We dropped skills whose installs don't match their repository, and skill copies published under several accounts.
 5. **Installs with one command.** Every skill below was installed with the Skillpack CLI from its GitHub folder.
@@ -227,7 +227,7 @@ description: |
 
   It's part of a chain. Once the design is approved, it calls the `writing-plans` skill from the same repository, so install that too or use the whole Superpowers set. The folder also ships a small local server for an optional visual companion, which the Skillpack CLI lists as executable files.
 suitedFor: |
-  teams who want a written design for every feature. It overlaps with grill-me, so most people pick one of the two. See our [ranking of planning skills](/blog/best-claude-code-skills-planning).
+  teams who want a written design for every feature. It overlaps with grill-me, so most people pick one of the two.
 ```
 
 ```skill-card
@@ -236,9 +236,9 @@ name: seo-audit
 maintainer: "Corey Haines"
 bestFor: "a prioritized technical and on-page SEO audit"
 source: { label: coreyhaines31/marketingskills, url: "https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit" }
-repoStars: "55.9K"
+repoStars: "58.6K"
 installs:
-  count: "234.2K"
+  count: "246.6K"
   url: "https://skills.sh/coreyhaines31/marketingskills/seo-audit"
 license:
   name: "MIT"
@@ -252,7 +252,7 @@ description: |
 
   It's honest about its limits. It warns that `curl` and web fetches can miss JSON-LD added by JavaScript, and sends you to the Rich Results Test for schema. It also treats fetched pages as untrusted data, a sensible guard against prompt injection.
 suitedFor: |
-  founders and marketers who want a structured audit of their own site. Pair it with Search Console data for real traffic numbers.
+  founders and marketers who want a structured audit of their own site. Pair it with Search Console data for real traffic numbers. Install count and repo stars for this card were refreshed from skills.sh and GitHub on November 5, 2026. For a full marketing and SEO ranking (GEO, AEO, Firecrawl audits and more), see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo).
 ```
 
 ```skill-card
@@ -280,7 +280,7 @@ suitedFor: |
   teams that already use Playwright for tests and want the agent to work in the same tool. If you don't, agent-browser covers similar ground.
 ```
 
-A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (656.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (408.6K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (827.4K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (660.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review). For TDD, Playwright and browser QA skills, see [the testing ranking](/blog/best-claude-code-skills-testing).
+A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (656.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (408.6K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (827.4K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (660.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review).
 
 We also left out two skills with around a million installs each, from repositories with about 20 GitHub stars. Same for AI video and image skills copied under several accounts. Those counts don't look like real adoption.
 
@@ -324,8 +324,8 @@ rows:
     why: "Short answers, and short numbered questions when it needs input"
   - useCase: "Organic traffic for your product"
     start: "seo-audit"
-    add: "find-skills"
-    why: "A prioritized audit, then other marketing skills when you need them"
+    add: "seo-geo (see marketing/SEO ranking)"
+    why: "Start here, then open the [marketing and SEO ranking](/blog/best-claude-code-skills-marketing-seo) for GEO, AEO and audit alternatives"
 ```
 
 ## How to install and share these skills with your team
@@ -342,7 +342,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/productivity/grill-me --scope project --share-org
 ```
 
-Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill), and borrow patterns from [these Claude skills examples](/blog/claude-skills-examples). Skillpack is open source (MIT) and can run on your own infrastructure.
+Want more SEO and marketing skills? See [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo). Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source (MIT) and can run on your own infrastructure.
 
 ## FAQ
 
