@@ -69,6 +69,7 @@ Install counts change every day, so treat this as a snapshot from November 5, 20
 ```skill-card
 rank: 1
 name: seo-audit
+title: "seo-audit (Corey Haines)"
 maintainer: "Corey Haines"
 bestFor: "a prioritized technical and on-page SEO audit"
 source: { label: coreyhaines31/marketingskills, url: "https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit" }
@@ -119,6 +120,7 @@ suitedFor: |
 ```skill-card
 rank: 3
 name: seo
+title: "seo (Addy Osmani)"
 maintainer: "Addy Osmani"
 bestFor: "Lighthouse-led technical SEO on real pages"
 source: { label: addyosmani/web-quality-skills, url: "https://github.com/addyosmani/web-quality-skills/tree/main/skills/seo" }
@@ -168,7 +170,8 @@ suitedFor: |
 
 ```skill-card
 rank: 5
-name: seo
+name: agricidaniel-seo
+title: "seo (AgriciDaniel)"
 maintainer: "AgriciDaniel"
 bestFor: "a hub that routes many SEO sub-skills and agents"
 source: { label: agricidaniel/claude-seo, url: "https://github.com/agricidaniel/claude-seo/tree/main/skills/seo" }
@@ -218,7 +221,8 @@ suitedFor: |
 
 ```skill-card
 rank: 7
-name: seo-audit
+name: anthropic-seo-audit
+title: "seo-audit (Anthropic)"
 maintainer: "Anthropic"
 bestFor: "a marketer-facing audit with keyword and gap modes"
 source: { label: anthropics/knowledge-work-plugins, url: "https://github.com/anthropics/knowledge-work-plugins/tree/main/marketing/skills/seo-audit" }
