@@ -64,7 +64,7 @@ This is the part most people get stuck on. The [Codex docs](https://developers.o
 
 A few details that save time:
 
-- **`~/.codex/skills` is the old location.** Codex added `~/.agents/skills` in early 2026 and kept reading `~/.codex/skills` for backward compatibility ([openai/codex#10437](https://github.com/openai/codex/pull/10437)). New skills should go in `~/.agents/skills`.
+- **`~/.codex/skills` is the old location.** Codex added `~/.agents/skills` in early 2026 and kept reading `~/.codex/skills` for backward compatibility ([openai/codex#10437](https://github.com/openai/codex/pull/10437)). New skills should go in `~/.agents/skills`. The current Codex docs list `~/.agents/skills`, not `~/.codex/skills`, so treat the old folder as legacy.
 - **Same name, no merge.** If two folders define a skill with the same `name`, Codex doesn't combine them. Both can show up in the picker.
 - **Symlinks work.** Codex follows a symlinked skill folder to its target.
 - **Changes are picked up automatically.** If a new or edited skill doesn't appear, restart Codex.
@@ -225,12 +225,15 @@ Then either symlink one folder to the other, or install with a tool that writes 
 
 Go through these in order:
 
-1. **Wrong folder.** Repo skills belong in `.agents/skills`. `.claude/skills` is not on Codex's list, and `.codex/skills` is the deprecated spot. Check that you launched Codex inside the repo.
+1. **Wrong folder.** Repo skills belong in `.agents/skills`. `.claude/skills` is not on Codex's list, and neither is a project-level `.codex/skills`. Check that you launched Codex inside the repo, in a folder at or below the one that holds `.agents/skills`.
 2. **Missing frontmatter.** `SKILL.md` needs `name` and `description` between `---` lines.
 3. **Not reloaded yet.** Restart Codex.
 4. **Disabled.** Look for an `enabled = false` entry in `~/.codex/config.toml`.
 5. **Pushed out of the list.** With lots of skills installed, Codex may shorten or omit some. Remove skills you don't use, or raise `skills.max_context_tokens`.
 6. **Never triggers on its own.** Check `allow_implicit_invocation` in `agents/openai.yaml`, then rewrite the description with the words you actually type.
+7. **Two copies with the same name.** Codex doesn't merge them, so you may be editing the copy it isn't using. Skillpack CLI 0.3.5 writes both `.agents/skills` and `.codex/skills` for a project install, so this is easy to hit. [Codex skills not loading? How to debug .agents/skills and .codex/skills](/blog/codex-skills-not-working) shows how to list every copy and clean up.
+
+Still stuck? The full walkthrough is in [Codex skills not loading? How to debug .agents/skills and .codex/skills](/blog/codex-skills-not-working), and the Claude Code version is [Claude Code skills not working](/blog/claude-code-skills-not-working).
 
 ```faq
 items:
