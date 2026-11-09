@@ -52,7 +52,7 @@ describe("public blog post page", () => {
     const header = container.querySelector(".v10-post__header");
 
     expect(headings).toHaveLength(1);
-    expect(headings[0]?.textContent).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
+    expect(headings[0]?.textContent).toBe("What is SKILL.md? Format, specification and examples (2026)");
     expect(header?.contains(headings[0] ?? null)).toBe(true);
     expect(Array.from(header?.querySelectorAll("nav[aria-label='Breadcrumb'] a") ?? []).map((a) => a.getAttribute("href"))).toEqual([
       "/",
@@ -140,9 +140,9 @@ describe("public blog post page", () => {
     expect(data["@graph"]).toEqual([
       {
         "@type": "BlogPosting",
-        headline: "What is SKILL.md? The complete guide to Agent Skills (2026)",
+        headline: "SKILL.md Format: Specification, Fields and Examples (2026)",
         description:
-          "SKILL.md explained: the Agent Skills format, frontmatter fields, examples, and how to version, share and install skills in Claude Code and Codex.",
+          "SKILL.md format explained: frontmatter fields, naming rules, size limits, an example file and how to validate it. Based on the agentskills.io spec.",
         datePublished: "2026-10-13",
         url: "https://skillpack.app/blog/what-is-skill-md",
         mainEntityOfPage: "https://skillpack.app/blog/what-is-skill-md",
@@ -164,7 +164,7 @@ describe("public blog post page", () => {
           {
             "@type": "ListItem",
             position: 3,
-            name: "What is SKILL.md? The complete guide to Agent Skills (2026)",
+            name: "SKILL.md Format: Specification, Fields and Examples (2026)",
             item: "https://skillpack.app/blog/what-is-skill-md",
           },
         ],
@@ -175,14 +175,14 @@ describe("public blog post page", () => {
   it("gives each post its own title, description, canonical and article Open Graph data", async () => {
     const metadata = await generateMetadata(routeProps(SLUG));
 
-    expect(metadata.title).toEqual({ absolute: "What is SKILL.md? The complete guide to Agent Skills (2026)" });
-    expect(metadata.description).toMatch(/^SKILL\.md explained/);
+    expect(metadata.title).toEqual({ absolute: "SKILL.md Format: Specification, Fields and Examples (2026)" });
+    expect(metadata.description).toMatch(/^SKILL\.md format explained/);
     expect(metadata.alternates?.canonical).toBe("/blog/what-is-skill-md");
     expect(metadata.openGraph).toMatchObject({
       url: "/blog/what-is-skill-md",
       type: "article",
       publishedTime: "2026-10-13",
-      title: "What is SKILL.md? The complete guide to Agent Skills (2026)",
+      title: "SKILL.md Format: Specification, Fields and Examples (2026)",
       authors: ["The Vibe Company"],
       tags: ["SKILL.md", "Agent Skills"],
     });
@@ -191,7 +191,7 @@ describe("public blog post page", () => {
     expect(metadata.twitter).toMatchObject({
       card: "summary_large_image",
       images: [
-        { url: "/blog/what-is-skill-md/opengraph-image", alt: "What is SKILL.md? The complete guide to Agent Skills (2026)" },
+        { url: "/blog/what-is-skill-md/opengraph-image", alt: "SKILL.md Format: Specification, Fields and Examples (2026)" },
       ],
     });
   });

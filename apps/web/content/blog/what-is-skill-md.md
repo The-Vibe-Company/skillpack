@@ -1,16 +1,18 @@
 ---
-title: "What is SKILL.md? The complete guide to Agent Skills (2026)"
-description: "SKILL.md explained: the Agent Skills format, frontmatter fields, examples, and how to version, share and install skills in Claude Code and Codex."
+title: "SKILL.md Format: Specification, Fields and Examples (2026)"
+description: "SKILL.md format explained: frontmatter fields, naming rules, size limits, an example file and how to validate it. Based on the agentskills.io spec."
 slug: what-is-skill-md
 date: 2026-10-13
 tags: ["SKILL.md", "Agent Skills"]
 ---
 
-# What is SKILL.md? The complete guide to Agent Skills (2026)
+# What is SKILL.md? Format, specification and examples (2026)
 
 Most coding agents can write code. The useful ones know how your team works: the review checklist, the deploy steps, how you triage an incident. In 2026, more and more of that knowledge lives in one file: `SKILL.md`.
 
 Here's what a SKILL.md file is, how the format works, and what a good one looks like. Then we'll cover how to keep skills from rotting in gists and Slack threads once your team starts writing them.
+
+Jump to the [SKILL.md format specification](#skillmd-format-specification) if you only need the fields and limits. Not sure whether your instruction belongs in a skill or in `AGENTS.md` or `CLAUDE.md`? Read [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md).
 
 Want to build one right away? Follow [How to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill), a step-by-step walkthrough with a working example. Looking for ready-made skills instead? See [the best Claude Code skills in 2026](/blog/best-claude-code-skills), ranked by installs.
 
@@ -48,9 +50,13 @@ code-review/
 
 Only `SKILL.md` is required. Everything else is optional and loads on demand.
 
-## SKILL.md frontmatter, field by field
+## SKILL.md format specification
 
-The frontmatter is YAML between two `---` lines. Per the [specification](https://agentskills.io/specification):
+The format is defined in the [Agent Skills specification](https://agentskills.io/specification) (we read it on November 9, 2026). A `SKILL.md` file has two parts: YAML frontmatter between two `---` lines, then a Markdown body with the instructions. The body has no format restrictions. The spec suggests step-by-step instructions, examples of inputs and outputs, and common edge cases.
+
+### SKILL.md frontmatter, field by field
+
+Two fields are required. Everything else is optional:
 
 | Field | Required | Rules |
 |---|---|---|
@@ -102,6 +108,27 @@ allowed-tools: Bash(git:*) Bash(pnpm:*) Read
 ```
 
 Two details trip people up. First, the `name` must match the parent directory, so `deploy/SKILL.md` must say `name: deploy`. Second, `metadata` values are strings, which is why `version: "3.0.1"` is quoted.
+
+### Naming rules and size limits
+
+Per the [specification](https://agentskills.io/specification):
+
+- `name`: 1 to 64 characters, lowercase letters, numbers and hyphens only. It can't start or end with a hyphen, can't contain `--`, and must match the parent folder name.
+- `description`: 1 to 1,024 characters, non-empty. Say what the skill does and when to use it.
+- `compatibility`: up to 500 characters, and only worth adding if the skill has real environment requirements.
+- Body: the spec recommends keeping `SKILL.md` under 500 lines and the instructions under about 5,000 tokens. Move detail into `references/`, one level deep from `SKILL.md`.
+
+### Which fields work everywhere
+
+The spec defines six frontmatter fields. Claude Code accepts more of its own, such as `disable-model-invocation`, `paths` and `when_to_use`. According to the [Claude Code skills docs](https://code.claude.com/docs/en/skills), uploading a skill to claude.ai or the Skills API with a field outside the spec fails with an error, and Claude Code ignores a field name it doesn't recognize without reporting anything. If you want one file that works in every agent, stay within the six spec fields.
+
+### Validate the file
+
+The spec points to the `skills-ref` reference library: `skills-ref validate ./my-skill` checks that the frontmatter is valid and follows the naming rules. Our guide to [checking agent skills in CI](/blog/how-to-check-agent-skills-in-ci) shows how to validate every skill on each pull request with the Skillpack CLI.
+
+### SKILL.md vs the other instruction files
+
+`SKILL.md` is loaded on demand, one task at a time. `AGENTS.md` and `CLAUDE.md` are read at the start of a session. The comparison, with a table of who reads what, is in [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md).
 
 ## Writing a description that actually triggers
 
@@ -167,10 +194,14 @@ Skillpack is MIT-licensed. If your skills encode sensitive internal processes, r
 items:
   - question: "Is SKILL.md only for Claude?"
     answer: "No. The format started at Anthropic but is now an open standard at [agentskills.io](https://agentskills.io), supported by several agents including Codex, Cursor and OpenCode."
+  - question: "What is the SKILL.md format?"
+    answer: "A SKILL.md file is YAML frontmatter followed by Markdown instructions. `name` and `description` are required; `license`, `compatibility`, `metadata` and `allowed-tools` are optional ([spec](https://agentskills.io/specification))."
+  - question: "Is SKILL.md the same as AGENTS.md or CLAUDE.md?"
+    answer: "No. AGENTS.md and CLAUDE.md are read at the start of a session. A SKILL.md body loads only when the agent uses that skill. See [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md)."
   - question: "What's the difference between a skill and an MCP server?"
     answer: "An MCP server exposes tools and data (APIs, databases). A skill is instructions and resources that teach the agent how to do a task, often with those tools. You'll usually want both."
   - question: "How long should a SKILL.md be?"
-    answer: "Keep the body focused on the procedure, and move extra detail into `references/` files that load on demand."
+    answer: "The spec recommends keeping SKILL.md under 500 lines and the instructions under about 5,000 tokens. Move extra detail into `references/` files that load on demand."
   - question: "Can I keep skills private?"
     answer: "Yes. In Skillpack, personal skills are visible only to their creator, and organization skills are shared with members. You can also self-host the whole hub."
 ```

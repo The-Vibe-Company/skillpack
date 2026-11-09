@@ -97,6 +97,8 @@ A few rules that matter here:
 - **`description`**: what the skill does and when to use it, written in the third person ("Writes…", not "I can help you…"). The spec caps it at 1,024 characters.
 - **Numbered steps** beat long paragraphs. The agent follows them in order and you can see which step went wrong.
 
+Not sure whether an instruction belongs in a skill or in CLAUDE.md? See [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md).
+
 ## Step 4: test that it triggers
 
 Claude Code watches the skills folders, so a new or edited `SKILL.md` is picked up in the current session. One catch from the docs: if `~/.claude/skills` didn't exist when the session started, run `/reload-skills` once.

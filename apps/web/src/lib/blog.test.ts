@@ -146,13 +146,13 @@ describe("blog post loading", () => {
     const fileBody = source.slice(source.indexOf("\n---\n", 4) + "\n---\n".length);
 
     expect(post).toMatchObject({
-      title: "What is SKILL.md? The complete guide to Agent Skills (2026)",
+      title: "SKILL.md Format: Specification, Fields and Examples (2026)",
       slug: "what-is-skill-md",
       date: "2026-10-13",
     });
     expect(post?.body).toBe(fileBody);
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
-      "416d8d5b6a72ecc20ebc3191b67b7a89944b45647ee0b1683f8091258440f445",
+      "e770597f29bb662a679eccd05e9f432df19ae6ff670267625b47d583d95aa2cb",
     );
   });
 
