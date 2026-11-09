@@ -39,7 +39,7 @@ Agents load skills through progressive disclosure, in three stages:
 2. **Activation.** When a task matches, it reads the full `SKILL.md`.
 3. **Execution.** It follows the instructions and may run bundled code or open referenced files.
 
-That contract is what travels. New to the format? Start with [What is SKILL.md?](/blog/what-is-skill-md) and [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill). For how skills compare to MCP, see [Agent Skills vs MCP](/blog/agent-skills-vs-mcp).
+That contract is what travels. New to the format? Start with [What is SKILL.md?](/blog/what-is-skill-md) and [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill). For how skills compare to MCP, see [Agent Skills vs MCP](/blog/agent-skills-vs-mcp). Skills are one of three instruction files a repo can carry; for the other two, read [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md).
 
 ## What each host still decides: where to look
 

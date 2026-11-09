@@ -62,8 +62,8 @@ describe("public blog index", () => {
       (card) => card.querySelector(".v10-postcard__title a")?.getAttribute("href") === "/blog/what-is-skill-md",
     );
 
-    expect(guide?.querySelector(".v10-postcard__title")?.textContent).toBe("What is SKILL.md? The complete guide to Agent Skills (2026)");
-    expect(guide?.querySelector(".v10-postcard__desc")?.textContent).toMatch(/^SKILL\.md explained: the Agent Skills format/);
+    expect(guide?.querySelector(".v10-postcard__title")?.textContent).toBe("SKILL.md Format: Specification, Fields and Examples (2026)");
+    expect(guide?.querySelector(".v10-postcard__desc")?.textContent).toMatch(/^SKILL\.md format explained: frontmatter fields/);
     expect(guide?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(guide?.querySelector("time")?.textContent).toBe("October 13, 2026");
     expect(guide?.querySelector(".v10-postmeta")?.textContent).toMatch(/\d+ min read$/);
@@ -76,7 +76,7 @@ describe("public blog index", () => {
     const cover = guide?.querySelector(".v10-cover");
     expect(cover?.getAttribute("aria-hidden")).toBe("true");
     expect(cover?.querySelector(".v10-cover__title")?.textContent).toBe(
-      "What is SKILL.md? The complete guide to Agent Skills (2026)",
+      "SKILL.md Format: Specification, Fields and Examples (2026)",
     );
     // One link per card: the stretched title link.
     expect(guide?.querySelectorAll("a")).toHaveLength(1);
