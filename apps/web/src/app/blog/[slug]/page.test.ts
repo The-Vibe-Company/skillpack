@@ -69,6 +69,18 @@ describe("public blog post page", () => {
       "Agent Skills",
     ]);
     expect(container.querySelector(".v10-post__cover .v10-cover")?.getAttribute("aria-hidden")).toBe("true");
+    // Without a cover image the banner is the drawn brand cover.
+    expect(container.querySelector(".v10-post__cover img")).toBeNull();
+  });
+
+  it("shows a post's own cover image as its decorative banner", async () => {
+    const container = await renderPost("skill-md-vs-agents-md-vs-claude-md");
+    const banner = container.querySelector(".v10-post__cover .v10-cover");
+
+    expect(banner?.getAttribute("aria-hidden")).toBe("true");
+    expect(banner?.classList.contains("v10-cover--image")).toBe(true);
+    expect(banner?.querySelector("img")?.getAttribute("src")).toBe("/blog/skill-md-vs-agents-md-vs-claude-md/cover-mascotte.webp");
+    expect(banner?.querySelector("img")?.getAttribute("alt")).toBe("");
   });
 
   it("renders the rest of the body: GFM tables, task lists and fenced code with copy buttons", async () => {

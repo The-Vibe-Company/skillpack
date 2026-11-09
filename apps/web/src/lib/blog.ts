@@ -11,6 +11,8 @@ export const BLOG_CONTENT_DIR = join(process.cwd(), "content", "blog");
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 const FRONTMATTER_RE = /^---\n([\s\S]*?)\n---\n/;
+// A cover image ships with its post under `public/blog/<slug>/`, so the path can't point elsewhere.
+const COVER_RE = /^\/blog\/([a-z0-9]+(?:-[a-z0-9]+)*)\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:webp|png|jpg)$/;
 
 function isCalendarDay(day: string): boolean {
   const parsed = new Date(`${day}T00:00:00Z`);
@@ -38,6 +40,8 @@ const blogFrontmatterSchema = z
       .regex(ISO_DAY_RE, "dataCollected must be YYYY-MM-DD")
       .refine(isCalendarDay, "dataCollected must be a real day")
       .optional(),
+    // An illustrated cover under `public/`. Without one, the post gets the drawn title-and-brand cover.
+    cover: z.string().regex(COVER_RE, "cover must be /blog/<slug>/<name>.webp|png|jpg").optional(),
   })
   .strict()
   .refine((frontmatter) => frontmatter.authorRole === undefined || frontmatter.author !== undefined, {
@@ -70,6 +74,9 @@ export function parseBlogPost(source: string, fileName: string): BlogPost {
   }
   if (`${frontmatter.data.slug}.md` !== fileName) {
     throw new Error(`${fileName}: slug "${frontmatter.data.slug}" must match the file name`);
+  }
+  if (frontmatter.data.cover !== undefined && COVER_RE.exec(frontmatter.data.cover)?.[1] !== frontmatter.data.slug) {
+    throw new Error(`${fileName}: cover must live under /blog/${frontmatter.data.slug}/`);
   }
   const body = source.slice(match[0].length);
   // The page renders the body's own H1 instead of the frontmatter title, so the body must lead

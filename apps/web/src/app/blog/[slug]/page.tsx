@@ -152,7 +152,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </header>
 
               <div className="v10-wrap v10-post__cover">
-                <BlogBanner />
+                <BlogBanner image={post.cover} />
               </div>
             </>
           )}

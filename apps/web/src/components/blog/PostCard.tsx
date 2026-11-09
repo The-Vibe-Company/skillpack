@@ -12,7 +12,7 @@ export function PostCard({ post, featured = false, headingLevel }: { post: BlogP
   return (
     <article className={featured ? "v10-postcard v10-postcard--featured" : "v10-postcard"}>
       <div className="v10-postcard__cover">
-        <BlogCover title={post.title} tags={post.tags} />
+        <BlogCover title={post.title} tags={post.tags} image={post.cover} />
       </div>
       <div className="v10-postcard__body">
         <PostMeta date={post.date} minutes={readingMinutes(post.body)} />

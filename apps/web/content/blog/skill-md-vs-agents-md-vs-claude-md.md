@@ -6,6 +6,7 @@ date: 2026-11-09
 tags: ["SKILL.md", "AGENTS.md", "CLAUDE.md", "Agent Skills", "Comparison"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
+cover: /blog/skill-md-vs-agents-md-vs-claude-md/cover-mascotte.webp
 ---
 
 # CLAUDE.md vs AGENTS.md vs SKILL.md: what goes where
