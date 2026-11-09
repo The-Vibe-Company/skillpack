@@ -78,22 +78,8 @@ describe("public blog index", () => {
     expect(cover?.querySelector(".v10-cover__title")?.textContent).toBe(
       "SKILL.md Format: Specification, Fields and Examples (2026)",
     );
-    expect(cover?.querySelector("img")).toBeNull();
     // One link per card: the stretched title link.
     expect(guide?.querySelectorAll("a")).toHaveLength(1);
-  });
-
-  it("uses a post's own cover image on its card when it has one", async () => {
-    const container = await renderIndex();
-    const card = Array.from(container.querySelectorAll(".v10-postcard")).find(
-      (item) => item.querySelector(".v10-postcard__title a")?.getAttribute("href") === "/blog/skill-md-vs-agents-md-vs-claude-md",
-    );
-    const cover = card?.querySelector(".v10-cover");
-
-    expect(cover?.getAttribute("aria-hidden")).toBe("true");
-    expect(cover?.querySelector("img")?.getAttribute("src")).toBe("/blog/skill-md-vs-agents-md-vs-claude-md/cover-mascotte.webp");
-    expect(cover?.querySelector(".v10-cover__title")).toBeNull();
-    expect(card?.querySelectorAll("a")).toHaveLength(1);
   });
 
   it("titles itself Blog and canonicalizes to /blog", () => {

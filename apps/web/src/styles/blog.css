@@ -234,10 +234,6 @@
   .v10-cover--banner .v10-cover__mark { width: 30cqi; height: 30cqi; right: 8cqi; }
 }
 
-/* An illustrated cover fills the card's frame; on the article page it keeps its own 3:2 shape. */
-.v10-cover__image { display: block; width: 100%; height: 100%; object-fit: cover; }
-.v10-cover--banner.v10-cover--image { aspect-ratio: 1536 / 1024; }
-
 /* --- reading progress ---------------------------------------------------------------- */
 .v10-progress { position: fixed; inset: 0 0 auto; z-index: 60; height: 3px; pointer-events: none; }
 .v10-progress__fill { height: 100%; background: var(--lp-grad-bright); transform: scaleX(0); transform-origin: 0 50%; }

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -91,21 +91,6 @@ describe("blog post parsing", () => {
     );
   });
 
-  it("reads an optional cover image, which must live under the post's own public folder", () => {
-    const cover = "/blog/a-post/cover.webp";
-
-    expect(parseBlogPost(postSource(`${VALID_FRONTMATTER}\ncover: ${cover}`), "a-post.md").cover).toBe(cover);
-    expect(parseBlogPost(postSource(VALID_FRONTMATTER), "a-post.md").cover).toBeUndefined();
-    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\ncover: /blog/other-post/cover.webp`), "a-post.md")).toThrow(
-      "a-post.md: cover must live under /blog/a-post/",
-    );
-    for (const bad of ["https://example.com/cover.webp", "/blog/a-post/../secret.webp", "/blog/a-post/cover.svg"]) {
-      expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\ncover: "${bad}"`), "a-post.md")).toThrow(
-        /a-post\.md: invalid frontmatter \(cover/,
-      );
-    }
-  });
-
   it("fails the build when a heading takes a block's fixed anchor", () => {
     const takeaways = "```takeaways\ntitle: Key Takeaways\nitems:\n  - { lead: One., text: Two. }\n```";
     const body = `\n# Title\n\n## Key Takeaways\n\n${takeaways}\n`;
@@ -169,13 +154,6 @@ describe("blog post loading", () => {
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
       "e770597f29bb662a679eccd05e9f432df19ae6ff670267625b47d583d95aa2cb",
     );
-  });
-
-  it("ships every post's cover image in public/", () => {
-    const covers = loadBlogPosts().flatMap((post) => (post.cover ? [post.cover] : []));
-
-    expect(covers).toContain("/blog/skill-md-vs-agents-md-vs-claude-md/cover-mascotte.webp");
-    for (const cover of covers) expect(existsSync(join(process.cwd(), "public", cover)), cover).toBe(true);
   });
 
   it("formats the publication day without shifting it across time zones", () => {
