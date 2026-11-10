@@ -12,7 +12,7 @@ dataCollected: 2026-11-10
 
 # The Best Claude Code Skills in 2026
 
-The most-installed Claude Code skill in 2026 is Vercel's **find-skills**, with 4.29M installs on skills.sh on November 10, 2026. It helps the agent find other skills for you. Matt Pocock's **grill-me** comes next, then HeyGen's **hyperframes** and Vercel's **agent-browser**, which are 126 installs apart. Searching for the best Claude skills or the top Claude skills? This is that list. Claude skills and Claude Code skills are the same `SKILL.md` folders. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
+The best Claude Code skills in 2026 start with Vercel's **find-skills**, the most-installed, with 4.29M installs on skills.sh on November 10, 2026. It helps the agent find other skills for you. Matt Pocock's **grill-me** comes next, then HeyGen's **hyperframes** and Vercel's **agent-browser**, which are 126 installs apart. Searching for the best Claude skills or the top Claude skills? This is that list. Claude skills and Claude Code skills are the same `SKILL.md` folders. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
 
 ```cta
 title: "Install any skill on this page with one command, and share it with your team."
@@ -23,23 +23,23 @@ primary: { label: "Create a free Skillpack workspace", href: /login }
 ```takeaways
 title: Key Takeaways
 items:
-  - lead: "Start with a process skill, not a pile of skills."
+  - lead: "Start with a process skill."
     text: "grill-me and brainstorming make the agent ask before it builds. That changes more of your results than any single domain skill."
   - lead: "Several top skills are thin wrappers around a CLI."
     text: "agent-browser, hyperframes and playwright-cli expect their own command-line tool to be installed. The skill only teaches the agent to drive it."
   - lead: "Some skills call other skills."
     text: "grill-me hands off to grilling, and brainstorming ends by calling writing-plans. Install the pair, or the shortcut does nothing."
   - lead: "High install counts aren't always real adoption."
-    text: "We left out skills whose counts don't match their repository, like near-empty repos with a million installs."
+    text: "The list leaves out skills whose counts don't match their repository, like near-empty repos with a million installs."
   - lead: "A skill only helps a team if everyone runs the same version."
     text: "Pin the exact commit in a lockfile that lives in the repo."
 ```
 
-## What a Claude Code skill is, in one paragraph
+## A Claude Code skill packages instructions in one folder
 
 A Claude Code skill is a folder with a `SKILL.md` file. It holds instructions, and sometimes scripts or reference files. Claude Code only sees each skill's name and description at first, and loads the rest when a task matches ([what is SKILL.md](/blog/what-is-skill-md)). A skill teaches the agent how to do a job. An MCP server gives it access to a system ([Agent Skills vs MCP](/blog/agent-skills-vs-mcp)). None of the nine skills below needs an MCP server.
 
-## Best Claude skills vs best Claude Code skills
+## Best Claude skills and best Claude Code skills share one format
 
 People search for both, and the answer is mostly the same list. Anthropic's [Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) says custom skills work across Claude's products. You create them in Claude Code, upload them through the Claude API, or add them in claude.ai settings. Three differences matter when you pick from this page:
 
@@ -47,23 +47,25 @@ People search for both, and the answer is mostly the same list. Anthropic's [Age
 - **Skills don't sync between surfaces.** A skill uploaded to claude.ai isn't available in the API. Claude Code skills are separate from both, per the same page.
 - **Some skills need a local CLI.** agent-browser, hyperframes and playwright-cli drive their own command-line tool. Claude Code has the network access of any program on your computer. The Claude API runs skills with no network access and no runtime package installation, so those three belong in Claude Code.
 
-The ranking below is about Claude Code, where all nine skills work.
+The ranking below is about Claude Code. All nine skills work there.
 
-## How we picked the best Claude skills
+## Five filters picked the best Claude skills
 
-We started from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026, and refreshed every count on November 10, 2026. Then we applied five filters, in this order:
+The list starts from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026. A refresh on November 10, 2026 updated every count. Then come five filters, in this order:
 
 1. **One skill per repository.** Otherwise a single author fills the list. Matt Pocock alone has 20 skills above 750K installs.
 2. **One skill per job.** Design, video, code review and [marketing / SEO](/blog/best-claude-code-skills-marketing-seo) each have a dedicated ranking page, so they get one entry here.
-3. **Works in any project.** We skipped skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
-4. **Believable numbers.** We dropped skills whose installs don't match their repository, and skill copies published under several accounts.
-5. **Installs with one command.** Every skill below was installed with the Skillpack CLI from its GitHub folder.
+3. **Works in any project.** Filter 3 skips skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
+4. **Believable numbers.** Filter 4 drops skills whose installs don't match their repository, and skill copies published under several accounts.
+5. **Installs with one command.** The Skillpack CLI installed every skill below from its GitHub folder.
 
-Adoption then sets the order. On November 10, every skill with more installs than playwright-cli was already on the October 22 leaderboard, so the selection stayed the same. Only the order moved: hyperframes passed agent-browser. Stars, license and last activity are shown for each skill so you can weigh them yourself. Skillpack isn't ranked. The Vibe Company, the author's company, builds Skillpack, the open-source tool used here to install and share skills, and it only appears in the install commands.
+**What this list does not test.** This list ranks skills by public adoption data. Each skill below went through a Skillpack CLI install and a read of its SKILL.md. None was benchmarked on a fixed task set, so install counts show adoption only.
 
-## The top Claude skills for Claude Code in 2026
+Adoption then sets the order. On November 10, every skill with more installs than playwright-cli was already on the October 22 leaderboard, so the selection stayed the same. Only the order moved: hyperframes passed agent-browser. Stars, license and last activity are shown for each skill so you can weigh them yourself. Skillpack isn't ranked. Disclosure: the author's company, The Vibe Company, builds Skillpack, the open-source tool used here to install and share skills. Skillpack only appears in the install commands.
 
-Install counts change every day, so treat this as a snapshot from November 10, 2026. Each command points at the skill's real folder on GitHub. Add `--scope project` to install it in the current repo for Claude Code, Codex and OpenCode, and `--share-org` to publish a copy to your Skillpack organization.
+## The top Claude skills for Claude Code in 2026 start with find-skills
+
+Install counts change every day. Treat this as a snapshot from November 10, 2026. Each command points at the skill's real folder on GitHub. Add `--scope project` to install it in the current repo for Claude Code, Codex and OpenCode, and `--share-org` to publish a copy to your Skillpack organization.
 
 ```skill-card
 rank: 1
@@ -131,7 +133,7 @@ license:
 focus: "Video from HTML"
 install: "skillpack install github:heygen-com/hyperframes/skills/hyperframes --scope project"
 description: |
-  HyperFrames is HeyGen's open-source framework for rendering video from HTML, and this skill is its front door. It calls itself the "mandatory entry point" for any request to make, edit, animate or render a video. Its sister skill hyperframes-cli has slightly more installs (1.49M), but it's the reference for the CLI, so we list the entry point.
+  HyperFrames is HeyGen's open-source framework for rendering video from HTML, and this skill is its front door. It calls itself the "mandatory entry point" for any request to make, edit, animate or render a video. Its sister skill hyperframes-cli has slightly more installs (1.49M), but it's the reference for the CLI, so this list keeps the entry point.
 
   For a new video, it runs a short intent interview and writes a `BRIEF.md`. It then routes to one of ten workflows, from product launch videos and explainers to captions, PR-to-video and Remotion ports.
 
@@ -185,9 +187,9 @@ description: |
 
   The rules are specific. The agent identifies the product and audience before designing, keeps line lengths under 80 characters, and avoids the usual tells of a generated page. Those include accenting one word in a headline, all-caps labels, and numbered markers on content that isn't a sequence. It then plans, builds and critiques its own work against the brief.
 
-  It's a direction skill, not a component library or a checklist. It won't pick your design system for you.
+  It's a direction skill. It ships no component library or checklist, and it won't pick your design system for you.
 suitedFor: |
-  anyone building a new UI or reshaping one that feels bland. We compared seven design skills in [the frontend design ranking](/blog/best-claude-code-skills-frontend-design).
+  anyone building a new UI or reshaping one that feels bland. [The frontend design ranking](/blog/best-claude-code-skills-frontend-design) compares seven design skills.
 ```
 
 ```skill-card
@@ -292,11 +294,11 @@ suitedFor: |
 
 A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (756.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (443.7K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (886.0K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (785.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review).
 
-We also left out two skills with around a million installs each, from repositories with about 20 GitHub stars. Same for AI video and image skills copied under several accounts. Those counts don't look like real adoption.
+The list also leaves out two skills with about 1.3M installs each, from repositories with about 30 GitHub stars. Same for AI video and image skills copied under several accounts. Those counts don't look like real adoption.
 
-## Side-by-side comparison
+## All nine side by side
 
-Ranked by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected November 10, 2026. Stars are for each skill's whole GitHub repository.
+The comparison ranks the nine skills by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected November 10, 2026. Stars are for each skill's whole GitHub repository.
 
 ```skill-comparison
 ```
@@ -308,7 +310,7 @@ primary: { label: "Start free", href: /login }
 secondary: { label: "How to share Claude Code skills with your team", href: /blog/how-to-share-claude-code-skills-with-your-team }
 ```
 
-## Which skill fits your use case
+## Pick a starting skill by use case
 
 ```use-cases
 rows:
@@ -338,9 +340,9 @@ rows:
     why: "Start here, then open the [marketing and SEO ranking](/blog/best-claude-code-skills-marketing-seo) for GEO, AEO and audit alternatives"
 ```
 
-## How to install and share these skills with your team
+## Install and share them with one command
 
-Each command above installs a public GitHub folder with the Skillpack CLI, without an account. The CLI resolves the branch to an exact commit and shows you the source and any executable files. It asks before copying anything and never runs package scripts. With `--scope project`, the skill lands in `.agents/skills/`, which OpenCode reads, with managed copies in `.claude/skills/` for Claude Code and `.codex/skills/` for Codex. The commit goes into `.companion/skills.lock.json`. Commit that lockfile, and `skillpack sync --frozen` gives every teammate and every CI run the same files ([full install guide](/blog/how-to-install-skills-in-claude-code)).
+Each command above installs a public GitHub folder with the Skillpack CLI, without an account. The CLI resolves the branch to an exact commit and shows you the source and any executable files. It asks before copying anything. It never runs package scripts. With `--scope project`, the skill lands in `.agents/skills/`, which OpenCode reads, with managed copies in `.claude/skills/` for Claude Code and `.codex/skills/` for Codex. The commit goes into `.companion/skills.lock.json`. Commit that lockfile. `skillpack sync --frozen` then gives every teammate and every CI run the same files ([full install guide](/blog/how-to-install-skills-in-claude-code)).
 
 These skills aren't Claude Code-only. The same folders work in Codex, which reads `SKILL.md` too ([Codex skills guide](/blog/how-to-use-skills-in-codex)).
 
@@ -352,7 +354,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/productivity/grill-me --scope project --share-org
 ```
 
-Want more SEO and marketing skills? See [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo). Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source (MIT) and can run on your own infrastructure.
+For more SEO and marketing skills, see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo). Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source (MIT). It can run on your own infrastructure.
 
 ## FAQ
 
@@ -371,7 +373,7 @@ items:
   - question: "Are Claude Code skills safe to install?"
     answer: "Treat them like a new dependency. Read the `SKILL.md`, any scripts and the `allowed-tools` field, which pre-approves commands. agent-browser, playwright-cli and frontend-design come from Vercel, Microsoft and Anthropic. Four of the nine skills here come from individual developers."
   - question: "Do these skills work in Codex?"
-    answer: "Yes. Codex reads the same `SKILL.md` format. A Skillpack project install writes the skill for Claude Code, Codex and OpenCode in one command. Skills that rely on Claude Code-only fields, like `disable-model-invocation`, may behave differently."
+    answer: "Yes. Codex reads the same `SKILL.md` format. A Skillpack project install writes the skill for Claude Code, Codex and OpenCode in one command. Skills that rely on fields outside the Agent Skills standard, like `disable-model-invocation`, may behave differently."
   - question: "How do I keep the same skills across my team?"
     answer: "Pin them to an exact commit in a lockfile committed to the repo, and share them through one workspace. See [how to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team)."
 ```
