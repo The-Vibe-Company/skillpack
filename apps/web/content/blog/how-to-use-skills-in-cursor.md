@@ -122,7 +122,7 @@ Cursor now has several ways to give the agent instructions, and they overlap. He
 | Skill | Folder with `SKILL.md` | When relevant, or when you call it | Multi-step, repeatable procedures |
 | Slash command | Older prompt shortcut | Only when you call it | Now covered by skills with `disable-model-invocation: true` |
 
-The rule of thumb from Cursor's own help page: use a rule when a short instruction is enough, and a skill when the agent needs a detailed, repeatable process. "Use TypeScript for new files" is a rule. "Deploy to staging: run tests, build, deploy, check health" is a skill.
+The rule of thumb from Cursor's own help page: use a rule when a short instruction is enough, and a skill when the agent needs a detailed, repeatable process. "Use TypeScript for new files" is a rule. "Deploy to staging: run tests, build, deploy, check health" is a skill. For the full comparison, including how to migrate rules with `/migrate-to-skills`, see [Cursor rules vs skills](/blog/cursor-rules-vs-skills).
 
 If your skill needs live data from another system, like an issue tracker or a database, pair it with an MCP server. [Agent skills vs MCP](/blog/agent-skills-vs-mcp) explains that split.
 
