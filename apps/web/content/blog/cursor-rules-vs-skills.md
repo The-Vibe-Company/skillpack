@@ -10,9 +10,9 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 # Cursor rules vs skills: when to use each
 
-Cursor rules vs skills comes down to how each loads. A Cursor rule is short guidance added to the agent's context. Depending on its settings, it applies every time, for matching files, or when the agent finds it relevant. A Cursor skill is a folder with a `SKILL.md` file. It holds a step-by-step procedure. Its full instructions load only when the task needs them, or when you call it with `/`. Use a rule for a constraint ("named exports only"). Use a skill for a workflow ("cut a release"). Two details trip most migrations: a plain `.md` file in `.cursor/rules/` is ignored, and `/migrate-to-skills` leaves always-on and glob rules untouched.
+Cursor rules vs skills comes down to how each loads. A Cursor rule is short guidance added to the agent's context. Depending on its settings, it applies every time, for matching files, or when the agent finds it relevant. A Cursor skill is a folder with a `SKILL.md` file. It holds a step-by-step procedure. Its full instructions load only when the task needs them, or when you call it with `/`. Use a rule for a constraint ("named exports only"). Use a skill for a workflow ("cut a release"). Two details are easy to miss when you migrate: a plain `.md` file in `.cursor/rules/` is ignored, and `/migrate-to-skills` leaves always-on and glob rules untouched.
 
-Cursor's behavior on this page comes from the official docs for [rules](https://cursor.com/docs/rules) and [skills](https://cursor.com/docs/skills), plus Cursor's help pages on [rules](https://cursor.com/help/customization/rules) and [skills](https://cursor.com/help/customization/skills), all read on November 10, 2026. This page doesn't measure how often the agent follows either one. The Skillpack commands below ran on Skillpack CLI 0.3.5 the same day. Disclosure: the author's company, The Vibe Company, builds [Skillpack](https://skillpack.app). It installs and shares skills. It doesn't manage Cursor rules, so this page isn't a ranking.
+Cursor's behavior on this page comes from the official docs for [rules](https://cursor.com/docs/rules) and [skills](https://cursor.com/docs/skills), plus Cursor's help pages on [rules](https://cursor.com/help/customization/rules) and [skills](https://cursor.com/help/customization/skills), all read on November 10, 2026. This page doesn't measure how often the agent follows either one. The Skillpack commands below ran on Skillpack CLI 0.3.5 the same day. Disclosure: Skillpack is built by The Vibe Company, the author's company. It installs and shares skills. It doesn't manage Cursor rules, so this page isn't a ranking.
 
 ```takeaways
 title: Key Takeaways
@@ -22,11 +22,11 @@ items:
   - lead: "A rule's frontmatter decides when it loads."
     text: "alwaysApply, globs and description combine into four modes: always, matching files, agent decides, or only when you @-mention it."
   - lead: "Project rules must be .mdc files."
-    text: "A plain .md file in .cursor/rules is ignored. Use AGENTS.md if you want plain Markdown."
+    text: "A plain .md file in .cursor/rules is ignored. Use AGENTS.md if you want plain Markdown instead."
   - lead: "/migrate-to-skills only converts some rules."
     text: "Rules set to Apply Intelligently become skills. Always-on rules, glob rules and user rules stay as they are."
-  - lead: "Skills travel further than rules."
-    text: "A SKILL.md works in any agent that supports the Agent Skills standard. Rules are a Cursor format."
+  - lead: "Skills travel further than .mdc rules."
+    text: "A SKILL.md works in any agent that supports the Agent Skills standard. AGENTS.md also travels; .mdc project rules are the one Cursor-specific format here."
 ```
 
 ## Cursor rules vs skills differ in loading, length and sharing
@@ -42,11 +42,11 @@ items:
 | Team sharing | Commit to git, Team Rules (Team and Enterprise), plugins | Commit to git, publish to a team marketplace, plugins, or a CLI |
 | Portability | `.mdc` rules are a Cursor format | Works in agents that follow the [Agent Skills standard](https://agentskills.io) |
 
-Cursor's skills help page sums it up in its own table: rules are "short coding guidelines and constraints", skills are "multi-step workflows and procedures".
+Cursor's skills help page sums it up in its own table: rules are "short coding guidelines and constraints," skills are "multi-step workflows and procedures."
 
-## Four kinds of rules, each loaded by its frontmatter
+## Four kinds of rules, each loaded by its own frontmatter
 
-Rules give the agent persistent context. Cursor's docs explain why they exist. Models don't keep memory between completions. So when a rule applies, its contents go in at the start of the model context. Cursor has four kinds:
+Rules give the agent persistent context because, as Cursor's docs put it, large language models don't retain memory between completions. So when a rule applies, its contents go in at the start of the model context. Cursor has four kinds:
 
 - **Project rules** live in `.cursor/rules/`, are version-controlled, and are scoped to your codebase.
 - **User rules** are global preferences you set in Customize, then Rules. They sync with your Cursor account.
@@ -80,7 +80,7 @@ Three details catch people out:
 
 - **The extension matters.** Project rules must use `.mdc`. Cursor ignores a plain `.md` file in `.cursor/rules/`, because it has no frontmatter to say when it applies.
 - **`@file` mentions are not inlined.** A rule that says "read `@migration-template.sql`" tells the agent where to look. The agent opens the file with its tools when it needs it. Anything that must always be in context has to sit in the rule body.
-- **`CLAUDE.md` is always on.** Cursor reads `CLAUDE.md` like `AGENTS.md`, and applies it to every conversation whatever its frontmatter says. For conditional guidance, use a project rule. [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md) explains how those root files relate to `SKILL.md`.
+- **`CLAUDE.md` is always on.** Cursor reads `CLAUDE.md` like `AGENTS.md`, and applies it to every conversation whatever its frontmatter says, to stay compatible with projects that also use Claude Code. For conditional guidance, use a project rule instead. [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md) explains how those root files relate to `SKILL.md`.
 
 When rules conflict, Cursor applies them in the order Team Rules, then Project Rules, then User Rules, and earlier sources win. The old `.cursorrules` file in the project root is legacy. Cursor's help page says it "will be deprecated" and shows how to move it into an Always Apply rule.
 
@@ -88,7 +88,7 @@ When rules conflict, Cursor applies them in the order Team Rules, then Project R
 
 A skill is a folder with a `SKILL.md` file that teaches the agent one task. It can also carry `scripts/`, `references/` and `assets/`. Cursor follows the open Agent Skills standard, the same `SKILL.md` format Claude Code and Codex read. The [Cursor skills guide](/blog/how-to-use-skills-in-cursor) covers folders, invocation and Cloud Agents in detail. Here is only what matters for the comparison.
 
-Cursor discovers skills when it starts and shows the agent the available ones. The agent decides when a skill is relevant, and the docs describe skills as loading resources "on demand, keeping context usage efficient". You can also run one yourself by typing `/` and its name. That call attaches the skill to one message.
+Cursor discovers skills when it starts and shows the agent the available ones. The agent decides when a skill is relevant, and the docs describe skills as loading resources "on demand, keeping context usage efficient." You can also run one yourself by typing `/` and its name. That call attaches the skill to one message.
 
 Two frontmatter fields bring skills closer to rules:
 
@@ -103,7 +103,7 @@ Loading is the real difference. A rule that applies is included in the prompt as
 
 A skill costs much less until it's used. The agent sees what skills exist, then reads the full instructions and any reference files only when it decides one fits. So a long release checklist works better as a skill than as an Always Apply rule.
 
-The trade-off runs the other way for reliability. An Always Apply rule is always there. A skill depends on the agent matching your request to its description, unless you call it with `/`, or keep it on for the whole session as a Custom Mode (Option+Enter on Mac, Alt+Enter on Windows). Some instructions must never be skipped, like "never edit files in `dist/`". Keep those in a rule.
+The trade-off runs the other way for reliability. An Always Apply rule is always there. A skill depends on the agent matching your request to its description. You can call it with `/` instead, or keep it on for the whole session as a Custom Mode (Option+Enter on Mac, Alt+Enter on Windows). Some instructions must never be skipped, like "never edit files in `dist/`." Keep those in a rule.
 
 ## Six questions pick a rule or a skill
 
@@ -116,7 +116,7 @@ Ask these questions about the instruction you're about to write:
 5. **Should it only run when someone asks for it?** Skill with `disable-model-invocation: true`. A deploy or a database migration belongs here.
 6. **Will teammates use Claude Code or Codex too?** Prefer a skill. The same folder works there, while `.mdc` rules are a Cursor format.
 
-Most repos end up with both: a handful of short rules for conventions, and a few skills for the jobs people repeat every week.
+A repo can hold both at once: a few short rules for standing constraints, and a few skills for the jobs people repeat every week.
 
 ## One release-notes procedure, written both ways
 
@@ -159,9 +159,9 @@ Cursor ships a built-in `/migrate-to-skills` skill, available since Cursor 2.4. 
 - **Dynamic rules:** rules set to Apply Intelligently, meaning `alwaysApply: false` (or unset) and no `globs`. They become standard skills.
 - **Slash commands:** user and workspace commands become skills with `disable-model-invocation: true`, so they still only run when called.
 
-It leaves alone rules with `alwaysApply: true`, rules with `globs`, and user rules, which aren't stored on the file system. That's the right call. Those rules have explicit triggers that skills don't copy exactly.
+It leaves alone rules with `alwaysApply: true`, rules with `globs`, and user rules, which aren't stored on the file system. That's the right call, since those rules have explicit triggers that a skill's on-demand model doesn't copy exactly.
 
-To convert a single rule by hand, type `/create-skill` and ask the agent to "turn `@my-rule` into a skill". Review the result. Then delete the old rule if you no longer need it. Before you commit a migrated skill, check three things:
+To convert a single rule by hand, type `/create-skill` and ask the agent to "turn `@my-rule` into a skill." Review the result. Then delete the old rule if you no longer need it. Before you commit a migrated skill, check three things:
 
 - The description says when to use the skill as well as what it does. The agent reads it to decide.
 - Steps that only made sense as always-on context ("prefer composition") go back into a short rule.
@@ -169,20 +169,20 @@ To convert a single rule by hand, type `/create-skill` and ask the agent to "tur
 
 ## Git first, then Team Rules or a team marketplace
 
-Both start in git. Commit `.cursor/rules/` and the team gets your project rules. Commit `.cursor/skills/` or `.agents/skills/` and the team gets your project skills. Cursor's docs also point to repo skills for automations and self-hosted workers. After that, the options differ.
+Both start in git. Commit `.cursor/rules/` and the team gets your project rules. Commit `.cursor/skills/` or `.agents/skills/` and the team gets your project skills too. Cursor's docs call skills version-controlled files. After that, the options differ.
 
 **For rules**, Team and Enterprise plans have [Team Rules](https://cursor.com/docs/rules#team-rules), set in the dashboard. Admins can enforce a rule so members can't switch it off, and Team Rules support glob patterns. Rules from another repository arrive through a plugin. You import the repo in Customize, and it needs a `.cursor-plugin/marketplace.json`.
 
 **For skills**, team marketplaces and publishing need Teams or Enterprise. On those plans, you can [publish a personal skill](https://cursor.com/docs/plugins#publish-a-skill-to-your-team) from `~/.cursor/skills/` to the team's Default marketplace (Customize, then Skills, then Publish). Teammates choose to install it. Publishing installs it for no one else, unless an admin sets the plugin to Default On or Required. A Team Rule can simply be enforced. Plugins that bundle skills also install from the Cursor Marketplace. Personal skills only reach Cloud Agents if you turn on [Sync Skills for Cloud Agents](https://cursor.com/docs/skills#use-personal-skills-with-cloud-agents), and `~/.agents/skills/` never syncs.
 
-**Across agents and repos**, a CLI that pins versions helps. Skillpack comes from the author's company, so weigh this paragraph accordingly. It has no `cursor` target: `--tools cursor` returned "unknown coding tool" when tested. Cursor reads `.agents/skills`, so `--tools opencode` is the way to go:
+**Across agents and repos**, a CLI that pins versions helps. Skillpack has no `cursor` target: `--tools cursor` returned "unknown coding tool" when tested. Cursor reads `.agents/skills`, so `--tools opencode` is the way to go:
 
 ```sh
 skillpack install github:anthropics/skills/skills/frontend-design \
   --scope project --tools opencode --yes
 ```
 
-That wrote `.agents/skills/frontend-design/` and a `.companion/skills.lock.json` with the exact commit. Before copying, the CLI printed the source commit, "Executable files: none" and a warning that Skillpack only copies files and never runs package scripts. With the skill folder deleted, `skillpack sync --frozen` restored it (`restored: 1`) and left the lockfile unchanged. Commit both. Every laptop and CI run then gets the same skill. The guides on [sharing skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) and [checking skills in CI](/blog/how-to-check-agent-skills-in-ci) go further.
+That wrote `.agents/skills/frontend-design/` and a `.companion/skills.lock.json` with the exact commit. Before copying, the CLI printed the source commit, "Executable files: none" and a warning that Skillpack only copies files and never runs package scripts. With the skill folder deleted, `skillpack sync --frozen` restored it (`restored: 1`) and left the lockfile unchanged. Commit both, so every laptop and CI run gets the same skill. The guides on [sharing skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) and [checking skills in CI](/blog/how-to-check-agent-skills-in-ci) go further.
 
 ```cta
 title: "Share your team's skills across Cursor, Claude Code and Codex"
@@ -208,17 +208,18 @@ items:
   - question: "Where are Cursor rules stored?"
     answer: "Project rules are .mdc files in .cursor/rules/ in your repo. User rules set in Customize are stored on your Cursor account, and rule files in ~/.cursor/rules stay on your machine. Team Rules live on Cursor's servers and are managed from the team dashboard."
   - question: "Should I use a rule or a skill in Cursor?"
-    answer: "Use a rule for a short constraint that must apply every time, like a naming convention. Use a skill for a repeatable process with steps, scripts or reference files, like deploying or writing release notes. Many teams use both."
+    answer: "Use a rule for a short constraint that must apply every time, like a naming convention. Use a skill for a repeatable process with steps, scripts or reference files, like deploying or writing release notes. A repo can use both at once."
   - question: "How do I convert Cursor rules to skills?"
     answer: "Type /migrate-to-skills in Agent chat. It converts rules set to Apply Intelligently and slash commands into skills in .cursor/skills/. Always-on rules, rules with globs and user rules are not migrated. For one rule, ask /create-skill to turn @my-rule into a skill."
-  - question: "Do Cursor rules load into every chat?"
-    answer: "For project rules, only those with alwaysApply: true. Team Rules without a glob pattern also apply to every conversation, and so does CLAUDE.md. A project rule with globs loads when a matching file is in context. A rule with only a description loads when the agent finds it relevant, and a rule with neither loads when you @-mention it."
+  - question: "Which rules and files load into every conversation?"
+    answer: "By the docs, these apply to every conversation: a project rule with alwaysApply: true, CLAUDE.md whatever its alwaysApply, and a Team Rule with no glob pattern. A member can still turn that Team Rule off unless it's enforced. User Rules apply across all your projects. A root AGENTS.md is picked up automatically, and a nested one applies when working with files in its folder or below."
   - question: "Are .cursorrules files still supported?"
     answer: "Cursor's help page calls .cursorrules legacy and says it will be deprecated. To migrate, create a new rule, paste the content, set it to Always Apply to keep the old behavior, then delete .cursorrules."
-  - question: "Can I use Cursor rules in Claude Code or Codex?"
-    answer: "Cursor treats .mdc rules as its own format: in plugins, rules belong to Cursor Plugins only, while skills are also part of the open Agent Plugins standard. For instructions that travel, use a SKILL.md, which Cursor, Claude Code and Codex read, or a plain AGENTS.md."
+  - question: "How do I share a Cursor skill with my team?"
+    answer: "Commit .cursor/skills/ or .agents/skills/ to git and any teammate who pulls the repo gets the same project skills, no extra setup needed. On Team or Enterprise, you can also publish a personal skill from ~/.cursor/skills/ to your team's Default marketplace, where teammates install it themselves. A CLI like Skillpack adds a third path: it pins a skill to an exact commit in a lockfile, which works across Cursor, Claude Code and Codex."
 ```
 
 ## Next: sort your .cursor/rules folder
 
-Open `.cursor/rules/` and sort what's there. Short constraints stay as rules. Anything with steps becomes a skill, through `/migrate-to-skills` or by hand. Is a skill worth sharing with people who also use Claude Code or Codex? [Create a free Skillpack workspace](/login) and install the same pinned version for everyone.
+Open `.cursor/rules/` and sort what's there. Short constraints stay as rules. Anything with steps becomes a skill, through `/migrate-to-skills` or by hand. The [Cursor skills guide](/blog/how-to-use-skills-in-cursor) covers the file format and invocation in more depth if a skill is also worth sharing with people who use Claude Code or Codex.
+

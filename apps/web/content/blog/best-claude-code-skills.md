@@ -12,7 +12,9 @@ dataCollected: 2026-11-10
 
 # The Best Claude Code Skills in 2026
 
-The best Claude Code skills in 2026 start with Vercel's **find-skills**, the most-installed, with 4.29M installs on skills.sh on November 10, 2026. It helps the agent find other skills for you. Matt Pocock's **grill-me** comes next, then HeyGen's **hyperframes** and Vercel's **agent-browser**, which are 126 installs apart. Searching for the best Claude skills or the top Claude skills? This is that list. Claude skills and Claude Code skills are the same `SKILL.md` folders. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
+The best Claude skills for Claude Code, by installs on skills.sh on November 10, 2026, start with Vercel's **find-skills**, at 4.29M installs. It helps the agent find an existing skill before you write one. Matt Pocock's **grill-me** comes next, then HeyGen's **hyperframes**, 126 installs ahead of Vercel's **agent-browser** in that snapshot. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
+
+Disclosure: Skillpack is built by The Vibe Company, the author's company. Skillpack is the open-source CLI used throughout this page to install and share skills. It doesn't rank skills, and it isn't ranked here.
 
 ```cta
 title: "Install any skill on this page with one command, and share it with your team."
@@ -24,13 +26,13 @@ primary: { label: "Create a free Skillpack workspace", href: /login }
 title: Key Takeaways
 items:
   - lead: "Start with a process skill."
-    text: "grill-me and brainstorming make the agent ask before it builds. That changes more of your results than any single domain skill."
+    text: "grill-me and brainstorming make the agent ask before it builds. brainstorming builds nothing until you approve its design doc."
   - lead: "Several top skills are thin wrappers around a CLI."
-    text: "agent-browser, hyperframes and playwright-cli expect their own command-line tool to be installed. The skill only teaches the agent to drive it."
+    text: "agent-browser, hyperframes and playwright-cli expect their own command-line tool to be installed. The skill teaches the agent to drive it, not to replace it."
   - lead: "Some skills call other skills."
     text: "grill-me hands off to grilling, and brainstorming ends by calling writing-plans. Install the pair, or the shortcut does nothing."
   - lead: "High install counts aren't always real adoption."
-    text: "The list leaves out skills whose counts don't match their repository, like near-empty repos with a million installs."
+    text: "This list leaves out skills whose counts don't match their repository, like near-empty repos with installs above a million."
   - lead: "A skill only helps a team if everyone runs the same version."
     text: "Pin the exact commit in a lockfile that lives in the repo."
 ```
@@ -39,29 +41,29 @@ items:
 
 A Claude Code skill is a folder with a `SKILL.md` file. It holds instructions, and sometimes scripts or reference files. Claude Code only sees each skill's name and description at first, and loads the rest when a task matches ([what is SKILL.md](/blog/what-is-skill-md)). A skill teaches the agent how to do a job. An MCP server gives it access to a system ([Agent Skills vs MCP](/blog/agent-skills-vs-mcp)). None of the nine skills below needs an MCP server.
 
-## Best Claude skills and best Claude Code skills share one format
+## Best Claude skills vs best Claude Code skills
 
-People search for both, and the answer is mostly the same list. Anthropic's [Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) says custom skills work across Claude's products. You create them in Claude Code, upload them through the Claude API, or add them in claude.ai settings. Three differences matter when you pick from this page:
+Anthropic's [Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) says custom skills work across Claude's products: you create them in Claude Code, upload them through the Claude API, or add them in claude.ai settings. Three differences matter when you pick from this page:
 
 - **Claude Code reads skills from folders.** Put them in `.claude/skills/` for a project or `~/.claude/skills/` for yourself. On claude.ai you upload a skill as a zip file, on paid plans with code execution turned on.
 - **Skills don't sync between surfaces.** A skill uploaded to claude.ai isn't available in the API. Claude Code skills are separate from both, per the same page.
-- **Some skills need a local CLI.** agent-browser, hyperframes and playwright-cli drive their own command-line tool. Claude Code has the network access of any program on your computer. The Claude API runs skills with no network access and no runtime package installation, so those three belong in Claude Code.
+- **Some skills need a local CLI.** agent-browser, hyperframes and playwright-cli each drive their own command-line tool. Claude Code gives a skill the same network access as any other program on your computer. The Claude API runs skills with no network access and no runtime package installation, so those three belong in Claude Code.
 
 The ranking below is about Claude Code. All nine skills work there.
 
 ## Five filters picked the best Claude skills
 
-The list starts from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026. A refresh on November 10, 2026 updated every count. Then come five filters, in this order:
+The list starts from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, refreshed on November 10, 2026. Then come five filters, in this order:
 
-1. **One skill per repository.** Otherwise a single author fills the list. Matt Pocock alone has 20 skills above 750K installs.
+1. **One skill per repository.** Otherwise a single author fills the list: on the November 10 leaderboard, Matt Pocock alone has 20 skills above 750K installs.
 2. **One skill per job.** Design, video, code review and [marketing / SEO](/blog/best-claude-code-skills-marketing-seo) each have a dedicated ranking page, so they get one entry here.
-3. **Works in any project.** Filter 3 skips skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
-4. **Believable numbers.** Filter 4 drops skills whose installs don't match their repository, and skill copies published under several accounts.
+3. **Works in any project.** This filter skips skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
+4. **Believable numbers.** This filter drops skills whose installs don't match their repository, and skill copies published under several accounts.
 5. **Installs with one command.** The Skillpack CLI installed every skill below from its GitHub folder.
 
-**What this list does not test.** This list ranks skills by public adoption data. Each skill below went through a Skillpack CLI install and a read of its SKILL.md. None was benchmarked on a fixed task set, so install counts show adoption only.
+**What this list does not test.** Each skill below went through a Skillpack CLI install and a read of its SKILL.md. None was benchmarked on a fixed task set, so these install counts show adoption, not quality.
 
-Adoption then sets the order. On November 10, every skill with more installs than playwright-cli was already on the October 22 leaderboard, so the selection stayed the same. Only the order moved: hyperframes passed agent-browser. Stars, license and last activity are shown for each skill so you can weigh them yourself. Skillpack isn't ranked. Disclosure: the author's company, The Vibe Company, builds Skillpack, the open-source tool used here to install and share skills. Skillpack only appears in the install commands.
+Adoption then sets the order. Skill, installs, repo stars, license and focus are shown for each entry below, so you can weigh them yourself. Skillpack isn't ranked; it appears only in the install commands.
 
 ## The top Claude skills for Claude Code in 2026 start with find-skills
 
@@ -85,7 +87,7 @@ install: "skillpack install github:vercel-labs/skills/skills/find-skills --scope
 description: |
   find-skills turns the agent into a skill scout. Ask "how do I do X" or "is there a skill for X", and it checks the skills.sh leaderboard first. Then it searches with `npx skills find <query>`, from Vercel's Skills CLI.
 
-  The useful part is its quality bar. Before recommending anything, the agent checks three things. Installs: prefer 1K+, be careful under 100. Source: official publishers first. Stars: be skeptical of repositories under 100. It then shows you the skill, its installs, the command and a skills.sh link.
+  The useful part is its quality bar. Before recommending anything, the agent checks three things. Installs: prefer 1K+, be careful under 100. Source: official publishers first. Stars: be skeptical of a repository under 100. It then shows you the skill, its installs, the command and a skills.sh link.
 
   Know what it does next. If you say yes, it installs with `npx skills add <owner/repo@skill> -g -y`, which is global and skips the confirmation prompt. If you'd rather review a skill before it lands, ask the agent to stop at the recommendation.
 suitedFor: |
@@ -110,11 +112,11 @@ install: "skillpack install github:mattpocock/skills/skills/productivity/grill-m
 description: |
   grill-me is "a relentless interview to sharpen a plan or design". You call it with `/grill-me`, since it sets `disable-model-invocation: true` and Claude never runs it on its own.
 
-  The folder is a one-line shortcut. Its only instruction is to call another skill, **grilling**, from the same repository. So install both, or the command has nothing to run: `skillpack install github:mattpocock/skills/skills/productivity/grilling --scope project`.
+  The folder is a one-line shortcut: its only instruction is to call another skill, **grilling**, from the same repository. So install both, or the command has nothing to run: `skillpack install github:mattpocock/skills/skills/productivity/grilling --scope project`.
 
-  grilling is where the method lives. The agent maps your plan as a design tree. Each round, it asks every question that can be settled now, numbered, with its recommended answer. Questions are worded so that "yes" accepts the recommendation. Facts it can look up itself, it sends a sub-agent to find. It doesn't act until you agree the tree is fully explored.
+  grilling is where the method lives. The agent maps your plan as a design tree, then works it in rounds. Every round it asks the whole set of questions it can settle now, numbered, each with a recommended answer worded so "yes" accepts it. Facts it can look up itself go to a sub-agent, not to you. The session ends only once every branch of the tree has been visited, and it doesn't act until you confirm.
 suitedFor: |
-  developers who keep getting a fast, confident build of the wrong thing. It costs a few minutes of questions per feature, which is the point.
+  developers who keep getting a fast, confident build of the wrong thing. It asks its questions before any code exists, which is the point.
 ```
 
 ```skill-card
@@ -133,11 +135,11 @@ license:
 focus: "Video from HTML"
 install: "skillpack install github:heygen-com/hyperframes/skills/hyperframes --scope project"
 description: |
-  HyperFrames is HeyGen's open-source framework for rendering video from HTML, and this skill is its front door. It calls itself the "mandatory entry point" for any request to make, edit, animate or render a video. Its sister skill hyperframes-cli has slightly more installs (1.49M), but it's the reference for the CLI, so this list keeps the entry point.
+  hyperframes is the read-first skill for HyperFrames, HeyGen's framework for rendering HTML to video. It renders by seeking a paused timeline frame by frame, so the same files always render the same video, and you edit those files in the Studio preview. Its sister skill hyperframes-cli has slightly more installs (1.49M), but this is the one that holds the render contract and the work loop. As the skill starts, it runs a usage beacon (`npx hyperframes events --skill=hyperframes`) that sends the skill's name with the CLI's usual telemetry, account-linked when signed in. `npx hyperframes telemetry disable` turns it off.
 
-  For a new video, it runs a short intent interview and writes a `BRIEF.md`. It then routes to one of ten workflows, from product launch videos and explainers to captions, PR-to-video and Remotion ports.
+  A new project starts with `npx hyperframes init`. Capturing a website as the subject uses `npx hyperframes capture <url> --json`. Twelve numbered rules govern the HTML itself (timed elements, scene structure, fonts, asset paths), checked with `npx hyperframes check --json`. On an existing project, the work loop reads the timeline and your recent edits first. After its last edit, it runs check again, then a snapshot and review. It renders when you approve the Studio preview, ask for the file, or ask for no stops.
 
-  It depends on the HyperFrames CLI, which installs each workflow with `npx hyperframes skills update <workflow>`. Your Skillpack lockfile doesn't track those workflow files. The folder also ships Node scripts, which the Skillpack CLI lists before it copies anything.
+  Past that, a lookup table routes the request. A launch film, an explainer, a music video, a chart, a vertical clip or a character story each point to their own reference file or specialized skill. The table also covers captions, motion and Figma imports.
 suitedFor: |
   marketers and developers who want finished videos from a prompt or a website. For Remotion, GSAP and motion design skills, see [the video and motion design ranking](/blog/best-claude-code-skills-video-motion-design).
 ```
@@ -162,7 +164,7 @@ description: |
 
   The skill itself is a stub. It tells the agent to install the CLI (`npm i -g agent-browser && agent-browser install`) and then load the real instructions from it with `agent-browser skills get core`. Vercel's reasoning is that the CLI serves guides that always match the installed version. Extra guides cover Electron apps, Slack, exploratory QA and cloud browsers.
 
-  Two things to know. Its frontmatter pre-approves `agent-browser` commands through `allowed-tools`. Its description also tells the agent to prefer it over any built-in browser tool, so it will take over browsing tasks once installed.
+  Two things to know. Its frontmatter pre-approves `agent-browser` commands through `allowed-tools`. Its description also tells the agent to prefer it over any built-in browser tool, so it takes over browsing tasks once installed.
 suitedFor: |
   teams that want the agent to check its own work in a browser, reproduce bugs or automate web chores. You need Node.js to install the CLI.
 ```
@@ -185,11 +187,11 @@ install: "skillpack install github:anthropics/skills/skills/frontend-design --sc
 description: |
   frontend-design is Anthropic's answer to generic, templated UI. It casts Claude as the design lead of a studio whose client "has already rejected proposals that felt cliché or templated". It asks for deliberate choices about palette, typography and layout.
 
-  The rules are specific. The agent identifies the product and audience before designing, keeps line lengths under 80 characters, and avoids the usual tells of a generated page. Those include accenting one word in a headline, all-caps labels, and numbered markers on content that isn't a sequence. It then plans, builds and critiques its own work against the brief.
+  The rules are specific. The agent identifies the product and audience before designing, and keeps line lengths under 80 characters. It names the usual tells of a generated page: one accented word in a headline, all-caps labels, unnecessary eyebrow text, and numbered markers on content that isn't a sequence. Then it plans, checks the plan against the brief, builds, and critiques the result.
 
-  It's a direction skill. It ships no component library or checklist, and it won't pick your design system for you.
+  It's a direction skill: it sets the aesthetic choices, not a component library or a design system, which stays your call.
 suitedFor: |
-  anyone building a new UI or reshaping one that feels bland. [The frontend design ranking](/blog/best-claude-code-skills-frontend-design) compares seven design skills.
+  anyone building a new UI or reshaping one that feels bland. [The frontend design ranking](/blog/best-claude-code-skills-frontend-design) compares it with other design skills.
 ```
 
 ```skill-card
@@ -208,11 +210,11 @@ license:
 focus: "Terse output style"
 install: "skillpack install github:juliusbrussee/caveman/skills/caveman --scope project"
 description: |
-  caveman changes how the agent talks, not what it does. Its description sums it up: "answer first, fluff gone, every technical fact kept". Turn it on with `/caveman` or "be brief", and it stays on for the session until you say "stop caveman" or "normal mode".
+  caveman changes how the agent talks, not what it does. Its description sums it up: "answer first, fluff gone, every technical fact kept". Turn it on with `/caveman` or "be brief", and it stays on for the whole session until you say "stop caveman" or "normal mode".
 
-  The name oversells the gimmick. The rules ban greetings, recaps, hedging and filler words, and cap sentences at 20 words. They also forbid dropping "not", "never" or "only", and keep code, commands, paths and errors verbatim. It switches back to full sentences for security warnings, irreversible actions and questions to you.
+  The name oversells the gimmick. The rules ban greetings, recaps, hedging and filler words, and cap sentences at 20 words. They also forbid dropping "not", "never", "no" or "only", and keep code, commands, paths and errors verbatim. It switches back to full sentences for security warnings, irreversible actions, and a question it needs you to answer.
 
-  Anything written outside the chat stays in normal prose: code, comments, commits, docs and PRs. The `/caveman ultra` and `/caveman wenyan` modes point to other skills in the same repository, which this folder doesn't include.
+  Anything written outside the chat stays in normal prose: code, comments, commits, docs, issues and PRs. The `/caveman ultra` and `/caveman wenyan` commands are aliases that hand off to the ultracave and megacave skills instead of this one, which this folder doesn't include.
 suitedFor: |
   developers who read the agent's output in a terminal all day and want less to scroll through. Skip it if you want explanations aimed at beginners.
 ```
@@ -235,11 +237,11 @@ install: "skillpack install github:obra/superpowers/skills/brainstorming --scope
 description: |
   brainstorming is the first step of Superpowers, Jesse Vincent's development methodology. Its description says the agent "MUST use this before any creative work". Its premise is that the agent's idea of what you want "is usually thinner than it feels".
 
-  The agent reads the code and anything you pointed at before its first question. It then asks about the one thing your request leaves open and lays out two or three approaches for you to pick from. Next comes a design doc, short for a small change and full for a project. Nothing gets built until you approve that doc, which it saves under `docs/superpowers/specs/`.
+  The agent reads the code and anything you pointed at before its first question. It then asks about the one thing your request leaves open and lays out two or three approaches for you to pick from. Next comes a design doc, short for a small change and full for a project, saved under `docs/superpowers/specs/`. Nothing gets built until you approve that doc.
 
-  It's part of a chain. Once the design is approved, it calls the `writing-plans` skill from the same repository, so install that too or use the whole Superpowers set. The folder also ships a small local server for an optional visual companion, which the Skillpack CLI lists as executable files.
+  It's part of a chain: once the design is approved, it calls the `writing-plans` skill from the same repository, so install that too or use the whole Superpowers set. The folder also ships a small local server for an optional visual companion, offered only when the look itself is yours to decide.
 suitedFor: |
-  teams who want a written design for every feature. It overlaps with grill-me, so most people pick one of the two.
+  teams who want a written design for every feature. It overlaps with grill-me, covering similar ground before any code gets written.
 ```
 
 ```skill-card
@@ -258,11 +260,11 @@ license:
 focus: "SEO audit"
 install: "skillpack install github:coreyhaines31/marketingskills/skills/seo-audit --scope project"
 description: |
-  seo-audit is the most-installed skill from Marketing Skills, Corey Haines' collection for marketers. It triggers on phrases like "why am I not ranking", "my traffic dropped" or "stuck on page 2".
+  seo-audit is the most-installed skill from Marketing Skills, Corey Haines' collection for marketers. Its description tells the agent to start here "when someone just says their SEO is bad". It also fires when someone asks why traffic dropped, why a page won't rank, or whether canonicals, hreflang or redirects are set up right.
 
-  It audits in a fixed priority order: crawlability and indexation, technical foundations, on-page optimization, content quality, then authority. Every finding comes back with its impact, evidence, fix and priority, ending in an action plan. It reads a `.agents/product-marketing.md` file first if you have one, so it doesn't ask what it already knows.
+  It audits in a fixed priority order: crawlability and indexation, technical foundations, on-page optimization, content quality, then authority and links. Every finding comes back with its impact, evidence, fix and priority. It warns that `curl` and `web_fetch` can miss JSON-LD schema markup that a CMS plugin injects with JavaScript. Instead, it points to the browser tool, the Rich Results Test or a Screaming Frog export.
 
-  It's honest about its limits. It warns that `curl` and web fetches can miss JSON-LD added by JavaScript, and sends you to the Rich Results Test for schema. It also treats fetched pages as untrusted data, a sensible guard against prompt injection.
+  It reads a `.agents/product-marketing.md` file first if you have one, so it doesn't ask what it already knows. It also treats any fetched page as untrusted data rather than instructions, a guard against prompt injection.
 suitedFor: |
   founders and marketers who want a structured audit of their own site. Pair it with Search Console data for real traffic numbers. For a full marketing and SEO ranking (GEO, AEO, Firecrawl audits and more), see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo).
 ```
@@ -283,22 +285,22 @@ license:
 focus: "Playwright from the CLI"
 install: "skillpack install github:microsoft/playwright-cli/skills/playwright-cli --scope project"
 description: |
-  playwright-cli is Microsoft's skill for the Playwright CLI. The agent opens a browser, navigates, clicks and fills elements by ref, and works with tabs, storage, network and DevTools from short commands.
+  playwright-cli is Microsoft's skill for the Playwright CLI. The agent opens a browser, navigates, clicks and fills elements by ref, all through short commands rather than a programming API. The same commands cover tabs, cookies, local storage and network mocking, plus DevTools: console, requests, tracing and video recording.
 
-  Microsoft's README explains why it exists next to Playwright MCP. CLI calls are more token-efficient, since the agent doesn't load large tool schemas or full accessibility trees. MCP stays the better fit for long, stateful sessions like self-healing tests.
+  One feature stands out. When a page registers its own tools through the experimental WebMCP API, the skill tells the agent to call them directly instead of clicking through the interface. The page's own tool "cannot be blocked by a cookie banner or a newsletter modal". The skill treats those tools as untrusted input from the page, not as instructions to follow. A `--raw` flag strips page status and generated code from any command, for piping results into other tools.
 
-  You need Node.js 18 or newer and the CLI itself (`npm install -g @playwright/cli@latest`). Its frontmatter pre-approves `playwright-cli` and `npx playwright` commands through `allowed-tools`.
+  You need the CLI itself (`npm install -g @playwright/cli@latest`), or a local Playwright run through `npx playwright cli`. Its frontmatter pre-approves `playwright-cli` and `npx playwright` commands through `allowed-tools`.
 suitedFor: |
   teams that already use Playwright for tests and want the agent to work in the same tool. If you don't, agent-browser covers similar ground.
 ```
 
 A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (756.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (443.7K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (886.0K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (785.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review).
 
-The list also leaves out two skills with about 1.3M installs each, from repositories with about 30 GitHub stars. Same for AI video and image skills copied under several accounts. Those counts don't look like real adoption.
+The leaderboard also lists two skills with installs above 1.3M each, from repositories with about 30 GitHub stars apiece. That gap between installs and stars doesn't look like real adoption, so this list leaves them out. The same holds for several copies of the same AI video and image skills, published under different account names with near-identical install counts.
 
 ## All nine side by side
 
-The comparison ranks the nine skills by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected November 10, 2026. Stars are for each skill's whole GitHub repository.
+The comparison below ranks the nine skills by adoption, showing the same fields as each card: installs, repo stars, license and focus. Data from skills.sh and GitHub, collected November 10, 2026. Stars are for each skill's whole GitHub repository.
 
 ```skill-comparison
 ```
@@ -342,7 +344,7 @@ rows:
 
 ## Install and share them with one command
 
-Each command above installs a public GitHub folder with the Skillpack CLI, without an account. The CLI resolves the branch to an exact commit and shows you the source and any executable files. It asks before copying anything. It never runs package scripts. With `--scope project`, the skill lands in `.agents/skills/`, which OpenCode reads, with managed copies in `.claude/skills/` for Claude Code and `.codex/skills/` for Codex. The commit goes into `.companion/skills.lock.json`. Commit that lockfile. `skillpack sync --frozen` then gives every teammate and every CI run the same files ([full install guide](/blog/how-to-install-skills-in-claude-code)).
+Each command above installs a public GitHub folder with the Skillpack CLI, without an account. The CLI resolves the branch to an exact commit and shows you the source and any executable files. It asks before copying anything, and it never runs package scripts. With `--scope project`, the skill lands in `.agents/skills/`, which OpenCode reads, with managed copies in `.claude/skills/` for Claude Code and `.codex/skills/` for Codex. The commit goes into `.companion/skills.lock.json`. Commit that lockfile, and `skillpack sync --frozen` gives every teammate and every CI run the same files ([full install guide](/blog/how-to-install-skills-in-claude-code)).
 
 These skills aren't Claude Code-only. The same folders work in Codex, which reads `SKILL.md` too ([Codex skills guide](/blog/how-to-use-skills-in-codex)).
 
@@ -354,7 +356,7 @@ To share a skill with your organization, add `--share-org`. Once the CLI is sign
 skillpack install github:mattpocock/skills/skills/productivity/grill-me --scope project --share-org
 ```
 
-For more SEO and marketing skills, see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo). Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source (MIT). It can run on your own infrastructure.
+For more SEO and marketing skills, see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo). Can't find a skill for your job? [Write your own](/blog/how-to-create-a-claude-code-skill). Skillpack is open source under the MIT license, and its README describes it as self-hostable.
 
 ## FAQ
 
@@ -363,24 +365,24 @@ items:
   - question: "What are the best Claude skills?"
     answer: "By installs on skills.sh on November 10, 2026, the top general-purpose Claude skills are find-skills (4.29M), grill-me (1.53M), hyperframes (1.46M), agent-browser (1.46M) and frontend-design (1.10M). The best set for you depends on your work: planning, browser checks, design, video, SEO or testing."
   - question: "Are Claude skills and Claude Code skills the same thing?"
-    answer: "They use the same SKILL.md format. Anthropic says custom skills work across Claude Code, the Claude API and claude.ai, but they don't sync between them: Claude Code reads skill folders from disk, while claude.ai takes a zip upload. Skills that drive a local CLI, like agent-browser, are a better fit for Claude Code."
+    answer: "They use the same SKILL.md format. Anthropic says custom skills work across Claude Code, the Claude API and claude.ai, but they don't sync between them. Claude Code reads skill folders from disk, while claude.ai takes a zip upload and the API takes an upload through its own endpoints. Skills that drive a local CLI, like agent-browser, are a better fit for Claude Code, since the API runs skills with no network access."
   - question: "How do I install a Claude Code skill?"
     answer: "Run `skillpack install github:owner/repo/path`, for example `skillpack install github:anthropics/skills/skills/frontend-design`. Add `--scope project` to install it in the current repository. You can also copy the skill's folder into `.claude/skills/` by hand."
   - question: "Where can I find Claude Code skills?"
-    answer: "skills.sh lists public Agent Skills with install counts. Most skills live in GitHub repositories as folders with a `SKILL.md` file, such as anthropics/skills, mattpocock/skills or obra/superpowers. The find-skills skill can also search for you."
+    answer: "skills.sh lists public Agent Skills with install counts. Skills live in GitHub repositories as folders with a SKILL.md file, such as anthropics/skills, mattpocock/skills or obra/superpowers. The find-skills skill can also search for you."
   - question: "How many skills should I install?"
     answer: "Fewer than you think. Claude Code shows every installed skill's description to the model, so a long list costs context and can make the wrong skill trigger. Start with two or three that match work you do every week."
   - question: "Are Claude Code skills safe to install?"
-    answer: "Treat them like a new dependency. Read the `SKILL.md`, any scripts and the `allowed-tools` field, which pre-approves commands. agent-browser, playwright-cli and frontend-design come from Vercel, Microsoft and Anthropic. Four of the nine skills here come from individual developers."
+    answer: "Treat them like a new dependency. Read the SKILL.md, any scripts and the allowed-tools field, which pre-approves commands. agent-browser, playwright-cli and frontend-design come from Vercel, Microsoft and Anthropic. Four of the nine skills here come from individual developers."
   - question: "Do these skills work in Codex?"
-    answer: "Yes. Codex reads the same `SKILL.md` format. A Skillpack project install writes the skill for Claude Code, Codex and OpenCode in one command. Skills that rely on fields outside the Agent Skills standard, like `disable-model-invocation`, may behave differently."
+    answer: "Yes. Codex reads the same SKILL.md format. A Skillpack project install writes the skill for Claude Code, Codex and OpenCode in one command. Skills that rely on fields outside the Agent Skills standard, like disable-model-invocation, may behave differently."
   - question: "How do I keep the same skills across my team?"
-    answer: "Pin them to an exact commit in a lockfile committed to the repo, and share them through one workspace. See [how to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team)."
+    answer: "Pin them to an exact commit in a lockfile committed to the repo, and share them through one workspace. See how to share Claude Code skills with your team."
 ```
 
 ## Try Skillpack for free
 
-Once you've picked your starter set, the next step is making sure everyone uses the same one. Skillpack installs any public skill from GitHub with one command and pins the exact commit in a lockfile you can commit. It shares skills with your whole organization, with license and source kept. It's open source. [Create your free Skillpack workspace](/login) and share your first skill in a few minutes.
+Once you've picked your starter set, the next step is making sure everyone uses the same one. Skillpack installs any public skill from GitHub with one command and pins the exact commit in a lockfile you can commit. It shares skills with your whole organization, with license and source kept. It's open source. [Create your free Skillpack workspace](/login) and share your first skill.
 
 ```cta
 title: "Your team's skills, in one place."
