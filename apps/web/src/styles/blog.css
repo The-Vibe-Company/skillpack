@@ -308,6 +308,7 @@
 .v10-post .v10-blog__prose h2 + *,
 .v10-post .v10-blog__prose h3 + * { margin-top: 0.6em; }
 .v10-post .v10-blog__prose > :first-child { margin-top: 0; }
+.v10-post .v10-blog__prose img { display:block; max-width:min(100%, 480px); height:auto; margin-inline:auto; }
 .v10-post .v10-blog__tablewrap { margin-top: 1.5em; }
 .v10-blog__tablewrap:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
 .v10-blog__prose thead th { border-bottom: 1px solid var(--v10-line-strong); }
