@@ -1,18 +1,18 @@
 ---
 title: "Best Claude Code Skills in 2026: 9 Ranked by Installs"
-description: "The best Claude Code skills in 2026, ranked by skills.sh installs: find-skills, grill-me, agent-browser, frontend-design and more, with install commands."
+description: "The best Claude skills for Claude Code in 2026, ranked by skills.sh installs: find-skills, grill-me, hyperframes and more, with install commands."
 slug: best-claude-code-skills
 date: 2026-10-22
 tags: ["Claude Code", "Agent Skills", "Skills List"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 layout: ranking
-dataCollected: 2026-10-22
+dataCollected: 2026-11-10
 ---
 
 # The Best Claude Code Skills in 2026
 
-The most-installed Claude Code skill in 2026 is Vercel's **find-skills**, with 3.98M installs on skills.sh. It helps the agent find other skills for you. Matt Pocock's **grill-me** comes next, then Vercel's **agent-browser**. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
+The most-installed Claude Code skill in 2026 is Vercel's **find-skills**, with 4.29M installs on skills.sh on November 10, 2026. It helps the agent find other skills for you. Matt Pocock's **grill-me** comes next, then HeyGen's **hyperframes** and Vercel's **agent-browser**, which are 126 installs apart. Searching for the best Claude skills or the top Claude skills? This is that list. Claude skills and Claude Code skills are the same `SKILL.md` folders. This page ranks nine general-purpose skills, one per repository and one per job, from planning and browser automation to design, video, SEO and testing. Each one comes with a command to install it and share it with your team.
 
 ```cta
 title: "Install any skill on this page with one command, and share it with your team."
@@ -39,21 +39,31 @@ items:
 
 A Claude Code skill is a folder with a `SKILL.md` file. It holds instructions, and sometimes scripts or reference files. Claude Code only sees each skill's name and description at first, and loads the rest when a task matches ([what is SKILL.md](/blog/what-is-skill-md)). A skill teaches the agent how to do a job. An MCP server gives it access to a system ([Agent Skills vs MCP](/blog/agent-skills-vs-mcp)). None of the nine skills below needs an MCP server.
 
-## How we ranked these skills
+## Best Claude skills vs best Claude Code skills
 
-We started from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026. Then we applied five filters, in this order:
+People search for both, and the answer is mostly the same list. Anthropic's [Agent Skills overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) says custom skills work across Claude's products. You create them in Claude Code, upload them through the Claude API, or add them in claude.ai settings. Three differences matter when you pick from this page:
 
-1. **One skill per repository.** Otherwise a single author fills the list. Matt Pocock alone has 16 skills above 750K installs.
+- **Claude Code reads skills from folders.** Put them in `.claude/skills/` for a project or `~/.claude/skills/` for yourself. On claude.ai you upload a skill as a zip file, on paid plans with code execution turned on.
+- **Skills don't sync between surfaces.** A skill uploaded to claude.ai isn't available in the API. Claude Code skills are separate from both, per the same page.
+- **Some skills need a local CLI.** agent-browser, hyperframes and playwright-cli drive their own command-line tool. Claude Code has the network access of any program on your computer. The Claude API runs skills with no network access and no runtime package installation, so those three belong in Claude Code.
+
+The ranking below is about Claude Code, where all nine skills work.
+
+## How we picked the best Claude skills
+
+We started from the all-time leaderboard on [skills.sh](https://skills.sh), the open directory for Agent Skills, on October 22, 2026, and refreshed every count on November 10, 2026. Then we applied five filters, in this order:
+
+1. **One skill per repository.** Otherwise a single author fills the list. Matt Pocock alone has 20 skills above 750K installs.
 2. **One skill per job.** Design, video, code review and [marketing / SEO](/blog/best-claude-code-skills-marketing-seo) each have a dedicated ranking page, so they get one entry here.
 3. **Works in any project.** We skipped skills that only make sense with one vendor's product or one framework, such as Lark, Azure, Supabase or React.
 4. **Believable numbers.** We dropped skills whose installs don't match their repository, and skill copies published under several accounts.
 5. **Installs with one command.** Every skill below was installed with the Skillpack CLI from its GitHub folder.
 
-Adoption then sets the order. Stars, license and last activity are shown for each skill so you can weigh them yourself. Skillpack isn't ranked. The Vibe Company, the author's company, builds Skillpack, the open-source tool used here to install and share skills, and it only appears in the install commands.
+Adoption then sets the order. On November 10, every skill with more installs than playwright-cli was already on the October 22 leaderboard, so the selection stayed the same. Only the order moved: hyperframes passed agent-browser. Stars, license and last activity are shown for each skill so you can weigh them yourself. Skillpack isn't ranked. The Vibe Company, the author's company, builds Skillpack, the open-source tool used here to install and share skills, and it only appears in the install commands.
 
-## The best Claude Code skills in 2026
+## The top Claude skills for Claude Code in 2026
 
-Install counts change every day, so treat this as a snapshot from October 22, 2026. Each command points at the skill's real folder on GitHub. Add `--scope project` to install it in the current repo for Claude Code, Codex and OpenCode, and `--share-org` to publish a copy to your Skillpack organization.
+Install counts change every day, so treat this as a snapshot from November 10, 2026. Each command points at the skill's real folder on GitHub. Add `--scope project` to install it in the current repo for Claude Code, Codex and OpenCode, and `--share-org` to publish a copy to your Skillpack organization.
 
 ```skill-card
 rank: 1
@@ -61,9 +71,9 @@ name: find-skills
 maintainer: "Vercel"
 bestFor: "finding an existing skill before you write one"
 source: { label: vercel-labs/skills, url: "https://github.com/vercel-labs/skills/tree/main/skills/find-skills" }
-repoStars: "36.0K"
+repoStars: "38.8K"
 installs:
-  count: "3.98M"
+  count: "4.29M"
   url: "https://skills.sh/vercel-labs/skills/find-skills"
 license:
   name: "MIT"
@@ -86,9 +96,9 @@ name: grill-me
 maintainer: "Matt Pocock"
 bestFor: "stress-testing a plan before any code is written"
 source: { label: mattpocock/skills, url: "https://github.com/mattpocock/skills/tree/main/skills/productivity/grill-me" }
-repoStars: "300.2K"
+repoStars: "320.2K"
 installs:
-  count: "1.41M"
+  count: "1.53M"
   url: "https://skills.sh/mattpocock/skills/grill-me"
 license:
   name: "MIT"
@@ -107,13 +117,38 @@ suitedFor: |
 
 ```skill-card
 rank: 3
+name: hyperframes
+maintainer: "HeyGen"
+bestFor: "turning a brief, a URL or a PR into a video"
+source: { label: heygen-com/hyperframes, url: "https://github.com/heygen-com/hyperframes/tree/main/skills/hyperframes" }
+repoStars: "81.9K"
+installs:
+  count: "1.46M"
+  url: "https://skills.sh/heygen-com/hyperframes/hyperframes"
+license:
+  name: "Apache 2.0"
+  note: "repository LICENSE"
+focus: "Video from HTML"
+install: "skillpack install github:heygen-com/hyperframes/skills/hyperframes --scope project"
+description: |
+  HyperFrames is HeyGen's open-source framework for rendering video from HTML, and this skill is its front door. It calls itself the "mandatory entry point" for any request to make, edit, animate or render a video. Its sister skill hyperframes-cli has slightly more installs (1.49M), but it's the reference for the CLI, so we list the entry point.
+
+  For a new video, it runs a short intent interview and writes a `BRIEF.md`. It then routes to one of ten workflows, from product launch videos and explainers to captions, PR-to-video and Remotion ports.
+
+  It depends on the HyperFrames CLI, which installs each workflow with `npx hyperframes skills update <workflow>`. Your Skillpack lockfile doesn't track those workflow files. The folder also ships Node scripts, which the Skillpack CLI lists before it copies anything.
+suitedFor: |
+  marketers and developers who want finished videos from a prompt or a website. For Remotion, GSAP and motion design skills, see [the video and motion design ranking](/blog/best-claude-code-skills-video-motion-design).
+```
+
+```skill-card
+rank: 4
 name: agent-browser
 maintainer: "Vercel"
 bestFor: "letting the agent drive a real browser"
 source: { label: vercel-labs/agent-browser, url: "https://github.com/vercel-labs/agent-browser/tree/main/skills/agent-browser" }
-repoStars: "44.4K"
+repoStars: "48.8K"
 installs:
-  count: "1.21M"
+  count: "1.46M"
   url: "https://skills.sh/vercel-labs/agent-browser/agent-browser"
 license:
   name: "Apache 2.0"
@@ -131,39 +166,14 @@ suitedFor: |
 ```
 
 ```skill-card
-rank: 4
-name: hyperframes
-maintainer: "HeyGen"
-bestFor: "turning a brief, a URL or a PR into a video"
-source: { label: heygen-com/hyperframes, url: "https://github.com/heygen-com/hyperframes/tree/main/skills/hyperframes" }
-repoStars: "69.4K"
-installs:
-  count: "1.14M"
-  url: "https://skills.sh/heygen-com/hyperframes/hyperframes"
-license:
-  name: "Apache 2.0"
-  note: "repository LICENSE"
-focus: "Video from HTML"
-install: "skillpack install github:heygen-com/hyperframes/skills/hyperframes --scope project"
-description: |
-  HyperFrames is HeyGen's open-source framework for rendering video from HTML, and this skill is its front door. It calls itself the "mandatory entry point" for any request to make, edit, animate or render a video. Its sister skill hyperframes-cli has slightly more installs (1.18M), but it's the reference for the CLI, so we list the entry point.
-
-  For a new video, it runs a short intent interview and writes a `BRIEF.md`. It then routes to one of ten workflows, from product launch videos and explainers to captions, PR-to-video and Remotion ports.
-
-  It depends on the HyperFrames CLI, which installs each workflow with `npx hyperframes skills update <workflow>`. Your Skillpack lockfile doesn't track those workflow files. The folder also ships Node scripts, which the Skillpack CLI lists before it copies anything.
-suitedFor: |
-  marketers and developers who want finished videos from a prompt or a website. For Remotion, GSAP and motion design skills, see [the video and motion design ranking](/blog/best-claude-code-skills-video-motion-design).
-```
-
-```skill-card
 rank: 5
 name: frontend-design
 maintainer: "Anthropic"
 bestFor: "UI that doesn't look AI-generated"
 source: { label: anthropics/skills, url: "https://github.com/anthropics/skills/tree/main/skills/frontend-design" }
-repoStars: "182.8K"
+repoStars: "191.6K"
 installs:
-  count: "1.02M"
+  count: "1.10M"
   url: "https://skills.sh/anthropics/skills/frontend-design"
 license:
   name: "Apache 2.0"
@@ -186,9 +196,9 @@ name: caveman
 maintainer: "Julius Brussee"
 bestFor: "shorter answers that keep every technical detail"
 source: { label: juliusbrussee/caveman, url: "https://github.com/juliusbrussee/caveman/tree/main/skills/caveman" }
-repoStars: "114.2K"
+repoStars: "118.8K"
 installs:
-  count: "586.2K"
+  count: "618.9K"
   url: "https://skills.sh/juliusbrussee/caveman/caveman"
 license:
   name: "Apache 2.0"
@@ -211,9 +221,9 @@ name: brainstorming
 maintainer: "Jesse Vincent (obra)"
 bestFor: "agreeing on a design before the agent builds"
 source: { label: obra/superpowers, url: "https://github.com/obra/superpowers/tree/main/skills/brainstorming" }
-repoStars: "303.3K"
+repoStars: "315.4K"
 installs:
-  count: "401.3K"
+  count: "423.6K"
   url: "https://skills.sh/obra/superpowers/brainstorming"
 license:
   name: "MIT"
@@ -236,9 +246,9 @@ name: seo-audit
 maintainer: "Corey Haines"
 bestFor: "a prioritized technical and on-page SEO audit"
 source: { label: coreyhaines31/marketingskills, url: "https://github.com/coreyhaines31/marketingskills/tree/main/skills/seo-audit" }
-repoStars: "58.6K"
+repoStars: "59.5K"
 installs:
-  count: "246.6K"
+  count: "250.7K"
   url: "https://skills.sh/coreyhaines31/marketingskills/seo-audit"
 license:
   name: "MIT"
@@ -252,7 +262,7 @@ description: |
 
   It's honest about its limits. It warns that `curl` and web fetches can miss JSON-LD added by JavaScript, and sends you to the Rich Results Test for schema. It also treats fetched pages as untrusted data, a sensible guard against prompt injection.
 suitedFor: |
-  founders and marketers who want a structured audit of their own site. Pair it with Search Console data for real traffic numbers. Install count and repo stars for this card were refreshed from skills.sh and GitHub on November 5, 2026. For a full marketing and SEO ranking (GEO, AEO, Firecrawl audits and more), see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo).
+  founders and marketers who want a structured audit of their own site. Pair it with Search Console data for real traffic numbers. For a full marketing and SEO ranking (GEO, AEO, Firecrawl audits and more), see [best Claude Code skills for marketing and SEO](/blog/best-claude-code-skills-marketing-seo).
 ```
 
 ```skill-card
@@ -261,9 +271,9 @@ name: playwright-cli
 maintainer: "Microsoft"
 bestFor: "browser testing with Playwright, token-light"
 source: { label: microsoft/playwright-cli, url: "https://github.com/microsoft/playwright-cli/tree/main/skills/playwright-cli" }
-repoStars: "14.5K"
+repoStars: "15.1K"
 installs:
-  count: "192.7K"
+  count: "212.5K"
   url: "https://skills.sh/microsoft/playwright-cli/playwright-cli"
 license:
   name: "Apache 2.0"
@@ -280,13 +290,13 @@ suitedFor: |
   teams that already use Playwright for tests and want the agent to work in the same tool. If you don't, agent-browser covers similar ground.
 ```
 
-A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (656.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (408.6K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (827.4K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (660.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review).
+A few skills just missed the list. leonxlnx's [design-taste-frontend](https://skills.sh/leonxlnx/taste-skill/design-taste-frontend) (756.0K installs) and Next Level Builder's [ui-ux-pro-max](https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max) (443.7K) are strong design picks, but design already has its entry. Vercel's [vercel-react-best-practices](https://skills.sh/vercel-labs/agent-skills/vercel-react-best-practices) (886.0K) only applies to React. Remotion's [remotion-best-practices](https://skills.sh/remotion-dev/skills/remotion-best-practices) (785.6K) is covered in the video ranking. For code review, see [the code review ranking](/blog/best-claude-code-skills-code-review).
 
 We also left out two skills with around a million installs each, from repositories with about 20 GitHub stars. Same for AI video and image skills copied under several accounts. Those counts don't look like real adoption.
 
 ## Side-by-side comparison
 
-Ranked by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected October 22, 2026. Stars are for each skill's whole GitHub repository.
+Ranked by adoption, with maintainer, license and scope shown for each skill. Data from skills.sh and GitHub, collected November 10, 2026. Stars are for each skill's whole GitHub repository.
 
 ```skill-comparison
 ```
@@ -348,8 +358,10 @@ Want more SEO and marketing skills? See [best Claude Code skills for marketing a
 
 ```faq
 items:
-  - question: "What are the best Claude Code skills?"
-    answer: "By installs on skills.sh on October 22, 2026, the top general-purpose skills are find-skills (3.98M), grill-me (1.41M), agent-browser (1.21M), hyperframes (1.14M) and frontend-design (1.02M). The best set for you depends on your work: planning, browser checks, design, video, SEO or testing."
+  - question: "What are the best Claude skills?"
+    answer: "By installs on skills.sh on November 10, 2026, the top general-purpose Claude skills are find-skills (4.29M), grill-me (1.53M), hyperframes (1.46M), agent-browser (1.46M) and frontend-design (1.10M). The best set for you depends on your work: planning, browser checks, design, video, SEO or testing."
+  - question: "Are Claude skills and Claude Code skills the same thing?"
+    answer: "They use the same SKILL.md format. Anthropic says custom skills work across Claude Code, the Claude API and claude.ai, but they don't sync between them: Claude Code reads skill folders from disk, while claude.ai takes a zip upload. Skills that drive a local CLI, like agent-browser, are a better fit for Claude Code."
   - question: "How do I install a Claude Code skill?"
     answer: "Run `skillpack install github:owner/repo/path`, for example `skillpack install github:anthropics/skills/skills/frontend-design`. Add `--scope project` to install it in the current repository. You can also copy the skill's folder into `.claude/skills/` by hand."
   - question: "Where can I find Claude Code skills?"
