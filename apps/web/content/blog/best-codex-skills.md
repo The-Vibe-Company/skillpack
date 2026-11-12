@@ -25,7 +25,7 @@ items:
     text: "skill-creator and skill-installer arrive with Codex, enabled by default, so this ranking skips them."
   - lead: "Install counts span agents."
     text: "skills.sh counts installs made through its own skills CLI and shows one total per skill, with no Codex figure."
-  - lead: "Pin what you install."
+  - lead: "Lock what you install."
     text: "A lockfile committed to the repo records the exact commit, and one command restores it on a teammate's machine."
 ```
 
@@ -109,7 +109,7 @@ suitedFor: |
   Any bug, test failure or unexpected behavior, per its description. Limit: the implementation phase calls on two other superpowers skills, `test-driven-development` and `verification-before-completion`, and this command installs neither.
 ```
 
-After rank 2 the counts fall from 329.9K to 12.4K, and the source changes with them. Ranks 3 to 8 are OpenAI's own skills from openai/skills, each with an Apache 2.0 `LICENSE.txt` in its folder.
+After rank 2 the counts fall from 329.9K to 12.4K, and the source changes with them. skills.sh doesn't split installs by agent, so the gap shows how widely superpowers is installed across agents, not how often Codex users pick it. Ranks 3 to 8 are OpenAI's own skills from openai/skills, each with an Apache 2.0 `LICENSE.txt` in its folder.
 
 ```skill-card
 rank: 3
@@ -302,7 +302,7 @@ The table stays inside this page's pool. For skills from other publishers, the [
 
 Install counts did not decide everything. OpenAI's pdf skill shows 13.8K installs, above security-best-practices, but it handles documents and this list covers software work. Four more superpowers skills dwarf the OpenAI entries: writing-plans (301.0K), requesting-code-review (278.7K), test-driven-development (277.3K) and subagent-driven-development (254.0K). The two-per-repository cap keeps them out, and the superpowers plugin in openai/plugins includes all four.
 
-Three other skills from openai/skills fell to a filter. The linear skill (10.8K) needs a Linear account. One job was already taken in two cases: security-threat-model (9.0K) duplicates security-best-practices, and playwright-interactive (5.7K) duplicates playwright.
+Three other skills from openai/skills fell to a filter. The linear skill (10.8K) needs a Linear account. The one-skill-per-job filter cut the other two: security-threat-model (9.0K) duplicates security-best-practices, and playwright-interactive (5.7K) duplicates playwright.
 
 The top two cards point at obra/superpowers, the upstream repository. OpenAI's copies inside openai/plugins have their own skills.sh pages, at 40 installs for brainstorming and 44 for systematic-debugging. The brainstorming copy differs from upstream today in its description and its body. The 425.9K figure belongs to the upstream skill, so that's the one each command installs.
 
@@ -310,7 +310,7 @@ If the superpowers plugin appears in your plugin browser, it's a fair route to t
 
 A count tells you a skill is popular. It says nothing about which version lands in your repo, and for a deprecated catalog that's the part to settle before you install.
 
-## Pin gh-fix-ci to a commit, because its repository can still change
+## Lock gh-fix-ci to a commit, because its repository can still change
 
 Take gh-fix-ci, rank 4, and install it the way a team would. From the root of your repository, preview the install:
 
@@ -338,15 +338,15 @@ That executable line deserves a second look, because gh-fix-ci is no exception. 
 
 That first install used `--tools codex`, and it shows why the cards don't. The CLI printed a second target, `Target (codex, project): .codex/skills/gh-fix-ci`, and wrote the same six files into both folders. The Codex docs name `.agents/skills` as the repository location. They also say that when two skills share a `name`, Codex doesn't merge them and "both can appear in skill selectors." One copy in the documented folder is simpler. If your repo already holds both, [Codex skills not loading](/blog/codex-skills-not-working) shows how to find the extra one.
 
-That install also left `.companion/skills.lock.json` in the repo. The lockfile records the repository, the path and the commit. Here those are openai/skills, `skills/.curated/gh-fix-ci` and the `49f948f` hash from the output above. The commit is what protects you. The README calls openai/skills deprecated, yet the repository is not archived and its last push dates from October 28, 2026, so its default branch can still change.
+That install also left `.companion/skills.lock.json` in the repo. The lockfile [records the repository, the path and the commit](https://github.com/The-Vibe-Company/skillpack/blob/main/docs/skillpack-cli.md). Here those are openai/skills, `skills/.curated/gh-fix-ci` and the `49f948f` hash from the output above. The commit is what protects you. The README calls openai/skills deprecated, yet the repository is not archived and its last push dates from October 28, 2026, so its default branch can still change.
 
-Commit the lockfile with the skill folder. A teammate then runs `skillpack sync --frozen`, which restores from the lockfile. In the test directory, that command reported `status: "verified"` and `lockChanged: false`. To choose a ref yourself, the CLI accepts `@<ref>` on the source.
+Commit the lockfile with the skill folder. A teammate then runs `skillpack sync --frozen`, which restores from the lockfile. In the test directory, that command reported `status: "verified"` and `lockChanged: false`. That install pins nothing. In the test lockfile, gh-fix-ci has `ref: null` and `pinned: null`, and a null ref tracks the default branch. To choose a ref yourself, the CLI accepts `@<ref>` on the source ([CLI docs](https://github.com/The-Vibe-Company/skillpack/blob/main/docs/skillpack-cli.md)).
 
-Sharing has two routes. The first is the repo itself. With `.agents/skills/gh-fix-ci` and the lockfile committed, everyone who clones the repo gets the same files. The guide on [how to share skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) covers that workflow. The second is `--share-org`, which publishes a copy to your Skillpack organization and needs an account.
+Sharing has two routes. The first is the repo itself. With `.agents/skills/gh-fix-ci` and the lockfile committed, everyone who clones the repo gets the same files. The guide on [how to share skills with your team](/blog/how-to-share-claude-code-skills-with-your-team) covers that workflow. The second is [`--share-org`](https://github.com/The-Vibe-Company/skillpack/blob/main/docs/skillpack-cli.md), which publishes a copy to your Skillpack organization and needs an account.
 
 One more command is worth knowing once you write skills of your own. In the test directory, `skillpack skills validate .agents/skills/gh-fix-ci` returned `valid: true` and `files: 6`. Point it at your own folder before you share it.
 
-So the catalog can stay deprecated. What you run is the commit in your lockfile, whatever the README says later. Open Codex in that repo on a branch with a failing check and type `$gh-fix-ci`. If the skill isn't offered, restart Codex, as its docs suggest. Then read the plan before you approve it, because the skill is written to wait for you.
+The catalog can stay deprecated. `skillpack sync --frozen` restores the commit in your lockfile, whatever the README says later. `skillpack update` follows the default branch unless you install with `--pin`. Open Codex in that repo on a branch with a failing check and type `$gh-fix-ci`. If the skill isn't offered, restart Codex, as its docs suggest. Then read the plan before you approve it, because the skill is written to wait for you.
 
 ## FAQ
 
