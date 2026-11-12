@@ -79,7 +79,7 @@ Use `disable-model-invocation: true` for anything with side effects, like commit
 
 ## When a plugin is worth it
 
-A plugin is a directory with a manifest at `.claude-plugin/plugin.json` and components such as `skills/`, `agents/` (subagents, compared with skills in [Claude Code subagents vs skills](/blog/claude-code-subagents-vs-skills)), `hooks/` and `.mcp.json`. The [plugins overview](https://code.claude.com/docs/en/plugins) notes that skills, subagents, hooks and MCP servers all work on their own without one. The [features overview](https://code.claude.com/docs/en/features-overview) gives the trigger in one line: when a second repository needs the same setup, package it as a plugin.
+A plugin is a directory with a manifest at `.claude-plugin/plugin.json` and components such as `skills/`, `agents/` (subagents, compared with skills in [Claude Code subagents vs skills](/blog/claude-code-subagents-vs-skills)), `hooks/` and `.mcp.json`. The [plugins overview](https://code.claude.com/docs/en/plugins) notes that skills, subagents, hooks and [MCP servers](/blog/agent-skills-vs-mcp) all work on their own without one. The [features overview](https://code.claude.com/docs/en/features-overview) gives the trigger in one line: when a second repository needs the same setup, package it as a plugin.
 
 | Your situation | Use |
 | :- | :- |

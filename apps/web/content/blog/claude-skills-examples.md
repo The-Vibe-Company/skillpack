@@ -197,5 +197,5 @@ items:
   - question: "How do I validate a skill folder?"
     answer: "Run skillpack skills validate on the skill directory. In our November 3, 2026 run, frontend-design and webapp-testing both returned valid: true. Invalid frontmatter fails with a nonzero exit code."
   - question: "Where can I find more Claude Code skill examples?"
-    answer: "Browse the rankings on this site for planning, testing, frontend design and the overall hub, and check skills.sh for install counts. Always open the GitHub folder and read SKILL.md before you install a third-party skill."
+    answer: "Browse the rankings on this site for planning, testing, [frontend design](/blog/best-claude-code-skills-frontend-design) and the overall hub, and check skills.sh for install counts. Always open the GitHub folder and read SKILL.md before you install a third-party skill."
 ```
