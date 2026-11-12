@@ -122,6 +122,10 @@ Cursor now has several ways to give the agent instructions, and they overlap. He
 | Skill | Folder with `SKILL.md` | When relevant, or when you call it | Multi-step, repeatable procedures |
 | Slash command | Older prompt shortcut | Only when you call it | Now covered by skills with `disable-model-invocation: true` |
 
+Two details in the rules docs trip up people who come from skills. First, the extension matters. Project rules must use `.mdc`, and a plain `.md` file in `.cursor/rules` [is ignored](https://cursor.com/docs/rules#rule-file-structure). If you prefer plain Markdown, the docs say to use `AGENTS.md`.
+
+Second, some instructions ride along in every conversation, while a skill waits until it's relevant or you call it. Per the docs, a project rule set to Always Apply joins every chat session, and a [Team Rule without a glob pattern](https://cursor.com/docs/rules#format-and-how-team-rules-are-applied) applies to every conversation. Cursor's help page adds that `CLAUDE.md` is always applied, regardless of any `alwaysApply` setting. Cursor picks up a root `AGENTS.md` automatically and applies a nested one when you work with files in its directory.
+
 The rule of thumb from Cursor's own help page: use a rule when a short instruction is enough, and a skill when the agent needs a detailed, repeatable process. "Use TypeScript for new files" is a rule. "Deploy to staging: run tests, build, deploy, check health" is a skill. For the full comparison, including how to migrate rules with `/migrate-to-skills`, see [Cursor rules vs skills](/blog/cursor-rules-vs-skills).
 
 If your skill needs live data from another system, like an issue tracker or a database, pair it with an MCP server. [Agent skills vs MCP](/blog/agent-skills-vs-mcp) explains that split.
