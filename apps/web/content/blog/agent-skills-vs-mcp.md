@@ -55,7 +55,7 @@ If the agent can't see the system at all, better instructions won't help. You ne
 
 Use a skill when the agent can already do the work but doesn't do it your way:
 
-- a repeatable process: release notes, code review checklist, incident write-up;
+- a repeatable process: release notes, [code review checklist](/blog/best-claude-code-skills-code-review), incident write-up;
 - team conventions: naming, folder layout, commit format;
 - a script that should run the same way every time;
 - reference material the agent should open only when relevant.

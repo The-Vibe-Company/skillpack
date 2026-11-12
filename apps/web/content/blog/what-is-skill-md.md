@@ -199,7 +199,7 @@ items:
   - question: "Is SKILL.md the same as AGENTS.md or CLAUDE.md?"
     answer: "No. AGENTS.md and CLAUDE.md are read at the start of a session. A SKILL.md body loads only when the agent uses that skill. See [CLAUDE.md vs AGENTS.md vs SKILL.md](/blog/skill-md-vs-agents-md-vs-claude-md)."
   - question: "What's the difference between a skill and an MCP server?"
-    answer: "An MCP server exposes tools and data (APIs, databases). A skill is instructions and resources that teach the agent how to do a task, often with those tools. You'll usually want both."
+    answer: "An [MCP server](/blog/agent-skills-vs-mcp) exposes tools and data (APIs, databases). A skill is instructions and resources that teach the agent how to do a task, often with those tools. You'll usually want both."
   - question: "How long should a SKILL.md be?"
     answer: "The spec recommends keeping SKILL.md under 500 lines and the instructions under about 5,000 tokens. Move extra detail into `references/` files that load on demand."
   - question: "Can I keep skills private?"

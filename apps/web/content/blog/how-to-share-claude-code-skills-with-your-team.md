@@ -55,7 +55,7 @@ Everyone who pulls the repo gets the skill. Changes go through pull requests lik
 
 **Good for:** skills that belong to one repo, like a deploy recipe or a project's test conventions.
 
-**Where it breaks:** skills that apply to many repos. A code review checklist ends up copied into ten repos, and the copies drift again. Some teams put shared skills in their own repo and pull it in as a git submodule. That works, but submodules come with their own friction, and you still can't easily tell which version each repo runs.
+**Where it breaks:** skills that apply to many repos. A [code review checklist](/blog/best-claude-code-skills-code-review) ends up copied into ten repos, and the copies drift again. Some teams put shared skills in their own repo and pull it in as a git submodule. That works, but submodules come with their own friction, and you still can't easily tell which version each repo runs.
 
 ## Option 2: package skills as a Claude Code plugin
 
