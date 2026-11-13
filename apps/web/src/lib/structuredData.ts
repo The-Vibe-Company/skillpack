@@ -64,11 +64,17 @@ export type BlogPostingFacts = {
   blogUrl: string;
 };
 
-type JsonLdAuthor = { "@type": "Person"; name: string } | { "@type": "Organization"; name: string; url: string };
+type JsonLdPerson = { "@type": "Person"; name: string; url?: string; jobTitle?: string; sameAs?: string[] };
+type JsonLdAuthor = JsonLdPerson | { "@type": "Organization"; name: string; url: string };
 
 function authorNode(author: BlogAuthor): JsonLdAuthor {
-  if (author.kind === "person") return { "@type": "Person", name: author.name };
-  return { "@type": "Organization", name: author.name, url: author.url };
+  if (author.kind === "organization") return { "@type": "Organization", name: author.name, url: author.url };
+  // Only the profile facts the author has are stated; an unprofiled author stays name-only.
+  const person: JsonLdPerson = { "@type": "Person", name: author.name };
+  if (author.url) person.url = author.url;
+  if (author.jobTitle) person.jobTitle = author.jobTitle;
+  if (author.sameAs && author.sameAs.length > 0) person.sameAs = [...author.sameAs];
+  return person;
 }
 
 /**

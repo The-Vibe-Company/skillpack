@@ -60,8 +60,11 @@ describe("public blog post page", () => {
     ]);
 
     const meta = header?.querySelector(".v10-postmeta");
-    expect(meta?.querySelector(".v10-postmeta__author")?.textContent).toBe("By The Vibe Company");
-    expect(meta?.querySelector(".v10-postmeta__author a")?.getAttribute("href")).toBe("https://thevibecompany.co");
+    expect(meta?.querySelector(".v10-postmeta__author")?.textContent).toBe(
+      "By Stan Girard, co-founder of The Vibe Company, which builds Skillpack",
+    );
+    expect(meta?.querySelector(".v10-postmeta__author a")?.textContent).toBe("Stan Girard");
+    expect(meta?.querySelector(".v10-postmeta__author a")?.getAttribute("href")).toBe("https://www.thevibecompany.co/en/about");
     expect(meta?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(meta?.textContent).toMatch(/\d+ min read$/);
     expect(Array.from(header?.querySelectorAll(".v10-tags li") ?? []).map((tag) => tag.textContent)).toEqual([
@@ -148,7 +151,13 @@ describe("public blog post page", () => {
         mainEntityOfPage: "https://skillpack.app/blog/what-is-skill-md",
         image: "https://skillpack.app/blog/what-is-skill-md/opengraph-image",
         keywords: ["SKILL.md", "Agent Skills"],
-        author: { "@type": "Organization", name: "The Vibe Company", url: "https://thevibecompany.co" },
+        author: {
+          "@type": "Person",
+          name: "Stan Girard",
+          url: "https://www.thevibecompany.co/en/about",
+          jobTitle: "Co-founder",
+          sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+        },
         publisher: {
           "@type": "Organization",
           "@id": "https://skillpack.app/#org",
@@ -183,7 +192,7 @@ describe("public blog post page", () => {
       type: "article",
       publishedTime: "2026-10-13",
       title: "SKILL.md Format: Specification, Fields and Examples (2026)",
-      authors: ["The Vibe Company"],
+      authors: ["Stan Girard"],
       tags: ["SKILL.md", "Agent Skills"],
     });
     // Open Graph gets the generated image from ./opengraph-image.tsx; X is pointed at the same file.

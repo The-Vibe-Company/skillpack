@@ -22,7 +22,7 @@ export function PostMeta({
       {author ? (
         <span className="v10-postmeta__item v10-postmeta__author">
           By{" "}
-          {author.kind === "organization" ? (
+          {author.url ? (
             <a href={author.url} target="_blank" rel="noopener noreferrer">
               {author.name}
             </a>

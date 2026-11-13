@@ -17,6 +17,10 @@ Posts are Markdown files in `apps/web/content/blog/<slug>.md`, loaded at build t
 | `dataCollected` | no | `YYYY-MM-DD`; the byline then shows "Published" and "Data collected" |
 | `layout` | no | `article` (default) or `ranking` |
 
+An `author` listed in `BLOG_AUTHOR_PROFILES` (`apps/web/src/lib/blog.ts`) gets a byline name linked to
+their about page and a BlogPosting `Person` with `url`, `jobTitle` and `sameAs`. Other authors
+stay name-only.
+
 The body starts with its only `# ` heading. GitHub alerts (`> [!TIP]`) render as callouts.
 
 ## Ranking posts (`layout: ranking`)

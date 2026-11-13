@@ -174,7 +174,13 @@ describe("blog post presentation", () => {
       name: "The Vibe Company",
       url: "https://thevibecompany.co",
     });
-    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toMatchObject({ name: "The Vibe Company" });
+    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toEqual({
+      kind: "person",
+      name: "Stan Girard",
+      url: "https://www.thevibecompany.co/en/about",
+      jobTitle: "Co-founder",
+      sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+    });
   });
 
   it("splits off the leading H1 line without rewriting either half", () => {

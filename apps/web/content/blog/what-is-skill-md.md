@@ -4,6 +4,8 @@ description: "SKILL.md format explained: frontmatter fields, naming rules, size 
 slug: what-is-skill-md
 date: 2026-10-13
 tags: ["SKILL.md", "Agent Skills"]
+author: "Stan Girard"
+authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
 # What is SKILL.md? Format, specification and examples (2026)

@@ -4,6 +4,8 @@ description: "Four ways to share Claude Code skills with your team: commit them 
 slug: how-to-share-claude-code-skills-with-your-team
 date: 2026-10-15
 tags: ["Claude Code", "Agent Skills", "Skillpack CLI", "Teams"]
+author: "Stan Girard"
+authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
 # How to share Claude Code skills with your team
