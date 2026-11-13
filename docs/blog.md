@@ -18,8 +18,9 @@ Posts are Markdown files in `apps/web/content/blog/<slug>.md`, loaded at build t
 | `layout` | no | `article` (default) or `ranking` |
 
 An `author` listed in `BLOG_AUTHOR_PROFILES` (`apps/web/src/lib/blog.ts`) gets a byline name linked to
-their about page and a BlogPosting `Person` with `url`, `jobTitle` and `sameAs`. Other authors
-stay name-only.
+their about page, a 44px round avatar (the profile's 96px `avatar`), and a BlogPosting `Person` with
+`url`, `image` (the 400px portrait on skillpack.app), `jobTitle` and `sameAs`. Avatars live in
+`apps/web/public/images/authors/`. Other authors stay name-only.
 
 The body starts with its only `# ` heading. GitHub alerts (`> [!TIP]`) render as callouts.
 

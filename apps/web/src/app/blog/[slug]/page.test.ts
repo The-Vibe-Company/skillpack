@@ -65,6 +65,9 @@ describe("public blog post page", () => {
     );
     expect(meta?.querySelector(".v10-postmeta__author a")?.textContent).toBe("Stan Girard");
     expect(meta?.querySelector(".v10-postmeta__author a")?.getAttribute("href")).toBe("https://www.thevibecompany.co/en/about");
+    const avatar = meta?.querySelector(".v10-postmeta__author img");
+    expect(avatar?.getAttribute("src")).toBe("/images/authors/stan.webp");
+    expect(avatar?.getAttribute("alt")).toBe("Stan Girard");
     expect(meta?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(meta?.textContent).toMatch(/\d+ min read$/);
     expect(Array.from(header?.querySelectorAll(".v10-tags li") ?? []).map((tag) => tag.textContent)).toEqual([
@@ -155,6 +158,7 @@ describe("public blog post page", () => {
           "@type": "Person",
           name: "Stan Girard",
           url: "https://www.thevibecompany.co/en/about",
+          image: "https://skillpack.app/images/authors/stan-400.webp",
           jobTitle: "Co-founder",
           sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
         },

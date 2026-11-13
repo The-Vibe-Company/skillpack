@@ -9,14 +9,25 @@ function byline(author: BlogAuthor, authorRole?: string): string {
 }
 
 describe("post byline", () => {
-  it("links a profiled author's name to their about page", () => {
+  it("shows a profiled author's avatar and links their name to their about page", () => {
     const html = byline(
-      { kind: "person", name: "Ada Lovelace", url: "https://example.com/about", jobTitle: "Co-founder", sameAs: [] },
+      {
+        kind: "person",
+        name: "Ada Lovelace",
+        url: "https://example.com/about",
+        jobTitle: "Co-founder",
+        sameAs: [],
+        avatar: "/images/authors/ada.webp",
+        imagePath: "/images/authors/ada-400.webp",
+      },
       "co-founder of Example",
     );
 
     expect(html).toContain(
-      'By <a href="https://example.com/about" target="_blank" rel="noopener noreferrer">Ada Lovelace</a>, co-founder of Example',
+      '<span>By <a href="https://example.com/about" target="_blank" rel="noopener noreferrer">Ada Lovelace</a>, co-founder of Example',
+    );
+    expect(html).toContain(
+      '<img class="v10-postmeta__avatar" src="/images/authors/ada.webp" alt="Ada Lovelace" width="44" height="44" decoding="async"/>',
     );
   });
 
@@ -27,5 +38,6 @@ describe("post byline", () => {
     const plain = byline({ kind: "person", name: "Ada Lovelace" });
     expect(plain).toContain("By Ada Lovelace");
     expect(plain).not.toContain("<a ");
+    expect(plain).not.toContain("<img");
   });
 });

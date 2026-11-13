@@ -53,8 +53,19 @@ export type BlogPost = z.infer<typeof blogFrontmatterSchema> & {
 /** The organization behind Skillpack, as credited in the site footer and root metadata. */
 export const BLOG_ORGANIZATION_AUTHOR = { name: "The Vibe Company", url: "https://thevibecompany.co" } as const;
 
-/** Public profile of a named author: the about page the byline links to, plus their other profiles. */
-export type BlogAuthorProfile = { url: string; jobTitle: string; sameAs: readonly string[] };
+/**
+ * Public profile of a named author: the about page the byline links to, their other profiles, the
+ * small avatar the byline shows and the larger portrait stated in JSON-LD (both under `public/`).
+ */
+export type BlogAuthorProfile = {
+  url: string;
+  jobTitle: string;
+  sameAs: readonly string[];
+  /** 96×96 WebP, shown at 44px in the byline. */
+  avatar: string;
+  /** 400×400 WebP, resolved against the production site for the BlogPosting `Person.image`. */
+  imagePath: string;
+};
 
 /** Profiles for the people who write posts, keyed by the frontmatter `author` name. */
 export const BLOG_AUTHOR_PROFILES: ReadonlyMap<string, BlogAuthorProfile> = new Map([
@@ -64,6 +75,8 @@ export const BLOG_AUTHOR_PROFILES: ReadonlyMap<string, BlogAuthorProfile> = new 
       url: "https://www.thevibecompany.co/en/about",
       jobTitle: "Co-founder",
       sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+      avatar: "/images/authors/stan.webp",
+      imagePath: "/images/authors/stan-400.webp",
     },
   ],
 ]);

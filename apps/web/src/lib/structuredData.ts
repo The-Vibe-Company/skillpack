@@ -64,7 +64,7 @@ export type BlogPostingFacts = {
   blogUrl: string;
 };
 
-type JsonLdPerson = { "@type": "Person"; name: string; url?: string; jobTitle?: string; sameAs?: string[] };
+type JsonLdPerson = { "@type": "Person"; name: string; url?: string; image?: string; jobTitle?: string; sameAs?: string[] };
 type JsonLdAuthor = JsonLdPerson | { "@type": "Organization"; name: string; url: string };
 
 function authorNode(author: BlogAuthor): JsonLdAuthor {
@@ -72,6 +72,8 @@ function authorNode(author: BlogAuthor): JsonLdAuthor {
   // Only the profile facts the author has are stated; an unprofiled author stays name-only.
   const person: JsonLdPerson = { "@type": "Person", name: author.name };
   if (author.url) person.url = author.url;
+  // The portrait is served by skillpack.app, so self-hosted deployments still point at a real file.
+  if (author.imagePath) person.image = new URL(author.imagePath, PRODUCTION_SITE_URL).href;
   if (author.jobTitle) person.jobTitle = author.jobTitle;
   if (author.sameAs && author.sameAs.length > 0) person.sameAs = [...author.sameAs];
   return person;

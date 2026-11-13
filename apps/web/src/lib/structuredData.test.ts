@@ -101,7 +101,7 @@ describe("blog post structured data", () => {
     expect(posting).not.toHaveProperty("keywords");
   });
 
-  it("states a profiled author's about page, job title and other profiles", () => {
+  it("states a profiled author's about page, portrait, job title and other profiles", () => {
     const [posting] = blogPostingStructuredData({
       ...FACTS,
       author: {
@@ -110,6 +110,8 @@ describe("blog post structured data", () => {
         url: "https://example.com/about",
         jobTitle: "Co-founder",
         sameAs: ["https://github.com/ada"],
+        avatar: "/images/authors/ada.webp",
+        imagePath: "/images/authors/ada-400.webp",
       },
     })["@graph"];
 
@@ -117,6 +119,7 @@ describe("blog post structured data", () => {
       "@type": "Person",
       name: "Ada Lovelace",
       url: "https://example.com/about",
+      image: "https://skillpack.app/images/authors/ada-400.webp",
       jobTitle: "Co-founder",
       sameAs: ["https://github.com/ada"],
     });
