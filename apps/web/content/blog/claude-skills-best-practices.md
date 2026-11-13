@@ -60,7 +60,7 @@ Microsoft Research describes the same drift Stan does. Its [SkillOpt blog post](
 
 SkillOpt's answer is a gate. In [Microsoft's SkillOpt paper](https://arxiv.org/abs/2605.23904), the skill file is trainable state outside a frozen model: an optimizer proposes bounded edits, and a candidate is accepted only if it scores strictly higher on a held-out validation split. Ties are rejected. What survives is small. Across six case studies, the blog reports a median final skill of roughly 920 tokens, with only one to four edits accepted into each file. On OfficeQA, with GPT-5.5 in direct chat, the score went from 33.1 to 72.1 on a single accepted edit.
 
-Skill Creator, the skill Stan says he created in Skillpack, brings that discipline to the skills you maintain yourself. The public package, `create-skill-tools` in [The Vibe Company's companion-skills repository](https://github.com/The-Vibe-Company/companion-skills), tells you to edit one target file per iteration when possible, keep the edit bounded, and compare against a snapshot of the previous version as well as against no skill. It accepts only strict improvements on held-out or previously unused prompts, rejects ties and logs the rejected edits. It also says to test the description as a routing surface, which is the exact spot where v3 lost the changelog prompt.
+Skill Creator brings that discipline to the skills you maintain yourself. If you are interested in Stan's Skill Creator, you can [contact Stan](https://thevibecompany.co). The public package, `create-skill-tools` in [The Vibe Company's companion-skills repository](https://github.com/The-Vibe-Company/companion-skills), tells you to edit one target file per iteration when possible, keep the edit bounded, and compare against a snapshot of the previous version as well as against no skill. It accepts only strict improvements on held-out or previously unused prompts, rejects ties and logs the rejected edits. It also says to test the description as a routing surface, which is the exact spot where v3 lost the changelog prompt.
 
 That package's own SKILL.md body runs 494 lines, 6 under Anthropic's limit, with the deeper material in reference files. The line rule and the measuring habit get along fine. Only one of them would have caught v3.
 
@@ -84,7 +84,7 @@ Run that loop on the commit skill and the argument happens at v1, when a require
 
 ```cta
 title: "Try the measuring habit on your next skill"
-text: "Stan Girard's Skill Creator lives in Skillpack. Create a workspace, or start with the step-by-step guide to building a skill."
+text: "If you are interested in Stan's Skill Creator, you can [contact Stan](https://thevibecompany.co). Or start with the step-by-step guide to building a skill."
 primary: { label: "Create a free Skillpack workspace", href: /login }
 secondary: { label: "Read the step-by-step skill guide", href: /blog/how-to-create-a-claude-code-skill }
 ```
