@@ -140,7 +140,15 @@
   content: "·" / "";
   margin-right: var(--space-2);
 }
-.v10-postmeta__author { color: var(--v10-ink-muted); }
+.v10-postmeta__author { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--v10-ink-muted); }
+/* The avatar keeps its own column, so a wrapped byline lines up with the text, not under the photo. */
+.v10-postmeta__avatar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
 .v10-postmeta a {
   color: var(--v10-ink);
   font-weight: var(--weight-medium);

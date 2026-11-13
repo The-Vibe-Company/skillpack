@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  BLOG_AUTHOR_PROFILES,
   BLOG_CONTENT_DIR,
   type BlogPost,
   blogPostAuthor,
@@ -174,7 +175,23 @@ describe("blog post presentation", () => {
       name: "The Vibe Company",
       url: "https://thevibecompany.co",
     });
-    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toMatchObject({ name: "The Vibe Company" });
+    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toEqual({
+      kind: "person",
+      name: "Stan Girard",
+      url: "https://www.thevibecompany.co/en/about",
+      jobTitle: "Co-founder",
+      sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+      avatar: "/images/authors/stan.webp",
+      imagePath: "/images/authors/stan-400.webp",
+    });
+  });
+
+  it("ships every author profile's avatar and portrait under public/", () => {
+    for (const profile of BLOG_AUTHOR_PROFILES.values()) {
+      for (const path of [profile.avatar, profile.imagePath]) {
+        expect(existsSync(join(process.cwd(), "public", path)), path).toBe(true);
+      }
+    }
   });
 
   it("splits off the leading H1 line without rewriting either half", () => {

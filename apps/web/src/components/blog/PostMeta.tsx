@@ -21,15 +21,22 @@ export function PostMeta({
     <p className="v10-postmeta">
       {author ? (
         <span className="v10-postmeta__item v10-postmeta__author">
-          By{" "}
-          {author.kind === "organization" ? (
-            <a href={author.url} target="_blank" rel="noopener noreferrer">
-              {author.name}
-            </a>
-          ) : (
-            author.name
-          )}
-          {authorRole ? `, ${authorRole}` : null}
+          {author.kind === "person" && author.avatar ? (
+            // A 96px file at 44px: next/image would only re-encode a 2 KB asset.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="v10-postmeta__avatar" src={author.avatar} alt={author.name} width={44} height={44} decoding="async" />
+          ) : null}
+          <span>
+            By{" "}
+            {author.url ? (
+              <a href={author.url} target="_blank" rel="noopener noreferrer">
+                {author.name}
+              </a>
+            ) : (
+              author.name
+            )}
+            {authorRole ? `, ${authorRole}` : null}
+          </span>
         </span>
       ) : null}
       {dataCollected ? (
