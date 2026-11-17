@@ -6,10 +6,10 @@ import { BLOG_SHARE_IMAGE, loadBlogPosts } from "@/lib/blog";
 import "@/styles/label.css";
 import "@/styles/blog-label.css";
 
-// The root layout template turns the page title into "Blog · Skillpack"; social titles are not
+// The root layout template appends " · Skillpack" to the page title; social titles are not
 // templated, so they carry the suffix themselves.
-const TITLE = "Blog";
-const SOCIAL_TITLE = "Blog · Skillpack";
+const TITLE = "Agent Skills Guides for Claude Code & Codex";
+const SOCIAL_TITLE = `${TITLE} · Skillpack`;
 const DESCRIPTION = "Guides on SKILL.md, Agent Skills, and running a shared skill library for your team's coding agents.";
 
 export const metadata: Metadata = {

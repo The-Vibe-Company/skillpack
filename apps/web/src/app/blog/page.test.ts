@@ -82,10 +82,11 @@ describe("public blog index", () => {
     expect(guide?.querySelectorAll("a")).toHaveLength(1);
   });
 
-  it("titles itself Blog and canonicalizes to /blog", () => {
+  it("titles itself for agent skills guides and canonicalizes to /blog", () => {
     // The root layout template appends " · Skillpack", so the page title must stay bare.
-    expect(metadata.title).toBe("Blog");
-    expect(metadata.openGraph?.title).toBe("Blog · Skillpack");
+    expect(metadata.title).toBe("Agent Skills Guides for Claude Code & Codex");
+    expect(metadata.openGraph?.title).toBe("Agent Skills Guides for Claude Code & Codex · Skillpack");
+    expect(metadata.twitter?.title).toBe("Agent Skills Guides for Claude Code & Codex · Skillpack");
     expect(metadata.description).toBeTruthy();
     expect(metadata.alternates?.canonical).toBe("/blog");
     expect(metadata.openGraph?.url).toBe("/blog");
