@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brings the sequential-loops and 2n-vs-n misconceptions into the open and has the learner reason through them with concrete counts and ratios, while Tutor B states the 'loops add' rule as a fact before the learner raises the misconception, so the learner just accepts it, and B's long lecture-style replies do most of the reasoning for the learner."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

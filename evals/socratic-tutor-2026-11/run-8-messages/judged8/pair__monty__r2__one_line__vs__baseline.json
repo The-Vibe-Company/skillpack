@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Transcript B drew out the learner's specific 50/50 objection and used Socratic questions about counting 300 games, so the learner rebuilt the table and worked out the random-host case on their own, while A gave a complete explanation up front and the learner just agreed with it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

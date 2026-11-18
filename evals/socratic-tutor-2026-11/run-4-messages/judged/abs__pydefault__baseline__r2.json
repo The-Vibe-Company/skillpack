@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__baseline__r2.json",
+ "scenario": "pydefault",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor opened with a long, accurate lecture that gave away the key point (defaults are evaluated once at def time) and the self-test answers before asking what the learner knew, so the learner's later correct predictions mostly confirm what they had just read rather than show reasoning they did themselves, though the follow-up checks were accurate and well targeted."
+ },
+ "usage": {}
+}

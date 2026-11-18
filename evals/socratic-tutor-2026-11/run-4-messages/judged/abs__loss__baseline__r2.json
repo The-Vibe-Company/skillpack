@@ -1,0 +1,17 @@
+{
+ "file": "loss__baseline__r2.json",
+ "scenario": "loss",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 3,
+  "why": "The tutor never checked what the learner already knew and gave away the +100% answer in a long first lecture; the learner then repeated it correctly in their own words, but every tutor turn was mostly exposition, with almost no Socratic questioning."
+ },
+ "usage": {}
+}

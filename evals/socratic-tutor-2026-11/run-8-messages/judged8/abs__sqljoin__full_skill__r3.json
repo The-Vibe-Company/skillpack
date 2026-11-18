@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__full_skill__r3.json",
+ "scenario": "sqljoin",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 7,
+  "why": "The tutor diagnosed carefully and used the learner's own inconsistency to show that the ON version keeps Cara, then set up the WHERE row-by-row check without giving away that the NULL row gets dropped; the subskill label hinted at the outcome, and the transcript ends before the learner reaches the full truth."
+ },
+ "usage": {}
+}

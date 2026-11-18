@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the learner's belief that hashes stay the same and then asks a probing question (what goes into a commit object, and what C's parent is before and after) so the learner can work out the answer, whereas B states that rebase makes new hashes before the first question and corrects the misconception directly in long lectures."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

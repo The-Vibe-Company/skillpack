@@ -1,0 +1,37 @@
+{
+ "id": "041ac0e474",
+ "scenario": "monty",
+ "kind": "tutor",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to. Let's set it up first, then try an explanation that works for a lot of people who don't buy the usual one.\n\n**The setup**\n- There are 3 doors. Behind one is a car, behind the other two are goats.\n- You pick a door, say Door 1.\n- The host knows where the car is. He opens one of the other two doors, and he always opens one with a goat behind it. He never opens your door and he never reveals the car.\n- He then asks: do you want to stay with Door 1 or switch to the other closed door?\n\nThe claim is that switching wins 2/3 of the time and staying wins only 1/3.\n\n**Another way to see it: list every case**\nSay you always pick Door 1. The car is equally likely to be behind any of the three doors:\n\n| Car is behind | Host opens | Staying gets you | Switching gets you |\n|---|---|---|---|\n| Door 1 | Door 2 or 3 | Car | Goat |\n| Door 2 | Door 3 (he has to) | Goat | **Car** |\n| Door 3 | Door 2 (he has to) | Goat | **Car** |\n\nSwitching wins in 2 of the 3 equally likely cases. The key is the middle and bottom rows. When your first pick is wrong, the host has no choice: he has to open the only other goat door, so the door he leaves closed is the car.\n\n**Why \"it's 50/50 now\" feels right but isn't**\nTwo closed doors look symmetric, but they didn't get there the same way. Your door was picked at random, before you knew anything. The other door was left closed by a host who knows where the car is and was obliged to avoid it. His choice carries information. Your original pick doesn't.\n\n**Exaggerate it**\nImagine 100 doors. You pick one. The host, who knows where the car is, opens 98 goat doors and leaves one other door closed. Would you stick with your first pick, which had a 1-in-100 chance, or switch to the one door he carefully skipped?\n\nNow I'm curious about your side. **Which part of the explanation doesn't hold up for you?** Is it the table, the idea that the host's choice carries information, or something else? Tell me how you're thinking about it and we'll work through that exact step."
+  },
+  {
+   "role": "learner",
+   "text": "It's the table, honestly. Once the host opens a goat door, there are two closed doors and the car is behind one of them, so I don't see why it isn't just 50/50 from that point. The history of how we got there shouldn't change what's behind the doors now."
+  },
+  {
+   "role": "tutor",
+   "text": "You're right that the history doesn't move the car. It sits wherever it was put at the start. So let's test the 50/50 idea against that.\n\nSay you play this game 300 times and always pick Door 1. The car is placed at random each time.\n\n**In about how many of those 300 games is the car behind Door 1?**\n\nThen a follow-up: the host opening a goat door doesn't move the car. So in those same 300 games, how many times does staying with Door 1 win? Does that number come out to 150, which is what 50/50 would need?"
+  },
+  {
+   "role": "learner",
+   "text": "About 100, since it's random across three doors. And yeah, if the car doesn't move, staying would win those same 100... huh, that's not 150. Hang on, I need to think about where the other 200 go."
+  },
+  {
+   "role": "tutor",
+   "text": "Good, you've got the key fact: staying wins about 100 times out of 300, and opening a door can't change that because the car never moves.\n\nSo let's look at the other 200 games, the ones where the car is not behind Door 1. Pick one of them. Say the car is behind Door 3.\n\n**Which door does the host open in that game? Does he have any choice?**\n\nAnd once he's opened it, **what's behind the one door still closed besides yours?**\n\nWork out that one game, then ask whether it plays out any differently when the car is behind Door 2. That should tell you where the other 200 wins end up."
+  },
+  {
+   "role": "learner",
+   "text": "If the car's behind Door 3, he has to open Door 2, since he can't open mine or show the car. So the other closed door is Door 3, which has the car... okay, so switching wins that one, and I guess Door 2 works the same way, which would put switching at 200 out of 300."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. You've just rebuilt the table yourself.\n\nHere's where the 300 games land:\n- **About 100 games** where the car is behind Door 1: staying wins, switching loses.\n- **About 100 games** where the car is behind Door 2: the host has to open Door 3, and switching wins.\n- **About 100 games** where the car is behind Door 3: the host has to open Door 2, and switching wins.\n\nSo staying wins about 100 times and switching wins about 200. That's 1/3 against 2/3.\n\nThis also answers your original objection. You were right that the history doesn't change what's behind the doors. What it changes is what you **know**. \"Two closed doors, one car\" only gives 50/50 when nothing separates the two doors. Here something does. Your door was picked blind. The other door is the one the host *had* to leave shut in every game where your first pick was wrong, and your first pick is wrong 2 times out of 3.\n\nPut shortly: switching wins whenever your first pick was wrong. So the chance that switching wins is the chance your first pick was wrong, which is 2/3.\n\nTo check it really holds, try this variation: **what if the host didn't know where the car was, opened a door at random, and it just happened to show a goat?** Run it through your 300 games the same way and see whether switching still comes out at 2/3. The answer shows exactly how much the host's knowledge matters."
+  }
+ ],
+ "pending": null
+}

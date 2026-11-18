@@ -1,0 +1,12 @@
+{
+ "file": "guard_race__one_line__r3.json",
+ "scenario": "guard_race",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply immediately defines a race condition, gives a brief example and common fixes, and does not quiz the user or propose a lesson."
+ },
+ "usage": {}
+}

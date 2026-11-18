@@ -1,0 +1,41 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's fix that properly. Here's how I've split Bayes' theorem into subskills:\n\n1. Conditional probability: what P(A|B) actually means\n2. Telling P(A|B) apart from P(B|A), and not confusing the two\n3. Base rates (priors) and why they matter\n4. Computing the evidence term P(B) with the law of total probability\n5. Putting it together: using the formula to get a posterior\n6. Thinking in natural frequencies (\"out of 1000 people...\")\n7. Updating with more than one piece of evidence (sequential updating)\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Just answer as best you can, and \"I don't know\" is a perfectly good answer.\n\nQuestion 1: In your own words, what does P(rain | cloudy) mean, and would you expect it to equal P(cloudy | rain)? Why or why not?"
+  },
+  {
+   "role": "student",
+   "text": "I think it means the chance it rains given that it's cloudy. And no, probably not equal, since it can be cloudy a lot without raining, but if it's raining it's almost always cloudy."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll save feedback for after the diagnostic.\n\nQuestion 2: A disease affects 1 in 100 people. A test for it catches 90% of people who have the disease, and it also comes back positive for 10% of people who don't have it. You test positive. Roughly how likely is it that you actually have the disease? Give your best estimate and briefly say how you got it."
+  },
+  {
+   "role": "student",
+   "text": "I'd say around 90%. The test catches 90% of sick people, so if I test positive there's about a 90% chance I've got it, maybe a little less because of the false positives."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Still in the diagnostic, so feedback comes afterwards.\n\nQuestion 3: Use the same disease and test. 1 in 100 people have the disease. The test catches 90% of people who have it and wrongly flags 10% of people who don't. Picture 1,000 people taking the test. About how many of them test positive in total? Show how you got your number."
+  },
+  {
+   "role": "student",
+   "text": "Okay, so 10 out of 1000 have it, and 90% of those is 9 positives. Then 990 don't have it, and 10% of those is 99 more, so about 108 positives total."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. Still in the diagnostic, so feedback comes once we're done.\n\nQuestion 4: Stick with those same 1,000 people and your 108 positive tests. How many of the 108 actually have the disease? So if you're one of the people who tested positive, what's the chance you have it?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "a68abfe36b"
+}

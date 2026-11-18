@@ -1,0 +1,37 @@
+{
+ "id": "d3b66112a3",
+ "scenario": "float",
+ "kind": "tutor",
+ "opening": "Teach me why 0.1 + 0.2 is not equal to 0.3 in my code. I want to really understand it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "You're right: in almost every language, `0.1 + 0.2 == 0.3` is false. Your code isn't broken. This is how computers store decimal numbers. Here's why.\n\n**1. Computers store numbers in base 2, not base 10**\n\nMost languages use IEEE 754 double-precision floats. A float is stored as a binary fraction: a sum of powers of two (1/2, 1/4, 1/8, 1/16, ...).\n\n**2. Some fractions never end in a given base**\n\nYou already know this from base 10: 1/3 = 0.3333... goes on forever, so any finite decimal version is slightly off.\n\nBase 2 has the same problem, just with different numbers. A fraction ends in a base only if its denominator's prime factors divide that base. 10 = 2 x 5, so 1/10 needs a factor of 5, and 2 doesn't have one. So in binary:\n\n```\n0.1 (decimal) = 0.0001100110011001100110011... (binary, repeating forever)\n```\n\n**3. The computer has to cut it off**\n\nA double has 52 bits of fraction (53 significant bits), so the repeating pattern gets rounded to the nearest number it can store. The values actually stored are:\n\n```\n0.1 -> 0.1000000000000000055511151231257827...\n0.2 -> 0.2000000000000000111022302462515654...\n0.3 -> 0.2999999999999999888977697537484345...\n```\n\nNotice that 0.1 and 0.2 both get rounded slightly up, while 0.3 gets rounded slightly down.\n\n**4. The errors add up**\n\nAdding the two slightly-too-big numbers gives about 0.3000000000000000166533453693773481. The result is rounded again to the nearest double, which is:\n\n```\n0.3000000000000000444089209850062616...\n```\n\nThat is a different double from the one you get by typing `0.3`. They are neighbouring values, one step apart. So `==`, which compares bit for bit, correctly says they are not equal. This is why many languages print:\n\n```\n>>> 0.1 + 0.2\n0.30000000000000004\n```\n\n**5. Why `print(0.1)` shows `0.1` anyway**\n\nWhen printing, languages show the shortest decimal string that maps back to the same double. \"0.1\" is enough to identify the stored value, so you never see the hidden ...0555 digits. That's why the problem feels invisible until a comparison fails.\n\n**6. What to do in your code**\n\n- **Compare with a tolerance, not `==`:**\n  ```python\n  import math\n  math.isclose(0.1 + 0.2, 0.3)          # True\n  abs((0.1 + 0.2) - 0.3) < 1e-9         # True\n  ```\n- **Use exact decimal types when decimal exactness matters** (money, for example):\n  ```python\n  from decimal import Decimal\n  Decimal(\"0.1\") + Decimal(\"0.2\") == Decimal(\"0.3\")   # True\n  ```\n  (Java: `BigDecimal`, C#: `decimal`, JS: a library, or work in integer cents.)\n- **Use integers for counts and currency:** store 10 cents as `10`, not `0.10`.\n- **Round only for display**, not before comparing.\n\n**Try it yourself** to make it stick:\n\n```python\nfrom decimal import Decimal\nprint(Decimal(0.1))        # the exact value of the stored double\nprint(Decimal(0.2))\nprint(Decimal(0.3))\nprint(Decimal(0.1 + 0.2))\nprint((0.1).hex(), (0.3).hex())   # see the actual binary representation\n```\n\nA good check that you've got it: can you predict whether `0.5 + 0.25 == 0.75` is true? (Hint: look at the denominators.) It's true, because 1/2 and 1/4 are powers of two and can be stored exactly."
+  },
+  {
+   "role": "learner",
+   "text": "Oh okay, so it's not just a JavaScript thing, Python does it too. I always figured the computer just stored 0.1 as exactly 0.1, but I guess it's like 1/3 never ending in decimal, only in binary. I think I get it now."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's exactly it. Your 1/3 comparison is the right way to think about it.\n\n- **It's not a JavaScript quirk.** Python, Java, C, C#, Go, Rust and others all use the same IEEE 754 binary floats, so they all give the same `0.30000000000000004`. It's about how numbers are stored, not about any one language.\n- **0.1 is never stored exactly.** Typing `0.1` gives you the nearest binary fraction the computer can hold. Printing hides the difference because it shows the shortest decimal that maps back to that stored value.\n- **It's the same idea as 1/3 in decimal.** 1/3 can't be written exactly with a finite number of decimal digits. In the same way, 1/10 can't be written exactly with a finite number of binary digits. Both get cut off and rounded.\n\nOne way to check you've really got it: which of these do you think can be stored exactly as a double?\n\n- `0.5`\n- `0.125`\n- `0.2`\n- `0.375`\n\nThink about whether each denominator is a power of 2, then check with `Decimal(x)` in Python. If you can explain why `0.2` behaves differently from the others, you understand it."
+  },
+  {
+   "role": "learner",
+   "text": "Okay so 0.5 is 1/2, and 2 is a power of 2, so that one should be stored exactly right? I'll try Decimal(0.5) to check."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, exactly right. 0.5 is 1/2, and 2 is a power of 2, so it fits into binary as a single digit after the point: `0.1` in binary. Nothing gets cut off and nothing gets rounded.\n\nWhen you run it you should see:\n\n```python\n>>> from decimal import Decimal\n>>> Decimal(0.5)\nDecimal('0.5')\n```\n\nThat's a clean `0.5`, with no long tail of hidden digits. Compare it to `Decimal(0.1)`, which shows `0.1000000000000000055511151231257827...`.\n\nNow try the same reasoning on the other three before you run them:\n\n- `0.125`: what fraction is that, and is its denominator a power of 2?\n- `0.375`: same question. (Hint: write it as something over 8.)\n- `0.2`: what's its denominator, and what prime factor does it have that 2 doesn't?\n\nMake your predictions first, then check each one with `Decimal(x)`. If `0.2` is the one that shows a long tail of digits, your reasoning is working."
+  },
+  {
+   "role": "learner",
+   "text": "Okay 0.125 is 1/8, and 8 is 2 times 2 times 2, so that's a power of 2 too. So I'm guessing that one comes out clean like 0.5 did?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right. 0.125 is 1/8, and 8 = 2 x 2 x 2 = 2^3, so it's a power of 2. In binary it's `0.001`: three digits after the point and then it stops. Nothing gets rounded, so you should see:\n\n```python\n>>> Decimal(0.125)\nDecimal('0.125')\n```\n\nTwo left:\n\n- `0.375`: write it as a fraction over 8. Is the denominator still a power of 2? Does the 3 on top change anything?\n- `0.2`: write it as a fraction in lowest terms. What prime factor does its denominator have that 2 doesn't?\n\nMake both predictions, then check them with `Decimal(x)`."
+  }
+ ],
+ "pending": null
+}

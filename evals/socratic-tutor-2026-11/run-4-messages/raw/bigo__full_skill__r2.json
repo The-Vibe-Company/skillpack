@@ -1,0 +1,41 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good plan, a week is enough time to get solid on this. Here's how I'll split Big-O into pieces:\n\n1. What Big-O actually means (upper bound, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops (sequential vs. nested, loops that halve or double)\n4. Analyzing recursion (recursion trees, the master theorem at a basic level)\n5. Space complexity (including call-stack space)\n6. Best/average/worst case and amortized analysis (e.g. dynamic array append)\n7. Complexity of standard data structure operations (hash maps, heaps, BSTs, sorting)\n8. Big-O vs. Big-Theta vs. Big-Omega\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we're through those. Then I'll show you a skill map and suggest where to focus.\n\nQuestion 1: What is the time complexity of this function, and why?\n\n    def f(arr):\n        total = 0\n        for x in arr:\n            total += x\n        for x in arr:\n            for y in arr:\n                total += x * y\n        return total"
+  },
+  {
+   "role": "student",
+   "text": "I'd say O(n^2), maybe even a bit worse than that. The nested loop is n^2 because it hits every pair, and then the first loop adds another n on top, so it's really O(n^2 + n), which I think is meaningfully slower than plain O(n^2)."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'm not going to say yet whether that's right. During the diagnostic I'm only placing you, and we'll come back to this one, especially your claim that O(n^2 + n) is \"meaningfully slower\" than O(n^2).\n\nQuestion 2: What is the time complexity of this function, and why?\n\n    def g(n):\n        count = 0\n        i = n\n        while i > 1:\n            i = i // 2\n            count += 1\n        return count"
+  },
+  {
+   "role": "student",
+   "text": "That one's O(log n) I think, because i gets cut in half every time so it only takes like log2(n) steps to get down to 1. There's just one loop and nothing nested, so it's not n or anything bigger."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. As with the first one, I'm holding off on feedback until the diagnostic is done.\n\nQuestion 3: What are the time complexity and the space complexity of this function, and why?\n\n    def h(n):\n        if n <= 1:\n            return 1\n        return h(n - 1) + h(n - 1)"
+  },
+  {
+   "role": "student",
+   "text": "Time I think is O(2^n), because every call makes two more calls so it doubles at each level, kind of like a tree. For space I'd guess also O(2^n) since all those calls have to be stored somewhere, but I'm less sure about that part."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold feedback on this one too, including the space part you're unsure about.\n\nQuestion 4: In Python, appending to a list with `lst.append(x)` is usually described as O(1). But a list is backed by a fixed-size array, and sometimes that array is full and everything has to be copied into a bigger one, which takes O(n). How can append still be called O(1)? What exactly is that O(1) a claim about?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "c7768fbbfa"
+}

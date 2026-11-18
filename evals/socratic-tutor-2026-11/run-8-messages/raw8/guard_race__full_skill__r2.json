@@ -1,0 +1,17 @@
+{
+ "scenario": "guard_race",
+ "kind": "guard",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Quick question: what is a race condition? Just a short answer please.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "A race condition is a bug where a program's result depends on the unpredictable timing or ordering of concurrent operations (threads, processes, requests) that access shared state. For example, two threads both read a counter value of 5, each add 1, and both write back 6, so one increment is lost. The usual fixes are synchronization (locks/mutexes), atomic operations, or designs that avoid shared mutable state."
+  }
+ ],
+ "usage": [],
+ "conv_id": "ea38c8b789"
+}

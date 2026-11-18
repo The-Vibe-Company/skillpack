@@ -1,0 +1,13 @@
+{
+ "id": "25945dbbbf",
+ "scenario": "guard_race",
+ "kind": "guard",
+ "opening": "Quick question: what is a race condition? Just a short answer please.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "A race condition is a bug that happens when two or more threads or processes use shared data at the same time, and the result depends on the unpredictable order in which they run. For example, two threads might both read a counter as 5 and both write back 6, so one of the increments is lost. The usual fixes are locks, atomic operations, or other synchronization."
+  }
+ ],
+ "pending": null
+}

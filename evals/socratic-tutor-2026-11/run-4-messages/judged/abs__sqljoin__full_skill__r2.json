@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__full_skill__r2.json",
+ "scenario": "sqljoin",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 5,
+  "why": "The tutor ran a clean, well-targeted diagnostic that surfaced the ON-vs-WHERE misconception without leaking the answer or flattering, but the transcript ends before any teaching, so the learner never reaches the correct understanding."
+ },
+ "usage": {}
+}

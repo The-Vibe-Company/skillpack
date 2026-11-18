@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__baseline__r1.json",
+ "scenario": "pydefault",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 4,
+  "why": "The tutor gave away the core idea in a long opening lecture without first checking what the learner believed; it later added useful prediction exercises and accurate feedback, and the learner restated the idea correctly, but most of the work was telling rather than Socratic questioning."
+ },
+ "usage": {}
+}

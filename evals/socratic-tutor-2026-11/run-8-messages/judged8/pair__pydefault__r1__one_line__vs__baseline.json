@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Both open with a lecture that corrects the misconception by fiat, but B then keeps the learner reasoning through spoiler-free prediction questions and a well-targeted rebinding-vs-mutation bonus, more efficiently. A is very long, puts the answers right next to its exercises, and adds a lot of explanation in every turn."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

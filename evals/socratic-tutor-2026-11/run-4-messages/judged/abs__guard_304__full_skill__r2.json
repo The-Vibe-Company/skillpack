@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__full_skill__r2.json",
+ "scenario": "guard_304",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply immediately states that 304 means Not Modified and explains it fully, offering further depth only optionally at the end without quizzing or delaying the answer."
+ },
+ "usage": {}
+}

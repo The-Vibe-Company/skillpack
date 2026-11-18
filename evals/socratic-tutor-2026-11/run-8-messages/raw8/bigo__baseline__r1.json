@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it! I'll ask one question at a time. You answer, then I'll tell you if you're right, explain why, and give you the next one. The questions get harder as we go.\n\n**Question 1 (warm-up):**\nWhat is the time complexity of this function?\n\n```python\ndef find_max(arr):\n    best = arr[0]\n    for x in arr:\n        if x > best:\n            best = x\n    return best\n```\n\nGive the Big-O and a one-sentence reason. That's good practice for interviews, because they usually care about your reasoning as much as the answer.\n\nHere's what's coming so you know what to expect:\n- Nested loops, and loops where the inner bound depends on the outer one\n- Logarithmic patterns (binary search, halving loops)\n- Recursion (naive Fibonacci, merge sort)\n- Space complexity\n- Amortized analysis (dynamic array appends, hash tables)\n- Common trick questions (e.g., O(2n) vs O(n), O(n + m) vs O(n²))\n\nIf you want to focus on one of those, or you'd rather get several questions at once, just say so. Go ahead with Question 1 when you're ready!"
+  },
+  {
+   "role": "student",
+   "text": "O(n), because it just goes through the array once and checks each element. Easy one, hit me with something harder!"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct! **O(n)**: the loop touches each element once and does constant work per element. Your reason was clear and to the point, which is what interviewers like to hear. One small extra you could mention: it's O(1) space, since it only keeps one variable no matter how big the array is.\n\nLet's step it up.\n\n**Question 2 (nested loops):**\nWhat is the time complexity of this function?\n\n```python\ndef count_pairs(arr):\n    n = len(arr)\n    count = 0\n    for i in range(n):\n        for j in range(i + 1, n):\n            if arr[i] + arr[j] == 0:\n                count += 1\n    return count\n```\n\nWatch out: the inner loop doesn't run n times on every pass. Give the Big-O and explain how you got there. Bonus points if you can say roughly how many times the `if` check actually runs."
+  },
+  {
+   "role": "student",
+   "text": "O(n^2), because it's a loop inside a loop so you're basically checking every pair of elements. The inner loop shrinks each time, so I think the if runs about n*(n-1)/2 times, but you drop the constant so it's still n squared."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on both counts! **O(n²)**, and your count is exactly right: the `if` runs **n(n-1)/2** times.\n\nHere's where that number comes from, in case they ask you to show it. When i = 0, the inner loop runs n-1 times. When i = 1, it runs n-2 times. This keeps going down to 0. So the total is (n-1) + (n-2) + ... + 1 + 0 = n(n-1)/2, which is (n² - n)/2. Drop the constant 1/2 and the smaller n term, and you get O(n²).\n\nOne thing to tighten in your wording: \"a loop inside a loop\" doesn't always mean O(n²). For example, if the inner loop always ran 5 times, the whole thing would be O(n). The real reason is that the number of pairs grows like n². You got there anyway by counting, and counting is the habit interviewers want to see.\n\n**Question 3 (logarithmic):**\nWhat is the time complexity of this function?\n\n```python\ndef count_halvings(n):\n    steps = 0\n    while n > 1:\n        n = n // 2\n        steps += 1\n    return steps\n```\n\nGive the Big-O and your reasoning. Follow-up for bonus points: what changes (if anything) if the line were `n = n // 3` instead?"
+  },
+  {
+   "role": "student",
+   "text": "O(log n), because n gets cut in half every time so it only takes like log2(n) steps to get down to 1. If it was // 3 I think it'd be log base 3, which is a bit faster, but I'm not sure if that counts as a different Big-O or not."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct! **O(log n)**. Each pass halves n, so after k steps n has become n / 2^k. The loop stops when that reaches 1, which happens when k = log₂(n).\n\nOn your follow-up: with `// 3` it's still **O(log n)**, not a different Big-O. Your instinct that it's \"a bit faster\" is right, because it takes about log₃(n) steps instead of log₂(n). But every log base differs from every other base only by a constant factor:\n\nlog₃(n) = log₂(n) / log₂(3) ≈ 0.63 · log₂(n)\n\nBig-O drops constant factors, so log₂(n), log₃(n) and log₁₀(n) all count as O(log n). That's why people usually leave the base off. Halving, cutting into thirds, or dividing by 10 each step all give logarithmic time. If they ask you this in an interview, the change-of-base formula above is a great one-line answer.\n\nYou're 3 for 3. Now we move into recursion.\n\n**Question 4 (recursion):**\nWhat is the time complexity of this function?\n\n```python\ndef fib(n):\n    if n <= 1:\n        return n\n    return fib(n - 1) + fib(n - 2)\n```\n\nGive the Big-O and your reasoning. Hint: try drawing the tree of calls for something like `fib(5)` and see how it grows. Bonus: what's the **space** complexity? (Careful, it isn't the same as the time.)"
+  },
+  {
+   "role": "student",
+   "text": "I think it's O(2^n), because every call splits into two more calls, so the tree roughly doubles at each level. For space I'm guessing it's also kind of big since there are so many calls, maybe O(2^n) too?"
+  },
+  {
+   "role": "tutor",
+   "text": "**Time: correct!** O(2ⁿ) is the answer interviewers expect, and your reasoning is right: each call makes two more calls, so the call tree roughly doubles at each level, and it's about n levels deep.\n\nA bonus detail that can impress people: O(2ⁿ) is an upper bound but not a tight one. The tree is lopsided, because the `fib(n - 2)` branch runs out sooner than the `fib(n - 1)` branch. The tight bound is about **O(1.618ⁿ)**, where 1.618 is the golden ratio φ. You don't need to derive that. Saying \"O(2ⁿ), more precisely about O(φⁿ)\" is a strong answer.\n\n**Space: not quite.** It's **O(n)**, not O(2ⁿ). This is a very common trap, and it's why I warned you about it.\n\nThe key idea: space depends on how many calls are **alive at the same time**, not how many calls happen in total. Recursion is depth-first. `fib(5)` calls `fib(4)`, which calls `fib(3)`, and so on down to `fib(1)`. That call returns and its stack frame is freed before the next branch starts. So the call stack never holds more than one path from the root to a leaf, and the longest path is about n calls (n → n-1 → n-2 → ... → 1). Each frame uses constant space, so the total is O(n).\n\nA rule worth remembering: **for recursion, time ≈ total number of calls × work per call, and space ≈ maximum recursion depth × space per frame.**\n\nSo far: 4 questions, with time right on all 4 and the first space question missed. Not bad at all.\n\n**Question 5 (recursion, divide and conquer):**\nWhat are the time and space complexity of merge sort?\n\n```python\ndef merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)  # merges two sorted lists in O(len(left) + len(right))\n```\n\nGive both Big-Os with your reasoning. Hint: think about how many levels the recursion tree has, and how much total work is done on each level. For space, use the rule from above, but watch out for the extra lists that the slicing and merging create."
+  },
+  {
+   "role": "student",
+   "text": "Merge sort is O(n log n) time, because it splits in half so there are log n levels and each level does about n work merging. For space, the recursion depth is only log n, but the slices make new lists, so I think it's O(n) extra space overall since the lists at one level add up to n."
+  },
+  {
+   "role": "tutor",
+   "text": "**Both correct!** **O(n log n) time** and **O(n) space**. You used the rule from last time well, and you caught the slicing trap.\n\n**Time:** Your explanation is the one interviewers want to hear. Halving the array gives about log₂(n) levels. On each level, all the merges together touch every element once, so each level costs O(n). That gives O(n) × log n levels = O(n log n). It's also worth knowing that merge sort is O(n log n) in the **best, average and worst case**, because it always splits the same way whatever the input looks like. Quicksort is different: its worst case is O(n²).\n\n**Space:** Your answer is right, but one part of the reasoning needs a fix. You said \"the lists at one level add up to n.\" That's true, but a whole level is never in memory at once. Just like with `fib`, recursion is depth-first, so only **one path from the root to a leaf** is alive at any moment. The slices along that path have sizes:\n\nn/2 + n/4 + n/8 + ... + 1 ≈ n\n\nOn top of that, the merge step builds an output list of up to n elements. Together that's still O(n). The recursion stack adds only O(log n) frames, which is smaller than O(n), so it doesn't change the answer. A strong interview answer would be: \"O(n) extra space. The call stack is only O(log n) deep, but the slices and merge buffers dominate.\"\n\n**Score so far:** 5 for 5 on time, 1 for 2 on space, and the space miss was in the hardest spot.\n\nNow for amortized analysis, which is where many candidates get stuck.\n\n**Question 6 (amortized analysis):**\nA Python list (a dynamic array) has a fixed amount of space. When you `append` to a full list, it allocates a new array **twice as big** and copies every existing element over.\n\n```python\ndef build(n):\n    result = []\n    for i in range(n):\n        result.append(i)\n    return result\n```\n\n1. What is the **worst-case** cost of a single `append`?\n2. What is the **total** time complexity of `build(n)`?\n3. So what is the **amortized** cost per `append`?\n\nHint: work out how many elements get copied in total over all the resizes (when the array grows to sizes 1, 2, 4, 8, ...). Then compare that to n."
+  },
+  {
+   "role": "student",
+   "text": "For the first one, I think the worst case for a single append is O(n), because when the array is full it has to copy every element over to the new bigger array. Most appends are cheap though, it's just the ones that trigger a resize that hurt."
+  },
+  {
+   "role": "tutor",
+   "text": "**Part 1: correct!** The worst case for a single `append` is **O(n)**. When the array is full, every existing element has to be copied into the new, bigger array. You also said the important thing: most appends are cheap, and only the ones that trigger a resize are expensive. That's the idea amortized analysis is built on.\n\nTo be exact: an append that doesn't trigger a resize is O(1). It just writes into the next free slot.\n\nNow for parts 2 and 3, where the interesting part is.\n\n**Part 2:** What is the **total** time complexity of `build(n)`?\n\nA tempting line of thinking goes: \"There are n appends, and each one can cost O(n), so the total is O(n²).\" Is that right? Here's a nudge. Resizes only happen when the array fills up at sizes 1, 2, 4, 8, ..., up to about n. Add up how many elements get copied across **all** of those resizes. What does 1 + 2 + 4 + ... + n come to? Then add the n cheap writes.\n\n**Part 3:** Using your total, what is the **amortized** cost per `append`? (Amortized cost = total cost ÷ number of operations.)\n\nGive both answers with your reasoning. Bonus: why does growing by **doubling** matter here? What would happen if the list grew by a fixed amount each time, like +10 slots?"
+  },
+  {
+   "role": "student",
+   "text": "Ok so 1 + 2 + 4 + ... + n adds up to about 2n copies, plus the n cheap writes, so the total is like 3n. I'd say that's O(3n), which is linear-ish but still meaningfully slower than a true O(n), right?"
+  },
+  {
+   "role": "tutor",
+   "text": "**Your count is right, but the conclusion isn't.** About 2n copies plus n writes, so roughly 3n operations in total. That part is spot on.\n\nBut **O(3n) is just O(n).** It isn't \"linear-ish,\" and it isn't a different complexity class. This is the O(2n) vs O(n) trick question I said was coming. Big-O drops constant factors, for the same reason log₃(n) and log₂(n) are both O(log n). So the answer is: **`build(n)` is O(n) total.**\n\nYour instinct isn't completely wrong, though. In *real running time*, 3n steps does take longer than n steps. Big-O just doesn't measure that. It describes how the cost **grows** as n grows. Double n and 3n doubles too, the same as n does. That's what \"linear\" means. Something like O(n log n) or O(n²) would grow faster than that, but 3n doesn't. In an interview, never write O(3n) as your final answer. Say \"about 3n operations, so O(n).\"\n\nA quick check on the sum: 1 + 2 + 4 + ... + n = 2n - 1 (when n is a power of 2). Each term is bigger than all the earlier terms added together, so the whole sum is less than twice the last term. That's the reason doubling works out so nicely.\n\n**Part 2: O(n) total.** ✔️ (once the constant is dropped)\n\nNow try to finish it off:\n\n**Part 3:** If n appends cost O(n) in total, what is the **amortized** cost of one `append`?\n\n**Bonus:** What if the list grew by a fixed **+10 slots** each time instead of doubling? Resizes would happen at sizes 10, 20, 30, ..., n. Add up the copies and tell me the total for `build(n)` and the amortized cost per append."
+  }
+ ],
+ "usage": [],
+ "conv_id": "9c12193ac3"
+}

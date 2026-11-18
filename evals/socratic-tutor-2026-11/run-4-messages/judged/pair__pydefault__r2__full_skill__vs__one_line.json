@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A gives away the key answer up front, but the learner then reasons correctly through three prediction questions and gets targeted, Socratic feedback, while B brings out the misconception through diagnostics but never resolves it, holding back all feedback across several questions in a way that is inefficient and unsatisfying."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

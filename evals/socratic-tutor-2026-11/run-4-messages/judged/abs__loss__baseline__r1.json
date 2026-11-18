@@ -1,0 +1,17 @@
+{
+ "file": "loss__baseline__r1.json",
+ "scenario": "loss",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 3,
+  "why": "The tutor gave the -50%/+100% answer in an opening lecture without first checking what the learner knew, and every later turn was more explanation instead of questions, so the learner's correct restatement came from reading the answer rather than working it out."
+ },
+ "usage": {}
+}

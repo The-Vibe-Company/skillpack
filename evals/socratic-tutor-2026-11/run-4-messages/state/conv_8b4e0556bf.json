@@ -1,0 +1,37 @@
+{
+ "id": "8b4e0556bf",
+ "scenario": "monty",
+ "kind": "tutor",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good. Being skeptical is the right starting point. I won't try to talk you into \"always switch.\" The aim is for you to work it out yourself until you can't see it any other way.\n\nHere's the map of what we'll cover:\n\n1. The exact rules of the game (what the host knows and must do)\n2. Basic probability: equally likely outcomes, counting cases\n3. Conditional probability: how new information changes odds\n4. Why the host's choice matters (informed vs. random host)\n5. Testing it: enumeration and simulation\n6. Variants and edge cases (100 doors, host who opens at random, host with a bias)\n\nFirst I'll ask you a few questions, one at a time, to see what you already know and exactly where the usual explanation loses you.\n\nQuestion 1: Say the problem in your own words. What happens, step by step? And what do you think the chance of winning is if you stick with your first door, and if you switch?"
+  },
+  {
+   "role": "learner",
+   "text": "You pick one of three doors, the host opens a different door that has a goat behind it, and then you can stick or switch. Once that door is open there are two doors left and the car is behind one of them, so it's 50/50 whether you stick or switch. I don't see why switching would be any better."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. You think it's 50/50, and I'm not going to argue with that yet. For now I'm just finding out where you're starting from, so the next few questions are only diagnostic.\n\nQuestion 2: Go back to the moment you first pick a door, before the host does anything. What's the chance your door has the car behind it? And what's the chance the car is behind one of the two doors you didn't pick?"
+  },
+  {
+   "role": "learner",
+   "text": "Before the host does anything, my door has a 1 in 3 chance and the other two together have 2 in 3. But once he opens a goat door that changes, because now there are only two doors left."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You have the starting odds right: 1/3 for your door and 2/3 for the other two together. Your claim is that opening a goat door resets things to 50/50. I'll leave that alone for now. We're still in the diagnostic.\n\nQuestion 3: Think about the host's choice when he opens a door. Say you picked Door 1. Is the host ever forced to open one particular door, with no choice about it? If so, when does that happen, and why?"
+  },
+  {
+   "role": "learner",
+   "text": "Yeah, if I picked a goat, he's stuck: only one other goat door is left, so he has to open that one. If I picked the car he can open either one. I still don't see why that matters though, there are two doors left either way."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. If you picked a goat, the host has only one door he can open. If you picked the car, he can choose either of the other two. You've also told me you don't think that difference changes anything. I'm noting that and won't argue it yet.\n\nOne more diagnostic question, and it's the hardest one.\n\nQuestion 4: Change the game. This host doesn't know where the car is. After you pick Door 1, he opens one of the other two doors at random. If it happens to show the car, the game is void and you start over. This time it happens to show a goat. Are your chances of winning by sticking or switching the same as in the normal game, where the host knows and always shows a goat? Or are they different? Explain why."
+  }
+ ],
+ "pending": null
+}

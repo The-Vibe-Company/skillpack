@@ -1,0 +1,17 @@
+{
+ "file": "bayes__full_skill__r2.json",
+ "scenario": "bayes",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 5,
+  "why": "The tutor diagnosed carefully without leaking, and its natural-frequency questions set the learner up well to find the base-rate error, but the transcript ends before the learner reaches the ~9% insight, so no learning has happened yet."
+ },
+ "usage": {}
+}

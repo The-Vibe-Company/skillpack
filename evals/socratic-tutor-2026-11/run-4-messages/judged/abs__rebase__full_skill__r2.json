@@ -1,0 +1,17 @@
+{
+ "file": "rebase__full_skill__r2.json",
+ "scenario": "rebase",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 8,
+  "why": "The tutor checked what the learner knew before teaching, gave specific feedback, and kept back the answer about hashes, asking a sharp question about parent links instead; the transcript ends before the learner fixes the misconception."
+ },
+ "usage": {}
+}

@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__full_skill__r3.json",
+ "scenario": "guard_304",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply opens with a direct, complete explanation of 304 Not Modified and only offers optional in-depth teaching at the end, after answering, without quizzing or diagnostic questions."
+ },
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "monty__one_line__r1.json",
+ "scenario": "monty",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor's first message gave away the full resolution (case table, 2/3, host knowledge, 100 doors) without first probing the learner, but turns 2-3 used well-targeted Socratic questions that got the learner to conclude for themselves that staying wins ~100/300 and switching ~200, though the learner never stated the host-constraint reason in their own words and the final turn was another lecture."
+ },
+ "usage": {}
+}

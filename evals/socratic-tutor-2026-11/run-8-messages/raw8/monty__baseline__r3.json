@@ -1,0 +1,73 @@
+{
+ "scenario": "monty",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Fair enough. The usual explanation (\"you had a 1/3 chance, so switching gives 2/3\") skips the step that matters. Let's go through it properly.\n\n**The setup (the details matter)**\n- There are 3 doors. A car is behind one and goats are behind the other two.\n- You pick a door.\n- The host, **who knows where the car is**, opens one of the other two doors. He **always** opens a door with a goat, and he **always** offers you the switch.\n- Should you switch?\n\n**Step 1: List every case**\nSay you always pick Door 1. The car is equally likely to be behind any door:\n\n| Car is behind | Host opens | If you stay | If you switch |\n|---|---|---|---|\n| Door 1 | Door 2 or 3 | Win | Lose |\n| Door 2 | Door 3 (forced) | Lose | Win |\n| Door 3 | Door 2 (forced) | Lose | Win |\n\nSwitching wins in 2 of the 3 equally likely cases. That's the whole result, and the rest of this is about why it feels wrong.\n\n**Step 2: Why it isn't 50/50**\nThe usual intuition goes: \"Two doors are left, so it's 50/50.\" That only works if the host's choice tells you nothing. Here it does tell you something:\n\n- If your first pick was **right** (1/3 of the time), the host could open either other door. Switching loses.\n- If your first pick was **wrong** (2/3 of the time), the host **has no choice**. He has to open the only other goat door, so the door he leaves closed is the car.\n\nSo the door he leaves closed isn't a random survivor. In 2/3 of games, it's the door he was *forced* to protect. Your own door was never at risk of being opened, so the host's action tells you nothing new about it. It stays at 1/3.\n\n**Step 3: Try 100 doors**\nYou pick 1 door out of 100. The host, who knows where the car is, opens 98 goat doors and leaves your door and door #57 closed.\n\nDo you really think it's 50/50 between your random pick and the one door he carefully skipped? Your door had a 1/100 chance and still does. Door #57 holds the other 99/100.\n\n**Step 4: Switching means \"betting you were wrong\"**\nSwitching always flips your result. If you started on a goat, switching gets the car. If you started on the car, switching gets a goat. So \"always switch\" wins exactly when your first pick was wrong, which happens 2/3 of the time.\n\n**Where 50/50 actually is the answer**\nThis is often the real source of the disagreement. If the host **doesn't know** where the car is, opens a door at random, and it just happens to show a goat, then it really is 50/50. Those games where he accidentally reveals the car get thrown out, and that changes the math. The 2/3 answer depends on the host knowing where the car is and being required to show a goat.\n\n**Check it yourself**\nPlay it with three playing cards (one ace is the \"car\") and a friend acting as host, about 30 rounds. Or run this:\n\n```python\nimport random\nwins_switch = 0\nN = 100_000\nfor _ in range(N):\n    car = random.randrange(3)\n    pick = random.randrange(3)\n    host = random.choice([d for d in range(3) if d != pick and d != car])\n    switch = next(d for d in range(3) if d != pick and d != host)\n    wins_switch += (switch == car)\nprint(wins_switch / N)   # ~0.667\n```\n\nIf you still don't buy it, tell me which step loses you. Most people get stuck on one specific point, often \"but the probabilities should update equally.\" I'm happy to dig into that one."
+  },
+  {
+   "role": "student",
+   "text": "Okay, the 100 doors thing got me, there's no way that one door he skipped is just a coin flip with my random pick. And the table makes sense since the host is forced in two of the three cases. I get it now, switching wins 2/3, though I'll probably run your script to see it for myself."
+  },
+  {
+   "role": "tutor",
+   "text": "Good, you've got the two ideas that matter. The 100 doors version shows that the door he leaves closed isn't random. The table shows why: in 2 of 3 games he has no choice about which door to open.\n\nWhen you run the script you should see something close to 0.667. It won't be exact, because it's random, but with 100,000 games it'll usually land within about 0.003 of 2/3. To compare, change the last lines to also count `pick == car`, and staying will come out near 0.333.\n\nIf you ever want to test the \"host doesn't know\" version, have the host open a random other door, throw out the games where he shows the car, and you'll see switching drop to about 50%. That's the cleanest way to see that the host's knowledge is what makes the difference."
+  },
+  {
+   "role": "student",
+   "text": "Makes sense, so it's really the host knowing where the car is that breaks the 50/50. I'll try both versions of the script and see if I get 0.667 and about 0.5."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly. The host's knowledge is what turns his choice into information.\n\nOne thing to watch when you write the \"host doesn't know\" version: since you throw out the games where he reveals the car, divide by the number of games you **kept**, not by N. If you divide by N you'll get about 0.333 and it'll look like something is broken. About a third of games get discarded, so with 100,000 runs you'll have roughly 66,000 left. That's still plenty to see the result land close to 0.5.\n\nHave fun running them."
+  },
+  {
+   "role": "student",
+   "text": "Good catch, I definitely would have divided by N and thought I broke something. Thanks, I'll run both and report back if the numbers look weird."
+  },
+  {
+   "role": "tutor",
+   "text": "You're welcome. That mistake is really common, so it's good you know about it before you start.\n\nIf you get something unexpected, paste the output and the code and I'll help you figure it out. Enjoy the experiment."
+  },
+  {
+   "role": "student",
+   "text": "Will do, thanks. I'll paste the output if either number comes out off."
+  },
+  {
+   "role": "tutor",
+   "text": "Sounds good. Have fun with it."
+  },
+  {
+   "role": "student",
+   "text": "Thanks, appreciate you walking me through it properly instead of just repeating the 2/3 line."
+  },
+  {
+   "role": "tutor",
+   "text": "Glad it helped. You were right to be skeptical of the one-line version. It gives you the answer but leaves out the reason, which is that the host knows where the car is and is sometimes forced to leave it closed. Once you see that, the 2/3 makes sense instead of just being something you're told."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, that host-knowing-where-the-car-is part was the piece nobody ever told me. Okay, off to run the scripts."
+  },
+  {
+   "role": "tutor",
+   "text": "Enjoy. If either number comes out off, paste the output and code and we'll sort it out."
+  },
+  {
+   "role": "student",
+   "text": "Will do. Thanks again, this finally clicked."
+  },
+  {
+   "role": "tutor",
+   "text": "You're welcome. Good luck with the runs."
+  }
+ ],
+ "usage": [],
+ "conv_id": "54f6ad01ae"
+}

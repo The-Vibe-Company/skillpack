@@ -1,0 +1,17 @@
+{
+ "file": "float__full_skill__r2.json",
+ "scenario": "float",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 6,
+  "why": "The tutor's questions are well sequenced and lead the learner to the denominator rule, but the opening syllabus already says 0.1 'isn't exactly 0.1', and the transcript ends before the learner applies the rule to base 2 or drops the idea that this is a JavaScript bug."
+ },
+ "usage": {}
+}

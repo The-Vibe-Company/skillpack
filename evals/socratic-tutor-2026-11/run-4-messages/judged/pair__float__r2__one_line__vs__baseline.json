@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Both open by lecturing and give away the 1/3 analogy, but B's opening is much shorter, and its follow-up questions draw out the learner's own reasoning and expose a subtle misconception (the idea that 0.1 gets rounded every time), which the learner then refines, while A's opening is a far longer one-sided lecture."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

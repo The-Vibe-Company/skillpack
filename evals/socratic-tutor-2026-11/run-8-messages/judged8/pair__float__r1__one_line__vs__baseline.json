@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open with a lecture, but A then uses targeted questions that make the learner find the gap in their own 'errors just add up' reasoning and work out the rounding and tie behaviour themselves, while B gives away the answers to its prediction questions and spends more turns on advice the learner didn't ask for."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

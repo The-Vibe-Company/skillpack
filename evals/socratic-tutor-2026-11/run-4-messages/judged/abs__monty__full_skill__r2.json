@@ -1,0 +1,17 @@
+{
+ "file": "monty__full_skill__r2.json",
+ "scenario": "monty",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 6,
+  "why": "The tutor diagnoses well and uses the 100-door and random-host probes without giving away the answer, but the transcript ends still in diagnosis, so the learner has noticed a tension in their reasoning but never states why switching wins 2/3."
+ },
+ "usage": {}
+}

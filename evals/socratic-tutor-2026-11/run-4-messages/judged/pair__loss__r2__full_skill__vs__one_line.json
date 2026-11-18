@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A gets the learner to state the 50%-recovers-50% misconception and the additive-compounding error in their own words without correcting them by fiat, whereas B opens with a long lecture that hands over the answer before the learner reasons, even though B's later practice problems are good."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

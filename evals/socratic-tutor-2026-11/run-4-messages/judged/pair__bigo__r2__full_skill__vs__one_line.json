@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the learner's constant-factor misconception and uses pointed questions and a doubling table to get the learner to reason through it, while B only runs a diagnostic, holds back all feedback, and never deals with the misconception."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

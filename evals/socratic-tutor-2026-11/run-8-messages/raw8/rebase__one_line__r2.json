@@ -1,0 +1,73 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. I'll ask one question at a time. Answer in your own words, and when something doesn't add up I'll push back with a narrower question instead of just giving you the answer.\n\nHere's the setup we'll keep coming back to:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\nYou're on `feature` and you want C in your branch.\n\n**Question 1:** If you run `git merge main` from `feature`, what does the history look like afterward? Specifically:\n- Do commits D and E still exist with the same commit hashes?\n- Is there a new commit? If so, how many parents does it have, and which commits are they?\n\nSketch the graph if you can, even roughly. Then we'll do the same thing with `git rebase main` and compare."
+  },
+  {
+   "role": "student",
+   "text": "With merge, D and E stay exactly the same hashes, and you get a new merge commit M on top of E with two parents, E and C. So it's like A-B-C on main, D-E on feature, and M joining E and C."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. D and E keep their original hashes, and M has two parents, E and C:\n\n```\nmain:     A---B---C\n               \\   \\\nfeature:        D---E---M\n```\n\nThe main thing to notice is that merge only adds to history. Nothing that already existed gets changed.\n\n**Question 2:** Start from the original setup again (before the merge). On `feature` you run `git rebase main` instead.\n\n- What does the graph look like afterward?\n- Do D and E still have their original hashes? If not, why not? Think about what a commit hash is computed from.\n- Is there a merge commit this time?"
+  },
+  {
+   "role": "student",
+   "text": "With rebase it'd look like A-B-C-D-E in a straight line, no merge commit. D and E keep the same hashes though, rebase just picks up the feature branch pointer and moves it so it starts from C instead of B. That's why I figured it's fine to rebase even after pushing, nothing actually changes about the commits."
+  },
+  {
+   "role": "tutor",
+   "text": "You've got the shape right: a straight line, A-B-C-D-E, with no merge commit. Before we get to pushing, though, I want to check the hash part with two narrower questions.\n\n**Question 2a:** A commit stores a snapshot of the tree, an author, a message, and one more thing that links it into history. What's that last thing? For D in the original graph, what is its value?\n\n**Question 2b:** Now look at your rebased graph, `A---B---C---D---E`. In that line, what is D's value for the same field?\n\nCompare your two answers. Then tell me whether D can still have the same hash, given that a hash is computed from the commit's contents. Once you've worked that out, we'll come back to whether rebasing after a push is \"fine.\""
+  },
+  {
+   "role": "student",
+   "text": "That'd be the parent commit, right? In the original graph D's parent is B."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. Every commit records its parent (or parents), and in the original graph D's parent is B.\n\nThat's half of it. Now finish the comparison:\n\n**Question 2b:** In your rebased line, `A---B---C---D---E`, what is D's parent?\n\nOnce you have that, put the two answers side by side. D's parent is part of what gets hashed. If it changed, can D's hash be the same? And if D's hash changes, what happens to E's parent, and so to E's hash?"
+  },
+  {
+   "role": "student",
+   "text": "In the rebased line D's parent is C. Oh wait, so if the parent is part of the hash, D has to get a new hash... and then E's parent changes too, so E gets a new hash as well?"
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. D's parent changed from B to C, so D gets a new hash. Call it D'. E's parent is now D' instead of D, so E gets a new hash too: E'. The change cascades down the whole branch:\n\n```\nmain:     A---B---C\n                   \\\nfeature:            D'---E'\n\n(old D---E still exist, hanging off B, but no branch points to them anymore)\n```\n\nSo rebase doesn't move commits. It makes new copies with the same changes and messages, and then points `feature` at the copies. The snapshots match what you wrote, but they are different commits.\n\nNow back to the claim you started with, that rebasing after you've pushed is fine because nothing about the commits changes.\n\n**Question 3:** Say you pushed `feature` (with D and E) before rebasing, and a teammate pulled it and added a commit F on top of E. Then you rebase and force-push, so `origin/feature` now points to E'.\n\n- What is F's parent?\n- Does F's parent appear anywhere in the history of the new `origin/feature`?\n- So when your teammate runs `git pull` next, what will Git see about how their branch relates to the remote one?"
+  },
+  {
+   "role": "student",
+   "text": "F's parent is E, the old E my teammate pulled before I rebased. Hmm, so that's not E', it's the original one that's now just hanging off B."
+  },
+  {
+   "role": "tutor",
+   "text": "Right. F's parent is the original E, and after your force-push that E has no branch pointing to it. It's only hanging off B.\n\nNow the next two parts:\n\n**Question 3b:** Walk back through the new `origin/feature`: E', D', C, B, A. Does the original E show up anywhere in that chain?\n\n**Question 3c:** Your teammate's local branch is F → E → D → B → A. The remote is E' → D' → C → B → A. When they run `git pull`, Git looks for the most recent commit the two histories share. Which commit is that? Then list what Git will think is \"only on their side\" and what it will think is \"only on the remote side.\"\n\nLook at those two lists and tell me what you notice about D/D' and E/E'. What's going to happen to your teammate when Git tries to combine them?"
+  },
+  {
+   "role": "student",
+   "text": "No, the original E isn't anywhere in that chain, it's just E', D', C, B, A. So the commit my teammate built F on isn't part of the remote branch anymore."
+  },
+  {
+   "role": "tutor",
+   "text": "Right. The new `origin/feature` is E', D', C, B, A, and the original E isn't in it. The commit your teammate built F on is no longer part of the remote branch's history.\n\nThat's the core of the problem. Now let's see what Git does with it.\n\n**Question 3c:** Your teammate's local branch is F → E → D → B → A. The remote is E' → D' → C → B → A.\n\n- Walking back from both ends, what's the most recent commit the two chains share?\n- After that shared commit, which commits does Git see as only on your teammate's side?\n- Which commits does it see as only on the remote side?\n\nWrite out both lists. Then look at D next to D', and E next to E'. Git compares commits by hash. Does Git know that D and D' are \"the same work\"? What does that mean for your teammate when they pull?"
+  },
+  {
+   "role": "student",
+   "text": "Walking back from both, the last commit they share is B. So on my teammate's side it's D, E, F, and on the remote side it's C, D', E'."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. The two histories split at B:\n\n```\nteammate:  B---D---E---F\nremote:    B---C---D'---E'\n```\n\nOnly on your teammate's side: D, E, F. Only on the remote side: C, D', E'.\n\nNow for the part that matters. Look at the two lists together:\n\n**Question 3d:** D and D' contain the same changes and the same message, but they have different hashes. When Git compares the two sides, it goes by hash. So does Git treat D and D' as one commit or as two unrelated commits? Same question for E and E'.\n\n**Question 3e:** Based on your answer, when your teammate runs a plain `git pull` (a merge), Git has to combine D, E, F with C, D', E'. How many times does the work from D end up in the combined history? What could happen when Git applies the same edits to the same lines twice, once from each side?\n\nAnswer those two, and then tell me in one sentence what the real rule about rebasing after pushing should be, and why."
+  }
+ ],
+ "usage": [],
+ "conv_id": "672dd8cfc4"
+}

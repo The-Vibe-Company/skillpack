@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A has the learner work out base-2 place values, the 1/3 analogy, and the prime-factor rule through questions, and it brings the 'stored exactly' and 'JavaScript bug' misconceptions into the open to be tested; B opens with a long lecture that corrects both misconceptions by fiat before the learner does any reasoning."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

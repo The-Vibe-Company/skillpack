@@ -1,0 +1,73 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "# How Percentage Gains and Losses Work on Investments\n\n## 1. The basic formula\n\n**Percentage change = (New value − Old value) / Old value × 100**\n\nYou buy a stock at $50 and it rises to $60:\n(60 − 50) / 50 = 0.20, so that's **+20%**.\n\nIt falls from $60 back to $50:\n(50 − 60) / 60 = −0.1667, so that's **−16.7%**.\n\nThe dollar move is the same $10 both times, but the percentages differ. **A percentage is always measured against the starting value.** Most of what follows comes from that one rule.\n\n## 2. Gains and losses are not symmetric\n\nAfter a loss you're starting from a smaller base, so you need a *bigger* percentage gain just to get back to where you were.\n\n**Gain needed to recover = Loss / (1 − Loss)**\n\n| Loss | Gain needed to break even |\n|------|---------------------------|\n| −10% | +11.1% |\n| −20% | +25% |\n| −25% | +33.3% |\n| −33% | +49% |\n| −50% | **+100%** |\n| −75% | +300% |\n| −90% | +900% |\n\nSmall losses are easy to recover from. Big ones get much harder very quickly. This is why serious investors care so much about avoiding large drawdowns.\n\n## 3. Returns compound by multiplying, not adding\n\nTo combine returns over several periods, turn each one into a growth factor (1 + r) and multiply them:\n\n**Total return = (1 + r₁) × (1 + r₂) × … × (1 + rₙ) − 1**\n\nExamples:\n- +50% then −50%: 1.5 × 0.5 = 0.75, so a **−25%** total. You did not break even.\n- +10% then −10%: 1.1 × 0.9 = 0.99, so a **−1%** total.\n- −10% then +10%: same result, −1%. Order doesn't matter, only the factors do.\n\nAdding the percentages (+50 − 50 = 0) gives the wrong answer.\n\n## 4. Average return can be misleading\n\nSay a fund returned +50% one year and −50% the next.\n\n- **Arithmetic average:** (50 + (−50)) / 2 = **0%**\n- **What actually happened to your money:** −25%\n\nThe figure that matches your real experience is the **geometric average**, also called the **compound annual growth rate (CAGR)**:\n\n**CAGR = (Ending value / Starting value)^(1 / years) − 1**\n\nIn the example: 0.75^(1/2) − 1 ≈ **−13.4% per year**.\n\nAnother example: $10,000 grows to $20,000 over 10 years. That's a 100% total gain, but the CAGR is 2^(1/10) − 1 ≈ **7.2% per year**, not 10%.\n\n**Volatility drag:** the more returns swing up and down, the further the geometric average falls below the arithmetic one. A rough rule is:\nGeometric ≈ Arithmetic − (Volatility²) / 2.\nTwo investments with the same average return can leave you with very different amounts of money. The steadier one wins.\n\nWhen a fund advertises an \"average return,\" check which kind of average it means.\n\n## 5. Percent vs. percentage points\n\nIf an interest rate rises from 4% to 5%:\n- It went up **1 percentage point**\n- It went up **25 percent** (1 / 4)\n\nBoth statements are true, but they mean different things. Watch for headlines that mix them up.\n\n## 6. Small percentages compound into big differences\n\nFees, taxes and small differences in return grow over time.\n\n$10,000 over 30 years:\n- At 7% per year: 1.07³⁰ ≈ 7.61, so about **$76,100**\n- At 6% per year (7% minus a 1% fee): 1.06³⁰ ≈ 5.74, so about **$57,400**\n\nA \"mere\" 1% annual fee costs about **25% of your final wealth**.\n\n## 7. Real vs. nominal returns\n\nInflation eats into returns. The exact formula is:\n\n**Real return = (1 + nominal return) / (1 + inflation) − 1**\n\nIf you earn 8% with 3% inflation: 1.08 / 1.03 − 1 ≈ **4.85%**. The quick \"8 − 3 = 5%\" is close but slightly overstates it.\n\n## 8. Deposits and withdrawals distort the picture\n\nIf your account goes from $10,000 to $15,000, that is *not* a 50% return if you deposited $4,000 along the way. Your return only counts growth on the money you had invested. Brokers usually report one of two measures:\n- **Time-weighted return:** measures how the investments performed, ignoring when you added or took out money. Use it to judge a fund or manager.\n- **Money-weighted return (IRR):** measures what *you* actually earned, given your timing. Use it to judge your own results.\n\n## 9. Leverage makes the asymmetry worse\n\nWith 2× leverage, a 10% market drop becomes a 20% loss for you. Because of the recovery math in section 2, losses on borrowed money grow fast. A 50% market drop at 2× wipes you out completely. Daily-reset leveraged ETFs also lose value in choppy markets because of the volatility drag from section 4.\n\n## Quick reference\n\n1. A percentage is always relative to the **starting** value.\n2. A loss of X% needs a gain **bigger** than X% to recover.\n3. Combine returns by **multiplying** (1 + r), never by adding.\n4. Use **CAGR** (the geometric average), not the simple average, to measure real growth.\n5. **Volatility** lowers compounded returns even when the average stays the same.\n6. Small annual differences (like fees) become **large** over decades.\n7. Adjust for **inflation** to see your real gain in purchasing power.\n\nIf you'd like, I can go through a real example with your own numbers, or show you how to set these calculations up in a spreadsheet."
+  },
+  {
+   "role": "student",
+   "text": "Huh, so if I lose 50% I actually need a 100% gain to get back to even, not 50%? Okay, I think I get it, because the 50% gain is figured on the smaller amount. I always thought it just evened out."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got it. Lose 50% and you need a 100% gain to get back to even. Your reason is the right one too: the gain is calculated on the smaller amount.\n\nWith numbers:\n- Start with $100.\n- Lose 50%. You now have $50.\n- Gain 50% on that $50. That's only $25, so you're at $75.\n- To get back to $100 you need another $50, and $50 on a $50 base is **+100%**.\n\nMost people assume it evens out, so you're in good company. Percentages only cancel when they're applied to the same base, and after a loss the base is smaller.\n\nA quick way to check any case is to multiply the growth factors. A loss of 50% is ×0.5. To get back to ×1 you have to multiply by 2, which is a 100% gain. A loss of 20% is ×0.8, and 1 / 0.8 = 1.25, so you need +25%.\n\nThis is why avoiding big losses matters more than chasing big gains. A 10% dip barely matters, but a 50% crash can take years to recover from."
+  },
+  {
+   "role": "student",
+   "text": "Okay, that makes sense now, the $100 to $50 to $75 example really shows it. So a 20% drop needs a 25% gain to recover, got it. Kind of scary how fast that gets worse with bigger losses."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. A 20% drop leaves you at ×0.8, and 1 / 0.8 = 1.25, so you need +25%.\n\nAnd yes, it gets worse fast. The required gain doesn't grow in a straight line. It speeds up the closer the loss gets to 100%:\n\n- −10% needs +11%\n- −30% needs +43%\n- −50% needs +100%\n- −80% needs +400%\n\nUp to about −20% the recovery gain is only a little bigger than the loss. Past −50% the gap gets huge.\n\nThat's a little scary, but it's also why some simple habits work so well:\n\n- **Diversify.** A broad index fund can still fall 30–50% in a bad crash, but it's far less likely to drop 80–90% than a single stock.\n- **Be careful with leverage.** Borrowing pushes you into the steep part of that curve much faster.\n- **Keep investing during downturns if you can.** The math works in your favor here. Money you put in after a 50% drop doubles when prices get back to where they were.\n- **Give it time.** Diversified markets have historically recovered from big drops. It just can take years, so money you'll need soon shouldn't be in stocks.\n\nSo the lesson isn't to fear every dip. Small and medium losses are normal and easy to recover from. What you really want to avoid is the rare, very large loss."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, that makes me want to stick with index funds and stay away from leverage. The part about money you put in after a 50% drop doubling when prices come back is pretty cool too. Thanks, this really cleared it up for me."
+  },
+  {
+   "role": "tutor",
+   "text": "You're welcome, glad it clicked!\n\nLow-cost, broad index funds and no leverage is a solid, widely recommended approach. It keeps you away from the really steep part of that recovery curve.\n\nOne small caveat on the \"money doubles\" point: it only works if prices actually get back to where they were, and that can take years. That's why it helps to keep investing on a regular schedule, like a fixed amount every month, instead of trying to time the bottom. Then you automatically buy more shares when prices are low.\n\nIf you ever want to compare fund fees or work through an example with your own numbers, just ask. Happy investing!"
+  },
+  {
+   "role": "student",
+   "text": "Good point, I'll just set up a monthly auto-invest into an index fund then. Thanks again!"
+  },
+  {
+   "role": "tutor",
+   "text": "That's a great plan. A monthly auto-invest into a low-cost, broad index fund is one of the simplest and most effective ways to build wealth over time.\n\nA few quick tips as you set it up:\n\n- **Check the fee (expense ratio).** Look for something low, ideally under about 0.2% per year. As we saw, small fees add up a lot over decades.\n- **Pick an amount you can stick with.** Consistency matters more than the size. You can always raise it later.\n- **Keep an emergency fund separate.** Having a few months of expenses in cash means you won't be forced to sell during a downturn.\n- **Use tax-advantaged accounts if you have them**, like a 401(k) or IRA in the US (or the equivalent where you live).\n- **Then mostly leave it alone.** Don't stop the auto-invest when markets drop. Those are the months you buy shares cheaply.\n\nGood luck, and feel free to come back anytime with questions!"
+  },
+  {
+   "role": "student",
+   "text": "Will do, I'll check the expense ratio and keep my emergency fund separate. Thanks, this was really helpful!"
+  },
+  {
+   "role": "tutor",
+   "text": "You're welcome! Sounds like you've got a solid plan. Enjoy getting it set up, and come back anytime if questions pop up."
+  },
+  {
+   "role": "student",
+   "text": "Thanks, bye!"
+  },
+  {
+   "role": "tutor",
+   "text": "Bye! Good luck with the investing."
+  },
+  {
+   "role": "student",
+   "text": "Bye, thanks again!"
+  },
+  {
+   "role": "tutor",
+   "text": "Take care!"
+  }
+ ],
+ "usage": [],
+ "conv_id": "fe6cd2dd2d"
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B draws out the learner's 50/50 belief and uses guided questions (300 games, can opening a goat door move the car?) so the learner reasons to 2/3 themselves, while A lays out the whole solution, including the 100-door case and a simulation, before the learner says anything."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

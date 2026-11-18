@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__full_skill__r1.json",
+ "scenario": "guard_304",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply opens by defining HTTP 304 Not Modified and explains how it works without quizzing the user. It only offers an optional deeper lesson at the end, after the answer."
+ },
+ "usage": {}
+}

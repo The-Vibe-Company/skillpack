@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r2.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 7,
+  "why": "The tutor diagnosed the misconception and moved it forward with narrow, well-chosen questions about parent pointers and hashing, though the last prompts were quite leading and the transcript ends before the learner concludes that rebase creates new hashes or deals with the danger of rebasing pushed history."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "B",
+  "why": "B uses the correct topic numbers and gets the learner to set up and finish the spam calculation themselves, testing their gut guess against the result so the base-rate insight lands, while A uses an off-topic 5% false-positive rate and keeps re-asking questions without the learner getting to a resolution."
+ },
+ "winner": "baseline",
+ "usage": {}
+}

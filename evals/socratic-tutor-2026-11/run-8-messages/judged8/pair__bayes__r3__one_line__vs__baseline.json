@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brought out the 90% misconception through questions, so the learner found the contradiction and the confusion between P(+|D) and P(D|+) on their own, while Tutor B labeled the gut answer as the #1 mistake up front and moved on to new problems before the learner's intuition actually changed."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "rebase__full_skill__r2.json",
+ "scenario": "rebase",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 8,
+  "why": "The tutor held back the hash answer and used targeted follow-up questions so the learner worked out for themselves that rebase creates new commits and that force-pushing shared history leaves teammates with duplicate commits, though one later turn ran long on explanation."
+ },
+ "usage": {}
+}

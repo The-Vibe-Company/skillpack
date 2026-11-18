@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Although A opens with a long lecture that states the answer up front, the learner then reasons through the prediction, the aliasing follow-up and the sentinel exercise, and the misconception is resolved; B surfaces misconceptions but withholds all feedback across four diagnostic questions, which is inefficient and leaves them uncorrected."
+ },
+ "winner": "baseline",
+ "usage": {}
+}

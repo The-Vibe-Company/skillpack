@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r2.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 8,
+  "why": "The tutor used narrow, well-sequenced questions that led the learner to work out for themselves that the parent change forces new hashes and that a teammate's base commit vanishes, but the transcript ends before the learner states in their own words why rebasing shared history is harmful."
+ },
+ "usage": {}
+}

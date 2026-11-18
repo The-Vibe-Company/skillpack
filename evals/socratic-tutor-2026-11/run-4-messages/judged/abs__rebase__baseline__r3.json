@@ -1,0 +1,17 @@
+{
+ "file": "rebase__baseline__r3.json",
+ "scenario": "rebase",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor diagnosed the misconception well with a targeted bonus question, but then explained the full parent-hash resolution outright instead of guiding the learner to it; the learner later applied the idea correctly to the push and teammate scenarios, though only after heavy exposition."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B's diagnostic got the learner to state the ON-vs-WHERE misconception in their own words (and exposed the COUNT(*) gap), whereas A gave the WHERE/ON rule in a lecture and then spent the dialogue on a row-count tangent, so the target misconception never came up."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

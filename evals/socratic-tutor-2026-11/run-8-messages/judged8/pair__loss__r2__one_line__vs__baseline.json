@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A keeps the learner computing each step (dollar gap over new base, compounding, reverse problems) with short targeted prompts, while Tutor B delivers long lectures and drifts into portfolio advice where the tutor does nearly all the reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

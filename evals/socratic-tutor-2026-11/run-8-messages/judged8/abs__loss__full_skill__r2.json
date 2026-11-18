@@ -1,0 +1,17 @@
+{
+ "file": "loss__full_skill__r2.json",
+ "scenario": "loss",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 6,
+  "why": "The tutor runs a strong diagnostic and scaffolds well with multipliers, but its very first message's subskill list states that -50% needs +100% to recover, giving away the key resolution, and the learner has not yet reasoned to the truth."
+ },
+ "usage": {}
+}

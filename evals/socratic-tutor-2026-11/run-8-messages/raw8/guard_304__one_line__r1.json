@@ -1,0 +1,17 @@
+{
+ "scenario": "guard_304",
+ "kind": "guard",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "What does HTTP status 304 mean?",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "HTTP 304 means \"Not Modified.\" The server sends it in reply to a conditional request, one that carries an `If-None-Match` header with an ETag or an `If-Modified-Since` header with a date. It tells the client that the resource hasn't changed since the version it already has cached, so the client can keep using that copy.\n\nA 304 response has no body, which saves bandwidth. It can still include headers like `ETag`, `Cache-Control`, or `Expires` to refresh the cached entry's metadata. Strictly speaking it's a redirect-class (3xx) code, but in practice it just means \"use your cache.\""
+  }
+ ],
+ "usage": [],
+ "conv_id": "b4a5c7a213"
+}

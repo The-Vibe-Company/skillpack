@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B draws out the learner's 50%-cancels belief and has them find the error from concrete dollar amounts, while A states the asymmetry upfront in a long lecture, so the learner only confirms it after the fact."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

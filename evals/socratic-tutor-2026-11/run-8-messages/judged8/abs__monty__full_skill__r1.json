@@ -1,0 +1,17 @@
+{
+ "file": "monty__full_skill__r1.json",
+ "scenario": "monty",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 7,
+  "why": "The tutor diagnosed carefully and guided the learner to enumerate cases without giving away the 2/3 answer, handling the split-row objection well, but the transcript ends before the learner explicitly accepts that switching wins 2/3 because the host is constrained, and the long progress-chart message adds overhead."
+ },
+ "usage": {}
+}

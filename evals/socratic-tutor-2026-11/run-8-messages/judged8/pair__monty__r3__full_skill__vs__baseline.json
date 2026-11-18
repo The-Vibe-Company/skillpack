@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner enumerate the cases and bring out the 50/50 misconception in their own words, while B lectures the whole answer up front and then runs through a long string of pleasantries, even though A's diagnostic phase is slow and hasn't reached the resolution yet."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

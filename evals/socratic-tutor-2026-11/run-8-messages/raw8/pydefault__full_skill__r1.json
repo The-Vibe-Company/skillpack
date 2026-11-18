@@ -1,0 +1,73 @@
+{
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. Here's how I've broken \"Python function default arguments\" into subskills:\n\n1. Basic syntax and rules: defining defaults, ordering (defaults after non-defaults), overriding them\n2. Positional vs. keyword passing with defaults\n3. When defaults are evaluated (at definition time, not call time)\n4. The mutable default trap (`def f(x=[])`) and why it happens\n5. The `None` sentinel idiom, and custom sentinels for when `None` is a valid value\n6. Interaction with `*args`, `**kwargs`, keyword-only (`*`) and positional-only (`/`) parameters\n7. Introspection: `__defaults__`, `__kwdefaults__`, `inspect.signature`\n8. Defaults that capture variables: closures, lambdas in loops, and the deliberate `i=i` trick\n\nFirst I'll ask a few diagnostic questions, one at a time, to see what you already know. I won't teach anything until that's done, so just answer as best you can. \"I don't know\" is a useful answer too.\n\nQuestion 1: What does this code print, and why?\n\n```python\ndef greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Ana\"))\nprint(greet(\"Ana\", \"Hi\"))\nprint(greet(greeting=\"Hey\", name=\"Ana\"))\n```"
+  },
+  {
+   "role": "student",
+   "text": "First one prints \"Hello, Ana!\" since greeting falls back to the default. Second prints \"Hi, Ana!\" because \"Hi\" overrides it, and the third prints \"Hey, Ana!\" since keywords can be passed in any order."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, noted.\n\nQuestion 2: What does this code print, and why?\n\n```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\n\nprint(add_item(\"a\"))\nprint(add_item(\"b\"))\nprint(add_item(\"c\", []))\nprint(add_item(\"d\"))\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints ['a'], then ['b'], then ['c'], then ['d']. Each call that doesn't pass a list gets a brand new empty list from the default, so nothing carries over between calls."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to that one once the diagnostic is done.\n\nQuestion 3: What does this code print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda i=i: i)\n\nprint([f() for f in funcs])\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think the first one prints [0, 1, 2] since each lambda grabs i as the loop goes. The second one also prints [0, 1, 2], and the i=i thing just makes it explicit, though I'm not totally sure why you'd need it."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to the `i=i` question after the diagnostic.\n\nQuestion 4: Which of these calls work and which raise an error? For each one that fails, say why.\n\n```python\ndef connect(host, /, port=5432, *, timeout=10, **options):\n    return host, port, timeout, options\n\nconnect(\"db\", 5433)                   # A\nconnect(host=\"db\")                    # B\nconnect(\"db\", 5433, 30)               # C\nconnect(\"db\", timeout=5, retries=3)   # D\n```"
+  },
+  {
+   "role": "student",
+   "text": "A works since host is \"db\" and port is 5433. C fails because timeout is after the star so it has to be passed by keyword, and D works with retries going into options. B I'm not sure about, I think the slash means host can't be passed by name so it errors, but I don't really use that syntax."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Here's where you are right now.\n\nQ1 and Q4 were solid. On Q4 you got all four right, including B, though you said you weren't sure about it. Q2 and Q3 each contain a wrong prediction. I'm not going to tell you which lines yet, because working that out yourself is the first thing we'll do.\n\n    Topic: Python function default arguments    overall: ███░░░░░░░ 28%\n    ---------------------------------------------------------------------------\n    1. Basic syntax & rules              [██████░░░░]  3/5\n    2. Positional vs. keyword passing    [██████░░░░]  3/5\n    3. When defaults are evaluated       [██░░░░░░░░]  1/5\n    4. Mutable default trap              [░░░░░░░░░░]  0/5\n    5. None / custom sentinels           [░░░░░░░░░░]  0/5  (not tested yet)\n    6. *args, **kwargs, *, /             [██████░░░░]  3/5\n    7. Introspection                     [░░░░░░░░░░]  0/5  (not tested yet)\n    8. Closures, lambdas, i=i trick      [██░░░░░░░░]  1/5\n    ---------------------------------------------------------------------------\n\nSome notes on these levels:\n- Subskills 1, 2 and 6 are at 3 and not 4 because each was checked only once, and on B you were guessing. You'll have to earn the 4s.\n- Your Q2 answer assumes each call gets \"a brand new empty list from the default.\" That assumption is the misconception behind subskills 3 and 4, and it also affects 5 and 8.\n- On Q3 you said you weren't sure why `i=i` would be needed. That's the gap in subskill 8.\n\nI suggest we start with subskill 3 (when defaults are evaluated) and go straight into 4 (the mutable default trap). Everything else on the list depends on them. Want to start there, or would you rather pick a different subskill?"
+  },
+  {
+   "role": "student",
+   "text": "Sure, starting with 3 and 4 sounds good. Though honestly I'm pretty sure about my Q2 answer, so I'm curious which line you think I got wrong there."
+  },
+  {
+   "role": "tutor",
+   "text": "Fair question. If I just point at the line, though, you'd get the result without the reason, and the reason is the whole of subskill 3. So I'd like you to find it yourself. It should only take a couple of questions. If you'd rather skip that, say \"just tell me\" and I'll give you the answer straight.\n\nHere's a smaller experiment that isolates the assumption your Q2 answer depends on. What does this print, line by line and in order?\n\n```python\ndef make_default():\n    print(\"making default\")\n    return []\n\ndef f(x=make_default()):\n    return x\n\nprint(\"defined f\")\nf()\nf()\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints \"defined f\" first, then \"making default\" twice, once for each f() call. The default gets built when you call the function without passing x, so each call should run make_default again."
+  },
+  {
+   "role": "tutor",
+   "text": "Not quite. The part you got wrong is exactly what subskill 3 is about, so let's go through it one line at a time.\n\nPython runs this script from top to bottom, so the `def f(x=make_default()):` line runs before `print(\"defined f\")`. That line contains `make_default()`, which is an ordinary function call with parentheses.\n\nWhen Python executes the `def` line, does it run the `make_default()` call written in it right then, or does it skip the call and save it for later? What in the code makes you think so?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I guess since it has parentheses it would actually run right when the def line executes, like any other call. But then wouldn't that mean \"making default\" prints before \"defined f\", and only once? That feels weird, I always assumed the default part was sort of saved up for later."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right. The output is:\n\n```\nmaking default\ndefined f\n```\n\nand the two `f()` calls print nothing more. You got there by applying a rule you already knew, that a call with parentheses runs when its line executes, and not by remembering a special rule about defaults. That's the right way to think about it.\n\nIt feels weird because of the \"saved up for later\" picture. Here's what actually happens. When `def` runs, Python evaluates each default expression once, right then. It stores the resulting *object* on the function. Every call that leaves out `x` gets that same stored object. No new one is built. The expression isn't saved, only its result.\n\nNow take that back to your Q2 answer. Here's the code again:\n\n```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\n\nprint(add_item(\"a\"))\nprint(add_item(\"b\"))\nprint(add_item(\"c\", []))\nprint(add_item(\"d\"))\n```\n\nUsing what you just worked out, predict all four lines again. For each line that differs from your first answer, say what changed in your reasoning."
+  }
+ ],
+ "usage": [],
+ "conv_id": "984e8650b7"
+}

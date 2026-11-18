@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good plan, a week is enough time to get solid on this. Here's how I'll split Big-O into pieces:\n\n1. What Big-O actually means (upper bound, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops (sequential vs. nested, loops that halve or double)\n4. Analyzing recursion (recursion trees, the master theorem at a basic level)\n5. Space complexity (including call-stack space)\n6. Best/average/worst case and amortized analysis (e.g. dynamic array append)\n7. Complexity of standard data structure operations (hash maps, heaps, BSTs, sorting)\n8. Big-O vs. Big-Theta vs. Big-Omega\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we're through those. Then I'll show you a skill map and suggest where to focus.\n\nQuestion 1: What is the time complexity of this function, and why?\n\n    def f(arr):\n        total = 0\n        for x in arr:\n            total += x\n        for x in arr:\n            for y in arr:\n                total += x * y\n        return total"
+  },
+  {
+   "role": "student",
+   "text": "I'd say O(n^2), maybe even a bit worse than that. The nested loop is n^2 because it hits every pair, and then the first loop adds another n on top, so it's really O(n^2 + n), which I think is meaningfully slower than plain O(n^2)."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'm not going to say yet whether that's right. During the diagnostic I'm only placing you, and we'll come back to this one, especially your claim that O(n^2 + n) is \"meaningfully slower\" than O(n^2).\n\nQuestion 2: What is the time complexity of this function, and why?\n\n    def g(n):\n        count = 0\n        i = n\n        while i > 1:\n            i = i // 2\n            count += 1\n        return count"
+  },
+  {
+   "role": "student",
+   "text": "That one's O(log n) I think, because i gets cut in half every time so it only takes like log2(n) steps to get down to 1. There's just one loop and nothing nested, so it's not n or anything bigger."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. As with the first one, I'm holding off on feedback until the diagnostic is done.\n\nQuestion 3: What are the time complexity and the space complexity of this function, and why?\n\n    def h(n):\n        if n <= 1:\n            return 1\n        return h(n - 1) + h(n - 1)"
+  },
+  {
+   "role": "student",
+   "text": "Time I think is O(2^n), because every call makes two more calls so it doubles at each level, kind of like a tree. For space I'd guess also O(2^n) since all those calls have to be stored somewhere, but I'm less sure about that part."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold feedback on this one too, including the space part you're unsure about.\n\nQuestion 4: In Python, appending to a list with `lst.append(x)` is usually described as O(1). But a list is backed by a fixed-size array, and sometimes that array is full and everything has to be copied into a bigger one, which takes O(n). How can append still be called O(1)? What exactly is that O(1) a claim about?"
+  },
+  {
+   "role": "student",
+   "text": "I think it's because the copying almost never happens, so most appends are just O(1) and the expensive ones are rare. So O(1) is kind of the typical case, like what you get most of the time. I'm not totally sure how you'd prove that though."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That's the last one I'll hold feedback on. One more question and then the diagnostic is done.\n\nQuestion 5: A classmate says, \"Binary search on a sorted array is O(n).\" Another says, \"No, that's wrong, binary search is O(log n).\" Is the first statement true, false, or something else? Explain your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "I'd say the first one is just false, binary search is O(log n) because it halves the search space each step. Saying O(n) is wrong because it doesn't look at every element."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the diagnostic done. Here's where you stand. I'm only telling you what held up and what didn't. I'm not giving you the answers to the ones you missed, because you'll work those out yourself shortly.\n\n- Q1: O(n^2) is correct. Your claim that O(n^2 + n) is \"meaningfully slower\" than O(n^2) is a misconception, and we'll pick it apart.\n- Q2: Correct, and your reasoning was right too (halving gives about log2(n) steps).\n- Q3: The time, O(2^n), is correct, and the tree picture is the right instinct. The space answer is not correct.\n- Q4: Not quite. \"Typical case\" isn't what that O(1) claims. There's a more precise idea behind it.\n- Q5: Not correct. Your reasoning about binary search's speed is fine, but your judgment of the first classmate's statement shows a gap in what Big-O actually means.\n\nEach subskill has only had one check so far, so these levels are deliberately conservative:\n\n    Topic: Big-O notation                         overall: ███░░░░░░░ 28%\n    -----------------------------------------------------------------------\n    1. Meaning of Big-O (bounds, dropping terms) [██░░░░░░░░]  1/5\n    2. Complexity classes and ranking            [████░░░░░░]  2/5\n    3. Analyzing loops                           [██████░░░░]  3/5\n    4. Analyzing recursion                       [████░░░░░░]  2/5\n    5. Space complexity                          [██░░░░░░░░]  1/5\n    6. Best/avg/worst and amortized              [██░░░░░░░░]  1/5\n    7. Data structure operation costs            [░░░░░░░░░░]  0/5  (not tested yet)\n    8. Big-O vs Big-Theta vs Big-Omega           [██░░░░░░░░]  1/5\n    -----------------------------------------------------------------------\n\nI'd suggest starting with subskill 1, what Big-O actually means. Your mistakes on Q1 and Q5 both come from it, and subskills 6 and 8 build on it. Interviewers also catch this kind of mistake quickly. After that we'd move to space complexity (Q3), then amortized analysis (Q4).\n\nDo you want to start with subskill 1, or would you rather begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, let's start with subskill 1. I'm kind of surprised though, I really thought the extra loop on top of the n^2 would count for something."
+  },
+  {
+   "role": "tutor",
+   "text": "That surprise is a good place to start. It's an intuition a lot of people have, so let's test it against actual numbers rather than me just telling you.\n\nTake your function from Q1 and suppose the array has n = 1,000,000 elements. Roughly how many steps does the nested loop take, and roughly how many does the first loop add? What fraction of the total work comes from that extra loop?"
+  },
+  {
+   "role": "student",
+   "text": "The nested loop would be 1,000,000 times 1,000,000, so a trillion steps, and the first loop only adds a million. So that's like one millionth of the total, which is basically nothing... huh, okay, I guess it doesn't really change much."
+  },
+  {
+   "role": "tutor",
+   "text": "Right. Your numbers are correct: the extra loop is about one millionth of the work at that size.\n\nNow push on it from the other side. At n = 10, the nested loop does 100 steps and the first loop adds 10, so the extra loop is about 9% of the total. That isn't nothing. Yet we still write O(n^2), not O(n^2 + n), for every n, including n = 10.\n\nWhat is Big-O actually describing that makes it fine to drop that n term, even when it's a noticeable chunk of the work for small inputs?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "c7768fbbfa"
+}

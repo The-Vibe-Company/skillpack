@@ -1,0 +1,41 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good luck next week! Let's go one question at a time. Answer each one and explain your reasoning, because interviewers usually care more about the reasoning than the final answer.\n\n**Question 1:** What's the time complexity of this function, and why?\n\n```python\ndef has_duplicate(arr):\n    for i in range(len(arr)):\n        for j in range(i + 1, len(arr)):\n            if arr[i] == arr[j]:\n                return True\n    return False\n```\n\nBonus: can you think of a way to make it faster, and what would that cost you in space?\n\nReply with your answer and I'll follow up. Later questions will get harder (amortized analysis, recursion, log factors, best vs. worst case)."
+  },
+  {
+   "role": "student",
+   "text": "It's O(n^2) because there's a loop inside a loop, so you're basically checking every pair of elements. For the bonus, I think you could throw everything into a set and check if it's already there, which would be faster but uses O(n) extra space."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on both counts, and your reasoning is solid.\n\n**Main question:** O(n^2) is right. To make it interview-proof, be precise about the count: the inner loop runs (n-1) + (n-2) + ... + 1 = n(n-1)/2 times. That's still O(n^2), because constants and lower-order terms drop out. Also note this is the *worst case* (no duplicates). If a duplicate shows up early, it returns quickly. Interviewers like it when you name which case you're analyzing.\n\n**Bonus:** Yes. A set gives O(n) time and O(n) extra space. One thing to add: the O(n) time is *average/expected*, because set lookups are O(1) on average for a hash table. Saying \"expected O(n)\" shows you understand that.\n\nIf they push you with \"what if memory is tight?\", a good middle option is to **sort first** and then compare neighbors. That's O(n log n) time, with O(1) extra space if you sort in place (it does modify the input).\n\n---\n\n**Question 2:** What's the time complexity of this function?\n\n```python\ndef count_steps(n):\n    steps = 0\n    i = n\n    while i > 1:\n        i = i // 2\n        steps += 1\n    return steps\n```\n\nAnd a follow-up: what changes if the line `i = i // 2` becomes `i = i - 2`?"
+  },
+  {
+   "role": "student",
+   "text": "I think the first one is O(log n) because you keep cutting i in half until it hits 1, so it's like how many times you can halve n. If it becomes i - 2 then it's O(n/2), which I guess is twice as fast as a normal O(n) loop since it skips every other number."
+  },
+  {
+   "role": "tutor",
+   "text": "**First part:** Correct. O(log n) is right, and \"how many times can you halve n before reaching 1\" is exactly the reasoning an interviewer wants to hear. To be more precise, it runs floor(log2 n) times.\n\n**Follow-up:** Let's look at this one more carefully before I confirm anything.\n\nIn Question 1, you counted n(n-1)/2 comparisons and still called it O(n^2), not O(n^2/2). So here's a narrower question:\n\n**Why did the 1/2 disappear there?** And if you apply that same rule here, what happens to O(n/2)?\n\nThen a second check on the \"twice as fast\" part. Big-O describes how runtime *grows* as n grows. With `i = i - 2`, what happens to the number of steps when you go from n = 1,000 to n = 2,000? Compare that with a plain loop that steps by 1. Does one of them grow differently from the other, or do they grow the same way?"
+  },
+  {
+   "role": "student",
+   "text": "I think the 1/2 went away there because n^2 is so big that halving it doesn't really matter, it's still squared. But with O(n/2) it's just linear, so cutting it in half feels like it actually counts. Like doing half the work is a real speedup, isn't it?"
+  },
+  {
+   "role": "tutor",
+   "text": "You're right that doing half the work is a real speedup on a stopwatch. Hold onto that. Now let's test whether \"n^2 is so big that halving doesn't matter\" really holds up.\n\nTake n = 1,000 in Question 1:\n\n- n^2 = 1,000,000\n- n(n-1)/2 is about 500,000\n\nThat's half the comparisons, which saves about 500,000 operations. In the `i - 2` loop at n = 1,000, halving saves only about 500 steps.\n\n**So here's the narrower question:** if halving saves *more* work in the n^2 case than in the linear case, why would the 1/2 count in the linear case but not in the n^2 case? What's different about the two, other than size?\n\nThen try this, and actually write down the numbers:\n\n| n | steps with `i - 1` | steps with `i - 2` |\n|---|---|---|\n| 1,000 | ? | ? |\n| 2,000 | ? | ? |\n\nWhen n doubles, by what factor does each column grow? Big-O is answering one specific question, and once you've filled in that table, try to say in one sentence what that question is. That sentence will tell you what happens to the 1/2 in both problems."
+  }
+ ],
+ "usage": [],
+ "conv_id": "0da9fd79e7"
+}

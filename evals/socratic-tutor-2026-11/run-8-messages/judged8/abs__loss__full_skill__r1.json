@@ -1,0 +1,17 @@
+{
+ "file": "loss__full_skill__r1.json",
+ "scenario": "loss",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 7,
+  "why": "The tutor ran a real diagnostic first and then used Socratic questions so the learner found the asymmetry ($100 -> $50 -> $75) on their own, but the transcript ends before the learner says that a +100% gain is needed, and the tutor's repeated refusal to give feedback during the diagnostic is somewhat rigid."
+ },
+ "usage": {}
+}

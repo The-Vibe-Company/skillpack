@@ -1,0 +1,73 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Here's how percentage gains and losses work, starting from the basics and moving to the parts that catch most people out.\n\n**1. The basic formula**\n\nPercentage change = (New value − Old value) / Old value × 100\n\nYou always divide by the starting value.\n- You buy at $100 and it rises to $120: (120 − 100) / 100 = **+20%**\n- You buy at $100 and it falls to $80: (80 − 100) / 100 = **−20%**\n\n**2. Gains and losses aren't symmetric**\n\nThis is the most important idea. A loss shrinks the base you're working from, so you need a bigger percentage gain to get back to where you started.\n\n- $100 drops 50% to $50. To get back to $100 you have to gain $50 on a $50 base, which is **+100%**.\n\nRecovery gain needed = L / (1 − L), where L is the loss as a decimal:\n\n| Loss | Gain needed to break even |\n|------|---------------------------|\n| 10%  | 11.1% |\n| 20%  | 25% |\n| 33%  | 50% |\n| 50%  | 100% |\n| 75%  | 300% |\n| 90%  | 900% |\n\nThe same thing works in reverse: +50% followed by −50% does not bring you back to even. $100 → $150 → $75, so you end down 25%.\n\n**3. Successive changes multiply, they don't add**\n\nTo combine several periods, turn each change into a growth factor (1 + r) and multiply them:\n\n- +10%, then −10%: 1.10 × 0.90 = 0.99, which is **−1%**, not 0%.\n- +20%, +30%, −15%: 1.20 × 1.30 × 0.85 = 1.326, which is **+32.6%** (adding them would give 35%).\n\nThe order doesn't affect the final result, but the sequence does affect how bumpy the ride feels.\n\n**4. Average return vs. actual (compound) return**\n\nSuppose you get +50% one year and −50% the next.\n- Arithmetic average: (50 − 50) / 2 = 0%. That sounds like you broke even.\n- What you actually earned: 1.5 × 0.5 = 0.75, so you lost 25%.\n\nThe figure that reflects reality is the **geometric average**, also called CAGR (compound annual growth rate):\n\nCAGR = (Ending value / Starting value)^(1/years) − 1\n\nHere that's 0.75^(1/2) − 1 ≈ **−13.4% per year**.\n\nThe general rule is that volatility drags compound returns below the simple average. Roughly, geometric ≈ arithmetic − (variance / 2). Be careful when a fund advertises its \"average annual return\"; check which average they mean.\n\n**5. Percentage points vs. percent**\n\nIf a return goes from 4% to 6%, that's a rise of **2 percentage points**, but a **50% increase** in the return. Mixing these two up is a very common mistake.\n\n**6. Percentages of your account vs. of a position**\n\nIf a stock that makes up 20% of your portfolio rises 10%, your portfolio rises about 20% × 10% = **2%**. A portfolio's return is the weighted average of what each holding returned.\n\n**7. Leverage amplifies both directions**\n\nWith 2× leverage, a 10% move in the asset becomes roughly a 20% move in your equity. Because of the asymmetry in section 2, losses hurt more than gains help. Leveraged ETFs that reset daily also lose value over time in choppy markets: an index that goes +10%, −10% ends at −1%, while a 2× daily fund goes +20%, −20% and ends at 1.2 × 0.8 = 0.96, which is **−4%**.\n\n**8. Things that change your real return**\n\n- **Fees:** a 1% annual fee compounds too. Over 30 years at 7% versus 6%, $10,000 grows to about $76,000 versus $57,000.\n- **Dividends:** the price change alone understates total return. Look at \"total return\" figures.\n- **Inflation:** real return ≈ nominal return − inflation (exact version: (1 + nominal) / (1 + inflation) − 1).\n- **Taxes:** your return after tax is what you actually keep.\n- **Contributions and withdrawals:** if you add or take out money, simple start-to-end percentages become misleading. Time-weighted return measures how the investment performed, and money-weighted return (IRR) measures how *you* did given when you added or removed cash.\n\n**Quick self-test**\n\n1. A stock falls 25%. What gain gets you back to even?\n2. Returns of +40%, −20%, +10%. What's the total return?\n3. $10,000 grows to $20,000 over 6 years. What's the CAGR?\n\n(Answers: 33.3%; 1.4 × 0.8 × 1.1 = 1.232, which is +23.2%; 2^(1/6) − 1 ≈ 12.2% per year.)\n\nIf you want to go further, I can work through a real example from your own portfolio or go deeper into any of these sections."
+  },
+  {
+   "role": "student",
+   "text": "Oh wow, I always figured if my stock dropped 50% I just needed it to go up 50% to be back where I started. But okay, $100 to $50 and then you need another $50 on a $50 base, so that's 100%. I think I get it now."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got it. The key step is the one you named: after the drop, the base is $50, not $100. So a 50% gain on $50 only gets you to $75. You need the full $50, and that's 100% of $50.\n\nA lot of people make the same assumption you did. It sounds reasonable because the drop and the recovery are the same number of dollars, $50 down and $50 up. But a percentage always depends on which base you divide by, and after a loss the base is smaller.\n\nTo make it stick, try one without the table: if a stock falls 20%, what percentage gain gets it back to even? (Start at $100 and work it out the same way.)"
+  },
+  {
+   "role": "student",
+   "text": "Okay, so $100 drops 20% to $80, and I need $20 to get back to $100. $20 out of $80 is a quarter, so 25%?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, 25% is right. You went through it the right way: you found the new base ($80), worked out the dollar gap ($20), and divided the gap by the new base, not the old one. That matches the formula too: 0.20 / (1 − 0.20) = 0.20 / 0.80 = 25%.\n\nNotice the pattern so far. A 20% drop needs 25% to recover, and a 50% drop needs 100%. The deeper the loss, the faster the recovery number grows, which is why big drawdowns are so hard to come back from.\n\nWant to try one going the other way? A stock rises 25%, then falls 20%. Where does it end up compared to where it started?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, $100 goes up 25% to $125, then 20% of $125 is $25, so it drops back to $100. Huh, so it ends up exactly where it started?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, exactly right. It ends at $100, back where it started. As growth factors: 1.25 × 0.80 = 1.00.\n\nThis is the 20% / 25% pair from before, just in the opposite order. A 20% drop needs a 25% gain to recover, so a 25% gain is undone by a 20% drop. The two numbers are different because each one is calculated on a different base. The 25% is taken from $100, and the 20% is taken from $125, but both work out to $25.\n\nThat's also why +10% followed by −10% doesn't bring you back to even. A gain and a loss of the same percentage don't cancel. To cancel each other, the loss percentage has to be smaller than the gain percentage. The exact relationship is: a gain of G is undone by a loss of G / (1 + G). Here that's 0.25 / 1.25 = 20%.\n\nWant to test it? A stock rises 100%. What percentage drop takes it back to where it started?"
+  },
+  {
+   "role": "student",
+   "text": "So $100 doubles to $200, and getting back to $100 means losing $100 out of $200, which is half. So a 50% drop wipes out a 100% gain? That's kind of scary actually."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's exactly right. $100 doubles to $200, and a 50% drop takes $100 off a $200 base, which puts you back at $100. The formula agrees: 1.00 / (1 + 1.00) = 0.50, so a 50% loss cancels a 100% gain. As growth factors, 2.0 × 0.5 = 1.0.\n\nIt does feel scary, and it's worth seeing why. It's the same asymmetry you've been working with all along. When a position grows, each later percentage move applies to a bigger base, so the same percentage drop takes away more dollars. You may also have noticed this is the 50% / 100% pair from the table, just in the opposite order. A 50% drop needs a 100% gain to recover, and a 100% gain is wiped out by a 50% drop.\n\nA few practical points help put this in proportion:\n\n- **It works both ways.** The percentages are lopsided, but the dollars aren't. Your $100 gain and your $100 loss are the same amount of money. The asymmetry describes how percentages behave. It doesn't mean losses are secretly bigger in dollar terms.\n- **The real risk is big drawdowns.** Small swings barely matter (+10% then −9.1% cancels out). Large drops are what get disproportionately hard to recover from, which is why investors care so much about avoiding deep losses.\n- **This is why people diversify, size positions carefully, and take some profits.** If one holding has doubled and is now a big share of your portfolio, a 50% fall in that one stock hurts much more than it would have when it was small.\n\nYou now have both directions down:\n- After a loss of L, you need a gain of L / (1 − L) to recover.\n- After a gain of G, a loss of G / (1 + G) wipes it out.\n\nWant to try putting it together? Section 4 said +50% then −50% leaves you down 25%. Using what you just worked out, can you explain *why* in terms of the base each percentage is applied to?"
+  },
+  {
+   "role": "student",
+   "text": "Okay so the 50% gain is taken on $100, which gets me to $150, but then the 50% drop is taken on $150, which is $75 gone. So the drop eats more dollars than the gain added because it's working off a bigger base, and I end at $75."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's exactly it. The +50% is worked out on $100, so it adds $50. The −50% is worked out on $150, so it takes away $75. The percentages are the same, but the drop applies to a bigger base and removes $25 more than the gain added. That's how you end at $75, down 25%. As growth factors: 1.5 × 0.5 = 0.75.\n\nThat's also why the order doesn't matter. Start with the drop instead: $100 falls 50% to $50, then rises 50% to $75. Now the gain is the one applied to the smaller base ($50), so it only adds $25 after a $50 loss. Either way you end at $75. Whichever move happens second is applied to a base the first move has already changed.\n\nSo you can now explain three things from one idea, that every percentage is taken from the current base:\n- why losses need bigger gains to recover (L / (1 − L)),\n- why gains are wiped out by smaller losses (G / (1 + G)),\n- why equal up and down percentages always leave you behind: (1 + r)(1 − r) = 1 − r², which is always less than 1. For ±50% that's 1 − 0.25 = 0.75. For ±10% it's 1 − 0.01 = 0.99, which is the −1% from section 3.\n\nThat last formula also shows why volatility hurts compounding. The bigger the swings (r), the bigger the r² you lose, even if the \"average\" return is zero.\n\nWant to try one with that formula? If a stock goes up 20% and then down 20%, where does it end up, and how much would you lose with ±30% instead?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, $100 up 20% is $120, then 20% of $120 is $24, so I drop to $96. So I end up down 4%, which matches 1 minus 0.2 squared."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right. $100 goes up to $120, the 20% drop takes $24 off that $120 base, and you end at $96, down 4%. It matches the formula: 1 − 0.2² = 1 − 0.04 = 0.96. Checking the step-by-step dollars against the formula like you did is a good habit.\n\nNotice what the formula tells you: going from ±10% to ±20% doubled the swing size, but the loss went from 1% to 4%, four times as much. The loss grows with the square of the swing.\n\nThere's still the second half of the question: what happens with ±30%? Try predicting it from the formula first, then check it with dollars starting from $100."
+  },
+  {
+   "role": "student",
+   "text": "Formula says 1 minus 0.3 squared is 1 minus 0.09, so 0.91, down 9%. Checking it: $100 up 30% is $130, then 30% of $130 is $39, so I land at $91. Yep, down 9%, which is way worse than the 4% from the 20% swings."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right, and you did it the best way: predicted from the formula first, then checked with dollars. Both give $91, down 9%.\n\nLook at the pattern you've built:\n\n| Swing | Ends at | Loss |\n|-------|---------|------|\n| ±10% | $99 | 1% |\n| ±20% | $96 | 4% |\n| ±30% | $91 | 9% |\n\nEach time the swing grows, the loss grows with its square: 1, 4, 9. Tripling the swing from 10% to 30% made the loss nine times bigger. That's the \"volatility drag\" from section 4 in action. Two investments can have the same average return, but the bumpier one ends up with less money.\n\nThis is also the leveraged ETF problem from section 7. An index that goes +10%, −10% loses 1%, but a 2× fund turns that into ±20% and loses 4%. Doubling the leverage quadrupled the drag.\n\nOne last challenge to tie it together: a stock goes up 30% one year and down 30% the next. What's its arithmetic average return, and what's its actual annual compound return (CAGR)? (Hint: you already know where it ends after two years.)"
+  }
+ ],
+ "usage": [],
+ "conv_id": "2878d94b69"
+}

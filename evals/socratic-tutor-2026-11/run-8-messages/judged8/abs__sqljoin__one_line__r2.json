@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__one_line__r2.json",
+ "scenario": "sqljoin",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 5,
+  "overall": 6,
+  "why": "The tutor gave away the ON-vs-WHERE resolution in an opening lecture before checking what the learner knew. Later, the Dan follow-up used good Socratic scaffolding and the learner reasoned through the edge case themselves, but many turns were still heavy on exposition, and one paragraph about Ana's orders was confusing."
+ },
+ "usage": {}
+}

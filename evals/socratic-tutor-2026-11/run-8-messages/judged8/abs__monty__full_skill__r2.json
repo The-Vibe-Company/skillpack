@@ -1,0 +1,17 @@
+{
+ "file": "monty__full_skill__r2.json",
+ "scenario": "monty",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 8,
+  "why": "The tutor diagnosed carefully and guided the learner, through enumeration and the 100-door and random-host contrasts, to find for themselves that 50 of 150 is not half, without ever stating 2/3; the transcript ends before the learner states the full resolution, and the long skill-map message is the one stretch of heavy exposition."
+ },
+ "usage": {}
+}

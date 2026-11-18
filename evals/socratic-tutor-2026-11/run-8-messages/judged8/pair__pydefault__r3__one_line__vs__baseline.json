@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B had the learner predict before explaining, which brought out the misconception (dicts reset, lists are special), and then used narrow Socratic questions so the learner worked out the shared-object rule themselves, while A gave the answer upfront in a long lecture before the learner did any reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

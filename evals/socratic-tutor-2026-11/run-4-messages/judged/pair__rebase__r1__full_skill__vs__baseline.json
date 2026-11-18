@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the learner's belief that rebase keeps the same hashes and then has the learner test it through the push consequence, while B corrects the misconception directly with a long explanation and does most of the reasoning for the learner."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

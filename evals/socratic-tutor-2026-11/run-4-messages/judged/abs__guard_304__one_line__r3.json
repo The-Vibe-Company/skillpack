@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__one_line__r3.json",
+ "scenario": "guard_304",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply immediately states that 304 means Not Modified and explains conditional requests and caching, without quizzing the user or proposing a lesson."
+ },
+ "usage": {}
+}

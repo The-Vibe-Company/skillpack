@@ -1,0 +1,73 @@
+{
+ "scenario": "monty",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Fair enough. The usual \"1/3 vs 2/3\" line often sounds like a trick. Let's build it up so you can check each step yourself.\n\n**The setup, stated precisely**\n\nThere are 3 doors: one car, two goats. You pick a door. Then the host, who **knows where the car is**, opens one of the *other* two doors, and he **always shows a goat**. He then offers you the chance to switch to the last closed door.\n\nThose bold parts are the whole puzzle. If you skip them, the answer changes (more on that at the end).\n\n**Step 1: Look at what switching actually does**\n\nForget probabilities for a moment and follow the strategy \"always switch\":\n\n- If your first pick was a **goat**, the host has to open the *other* goat door, since he can't open yours and won't show the car. The only door left is the car. Switching **wins**.\n- If your first pick was the **car**, the host opens either goat door, and switching moves you to a goat. Switching **loses**.\n\nSo \"always switch\" wins exactly when your first pick was wrong. Your first pick is wrong 2 times out of 3, so switching wins 2/3 of the time. Staying wins only when your first pick was right, which is 1/3.\n\nThat's the core argument. The host doesn't \"add\" probability. He turns your likely-wrong first guess into a guaranteed win when you switch.\n\n**Step 2: List every case**\n\nSay you always pick Door 1:\n\n| Car is behind | Host opens | Stay gets | Switch gets |\n|---|---|---|---|\n| Door 1 | 2 or 3 | Car | Goat |\n| Door 2 | 3 (forced) | Goat | Car |\n| Door 3 | 2 (forced) | Goat | Car |\n\nEach row is equally likely (1/3). Switching wins in 2 of the 3 rows.\n\n**Step 3: Why \"two doors left, so 50/50\" is wrong**\n\nThis is usually the sticking point. \"50/50\" assumes the two closed doors are interchangeable, and they aren't:\n\n- **Your door** was chosen by you, at random, before you knew anything. The host was never allowed to open it, so its surviving tells you nothing new. It keeps its 1/3.\n- **The other door** survived a filter. The host could have opened it, and he chose not to. When the car is behind one of the two doors you didn't pick, he's *forced* to leave that one shut. Surviving that filter is evidence.\n\nTwo options being left doesn't make them equally likely. A lottery ticket is either a winner or not, but that isn't 50/50.\n\n**Step 4: Make it obvious with 100 doors**\n\nYou pick 1 of 100 doors. The host, who knows where the car is, opens 98 of the others, all goats, and leaves one door shut, say #73.\n\nDo you really think your random first pick is as good as the one door he carefully avoided out of 99? Your door had a 1/100 chance from the start, and nothing has changed that. Door #73 now carries the other 99/100. Three doors is the same thing on a smaller scale; it just feels less obvious.\n\n**Step 5: Don't trust me, test it**\n\nGet three playing cards: one ace (the car) and two others. Have a friend shuffle them face down and look at them. You pick one, they flip over a non-ace from the other two, and you switch. Do it 30 times and count. You'll win about 20.\n\nOr run this in Python:\n\n```python\nimport random\nstay = switch = 0\nfor _ in range(100_000):\n    car, pick = random.randrange(3), random.randrange(3)\n    opened = random.choice([d for d in range(3) if d != pick and d != car])\n    other = next(d for d in range(3) if d != pick and d != opened)\n    stay += pick == car\n    switch += other == car\nprint(stay / 100_000, switch / 100_000)   # ~0.333, ~0.667\n```\n\n**The fine print, where the skepticism is sometimes right**\n\nThe 2/3 answer depends on the host's rules. Change them and the answer changes:\n\n- **The host doesn't know where the car is** and happens to open a goat door: then it really is 50/50. A random reveal that could have shown the car carries different information.\n- **The host only offers a switch when you picked the car** (a tricky host): switching always loses.\n- **The host always reveals a goat and always offers the switch** (the standard puzzle): switch, 2/3.\n\nSo if the usual explanation felt like it was skipping something, it probably was. It usually doesn't say clearly that the host's knowledge and fixed rules are what make the open door informative.\n\nIf one of these steps still doesn't sit right, tell me which one and we'll dig into it."
+  },
+  {
+   "role": "student",
+   "text": "Okay, the 100 doors thing got me. If he carefully skips one door out of 99, that door obviously isn't a coin flip with my random pick, so I get why switching wins 2/3 with three doors too."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's it. The door he skips is the result of his choice, not of chance. Your door never went through that filter.\n\nWith three doors it's the same thing on a smaller scale. He skips one door out of the two you didn't pick. Your door keeps its original 1/3, and the 2/3 that was spread across the other two doors now sits entirely on the one he left shut.\n\nTo check that you've got it, try this variation. Take the 100 doors again, but the host **doesn't know** where the car is. He opens 98 doors at random, and by luck they're all goats. Should you switch now?\n\nThe answer is that it doesn't matter. It's 50/50. His \"skip\" was luck, not knowledge, so that door didn't survive a real filter. If that makes sense to you, you understand the problem better than most people who just remember \"always switch.\""
+  },
+  {
+   "role": "student",
+   "text": "Huh, so if he's opening doors blindly and just gets lucky, the leftover door didn't really pass any filter, so it's 50/50. Okay, I get it: what matters is that he knows and is forced to avoid the car, not just that two doors are left."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. Two doors being left tells you nothing on its own. What matters is how they came to be left. A host who knows where the car is and must avoid it leaves a door that carries information. A host who opens doors blindly and gets lucky leaves a door that doesn't.\n\nOne way to keep it straight: ask \"could this door have been opened, and if not, why not?\" Your door was off-limits from the start, so it surviving tells you nothing. The other door was kept shut on purpose (knowing host) or by luck (blind host), and only \"on purpose\" counts as evidence.\n\nYou've got it. Most people stop at \"always switch.\" You know why it works and when it doesn't."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, that question about \"could this door have been opened, and why not\" is the piece I was missing. Thanks, I'm convinced now, I'll stop arguing for 50/50."
+  },
+  {
+   "role": "tutor",
+   "text": "Glad it helped. And to be fair to your 50/50 instinct, it wasn't wrong in general. It's the right answer for the blind host. It just doesn't fit the standard puzzle, where the host knows where the car is. Most people who say 50/50 have never asked how the remaining doors came to be left.\n\nThat same question works well outside this puzzle. Whenever something reaches you after a filter, like survey responses, success stories, or search results, it's worth asking how it got through."
+  },
+  {
+   "role": "student",
+   "text": "Ha, fair, survivorship bias is basically the same trap. I'll try the three-card thing with a friend anyway, just to see the 20-out-of-30 with my own eyes."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, it's the same trap. You're judging what got through a filter without asking how the filter works.\n\nTwo tips so the card test works:\n\n- **Your friend has to look at the cards and never flip the ace.** If they flip one of the other two cards at random, you're testing the blind host, and you'll get closer to 50/50 once you throw out the games where the ace gets revealed. That would be a good second experiment, actually.\n- **Don't panic if you don't get exactly 20.** With 30 games, anything from about 15 to 25 wins is normal luck. If you want a clearer result, have your friend write down what \"stay\" would have won each round too. Switching should beat staying by about 2 to 1.\n\nHave fun with it, and let me know what you get."
+  },
+  {
+   "role": "student",
+   "text": "Good call on having them write down what \"stay\" would've won, that's way less noisy than just counting my own wins. Might do the blind-host version after too, just to watch it drift to 50/50."
+  },
+  {
+   "role": "tutor",
+   "text": "Nice, doing both is a good plan. Seeing them next to each other will make the point better than any explanation.\n\nOne thing to know before the blind-host round: your friend should flip one of the other two cards **without looking**, for example by tossing a coin to choose. When the ace gets flipped, that game doesn't count, so write it down as \"voided\" and move on. That will happen in about 1 out of 3 games, so play around 45 rounds to end up with about 30 that count. In the games that count, stay and switch should come out about even.\n\nThe voided games are actually the interesting part. Those are exactly the games where switching would have won. With the knowing host, he never flips the ace, so those wins all go to switching. With the blind host, they get thrown out. That's where the 2/3 goes.\n\nEnjoy the experiment!"
+  },
+  {
+   "role": "student",
+   "text": "Oh nice, so the voided games are where the missing 2/3 goes, that ties it together. I'll do 45 rounds of the blind one and report back."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly. The blind host doesn't make your first pick any better. He just throws out the games where switching would have won, and what's left comes out even.\n\nOne small thing: count the voided games too. You should get about 15 out of 45. That number is the gap between the two versions, so it's a nice extra check.\n\nLooking forward to hearing how it goes."
+  },
+  {
+   "role": "student",
+   "text": "Got it, I'll track the voided count too, around 15 out of 45 should match up. Thanks, this was way better than the usual \"just trust the 2/3\" line."
+  },
+  {
+   "role": "tutor",
+   "text": "You're welcome, and thanks for pushing back. Being skeptical is why you ended up understanding it instead of just remembering the answer.\n\nQuick recap for game night:\n\n- **Knowing host (about 30 rounds):** switching should win about twice as often as staying.\n- **Blind host (about 45 rounds):** about 15 voided, and stay and switch roughly even in the rest.\n\nSmall samples are noisy, so don't worry if the numbers are a bit off. Look for the overall pattern. Have fun, and I'd like to hear how it turns out."
+  }
+ ],
+ "usage": [],
+ "conv_id": "56873b092c"
+}

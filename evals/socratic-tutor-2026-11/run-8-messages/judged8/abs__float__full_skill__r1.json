@@ -1,0 +1,17 @@
+{
+ "file": "float__full_skill__r1.json",
+ "scenario": "float",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 6,
+  "why": "The tutor diagnosed carefully, used well-sequenced Socratic questions, and tied its praise to specific correct points, but its opening syllabus already said 0.1 'isn't exactly 0.1' and that stored values are rounded, and the transcript ends before the learner gives up the 'exact 0.1' or 'JavaScript bug' beliefs."
+ },
+ "usage": {}
+}

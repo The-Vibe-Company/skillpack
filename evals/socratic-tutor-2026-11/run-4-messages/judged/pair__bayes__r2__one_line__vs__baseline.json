@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A drew out the learner's base-rate misconception and guided them with targeted questions to compute the posterior themselves, while B lectured at length and simply handed over the full worked answer when the learner's actual 9%-false-positive misconception came up."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

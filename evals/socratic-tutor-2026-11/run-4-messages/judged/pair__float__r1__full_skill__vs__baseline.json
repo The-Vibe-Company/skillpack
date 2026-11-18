@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A gets the learner to state the misconception and reason through the 1/3 and terminating-fraction questions themselves, while B opens with a long lecture that corrects the JavaScript-bug and exact-0.1 beliefs by fiat before the learner has reasoned at all, even though B's later prediction exercises are good."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

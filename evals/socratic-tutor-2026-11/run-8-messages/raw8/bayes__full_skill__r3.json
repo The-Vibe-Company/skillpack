@@ -1,0 +1,73 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Since you keep getting it wrong, the goal is to find out exactly where it breaks for you, not to hand you the formula again.\n\nHere's how I'm splitting Bayes' theorem into parts:\n\n1. Reading conditional probability: what P(A|B) actually means\n2. Telling P(A|B) apart from P(B|A) (mixing these up is the classic mistake)\n3. Base rates / priors: why the starting probability matters\n4. Likelihoods: how strongly the evidence points one way\n5. The denominator: total probability of the evidence\n6. Putting it together on word problems (medical tests, spam filters, etc.)\n7. Updating step by step as new evidence comes in\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. Don't look anything up. A rough honest answer tells me more than a polished guessed one.\n\nQuestion 1: In your own words, what does P(rain | cloudy) mean, and would you expect it to be bigger, smaller, or the same as P(cloudy | rain)? Why?"
+  },
+  {
+   "role": "student",
+   "text": "I think P(rain | cloudy) is the chance it rains given that it's cloudy out. I'd guess it's smaller than P(cloudy | rain), because when it's raining it's basically always cloudy, but plenty of cloudy days stay dry."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right, and your reason is the correct one: the two conditionals ask about different groups of days. So you can at least tell them apart on an everyday example. We'll see later whether that holds up once there are numbers involved.\n\nQuestion 2: A disease affects 1 in 1,000 people. A test for it catches 99% of people who have it, and it wrongly comes back positive for 5% of people who don't. You test positive. Roughly how likely is it that you actually have the disease? A gut estimate is fine. Then tell me briefly how you got there."
+  },
+  {
+   "role": "student",
+   "text": "Gut says about 99%, maybe a touch less because of that 5% false positive thing, so call it 95%. The test catches 99% of sick people, so if it says I'm positive I'm pretty much sick."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I won't say yet whether that's right. We're still in the diagnostic, and I'll come back to this exact problem once we start working.\n\nQuestion 3: Same setup, but use counts this time. Picture 100,000 people taking the test. About how many of them have the disease, and how many of those test positive? About how many don't have it, and how many of those test positive? Give me the two numbers of positives."
+  },
+  {
+   "role": "student",
+   "text": "Okay, 1 in 1,000 of 100,000 is 100 people with the disease, and 99% of those is 99 positives. The other 99,900 don't have it, and 5% of that is about 4,995 positives, so 99 and roughly 5,000."
+  },
+  {
+   "role": "tutor",
+   "text": "Both counts are right: 99 true positives and about 4,995 false positives.\n\nQuestion 4: Stay with your 100,000 people. Everyone who got a positive result is now in one room. If you pick one person from that room at random, roughly how likely is it that they actually have the disease? Give a number and show how you got it."
+  },
+  {
+   "role": "student",
+   "text": "Okay, so the room has 99 plus about 4,995, roughly 5,100 people, and only 99 of them are actually sick. That's 99 out of 5,100, so about 2%?? Wait, that totally contradicts my 95% from before, so which one is right?"
+  },
+  {
+   "role": "tutor",
+   "text": "The 2% is right. More precisely it's 99 out of 5,094, about 1.9%. The 95% was a gut guess. The 2% you worked out step by step from counts that you checked. When those two disagree, the counts win.\n\nThat's the end of the diagnostic. You just found the mistake you keep making, so it's a good place to stop. Here's where I'd place you:\n\n    Topic: Bayes' theorem                   overall: ███░░░░░░░ 34%\n    -----------------------------------------------------------------\n    1. Reading P(A|B)           [██████░░░░]  3/5\n    2. P(A|B) vs P(B|A)         [████░░░░░░]  2/5  <- proposed focus\n    3. Base rates / priors      [██░░░░░░░░]  1/5  <- proposed focus\n    4. Likelihoods              [████░░░░░░]  2/5\n    5. The denominator          [████░░░░░░]  2/5\n    6. Word problems            [████░░░░░░]  2/5\n    7. Step-by-step updating    [░░░░░░░░░░]  0/5  (not tested yet)\n    -----------------------------------------------------------------\n\nHere's why. On the rain example you kept the two conditionals apart, and when you counted people you got the right answer. But your gut answer to the test question skipped the 1-in-1,000 completely. So I'd start with 2 and 3 together, because that's where your 95% came from. If you'd rather start somewhere else, tell me.\n\nLet's begin there. Your gut answer was built on \"the test catches 99% of sick people.\" Write that 99% as a conditional probability, in the form P(___ | ___). Then tell me: is that the same thing the question asked you for?"
+  },
+  {
+   "role": "student",
+   "text": "I guess it's P(positive | sick), the chance of testing positive if you have it. And no, the question was asking the flip of that, P(sick | positive), which is what I just worked out as about 2%."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. Your gut answered P(positive | sick) when the question asked for P(sick | positive). Swapping the two like that is the mistake you keep making.\n\nNow let's look at why the two numbers ended up so far apart. Nothing about the test changed between your 95% and your 2%. What your count used that your gut didn't was the 1 in 1,000.\n\nSo change only that one number and keep everything else the same: the test still catches 99% of sick people and still gives a false positive to 5% of healthy people. This time, though, the disease affects 1 in 10 people. Before you calculate anything, will P(sick | positive) go up or down compared with the 2%, and why? Then use 1,000 people to work out roughly what it becomes."
+  },
+  {
+   "role": "student",
+   "text": "Should go up, since way more people actually have it so more of the positives are real. With 1,000 people that's 100 sick, 99 test positive, and 900 healthy with 5% false positives is 45, so 99 out of 144, roughly 69%?"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. 99 out of 144 is about 68.75%, so roughly 69%. Your prediction was right and so was your reason. With more sick people, more of the room is real positives. The test itself didn't change at all. Only the base rate did, and that took the answer from about 2% to about 69%.\n\nThat's one solid check on base rates. I won't move your level yet, because I want to see it hold up on a different kind of question.\n\nGo back to the original disease, 1 in 1,000. The test company has budget for one upgrade:\n\n(a) raise the catch rate from 99% to 100%, or\n(b) cut the false-positive rate from 5% to 1%.\n\nWhich upgrade does more for P(sick | positive)? Predict first and explain why. Then check your prediction with your 100,000 people."
+  },
+  {
+   "role": "student",
+   "text": "My gut says (a), catching every sick person sounds like the bigger deal. But checking with 100,000: (a) gives 100 real out of about 5,095 positives, still around 2%, while (b) gives 99 real out of 99 plus 999, so about 9%. Huh, so (b) wins by a lot, because the false positives from all those healthy people are what's swamping the room?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, and your numbers are right. (a) gives 100 out of about 5,095, which is still about 2%. (b) gives 99 out of 1,098, about 9%. Your reason is also right. Upgrade (a) adds exactly one true positive to the room. Upgrade (b) takes out about 4,000 false positives. When 999 out of every 1,000 people are healthy, even a small error rate on that group adds up to far more people than the whole sick group.\n\nYour gut was wrong again, though, and in the same direction as before. Counting caught it both times, which is good. But you have now answered two base-rate questions correctly by counting, so I'm moving base rates up one level. It stays below \"can do independently\" until your predictions start agreeing with your counts.\n\n    Topic: Bayes' theorem                   overall: ████░░░░░░ 37%\n    -----------------------------------------------------------------\n    1. Reading P(A|B)           [██████░░░░]  3/5\n    2. P(A|B) vs P(B|A)         [████░░░░░░]  2/5  <- current focus\n    3. Base rates / priors      [████░░░░░░]  2/5  <- current focus\n    4. Likelihoods              [████░░░░░░]  2/5\n    5. The denominator          [████░░░░░░]  2/5\n    6. Word problems            [████░░░░░░]  2/5\n    7. Step-by-step updating    [░░░░░░░░░░]  0/5  (not tested yet)\n    -----------------------------------------------------------------\n\nYour first gut answer (95%) and this one (pick upgrade a) went wrong in the same way. In both cases, which group of people was your gut looking at, which group did it ignore, and why does ignoring that group cause so much damage when the disease is rare?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "7d5633aa6f"
+}

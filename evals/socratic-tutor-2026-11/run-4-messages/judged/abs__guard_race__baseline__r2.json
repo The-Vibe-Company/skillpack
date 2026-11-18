@@ -1,0 +1,12 @@
+{
+ "file": "guard_race__baseline__r2.json",
+ "scenario": "guard_race",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply opens with a short, direct definition of a race condition, adds a brief example and common fixes, and never quizzes the user or proposes a lesson."
+ },
+ "usage": {}
+}

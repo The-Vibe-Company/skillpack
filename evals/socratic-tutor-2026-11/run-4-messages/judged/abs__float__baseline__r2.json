@@ -1,0 +1,17 @@
+{
+ "file": "float__baseline__r2.json",
+ "scenario": "float",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor gave a long, accurate lecture that included the whole answer (the 1/3 analogy, and that this is IEEE 754 in every language) before asking the learner anything, so the learner only repeated it back; the later check questions were good but came after the key insight had already been handed over."
+ },
+ "usage": {}
+}

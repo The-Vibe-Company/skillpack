@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the learner's 50%-recovery misconception and related errors through diagnostic questions and lets the learner build the multiplier reasoning, while B opens with a lecture that hands over the +100% answer before the learner reasons about it, even though the learner does good practice problems afterward."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

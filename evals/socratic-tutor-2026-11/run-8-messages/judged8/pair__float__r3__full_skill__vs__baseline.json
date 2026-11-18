@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B gets the learner to surface the 'stores 0.1 exactly' and 'JavaScript-only' misconceptions and to prove for themselves that 1/3 cannot end in decimal, leading them to connect it to 0.1 in binary on their own, whereas A explains everything up front and the learner just agrees, even though B's long diagnostic is less efficient."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

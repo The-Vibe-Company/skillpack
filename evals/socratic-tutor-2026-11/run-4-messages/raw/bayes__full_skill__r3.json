@@ -1,0 +1,41 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Since you keep getting it wrong, the goal is to find out exactly where it breaks for you, not to hand you the formula again.\n\nHere's how I'm splitting Bayes' theorem into parts:\n\n1. Reading conditional probability: what P(A|B) actually means\n2. Telling P(A|B) apart from P(B|A) (mixing these up is the classic mistake)\n3. Base rates / priors: why the starting probability matters\n4. Likelihoods: how strongly the evidence points one way\n5. The denominator: total probability of the evidence\n6. Putting it together on word problems (medical tests, spam filters, etc.)\n7. Updating step by step as new evidence comes in\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. Don't look anything up. A rough honest answer tells me more than a polished guessed one.\n\nQuestion 1: In your own words, what does P(rain | cloudy) mean, and would you expect it to be bigger, smaller, or the same as P(cloudy | rain)? Why?"
+  },
+  {
+   "role": "student",
+   "text": "I think P(rain | cloudy) is the chance it rains given that it's cloudy out. I'd guess it's smaller than P(cloudy | rain), because when it's raining it's basically always cloudy, but plenty of cloudy days stay dry."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right, and your reason is the correct one: the two conditionals ask about different groups of days. So you can at least tell them apart on an everyday example. We'll see later whether that holds up once there are numbers involved.\n\nQuestion 2: A disease affects 1 in 1,000 people. A test for it catches 99% of people who have it, and it wrongly comes back positive for 5% of people who don't. You test positive. Roughly how likely is it that you actually have the disease? A gut estimate is fine. Then tell me briefly how you got there."
+  },
+  {
+   "role": "student",
+   "text": "Gut says about 99%, maybe a touch less because of that 5% false positive thing, so call it 95%. The test catches 99% of sick people, so if it says I'm positive I'm pretty much sick."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I won't say yet whether that's right. We're still in the diagnostic, and I'll come back to this exact problem once we start working.\n\nQuestion 3: Same setup, but use counts this time. Picture 100,000 people taking the test. About how many of them have the disease, and how many of those test positive? About how many don't have it, and how many of those test positive? Give me the two numbers of positives."
+  },
+  {
+   "role": "student",
+   "text": "Okay, 1 in 1,000 of 100,000 is 100 people with the disease, and 99% of those is 99 positives. The other 99,900 don't have it, and 5% of that is about 4,995 positives, so 99 and roughly 5,000."
+  },
+  {
+   "role": "tutor",
+   "text": "Both counts are right: 99 true positives and about 4,995 false positives.\n\nQuestion 4: Stay with your 100,000 people. Everyone who got a positive result is now in one room. If you pick one person from that room at random, roughly how likely is it that they actually have the disease? Give a number and show how you got it."
+  }
+ ],
+ "usage": [],
+ "conv_id": "7d5633aa6f"
+}

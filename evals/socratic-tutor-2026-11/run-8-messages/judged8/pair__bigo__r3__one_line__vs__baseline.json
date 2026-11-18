@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A had the learner bring out both misconceptions and then work them out with doubling tables, while Tutor B stated the sequential-loops rule before the misconception came up and mostly fixed the O(n^2/2) error by telling the learner the answer."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

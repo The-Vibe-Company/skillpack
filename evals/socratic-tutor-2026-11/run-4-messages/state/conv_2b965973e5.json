@@ -1,0 +1,37 @@
+{
+ "id": "2b965973e5",
+ "scenario": "bayes",
+ "kind": "tutor",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to help. Let's start with the core idea, then find exactly where things go off track for you.\n\n**The formula**\n\nP(A | B) = P(B | A) × P(A) / P(B)\n\nIn words: how likely A is once you've seen B equals how likely B would be if A were true, times how likely A was to begin with, divided by how likely B is overall.\n\n- **P(A)** is the *prior*: what you believed before the evidence.\n- **P(B | A)** is the *likelihood*: how well A explains the evidence.\n- **P(B)** is the *evidence*: how common B is across all cases. You usually have to build it yourself: P(B) = P(B | A)·P(A) + P(B | not A)·P(not A).\n- **P(A | B)** is the *posterior*: your updated belief.\n\n**The classic example**\n\nA disease affects 1% of people. A test catches 90% of real cases (sensitivity) and gives a false positive 5% of the time. You test positive. How likely is it that you're sick?\n\nTry counting people instead of using the formula. Imagine 1,000 people:\n- 10 are sick, and 9 of them test positive.\n- 990 are healthy, and about 50 of them test positive anyway.\n- That's 59 positives in total, and only 9 are really sick.\n\nSo P(sick | positive) = 9/59 ≈ 15%. Most people guess 90%, and that's the most common mistake: mixing up P(positive | sick) with P(sick | positive). They're different questions.\n\n**Common mistakes to watch for**\n1. Swapping P(A|B) and P(B|A).\n2. Ignoring the prior, or base rate. A rare condition stays fairly unlikely even after a positive test.\n3. Forgetting the false positives when you work out P(B).\n\n**Your turn**\n\nSame setup, but this time the disease affects 10% of people. What's P(sick | positive)? Walk me through your reasoning step by step, not just the number. That will show me exactly where it's going wrong for you, so we can fix that specific step."
+  },
+  {
+   "role": "learner",
+   "text": "Ok so the test catches 90% of sick people, and now the disease is way more common, so the base rate thing shouldn't drag it down much anymore. I'd say a positive means roughly 90% chance you're sick, maybe a bit under, like 85%?"
+  },
+  {
+   "role": "tutor",
+   "text": "Good, you're thinking about the base rate, which is the right instinct. Before we settle on a number, let's test the \"it won't drag it down much anymore\" idea with the same counting trick from before.\n\nPicture 1,000 people again, with the disease now at 10%:\n\n1. How many of them are sick, and how many of those test positive?\n2. How many are healthy, and how many of *those* test positive anyway, with the 5% false-positive rate?\n\nOnce you have both numbers, ask yourself: out of everyone holding a positive result, what fraction is actually sick? If your answer is around 85-90%, the healthy people with false positives would have to be only a small slice of the positive group. Does your count in step 2 back that up?"
+  },
+  {
+   "role": "learner",
+   "text": "Ok, 10% of 1,000 is 100 sick people, and 90% of those test positive, so 90 sick people with a positive. That's already a lot of positives, so I'm still thinking it lands up near 85-90%."
+  },
+  {
+   "role": "tutor",
+   "text": "Your 90 is right: 100 sick people, and 90 of them test positive. But \"that's already a lot of positives\" only counts one side of the group. Whether 90 is a lot depends on what it's being compared to.\n\nSo let's finish step 2 before we pick a number:\n\n- If 100 people are sick, how many of the 1,000 are healthy?\n- With a 5% false-positive rate, how many of those healthy people test positive anyway?\n\nOnce you have that number, compare it with your 90. For the answer to be 85-90%, the healthy positives would need to be roughly 10-15 people. Is your number anywhere near that small?"
+  },
+  {
+   "role": "learner",
+   "text": "Ok, 900 are healthy, and 5% of 900 is 45 who test positive anyway. Huh, that's way more than 10-15, so it's 90 sick out of 135 positives, which is only about two thirds, not 85-90%."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. 90 sick positives out of 135 total positives is 90/135 = 2/3, or about 67%. You worked that out yourself, and it's the full Bayes calculation:\n\nP(sick | positive) = (0.90 × 0.10) / (0.90 × 0.10 + 0.05 × 0.90) = 0.09 / 0.135 ≈ 0.67\n\n**Where it went wrong before**\n\nYour instinct that the base rate matters less now was partly right. The answer did jump from about 15% to about 67%. The mistake was stopping after you'd counted only the sick people. \"90 positives is a lot\" can't be judged alone, because the posterior is always a ratio:\n\ntrue positives / (true positives + false positives)\n\nEven a small false-positive rate (5%) applies to the much larger healthy group (900 people), so it still produced 45 false alarms. That's half as many as the real cases.\n\n**The habit to build**\n\nBefore you guess a number, always fill in both boxes: sick and positive, and healthy and positive. Then divide. If you only have one box filled in, you aren't ready to answer yet.\n\n**Quick check to lock it in**\n\nKeep the 10% base rate and the 90% sensitivity, but suppose the false-positive rate drops from 5% to 1%. Before calculating, predict whether P(sick | positive) goes up or down, and roughly by how much. Then count it out with 1,000 people and see if your prediction holds."
+  }
+ ],
+ "pending": null
+}

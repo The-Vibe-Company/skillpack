@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__one_line__r3.json",
+ "scenario": "sqljoin",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 4,
+  "why": "The tutor gave the WHERE-vs-ON answer in its first lecture without checking what the learner knew, then spent most of the session on row-count bounds instead of the misconception; the learner was still holding it at the end, and only the last turn started a good Socratic trace toward it."
+ },
+ "usage": {}
+}

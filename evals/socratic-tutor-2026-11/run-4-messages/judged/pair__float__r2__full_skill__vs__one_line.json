@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B has the learner work out the rule themselves, starting from the 1/3 analogy, so the 'JS bug / 0.1 is exact' misconception gets exposed through questions; A opens with a full lecture that corrects it by fiat, and its follow-up turns are long explanations."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

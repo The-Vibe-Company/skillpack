@@ -1,0 +1,41 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's the ground I plan to cover:\n\n1. Commit graph basics: commits, parents, branches as pointers, HEAD\n2. What `git merge` does: fast-forward vs. a true merge commit\n3. What `git rebase` does: replaying commits and creating new SHAs\n4. History shape and readability: linear vs. branching history, `git log --graph`\n5. Conflicts: how they show up and how you resolve them in a merge vs. during a rebase (`--continue`, `--abort`, `--skip`)\n6. The golden rule: rewriting shared history, force-push, `--force-with-lease`\n7. Interactive rebase: squash, fixup, reorder, edit\n8. Choosing between them: team workflows, pull `--rebase`, and recovering with reflog\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we're through them.\n\nQuestion 1: You're on a branch called `feature` that you created from `main` some time ago. Since then you've made 2 commits on `feature`, and someone else has pushed 3 new commits to `main`. In your own words, what does the commit graph look like right now? Which commit do the two branches have in common, and where does each branch name point?"
+  },
+  {
+   "role": "student",
+   "text": "So there's the commit where I branched off main, that's the shared one. After that main has its 3 new commits and the main label points at the newest one, and feature has my 2 commits with the feature label on my latest. It's like a Y shape in the GUI graph."
+  },
+  {
+   "role": "tutor",
+   "text": "That's correct. The shared commit is the merge base, and each branch name points at its own newest commit.\n\nQuestion 2: Same situation. You're on `feature` and you run `git merge main`. What new commit(s), if any, appear in the graph? Where does `feature` point afterward, and does `main` move?"
+  },
+  {
+   "role": "student",
+   "text": "I think git makes a new merge commit on feature that has two parents, my latest commit and the newest one on main. Feature moves to that merge commit, and main stays where it was."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. Git creates one new merge commit with two parents: your latest `feature` commit and the tip of `main`. `feature` moves forward to it, and `main` stays where it was.\n\nQuestion 3: Go back to the original Y shape, before any merge. This time you're on `feature` and you run `git rebase main` instead. Afterward, what does the graph look like? What happens to your 2 commits, and do they keep the same commit hashes (SHAs)? Explain why or why not."
+  },
+  {
+   "role": "student",
+   "text": "Rebase just picks up my 2 commits and sets them down on top of main's newest commit, so the graph is a straight line now. They keep the same hashes, since it's the same commits with the same changes, git only moves the feature pointer. Nothing new gets created, unlike with merge."
+  },
+  {
+   "role": "tutor",
+   "text": "You have the shape right: after the rebase, your 2 commits sit on top of main's newest commit and the history is a straight line. The second half, about the hashes staying the same and nothing new being created, is something we'll come back to. I won't settle it yet because we're still in the diagnostic.\n\nQuestion 4: Say you had already pushed `feature` to the remote before you rebased, and a teammate has pulled it and is building on it. After the rebase you run a plain `git push`. What do you expect to happen, and why?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "d5979b154b"
+}

@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. I'll ask one question at a time, starting simple and getting harder. Answer in your own words, and explain your reasoning, not just the final Big-O. That's what interviewers care about.\n\n**Question 1:**\n\nWhat is the time complexity of this function, and why?\n\n```python\ndef find_max(arr):\n    best = arr[0]\n    for x in arr:\n        if x > best:\n            best = x\n    return best\n```\n\nOnce you answer, I'll tell you whether you're on track and give you the next one. We'll work up to nested loops, recursion, binary search, sorting, and amortized analysis."
+  },
+  {
+   "role": "student",
+   "text": "That's O(n) because it just goes through the array once and checks each element one time. So if the array doubles in size, it does about double the work."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct, and that's a strong answer. You named the complexity, said why (one pass, a constant amount of work per element), and described how it scales, which is exactly what interviewers want to hear. One small extra you could mention: it uses O(1) extra space, because it only keeps one variable no matter how big the input gets.\n\n**Question 2:**\n\nWhat is the time complexity of this function, and why?\n\n```python\ndef has_duplicate_pair(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(i + 1, n):\n            if arr[i] == arr[j]:\n                return True\n    return False\n```\n\nThink about the worst case. Bonus: the inner loop doesn't start at 0. Does that change the Big-O?"
+  },
+  {
+   "role": "student",
+   "text": "That's O(n^2) because for every element the inner loop compares it against the rest, so you're basically checking every pair. Since the inner loop starts at i+1 it only does about half the pairs, so I'd say it's more like O(n^2/2), which is meaningfully faster than full O(n^2)."
+  },
+  {
+   "role": "tutor",
+   "text": "Your first part is right: it's O(n^2) because in the worst case (no duplicates) you compare every pair. And you're right that starting at i+1 means you do about n^2/2 comparisons, not n^2. That's a good catch.\n\nThe last part is what I want you to look at again: the claim that O(n^2/2) is \"meaningfully faster\" than O(n^2).\n\nUse the same scaling test you used on Question 1. If the array doubles from n to 2n:\n\n1. By roughly what factor does the work grow for a function that does n^2 comparisons?\n2. By roughly what factor does it grow for one that does n^2/2 comparisons?\n\nCompare those two numbers. Then tell me what that says about whether \"O(n^2/2)\" and \"O(n^2)\" describe different growth rates, and how you'd write the answer in an interview."
+  },
+  {
+   "role": "student",
+   "text": "For n^2, if n doubles you get (2n)^2 = 4n^2, so the work goes up about 4 times. I'd guess the n^2/2 one grows less since it's only doing half the comparisons in the first place?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your n^2 calculation is exactly right: doubling n makes the work go up 4 times.\n\nNow don't guess on the second one. Do the same calculation you just did. Plug 2n into n^2/2:\n\n(2n)^2 / 2 = ?\n\nSimplify that, then divide it by the original n^2/2. What factor do you get?\n\nThen compare it to the 4 you got for n^2. If doing \"half the comparisons\" made it grow more slowly, the two factors would be different. Are they?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, (2n)^2/2 is 4n^2/2, which is 2n^2, and 2n^2 divided by n^2/2 is... 4. Huh, so it's the same factor of 4, the half just cancels out. So I guess I'd just say O(n^2) in the interview, since the 1/2 doesn't change how it grows?"
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. You worked it out yourself, which is the best way to make it stick. Big-O describes how the work grows, not the exact number of operations. Constant factors like 1/2 cancel out when you look at scaling, so we drop them. O(n^2/2), O(3n^2) and O(n^2 + 5) are all just O(n^2).\n\nIn an interview you could say something like: \"It's O(n^2). The inner loop starts at i+1, so it does about n(n-1)/2 comparisons. That's roughly half of n^2, but constant factors don't change the growth rate, so it's still quadratic.\" That shows you noticed the detail and also know why it doesn't change the answer. Interviewers like that.\n\nWorth knowing: the 1/2 can still matter in practice, since it really does halve the actual runtime. It just doesn't change the Big-O class.\n\n**Question 3:**\n\nWhat is the time complexity of this function, and why?\n\n```python\ndef count_halvings(n):\n    steps = 0\n    while n > 1:\n        n = n // 2\n        steps += 1\n    return steps\n```\n\nUse the same scaling test again: if n doubles, how many extra loop iterations do you get?"
+  },
+  {
+   "role": "student",
+   "text": "If n doubles, it just has to halve one extra time to get back to where it was, so you only get one extra iteration. So it grows really slowly, I think that's O(log n)?"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct, and your reasoning is spot on. Doubling n adds only one more iteration, because one extra halving brings it back to where it was. \"Doubling the input adds a constant amount of work\" is what O(log n) means. More precisely, the loop runs about log2(n) times, since that's how many times you can halve n before reaching 1.\n\nTwo things you could add in an interview:\n- The base of the log doesn't matter in Big-O. log2(n), log10(n) and ln(n) differ only by a constant factor, and you already know constant factors get dropped. So just say O(log n).\n- To show how slowly it grows: for n = 1,000,000 the loop runs only about 20 times.\n\nSpace is O(1), since it only keeps a couple of variables.\n\n**Question 4:**\n\nThis is a classic interview question. What is the time complexity of binary search, and why?\n\n```python\ndef binary_search(arr, target):\n    lo, hi = 0, len(arr) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1\n```\n\nTry to link it to Question 3: what gets halved on each iteration here? Also, what does binary search need to be true about `arr` to work, and what would it cost to make that true if it weren't already?"
+  },
+  {
+   "role": "student",
+   "text": "It's the search range between lo and hi that gets cut in half every time, just like n in Question 3. So it only takes about log n steps to narrow down to one element, which makes it O(log n)."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. You made the link to Question 3 well: the search range between lo and hi is what gets halved, so after about log2(n) iterations it's down to one element. Each iteration does a constant amount of work (one comparison and a pointer update), so the total is O(log n). Space is O(1) for this iterative version.\n\nOne detail worth saying in an interview: that's the worst case. In the best case the target is at the very first `mid`, which is O(1). Interviewers sometimes ask about best and worst cases separately, so it helps to say which one you mean.\n\nYou skipped the second part of the question, though, and it's the part interviewers like to follow up on:\n\n1. What has to be true about `arr` for binary search to work? Think about the line `elif arr[mid] < target: lo = mid + 1`. Why is it safe to throw away the whole left half?\n2. If `arr` didn't meet that requirement, what would it cost to fix it first? And for a single search, would binary search still beat just scanning the array the way `find_max` did in Question 1?\n\nTake a shot at both."
+  },
+  {
+   "role": "student",
+   "text": "Oh right, the array has to be sorted. If arr[mid] is smaller than the target, then everything to the left of mid is even smaller, so the target can't be there and you can just skip that half."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. The array has to be sorted, and your explanation is the important part: since arr[mid] < target and everything to the left of mid is less than or equal to arr[mid], none of those elements can be the target. Being able to safely throw away half the range on every step is what makes it O(log n). Without sorting, that one comparison would tell you nothing about the left half.\n\nIn an interview you could put it like this: \"Binary search requires a sorted array. Each comparison rules out half of the remaining range, so it takes O(log n) time.\"\n\nThat leaves the second part, which is the follow-up interviewers love:\n\nSuppose `arr` is **not** sorted and you need to find one target, just once.\n\n1. What is the time complexity of sorting it first? (Think of a standard comparison sort, like Python's `sorted()`.)\n2. So what is the total cost of \"sort, then binary search\"?\n3. Compare that to a plain linear scan through the unsorted array, like `find_max` in Question 1. For a single search, which one wins?\n\nBonus: is there a situation where sorting first *is* worth it? Think about what changes if you need to search the same array many times."
+  }
+ ],
+ "usage": [],
+ "conv_id": "adf401349e"
+}

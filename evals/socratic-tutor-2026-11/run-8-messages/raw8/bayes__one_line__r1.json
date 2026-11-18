@@ -1,0 +1,73 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to help. Let's start with the core idea, then find exactly where things go off track for you.\n\n**The formula**\n\nP(A | B) = P(B | A) × P(A) / P(B)\n\nIn words: to find how likely A is *given* you've seen B, take how likely B is when A is true, weight it by how common A was to begin with, and divide by how common B is overall.\n\n**The pieces**\n- **P(A)**, the *prior*: how likely A is before any evidence.\n- **P(B | A)**, the *likelihood*: how likely the evidence is if A is true.\n- **P(B)**, the *evidence*: how likely the evidence is overall, counting every way it could happen. Usually you compute it as P(B | A)·P(A) + P(B | not A)·P(not A).\n- **P(A | B)**, the *posterior*: your updated belief.\n\n**A classic example**\n\nA disease affects 1% of people. A test catches 90% of real cases (sensitivity) but also comes back positive for 5% of healthy people (false positives). You test positive. What's the chance you actually have the disease?\n\nTry it as counts with 1,000 people:\n- 10 have the disease, and 9 of them test positive.\n- 990 are healthy, and about 49.5 of them test positive.\n- Total positives: about 58.5.\n- So P(disease | positive) ≈ 9 / 58.5 ≈ **15%**.\n\nMost people guess around 90%. That gap is the whole lesson.\n\n**The two most common mistakes**\n1. **Mixing up P(A | B) and P(B | A).** \"The test is 90% accurate\" tells you P(positive | disease), not P(disease | positive).\n2. **Ignoring the base rate.** A rare condition stays fairly unlikely even after a positive result, because the false positives from the large healthy group swamp the true positives.\n\n**Your turn**\n\nBefore you work through it, tell me: in the example above, which number is the prior and which is the likelihood? Then show me how you'd usually set up a problem like this, step by step. Once I can see your reasoning I can point to exactly where it slips."
+  },
+  {
+   "role": "student",
+   "text": "Okay, I think the prior is the 1% and the likelihood is the 90%? Honestly that 15% surprises me, my gut still says a positive on a 90% accurate test should mean you're pretty much sick, but I can see the counts add up."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got both right. The 1% is the prior, P(disease), and the 90% is the likelihood, P(positive | disease). Good.\n\nYour gut reaction is the useful part, so let's work on that. It isn't silly. It's the exact intuition Bayes' theorem corrects, and you'll learn more by finding the flaw yourself than by having me point to it.\n\nOne question. When you say a positive on a \"90% accurate\" test means you're pretty much sick, you're treating the 90% as an answer to a question. Which one?\n\n- (a) \"If I have the disease, how likely is a positive test?\"\n- (b) \"If I have a positive test, how likely is it that I have the disease?\"\n\nChoose one. Then go back to the 1,000 people and check which group the 90% was actually calculated from: everyone who tested positive, or everyone who has the disease?"
+  },
+  {
+   "role": "student",
+   "text": "I guess (a)? The 90% came from the 10 sick people, 9 of them tested positive. But honestly in real life if my doctor said \"90% accurate test, you're positive\" I'd still assume that's basically my odds of being sick."
+  },
+  {
+   "role": "tutor",
+   "text": "Right, (a). And you found it yourself: the 90% was calculated only from the 10 sick people.\n\nNow hold that next to your real-life instinct. When your doctor says \"you're positive,\" you don't know yet which group you're in. You only know you're one of the roughly 58.5 people who tested positive.\n\nSo here's a narrower question: of those 58.5 positive people, how many are actually sick? And does a number calculated only from the 10 sick people tell you anything about the other 49.5 positives who are healthy?\n\nWork out that fraction, then tell me if \"90%\" is still the number you'd want your doctor to give you."
+  },
+  {
+   "role": "student",
+   "text": "Okay, so only 9 of the 58.5 positives are actually sick, that's like 15%. Huh, so the 90% was never about people who tested positive at all, it's just about the sick ones. I guess I'd want my doctor to tell me the 15%, that's kind of unsettling."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right, and you put it well: the 90% was never about people who tested positive. It describes how the test behaves in sick people. The 15% describes people in your situation, which is the number you actually care about. That switch from P(positive | disease) to P(disease | positive) is the core of Bayes' theorem, and you worked it out yourself.\n\nIt's fair to find it unsettling, but here's some reassurance:\n\n- **The 15% isn't \"you're probably fine, ignore it.\"** Before the test your chance was 1%. After it, your chance is 15%. That's a 15-fold jump, so the test told you a lot. It just didn't make the disease certain.\n- **The prior depends on who's being tested.** The 1% assumes you were picked at random from the population. If you went to the doctor because you had symptoms, your starting probability is higher, and the same positive result would push you much higher than 15%.\n- **This is why doctors use follow-up tests.** Your 15% becomes the new prior. A second, independent positive result would raise it a lot. Try it later: rerun the counts starting from 15% instead of 1%.\n\n**Check yourself on a new one**\n\nSame test (catches 90% of real cases, 5% false positives), but now it's used in a clinic where 30% of patients actually have the disease. Out of 1,000 patients:\n\n1. How many are sick, and how many of them test positive?\n2. How many are healthy, and how many of them test positive?\n3. What's P(disease | positive)?\n\nBefore you calculate, make a guess: will the answer be higher or lower than 15%, and why? Then do the counts and see if your guess was right."
+  },
+  {
+   "role": "student",
+   "text": "My guess is higher, since way more of the people walking in are actually sick. So 300 sick and 270 of them test positive, then 700 healthy and 35 of those test positive, which makes 270 out of 305, so around 88%? Funny, that's almost the 90% my gut wanted the first time."
+  },
+  {
+   "role": "tutor",
+   "text": "That's all correct. 300 sick with 270 positives, 700 healthy with 35 positives, so 270 / 305 ≈ 88.5%. Your guess was right too, and your reason was the right one: when more of the people being tested are sick, a positive result is more likely to be a true positive.\n\nThe near-match with your gut's 90% is a coincidence, though, and it's worth seeing why. Look at what changed between the two problems:\n\n- **Same test both times:** 90% sensitivity, 5% false positives.\n- **Different prior:** 1% in the first problem, 30% in the second.\n- **Very different answers:** about 15% versus about 88%.\n\nThe test didn't change. Only the prior did, and that moved the answer from 15% to 88%. So \"90% accurate\" alone can never tell you your odds. You can only get them once you know who is being tested. Your gut happened to land close this time because the prior was high enough for true positives to swamp the false ones. In the general-population case, the same gut answer was off by a factor of six.\n\nThat gives you a reliable habit for any Bayes problem: **before you look at how good the test is, ask \"how common was this to begin with?\"**\n\n**One more to lock it in**\n\nGo back to the original problem (1% prior) and do the follow-up test I mentioned. Your first positive brought you to about 15%, so use 15% as the new prior. Out of 1,000 people who all tested positive once, about 150 are sick and 850 are healthy. Now give everyone a second, independent test of the same kind:\n\n1. How many of the sick test positive again?\n2. How many of the healthy test positive again?\n3. What's P(disease | two positives)?\n\nAs before, guess first: will two positives get you above or below 88%?"
+  },
+  {
+   "role": "student",
+   "text": "I'd guess above 88%, since two positives feels like it should be pretty conclusive. For the first one, 90% of the 150 sick people is 135 who test positive again."
+  },
+  {
+   "role": "tutor",
+   "text": "135 is right. 90% of the 150 sick people test positive again.\n\nBefore you go on, let's test your guess, because \"two positives feels pretty conclusive\" is a gut feeling, and earlier today your gut called 90% when the answer was 15%.\n\nYou just saw that the same test gave very different answers depending on the prior. So compare the starting points:\n\n- In the clinic problem, what was the prior going into the test?\n- In this follow-up problem, what's the prior going into the second test?\n\nWhich one is bigger? And if it's the same test both times, what does that suggest about whether this answer should come out above or below the clinic's 88%?\n\nOnce you've answered that, do step 2: how many of the 850 healthy people test positive again? Then work out the fraction and see whether it backs up your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "In the clinic the prior was 30%, and here it's 15%, so the clinic one is bigger. Hmm, so if it's the same test, I guess that means this should come out below 88%, even with two positives?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, exactly. Your reasoning holds up. The second test is the same test as in the clinic, and the only thing that changed is the prior: 15% going in here versus 30% in the clinic. A lower prior with the same test means a lower answer. So even after two positives, you should end up below 88%.\n\nNotice what you just did. You overruled your gut (\"two positives feels conclusive\") with a structural argument, and you did it before calculating anything. That's the habit we've been building: ask what the prior is before you trust how impressive the evidence feels.\n\nThe reason it feels wrong is worth spelling out. \"Two positives\" sounds like a lot of evidence, but your starting point was the 1% general-population figure. The first positive used up much of its force just getting you from 1% to 15%. The second test starts from 15%, which is still lower than where the clinic patients started.\n\nNow finish the calculation to check it:\n\n1. You have 135 sick people testing positive again. ✔\n2. How many of the 850 healthy people test positive again? (Same 5% false-positive rate.)\n3. What's P(disease | two positives)?\n\nOnce you have the number, compare it to your first-test result of 15%. How much did the second test move you, and is that more or less of a jump than the first one gave you?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, 5% of 850 is 42.5 healthy people testing positive again, so it's 135 out of 177.5, which is about 76%. So yeah, below 88% like I reasoned, but that's a huge jump from 15%, way bigger than the first test gave me."
+  },
+  {
+   "role": "tutor",
+   "text": "That's all correct. 42.5 healthy people test positive again, so P(disease | two positives) = 135 / 177.5 ≈ 76%. It's below 88%, as you reasoned, and you worked that out before you did any arithmetic.\n\nYou're also right that the jump is much bigger this time. In percentage points:\n\n- **First test:** 1% → 15%, a gain of about 14 points.\n- **Second test:** 15% → 76%, a gain of about 61 points.\n\nHere's what makes that interesting: **it's exactly the same test both times.** The evidence wasn't any stronger the second time. So why did it move you so much further?\n\nOne way to see it is with odds instead of percentages. Odds compare sick to healthy:\n\n- Before the first test: 10 sick to 990 healthy, about 1 : 99.\n- After the first test: 9 : 49.5, about 1 : 5.5.\n- After the second test: 135 : 42.5, about 3.2 : 1.\n\nEach positive multiplies the odds by the same amount: 90% / 5% = **18**. That number, the ratio of \"positive if sick\" to \"positive if healthy\", is the real strength of the test, and it never changes. What changes is where you start. Multiplying odds of 1 : 99 by 18 still leaves you as an underdog. Multiplying 1 : 5.5 by 18 puts you clearly on the \"probably sick\" side. Equal evidence produces small percentage moves near 0% or 100% and big moves in the middle.\n\nSo here's a better version of the habit from earlier: **the prior tells you where you start, and the test's ratio tells you how far each piece of evidence pushes you.**\n\n**Quick check, no counting needed**\n\nSuppose you take a third positive test of the same kind, starting from your 76%.\n\n1. Using the \"multiply the odds by 18\" rule, about what would your new probability be?\n2. Will this third test add more or fewer percentage points than the 61 the second one added? Why?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "52259948d6"
+}

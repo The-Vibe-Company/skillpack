@@ -1,0 +1,17 @@
+{
+ "file": "float__full_skill__r1.json",
+ "scenario": "float",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 5,
+  "why": "The tutor runs a careful, well-sequenced diagnostic built on the 1/3 analogy, but its opening roadmap already says doubles must be rounded and that 0.1 'isn't exactly 0.1', and the transcript ends before the learner reasons to the resolution or drops the JavaScript-bug belief."
+ },
+ "usage": {}
+}

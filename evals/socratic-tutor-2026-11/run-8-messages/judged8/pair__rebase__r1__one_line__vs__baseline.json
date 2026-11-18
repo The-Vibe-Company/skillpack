@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B leads the learner to work out for themselves that rebase creates new hashes, by asking about D's parent, while A simply tells them the mechanism and then repeatedly has to chase unanswered halves of its multi-part questions."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

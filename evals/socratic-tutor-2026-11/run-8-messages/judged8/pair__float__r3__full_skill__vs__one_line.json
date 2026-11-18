@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A got the learner to prove for themselves why 1/3 never ends and to spot the binary link on their own, whereas B opened with a lecture that settled the misconception by fiat and then only had the learner do simple guided checks, despite A's long diagnostic."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

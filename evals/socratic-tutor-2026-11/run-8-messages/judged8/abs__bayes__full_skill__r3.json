@@ -1,0 +1,17 @@
+{
+ "file": "bayes__full_skill__r3.json",
+ "scenario": "bayes",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 9,
+  "why": "The tutor diagnosed first, let the learner find the base-rate error by counting people, and then tested it with a base-rate change and an upgrade comparison, with the learner saying in their own words that false positives from the large healthy group swamp the true positives."
+ },
+ "usage": {}
+}

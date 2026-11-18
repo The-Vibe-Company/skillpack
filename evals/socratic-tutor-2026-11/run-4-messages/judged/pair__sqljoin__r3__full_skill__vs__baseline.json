@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner predict query results, which brings the ON-vs-WHERE misconception into the open, while B corrects it by lecture, so the learner's quick 'I get it' turns out to be false and has to be corrected by fiat a second time."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

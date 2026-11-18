@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open with a lecture that hands over the 1/3 analogy, but A then switches to prediction questions (0.5, 0.125, 0.375, 0.2) so the learner reasons about denominators themselves, while B keeps lecturing and the learner only agrees."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

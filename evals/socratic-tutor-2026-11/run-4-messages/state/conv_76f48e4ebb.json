@@ -1,0 +1,37 @@
+{
+ "id": "76f48e4ebb",
+ "scenario": "sqljoin",
+ "kind": "tutor",
+ "opening": "Help me master SQL joins, especially LEFT JOIN.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's how I've broken SQL joins down into subskills we'll work through:\n\n1. INNER JOIN basics: matching rows across tables on a key\n2. LEFT JOIN semantics: keeping unmatched left rows and where NULLs come from\n3. ON vs. WHERE with LEFT JOIN: where you put a filter changes the result\n4. Row multiplication: one-to-many and many-to-many matches, duplicate rows\n5. Anti-joins and finding missing data: `LEFT JOIN ... WHERE right.id IS NULL`, and how it compares to `NOT EXISTS` / `NOT IN`\n6. RIGHT and FULL OUTER JOIN: how they relate to LEFT JOIN\n7. Chaining multiple joins: how a LEFT JOIN early in a chain can be quietly undone later\n8. Aggregates over outer joins: `COUNT(*)` vs. `COUNT(col)`, and handling NULLs with `COALESCE`\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we've done those. Then I'll show you a skill map and suggest where to begin.\n\nQuestion 1. You have these two tables:\n\n    customers                orders\n    id | name                id | customer_id | amount\n    ---+-------              ---+-------------+-------\n    1  | Ana                 10 | 1           | 50\n    2  | Ben                 11 | 1           | 30\n    3  | Cai                 12 | 3           | 20\n                             13 | 4           | 99\n\nWhat will this query return? List every row it outputs:\n\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id;"
+  },
+  {
+   "role": "learner",
+   "text": "I think it's Ana 50, Ana 30, Ben NULL, Cai 20. Order 13 doesn't show up since there's no customer 4 and it's a left join on customers."
+  },
+  {
+   "role": "tutor",
+   "text": "That's correct: all four rows, and the right reason for order 13 being dropped. I'll note it and move on.\n\nQuestion 2. Same tables. Here are two queries that differ only in where the filter `o.amount > 25` goes:\n\n    -- Query A\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id AND o.amount > 25;\n\n    -- Query B\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    WHERE o.amount > 25;\n\nList the rows each query returns, and explain why they differ (if they do)."
+  },
+  {
+   "role": "learner",
+   "text": "I think they return the same thing: Ana 50, Ana 30, Ben NULL, Cai NULL. Cai's 20 order gets filtered out by amount > 25, and it doesn't really matter if the filter is in ON or WHERE since it's still a left join on customers."
+  },
+  {
+   "role": "tutor",
+   "text": "Your rows for Query A are right. Your claim that Query B returns the same thing is not, so ON vs. WHERE goes on the map as a gap. I won't explain it yet because we're still in the diagnostic. It'll be one of the first things we work on.\n\nQuestion 3. Same tables. What does this query return? List every row:\n\n    SELECT c.name, COUNT(*) AS n_star, COUNT(o.id) AS n_orders\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    GROUP BY c.name;"
+  },
+  {
+   "role": "learner",
+   "text": "Ana 2 2, Ben 1 0, Cai 1 1. I think COUNT(*) counts Ben's row even though it's all NULLs on the orders side, but COUNT(o.id) skips the NULL so he gets 0."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on all three rows, and your explanation is right: COUNT(*) counts rows, COUNT(o.id) counts non-NULL values. I'm noting that as a strength.\n\nQuestion 4. Same tables. Write a query that returns the names of customers who have no orders at all. Use a LEFT JOIN, not a subquery. Also say which name(s) it should return."
+  }
+ ],
+ "pending": null
+}

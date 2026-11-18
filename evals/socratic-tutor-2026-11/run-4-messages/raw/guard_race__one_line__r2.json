@@ -1,0 +1,17 @@
+{
+ "scenario": "guard_race",
+ "kind": "guard",
+ "condition": "one_line",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quick question: what is a race condition? Just a short answer please.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "A race condition happens when two or more threads or processes use shared data at the same time, and the result depends on which one runs first. Because that order isn't controlled, the program can give different or wrong results from run to run. For example, two threads both read a counter as 5, each adds 1, and both write back 6, so one increment is lost. You usually prevent it with locks, atomic operations, or other synchronization."
+  }
+ ],
+ "usage": [],
+ "conv_id": "d20bc008be"
+}

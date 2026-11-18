@@ -1,0 +1,41 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Deal. Here's how it'll go: I ask one question at a time, you answer in your own words, and if your answer has a hole in it, I won't correct you. I'll ask a smaller question that points right at the hole until you spot it yourself. Guessing is fine. Wrong answers are where the learning happens.\n\nHere's the setup we'll use the whole time:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\nYou branched `feature` off `main` at B. Since then, someone added C to `main`, and you made D and E on `feature`.\n\n**Question 1:** You're on `feature` and you run `git merge main`. Draw (or describe) what the history looks like afterward. How many new commits exist that didn't exist before, and what's special about any of them?\n\nAnswer that, and then we'll do the same scenario with `git rebase main` and compare."
+  },
+  {
+   "role": "student",
+   "text": "After the merge I think you get A-B-C on main and D-E on feature, plus one new merge commit that has two parents, E and C. So just one new commit, and the special thing is it ties the two lines together."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. Exactly one new commit, the merge commit (call it M), with two parents: E and C. Nothing that already existed gets changed. A, B, C, D and E all keep their exact identities.\n\n```\nmain:     A---B---C\n               \\   \\\nfeature:        D---E---M\n```\n\nOne detail to lock in: only the `feature` pointer moves (it now points at M). `main` still points at C, because you were on `feature` when you merged.\n\nNow let's do the other version. Same starting picture:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\n**Question 2:** You're on `feature` and you run `git rebase main` instead. Draw what the history looks like afterward. Then tell me:\n- Are D and E in the result the *same* commits as before, or something else? Why?\n- Is there a merge commit this time?\n\nTake a guess even if you're unsure about the first part. That's the bit that matters most."
+  },
+  {
+   "role": "student",
+   "text": "I think it ends up as A-B-C-D-E in a straight line, and no merge commit this time. D and E are the same commits, rebase just picks them up and moves the feature pointer so they sit after C instead of B, same hashes."
+  },
+  {
+   "role": "tutor",
+   "text": "Two of your three answers are right. The result is a straight line, and there's no merge commit. Good.\n\nThe \"same commits, same hashes\" part is the hole, so let's dig into it.\n\nHere's a fact you can rely on: a commit's hash is computed from its contents. That includes the snapshot of files, the author, the message, and **the hash of its parent commit**. Change any of those and you get a different hash.\n\nWith that in mind:\n\n**Question 2a:** Before the rebase, what is D's parent? After the rebase, in your straight line A-B-C-D-E, what is D's parent?\n\nThen tell me what that means for D's hash. And once you've worked out D, do the same for E."
+  },
+  {
+   "role": "student",
+   "text": "Before the rebase D's parent is B, and after it's C. Hmm, so if the parent hash is part of D's hash, then D would have to get a different hash... wait, so it's not really the same D?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got it. It's not the same D. The rebased D has the same changes and the same message, but its parent is now C instead of B. Since the parent hash goes into the commit hash, it gets a new hash, so it's a new commit. People usually write it as D' (\"D prime\").\n\nYou said you'd do the same for E, so do that next.\n\n**Question 2b:** After the rebase, what is E's parent? Is it the old D or the new D'? Given that, does E keep its old hash?\n\nOnce you've answered that, draw the full picture after `git rebase main`, labeling which commits are new. Then think about this: the original D and E still exist in the repository for a while. Which branch, if any, still points at them?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "c1247a28a1"
+}

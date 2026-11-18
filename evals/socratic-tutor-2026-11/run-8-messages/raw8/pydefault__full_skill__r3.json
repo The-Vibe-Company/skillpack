@@ -1,0 +1,73 @@
+{
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's how I've split \"Python function default arguments\" into subskills:\n\n1. Basic syntax and rules: defining defaults, why non-default parameters can't follow default ones, calling with positional vs. keyword arguments\n2. When defaults are evaluated: once, at definition time, not on every call\n3. The mutable default trap: `def f(x=[])` and why the list sticks around between calls\n4. The `None` sentinel idiom, plus custom sentinels (`_MISSING = object()`) for when `None` is a valid value\n5. Interaction with `*args`, keyword-only parameters, `/`, and `**kwargs`\n6. Introspection: `__defaults__`, `__kwdefaults__`, and `inspect.signature`\n7. Late binding in closures and lambdas, and the `lambda i=i:` trick\n8. Edge cases and design: defaults that reference globals or other defaults, defaults in methods and dataclasses (`field(default_factory=...)`), and when a default is the wrong choice\n\nI'll start by asking a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Answer in your own words, and \"I don't know\" is a useful answer too.\n\nQuestion 1: What does this code print, and why?\n\n```python\ndef add_item(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add_item(1))\nprint(add_item(2))\nprint(add_item(3, []))\nprint(add_item(4))\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints [1], then [2], then [3], then [4]. The default bucket=[] gets made fresh as an empty list each time you call the function, so every call without a bucket starts empty and you just get the one item back."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I won't say yet whether that's right; we'll come back to it once the diagnostic is done.\n\nQuestion 2: Which of these function definitions are valid Python, and for any that aren't, what rule do they break?\n\n```python\ndef a(x, y=2, z): ...\ndef b(x=1, *args, y): ...\ndef c(x, /, y=2, *, z): ...\ndef d(*, x=1, y): ...\n```"
+  },
+  {
+   "role": "student",
+   "text": "I'm pretty sure a is invalid because you can't put a parameter without a default (z) after one that has a default. I think b, c and d are all fine since anything after * or *args is keyword-only, so it's allowed to have no default there, though I'm a bit fuzzy on what the / in c does exactly."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, including that you're unsure about `/`. I'll come back to all of these after the diagnostic.\n\nQuestion 3: What does this code print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n\nfuncs2 = []\nfor i in range(3):\n    funcs2.append(lambda i=i: i)\n\nprint([f() for f in funcs2])\n```"
+  },
+  {
+   "role": "student",
+   "text": "I'd guess both print [0, 1, 2], since each lambda gets made during a different loop iteration so it should hold onto that iteration's i. I'm honestly not sure what the i=i adds in the second one, it looks like it does the same thing just written differently."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That includes your guess that `i=i` does the same thing. We'll come back to it.\n\nQuestion 4: Suppose you want a function that adds an item to a list. If the caller passes a list, it should use that one. If they don't, it should start with a fresh empty list. The catch is that `None` is a legitimate item someone might want to store, and someone might also pass `bucket=None` on purpose to mean \"no list given\". How would you write the signature and the first few lines of the body? Then: how would you check what default values a function has without calling it?"
+  },
+  {
+   "role": "student",
+   "text": "Honestly I'd just write def add_item(item, bucket=[]) and then bucket.append(item) and return bucket, since the empty list default already gives you a fresh list when they don't pass one. I don't really see why None would come into it at all, so I'm not sure what the catch is meant to be."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. You didn't answer the second half of Question 4 (checking a function's defaults without calling it), so I'm counting that as \"don't know yet\".\n\nOne thing stands out. Your answers to Questions 1, 3 and 4 all rest on the same assumption about *when* a default value gets created. I'm not going to say yet whether that assumption holds. Testing it is where we'll start.\n\nHere's where I'd place you for now. The levels are provisional and you'll have to earn any increases:\n\n    Topic: Python function default arguments      overall: ██░░░░░░░░ 15%\n    ---------------------------------------------------------------------------\n    1. Basic syntax and rules           [██████░░░░]  3/5\n    2. When defaults are evaluated      [██░░░░░░░░]  1/5  <- proposed focus\n    3. The mutable default trap         [░░░░░░░░░░]  0/5\n    4. None / custom sentinels          [░░░░░░░░░░]  0/5\n    5. *args, kw-only, /, **kwargs      [████░░░░░░]  2/5\n    6. Introspection                    [░░░░░░░░░░]  0/5\n    7. Late binding and `i=i`           [░░░░░░░░░░]  0/5\n    8. Edge cases and design            [░░░░░░░░░░]  0/5  (not tested yet)\n    ---------------------------------------------------------------------------\n\n- #1 is at 3 because you got the rule behind `a` right and judged `b`, `c` and `d` correctly. I haven't pushed you on edge cases yet.\n- #5 is at 2 because you said yourself that you're unsure what `/` does.\n- #3, #4 and #7 all depend on #2, so if we get #2 right, the others should go much faster.\n\nI suggest we start with #2, when defaults are evaluated. Shall we start there, or would you rather pick a different subskill?"
+  },
+  {
+   "role": "student",
+   "text": "Sure, let's start with #2. Though I'm still pretty sure the default gets made each time you call the function, so I'm curious what you're going to show me."
+  },
+  {
+   "role": "tutor",
+   "text": "Good. Your belief is clear and specific, so we can test it directly. Here's a version where the default value announces itself whenever it gets created:\n\n```python\ndef make_default():\n    print(\"making default\")\n    return []\n\ndef f(x=make_default()):\n    return x\n\nprint(\"f is defined\")\nf()\nf()\nf()\n```\n\nIf you're right that the default is made each time you call the function, what exact output would this print, line by line, and in what order?"
+  },
+  {
+   "role": "student",
+   "text": "If I'm right, it should print \"f is defined\" first, since nothing gets made when you just define f. Then each of the three f() calls makes the default, so you'd see \"making default\" three times after that."
+  },
+  {
+   "role": "tutor",
+   "text": "That's a clear prediction: \"f is defined\" first, then \"making default\" three times. If you have Python handy, run it yourself. Your own output counts for more than my word. Here's what it actually prints:\n\n```\nmaking default\nf is defined\n```\n\nThat's the whole output. None of the three `f()` calls printed anything.\n\nTwo things in there go against your prediction. \"making default\" appears before \"f is defined\", and it appears only once instead of three times.\n\nUsing only this output, when does Python run the expression `make_default()` that's written after `x=`, and how many times does it run it?"
+  },
+  {
+   "role": "student",
+   "text": "Huh, so it runs make_default() just once, and it happens when the def line runs, before \"f is defined\" even prints. So I guess the default is made at definition time and every call just reuses that same object?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right on both counts. Python evaluates the expression after `x=` once, when the `def` statement runs, and stores the result with the function. Calls that leave out `x` don't evaluate `make_default()` again.\n\nYour second point, that every call reuses that same object, is a reasonable inference, but this experiment doesn't prove it. All it shows is that `make_default()` ran only once. So let's test the \"same object\" idea on code you've already seen.\n\nHere's Question 1 from the diagnostic again:\n\n```python\ndef add_item(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add_item(1))\nprint(add_item(2))\nprint(add_item(3, []))\nprint(add_item(4))\n```\n\nWith what you now know about when `bucket=[]` is evaluated, what exactly do the four lines print? Explain each line, and especially the third and fourth."
+  }
+ ],
+ "usage": [],
+ "conv_id": "2de330809d"
+}

@@ -1,0 +1,73 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to help. Let's build it up so it sticks, rather than just memorizing the formula.\n\n**The formula**\n\nP(A | B) = P(B | A) · P(A) / P(B)\n\nIn words: how likely A is *given* you've seen B equals how well A predicts B, times how likely A was to begin with, divided by how likely B is overall.\n\n- **P(A)** is the *prior*: your belief in A before seeing any evidence.\n- **P(B | A)** is the *likelihood*: how probable the evidence is if A is true.\n- **P(B)** is the *evidence*: how probable the evidence is overall, across all possibilities.\n- **P(A | B)** is the *posterior*: your updated belief after seeing B.\n\n**Where people usually go wrong**\n\n1. **Mixing up P(A | B) and P(B | A).** \"Most people with the disease test positive\" is not the same as \"most people who test positive have the disease.\"\n2. **Ignoring the prior (base-rate neglect).** A rare condition stays fairly unlikely even after a positive test.\n3. **Computing P(B) wrong.** You have to add up every way B can happen:\n   P(B) = P(B | A)·P(A) + P(B | not A)·P(not A)\n\n**Worked example**\n\nA disease affects 1% of people. A test catches 90% of real cases (sensitivity) and gives a false positive 5% of the time. You test positive. What's the chance you actually have it?\n\n- P(D) = 0.01, P(+ | D) = 0.90, P(+ | not D) = 0.05\n- P(+) = 0.90·0.01 + 0.05·0.99 = 0.009 + 0.0495 = 0.0585\n- P(D | +) = 0.009 / 0.0585 ≈ **15.4%**\n\nMost people guess around 90%. That's mistake #1 and mistake #2 together.\n\n**A trick that helps: think in counts**\n\nPicture 1,000 people. 10 have the disease, and 9 of them test positive. Of the 990 healthy people, about 49.5 test positive. So roughly 58.5 people test positive, and only 9 of them are sick: 9/58.5 ≈ 15%. That's Bayes' theorem without the formula.\n\n**Your turn**\n\nSame test, but now the disease affects 10% of people. Before you calculate anything: do you expect P(D | +) to go up or down compared with 15%, and why? Then work it out and show me each step, including P(+). If you'd rather, paste a problem you got wrong earlier and walk me through how you approached it, and we'll find exactly where it went off track."
+  },
+  {
+   "role": "student",
+   "text": "I guess it goes up since more people have it, but honestly I'm still a bit stuck on why it isn't just 90% in the first place. If the test catches 90% of sick people, doesn't a positive pretty much mean you're 90% likely to be sick?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your instinct that it goes up is right. Let's hold onto that, because it's going to help with the 90% question.\n\nYou said the chance should rise because more people have the disease. But the test's 90% didn't change between the two scenarios. So if a positive result just meant \"90% likely to be sick,\" what would the answer be at 1%, and what would it be at 10%?\n\nAnd one more, using the 1,000 people from before: of the roughly 58.5 people who tested positive, how many were actually sick? Does that number look like 90% of 58.5?\n\nTake a shot at both. Once you have them, ask yourself what the 90% is actually a percentage *of*."
+  },
+  {
+   "role": "student",
+   "text": "Hmm, if a positive just meant 90%, then it'd be 90% at both 1% and 10%, which is weird because I just said it should go up. But the test still catches 90% of sick people either way, so I'm not sure where the 90% goes wrong."
+  },
+  {
+   "role": "tutor",
+   "text": "You just spotted the contradiction yourself, and that's the important part. The \"90% at both\" answer clashes with your own (correct) sense that it should go up. Something in the \"positive means 90%\" idea has to give.\n\nYou're also right that the test catches 90% of sick people in both scenarios. That part is true, so let's look at exactly what it says.\n\nBack to the 1,000 people at 1% prevalence:\n\n1. The 90% is 90% of which group: the 10 sick people, or the 58.5 people who tested positive?\n2. When you get a positive result, which group do you know you're in?\n3. The 58.5 positives include the 9 sick people who were caught. Who are the other 49.5, and does the 90% figure say anything about them?\n\nAnswer those three in order. Then try to say in one sentence what question the 90% answers, and what question you're actually asking when you hold a positive result."
+  },
+  {
+   "role": "student",
+   "text": "I think the 90% is of the 10 sick people, since that's the group the test \"catches.\" So 9 out of those 10 test positive."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. The 90% is a percentage of the 10 sick people: 9 of them test positive. That's P(+ | D), \"given that you're sick, how likely is a positive?\"\n\nNow question 2: when you get a positive result back, which group do you know you're in? The 10 sick people, or the 58.5 people who tested positive?\n\nAnd question 3: the 58.5 positives include those 9 sick people. Who are the other 49.5, and where do they come from? (Hint: the test's 5% false positive rate applies to the healthy people, and there are a lot of them.)\n\nOnce you've answered those, try the one-sentence version: the 90% answers \"if I'm sick, how likely am I to test positive?\" What's the question you're actually asking when you're holding a positive result, and what fraction answers it?"
+  },
+  {
+   "role": "student",
+   "text": "When I get a positive, I guess I'm in the 58.5 who tested positive, not necessarily the 10 sick people. Huh, so only 9 of those 58.5 are actually sick?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's exactly it. Only 9 of the 58.5 positives are actually sick, so 9/58.5 ≈ 15%.\n\nYou've also found where the 90% goes wrong. The 90% is out of the 10 sick people. Once you're holding a positive result, though, the group you're in is the 58.5 positives, and that's a different group. Those are two different questions:\n\n- **P(+ | D):** \"If I'm sick, how likely am I to test positive?\" Answer: 9/10 = 90%.\n- **P(D | +):** \"If I tested positive, how likely am I to be sick?\" Answer: 9/58.5 ≈ 15%.\n\nSame 9 people on top, different group on the bottom. That's mistake #1 from the list: flipping P(A | B) and P(B | A).\n\nThe other 49.5 are healthy people who got false positives. The rate is only 5%, but it applies to 990 people, so it adds up to more positives than the real cases. That's the base rate at work (mistake #2).\n\n**Back to your prediction**\n\nYou said the answer should go up when 10% of people have the disease. Use the same 1,000 people to check it:\n\n1. How many are sick, and how many of them test positive?\n2. How many are healthy, and how many of them get a false positive?\n3. How many positives is that in total, and what fraction of them are actually sick?\n\nWork it out and tell me whether it went up like you predicted, and by about how much."
+  },
+  {
+   "role": "student",
+   "text": "OK so with 10%, 100 of the 1,000 are sick, and 90% of them test positive, so that's 90 people."
+  },
+  {
+   "role": "tutor",
+   "text": "Right: 100 sick, and 90 of them test positive. That's step 1 done.\n\nNow step 2: how many of the 1,000 are healthy, and how many of them get a false positive at the 5% rate?\n\nThen step 3: add the two groups of positives together, and work out what fraction of all the positives are actually sick. Before you divide, quick gut check. Compared with the 1% case, are the true positives now a bigger or smaller share of all positives? Then see if your number matches your prediction that it goes up."
+  },
+  {
+   "role": "student",
+   "text": "So 900 are healthy, and 5% of them is 45 false positives. That makes 135 positives total, and 90 of them are sick, so 90/135 is about 67%? Wow, so it did go up a lot, from 15% to like two-thirds."
+  },
+  {
+   "role": "tutor",
+   "text": "That's exactly right. 900 healthy people, 45 false positives, 135 positives in total, and 90/135 ≈ 67%. Your prediction held up, and you worked it out step by step.\n\nLook at what changed and what didn't:\n\n- **The test didn't change.** It still catches 90% of sick people and still gives false positives 5% of the time.\n- **The prior changed.** It went from 1% to 10%, and the posterior went from about 15% to about 67%.\n\nSo the test's 90% is a fixed property of the test. The answer you actually care about, \"given my positive, am I sick?\", depends heavily on how common the disease was in the first place. That's why the answer can't just be \"90%.\"\n\nHere's why it moved so much. At 1%, the false positives (49.5) outnumbered the true positives (9) by more than 5 to 1. At 10%, the true positives (90) outnumber the false positives (45) 2 to 1. You had 10 times as many sick people, and the healthy group shrank only a little, so the true positives grew much faster than the false ones.\n\n**Connecting it to the formula**\n\nYour counts are the formula. Check that each piece matches:\n\n- P(+ | D) · P(D) = 0.90 × 0.10 = 0.09, which is your 90 out of 1,000\n- P(+ | not D) · P(not D) = 0.05 × 0.90 = 0.045, which is your 45 out of 1,000\n- P(+) = 0.09 + 0.045 = 0.135, which is your 135 out of 1,000\n- P(D | +) = 0.09 / 0.135 ≈ 0.67\n\n**One to try on your own**\n\nGo back to 1% prevalence, but suppose the test improves so its false positive rate drops from 5% to 1%. Sensitivity stays at 90%. First predict whether P(D | +) goes up a little or a lot, then work it out with the 1,000 people. Comparing that with this problem tells you which matters more for a rare disease: better sensitivity or fewer false positives."
+  },
+  {
+   "role": "student",
+   "text": "I'd guess it only goes up a little, since 1% vs 5% sounds like a small change. But working it out: 9 sick people test positive, and 1% of the 990 healthy is about 10 false positives, so 9 out of roughly 19 is almost 50%. Huh, that's way more than I expected, so cutting false positives seems to matter a lot more for a rare disease."
+  },
+  {
+   "role": "tutor",
+   "text": "Your numbers are right. 9 true positives and 9.9 false positives gives 9 / 18.9 ≈ 47.6%, so \"almost 50%\" is correct. Your conclusion holds too: for a rare disease, cutting false positives matters far more.\n\nYour gut said \"a small change\" because 5% to 1% looks small next to 90%. But the 5% isn't small in this problem, because it applies to 990 people. Cutting it to 1% removed about 40 false positives, and the true positives stayed at 9. The posterior is controlled by the ratio of true positives to false positives:\n\n- At a 5% false positive rate: 9 true vs 49.5 false, roughly 1 to 5.5, so about 15%\n- At a 1% false positive rate: 9 true vs 9.9 false, roughly 1 to 1, so about 48%\n\n**Compare that with improving sensitivity**\n\nGo back to the 5% false positive rate and give the test a perfect 100% sensitivity. Now all 10 sick people test positive instead of 9, and there are still 49.5 false positives. That's 10 / 59.5 ≈ 17%. A perfect catch rate only moves you from 15% to 17%, while cutting false positives took you to nearly 48%.\n\nHere's the reason. With a rare disease, sensitivity can only work on the 10 sick people, so the most it can add is 1 more true positive. The false positive rate works on the 990 healthy people, which is where most of the positives come from.\n\n**The general lesson**\n\nWhen the prior is low, the false positive rate (or specificity, which is 1 minus it) usually decides whether a positive result means much. That's why screening for rare conditions is often a two-step process: a positive on the first test gets followed by a second, more specific test.\n\n**One last challenge, if you want it**\n\nSuppose you test positive with the original test (1% prevalence, 90% sensitivity, 5% false positives), so your probability is now about 15%. You take the same test again, it comes back positive again, and the two results are independent. What prior should you use for the second calculation, and what's your new probability? Try it with 1,000 people, starting from the 58.5 who tested positive the first time."
+  }
+ ],
+ "usage": [],
+ "conv_id": "5d8349d4ac"
+}

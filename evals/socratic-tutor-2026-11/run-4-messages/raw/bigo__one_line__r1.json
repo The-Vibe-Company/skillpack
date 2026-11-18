@@ -1,0 +1,41 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. I'll ask one question at a time, starting simple and getting harder. Answer in your own words, and explain your reasoning, not just the final Big-O. That's what interviewers care about.\n\n**Question 1:**\n\nWhat is the time complexity of this function, and why?\n\n```python\ndef find_max(arr):\n    best = arr[0]\n    for x in arr:\n        if x > best:\n            best = x\n    return best\n```\n\nOnce you answer, I'll tell you whether you're on track and give you the next one. We'll work up to nested loops, recursion, binary search, sorting, and amortized analysis."
+  },
+  {
+   "role": "student",
+   "text": "That's O(n) because it just goes through the array once and checks each element one time. So if the array doubles in size, it does about double the work."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct, and that's a strong answer. You named the complexity, said why (one pass, a constant amount of work per element), and described how it scales, which is exactly what interviewers want to hear. One small extra you could mention: it uses O(1) extra space, because it only keeps one variable no matter how big the input gets.\n\n**Question 2:**\n\nWhat is the time complexity of this function, and why?\n\n```python\ndef has_duplicate_pair(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(i + 1, n):\n            if arr[i] == arr[j]:\n                return True\n    return False\n```\n\nThink about the worst case. Bonus: the inner loop doesn't start at 0. Does that change the Big-O?"
+  },
+  {
+   "role": "student",
+   "text": "That's O(n^2) because for every element the inner loop compares it against the rest, so you're basically checking every pair. Since the inner loop starts at i+1 it only does about half the pairs, so I'd say it's more like O(n^2/2), which is meaningfully faster than full O(n^2)."
+  },
+  {
+   "role": "tutor",
+   "text": "Your first part is right: it's O(n^2) because in the worst case (no duplicates) you compare every pair. And you're right that starting at i+1 means you do about n^2/2 comparisons, not n^2. That's a good catch.\n\nThe last part is what I want you to look at again: the claim that O(n^2/2) is \"meaningfully faster\" than O(n^2).\n\nUse the same scaling test you used on Question 1. If the array doubles from n to 2n:\n\n1. By roughly what factor does the work grow for a function that does n^2 comparisons?\n2. By roughly what factor does it grow for one that does n^2/2 comparisons?\n\nCompare those two numbers. Then tell me what that says about whether \"O(n^2/2)\" and \"O(n^2)\" describe different growth rates, and how you'd write the answer in an interview."
+  },
+  {
+   "role": "student",
+   "text": "For n^2, if n doubles you get (2n)^2 = 4n^2, so the work goes up about 4 times. I'd guess the n^2/2 one grows less since it's only doing half the comparisons in the first place?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your n^2 calculation is exactly right: doubling n makes the work go up 4 times.\n\nNow don't guess on the second one. Do the same calculation you just did. Plug 2n into n^2/2:\n\n(2n)^2 / 2 = ?\n\nSimplify that, then divide it by the original n^2/2. What factor do you get?\n\nThen compare it to the 4 you got for n^2. If doing \"half the comparisons\" made it grow more slowly, the two factors would be different. Are they?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "adf401349e"
+}

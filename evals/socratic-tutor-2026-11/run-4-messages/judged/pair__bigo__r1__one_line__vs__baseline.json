@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brings out the learner's belief that constant factors matter, then has the learner test it with their own scaling calculation instead of just correcting them, while Tutor B mostly confirms answers and explains at length, so the target misconception never comes up."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

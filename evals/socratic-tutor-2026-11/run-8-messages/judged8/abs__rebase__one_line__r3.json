@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r3.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 8,
+  "why": "The tutor withheld the answer and used narrowly targeted questions about parent pointers and hashes until the learner concluded on their own that rebased commits are new and that rewriting shared history causes duplicates, though several later turns lean on substantial confirmatory exposition."
+ },
+ "usage": {}
+}

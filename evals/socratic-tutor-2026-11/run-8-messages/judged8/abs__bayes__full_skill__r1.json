@@ -1,0 +1,17 @@
+{
+ "file": "bayes__full_skill__r1.json",
+ "scenario": "bayes",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 6,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 6,
+  "why": "The diagnostic was careful and the questions built on the learner's own numbers, but the summary told the learner outright that they had ignored the base rate. The session ended before the learner worked out the posterior for themselves."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A front-loads a lecture and corrects the misconception by telling the learner, but the learner then works through recovery problems with real numbers and ends up understanding the idea; B brings the misconception out well, then defers it and ends with it still uncorrected, which makes for a slow, unfinished exchange."
+ },
+ "winner": "baseline",
+ "usage": {}
+}

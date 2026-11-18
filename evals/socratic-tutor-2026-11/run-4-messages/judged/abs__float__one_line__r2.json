@@ -1,0 +1,17 @@
+{
+ "file": "float__one_line__r2.json",
+ "scenario": "float",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 5,
+  "why": "The tutor's opening lecture already covered the 1/3 analogy, the claim that this isn't JavaScript-specific, and the fact that 0.1 isn't stored exactly, so the learner only had to repeat those points; the later prediction questions were good and drew out real reasoning, but every turn was mostly exposition."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Tutor B gets the learner to find the flipped conditional through targeted questions and has them do every count, while Tutor A mostly lectures with long worked answers and reveals solutions before the learner tries, so the learner reasons far less."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

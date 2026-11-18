@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "In A the learner works out the counts and finds on their own that P(cancer|smoker) is only 4%, which brings out the direction/base-rate misconception, while B lectures at length and does every calculation itself, so the learner only states gut guesses and never reasons through a count."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

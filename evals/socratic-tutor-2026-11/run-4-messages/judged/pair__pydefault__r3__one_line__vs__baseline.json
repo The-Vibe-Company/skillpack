@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B surfaced the learner's misconception (lists as a special case, dict item assignment as 'resetting') and guided them to reason it out with targeted predictions, while A lectured exhaustively and gave the quiz answer upfront, so the learner did less of the reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__baseline__r1.json",
+ "scenario": "sqljoin",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 6,
+  "overall": 5,
+  "why": "The tutor gave the full ON-vs-WHERE answer in an opening lecture without checking what the learner knew, but its later prediction experiment (threshold 60, crossing out rows by hand) got the learner to state the idea correctly in their own words."
+ },
+ "usage": {}
+}

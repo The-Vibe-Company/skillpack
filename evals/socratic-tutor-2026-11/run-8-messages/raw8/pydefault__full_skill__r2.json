@@ -1,0 +1,73 @@
+{
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do it properly. Here's how I've broken the topic into subskills:\n\n1. Syntax and ordering rules (where defaults can go, how they mix with positional, keyword, `*args`, keyword-only, and `**kwargs`)\n2. When defaults are evaluated (definition time vs. call time)\n3. The mutable default trap (lists, dicts, and objects shared across calls)\n4. The `None` sentinel idiom and its limits\n5. Custom sentinel objects (for when `None` is a valid input)\n6. Introspection (`__defaults__`, `__kwdefaults__`, `inspect.signature`)\n7. Defaults used for early binding (`lambda i=i:` in loops and closures)\n\nBefore teaching anything, I'll ask you a few questions, one at a time, to see what you already know. Answer as best you can. \"I don't know\" is a useful answer too.\n\n**Question 1:** Without running it, what does this print, and why?\n\n```python\ndef add_item(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add_item(1))\nprint(add_item(2))\n```"
+  },
+  {
+   "role": "student",
+   "text": "It prints [1] and then [2]. The bucket=[] gives you a fresh empty list each time you call the function, so each call just has its own item in it."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on saying whether that's right until the diagnostic is done, and then we'll come back to it.\n\n**Question 2:** Which of these function definitions are valid Python, and for each invalid one, what rule does it break?\n\n```python\ndef a(x=1, y): ...\ndef b(x, y=2, *args, z): ...\ndef c(x, *, y=2, z): ...\ndef d(x=1, *args, y, **kwargs): ...\n```"
+  },
+  {
+   "role": "student",
+   "text": "The first one, a, is invalid because you can't put a parameter without a default after one that has a default, so y would need a default too. I'm less sure about the others with the star stuff."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. You gave a reason for `a` and said you're unsure about the starred ones. I'll take both of those into account. We'll come back to all four definitions properly once the diagnostic is done.\n\n**Question 3:** Without running it, what does this print, and why?\n\n```python\ncounter = 0\n\ndef next_id():\n    global counter\n    counter += 1\n    return counter\n\ndef make_record(name, record_id=next_id()):\n    return (name, record_id)\n\nprint(make_record(\"a\"))\nprint(make_record(\"b\"))\nprint(counter)\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints (\"a\", 1) then (\"b\", 2) and then 2. Since the default gets worked out each time you call make_record, next_id() runs on every call and bumps the counter."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You're predicting that `next_id()` runs again on every call to `make_record`. I'll come back to this one after the diagnostic too.\n\n**Question 4:** Without running it, what does this print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n```"
+  },
+  {
+   "role": "student",
+   "text": "I'd say it prints [0, 1, 2]. Each lambda gets made during a different loop iteration, so each one should remember the i from when it was created."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You're predicting that each lambda captures the value of `i` at the moment it was created. I'll come back to that one with the others.\n\nOne last diagnostic question, and then I'll show you where you stand and we'll start working through it properly.\n\n**Question 5:** A common way to write a function with an \"optional list\" is:\n\n```python\ndef tag(item, tags=None):\n    if tags is None:\n        tags = []\n    tags.append(item)\n    return tags\n```\n\nWhy would someone write it this way instead of `tags=[]`? And can you think of a situation where using `None` as the default would *not* work well?"
+  },
+  {
+   "role": "student",
+   "text": "Honestly I'm not sure why, since tags=[] already gives you a new empty list each call, so they seem like they'd do the same thing. Maybe it's just a style thing, or so you can check whether the caller actually passed something in?"
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Here's where you stand.\n\nYour answer to Question 2 about `a` was correct, and the rule you gave is the right one. Your predictions for Questions 1, 3 and 4 were not correct. I'm not going to tell you the right outputs yet, because you'll get more out of working them out yourself. Your answer to Question 5 rests on the same assumption as Questions 1 and 3: that `bucket=[]` produces a fresh list on every call. That one belief is behind most of what you got wrong, so it's the most useful thing to fix first.\n\n```\nTopic: Python default arguments           overall: █░░░░░░░░░ 11%\n-----------------------------------------------------------------\n1 syntax & ordering      [████░░░░░░]  2/5  knew rule for `a`, unsure on * forms\n2 evaluation time        [██░░░░░░░░]  1/5  holds a misconception\n3 mutable default trap   [░░░░░░░░░░]  0/5\n4 None sentinel idiom    [██░░░░░░░░]  1/5  partial guess (\"did caller pass it?\")\n5 custom sentinels       [░░░░░░░░░░]  0/5\n6 introspection          [░░░░░░░░░░]  0/5  not tested yet (provisional)\n7 early binding (i=i)    [░░░░░░░░░░]  0/5\n-----------------------------------------------------------------\n```\n\n**Proposed start:** subskill 2, evaluation time. Subskills 3, 4, 5 and 7 all depend on it, so once it's solid, Questions 1, 3 and 5 should make sense to you without me explaining them. If you'd rather start with the syntax rules (subskill 1), tell me and we'll do that instead.\n\nAssuming we start with subskill 2, here's the first question. Without running it, what does this print?\n\n```python\nprint(\"A\")\n\ndef greet(name=print(\"B\") or \"world\"):\n    print(\"hello\", name)\n\nprint(\"C\")\ngreet()\ngreet()\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints A, then C, then B and hello world, then B and hello world again. The default only gets worked out when you actually call greet, so B shows up once for each call and never when the def line runs."
+  },
+  {
+   "role": "tutor",
+   "text": "Not quite. That's the same assumption as in Questions 1 and 3: that the default expression is worked out each time you call the function. Let's test that assumption directly instead of me telling you the answer.\n\nHere's a smaller case. This script defines a function and never calls it:\n\n```python\nprint(\"start\")\n\ndef f(x=1/0):\n    return x\n\nprint(\"end\")\n```\n\nWithout running it, what happens when this script runs? Does it print both \"start\" and \"end\", or does something go wrong, and if so, at which line? Explain your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "I think it prints both \"start\" and \"end\" with no error. The 1/0 would only blow up if you actually called f() without passing x, and since f is never called, that default never gets worked out."
+  },
+  {
+   "role": "tutor",
+   "text": "Not quite. That's the same assumption again: that the default expression waits until `f()` is actually called. This is the second time in a row that prediction has gone wrong, so instead of arguing about it, let's get real evidence.\n\nSave that exact script to a file, for example `defaults.py`, and run it with `python3 defaults.py`. Don't change anything, and don't call `f`.\n\nPaste exactly what it prints, including any error message and the line number it mentions. What does that output tell you about *when* `1/0` was worked out?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "6a51d3b615"
+}
