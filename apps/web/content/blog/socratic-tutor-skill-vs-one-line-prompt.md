@@ -1,6 +1,6 @@
 ---
 title: "Socratic Tutor Skill vs One-Line Prompt: The Verdict Flips"
-description: "Jane Street's Socratic Tutor skill vs the one-line prompt from Hacker News: a blind test where the winner changes between message four and message eight."
+description: "Jane Street's Socratic Tutor skill vs the one-line prompt from Hacker News: a blind test where the lead changes between message four and message eight."
 slug: socratic-tutor-skill-vs-one-line-prompt
 date: 2026-11-18
 dataCollected: 2026-11-18
@@ -15,7 +15,7 @@ Jane Street's [Socratic Tutor skill](https://github.com/janestreet/agent_skills/
 
 It's a good line. It's also Jane Street's. It sits word for word inside the skill's teaching loop, so the "one line would do" argument was really one piece of the skill arguing against the rest of it.
 
-That makes the argument testable. A notebook test put three tutors in front of the same stubborn learners: the full skill, the one line, and no instructions at all. A judge that couldn't tell which was which picked the better session. After four tutor messages, the judge preferred the one line in 14 of 24 comparisons. After eight, it preferred the full skill, 15 to 9. Same sessions, four messages later. Whether the skill beats the prompt depends on where you stop reading, and on what each part of the skill costs before it pays.
+That makes the argument testable. A notebook test put three tutors in front of the same stubborn learners: the full skill, the one line, and no instructions at all. A judge that couldn't tell which was which picked the better session. The solid result is that both sets of instructions beat no instructions, in all 24 comparisons by message eight. Between the two, it's closer. After four tutor messages, the judge preferred the one line in 14 of 24 comparisons, a slight edge and too close to call. After eight, it preferred the full skill, 15 to 9. Same sessions, four messages later. Whether the skill beats the prompt depends on where you stop reading. The stranger finding is where the skill slipped: when its tutor gave the answer away, it was mostly in its very first message.
 
 ## The thread argued about the Socratic Tutor with no numbers on either side
 
@@ -29,29 +29,31 @@ Assuming. No one in the thread posted a measurement, for the skill or for the on
 
 None of this is a knock on Jane Street. The skill is free under [the MIT license](https://github.com/janestreet/agent_skills/blob/master/LICENSE.md), and its README is modest: the prior-art note points out that teaching by asking questions is "rather older than LLMs." The README even tells people on a plain chatbot to "paste the body of the skill's SKILL.md into the chat." And if a skill is a prompt you can paste, you can paste a shorter one next to it and compare. (If the format is new to you, here's [what a SKILL.md file is and what goes in it](/blog/what-is-skill-md).)
 
-## Four messages in, the one line was winning and the skill hadn't taught a thing
+## Four messages in, the one line led and the skill was still asking questions
 
-So the notebook built a small classroom. It picked eight topics and gave each one a simulated learner, played by a second model instance. Each learner holds one classic misconception and keeps it until a concrete case contradicts it or the tutor simply gives the answer. The topics are familiar traps: what 0.1 + 0.2 gives in floating point, Monty Hall, recovering from a 50% loss, Python's mutable default arguments.
+So the notebook built a small classroom. It picked eight topics and gave each one a simulated learner, played by a second model instance. Each learner holds one classic misconception and keeps it until a concrete case contradicts it or the tutor simply gives the answer. Told the answer, the learner was instructed to accept it and say it gets it, even if it only half does. The topics are familiar traps: what 0.1 + 0.2 gives in floating point, Monty Hall, recovering from a 50% loss, Python's mutable default arguments.
 
-Three tutors met each learner three times. One carried the full SKILL.md, one carried arshxyz's line, and one carried only "You are a helpful assistant." A separate judge, never shown the instructions, compared the transcripts two at a time: 24 comparisons for each pair of tutors.
+Three tutors met each learner three times. One carried the 793-word body of the SKILL.md (the file minus its frontmatter), one carried arshxyz's line, and one carried only "You are a helpful assistant." A separate judge, never shown the instructions, compared the transcripts two at a time: 24 comparisons for each pair of tutors.
 
-The first reading came after four tutor messages, and the skill lost it to the one line. The SKILL.md itself says why: "Do not teach anything until the diagnostic is done." So the skill's tutor spent its opening on placement questions. When the learner said something wrong, the tutor filed the error for later. One reply reads: "Noted. I'll come back to this one too once the diagnostic is done." The judge's notes keep saying the tutor "never addresses the misconception" and "withholds all feedback." By the fourth message, the learner had stated the right understanding in 0 of the skill's 24 sessions.
+The first reading came after four tutor messages, and the one line came out slightly ahead. The SKILL.md says: "Do not teach anything until the diagnostic is done." The skill's tutor spent its opening on placement questions. When the learner said something wrong, the tutor filed the error for later. One reply reads: "Noted. I'll come back to this one too once the diagnostic is done." The judge's notes keep saying the tutor "never addresses the misconception" and "withholds all feedback." By the fourth message, the learner had stated the right understanding in 0 of the skill's 24 sessions.
 
-Meanwhile the one line was doing something strange for a Socratic prompt. It was lecturing. The rule only fires "when the user is wrong," and at the start of a session the learner hasn't had a chance to be wrong yet. So in most sessions the model opened with a full lecture. One first message, on the investing topic, ran 739 words. After the lecture, the rule woke up and the tutor asked good narrowing questions, which is why the judge often preferred it at this length.
+Meanwhile the one line was doing something strange for a Socratic prompt. It was lecturing. The rule only fires "when the user is wrong," and at the start of a session the learner hasn't had a chance to be wrong yet. In most sessions the model opened with a full lecture. One first message, on the investing topic, ran 739 words. After the lecture, the rule woke up and the tutor asked good narrowing questions, which fits the judge's slight preference at this length.
 
 This reading hides a second trap. Count only whether the learner held the right idea by message four, and the winner is the tutor with no instructions: 18 of 24 sessions, against 12 for the one line. It got there by giving the answer away in 23 of its 24 sessions and letting the learner repeat it. The one line gave the answer away in 20, the skill in 6. One number, read alone, would have crowned the tutor that just tells you.
 
-So at four messages the one-line camp was right, for a reason nobody in it gave. Then the sessions kept going.
+At four messages the one line had a slight edge, 14 to 10, too close to call on its own, for a reason nobody in the thread gave. Then the sessions kept going.
 
-## Four messages later the verdict flipped, and every feature showed its bill
+## Four messages later the verdict flipped, and the skill's costs showed up
 
-The same sessions ran on to eight tutor messages, in front of the same blind judge, and this time the full skill won, 15 comparisons to 9. The figure shows the two readings crossing.
+The skill's tutor gave the answer away in 8 of 24 sessions, against 19 for the one line, and the gap was already there at message four, 6 against 20. The surprise is where the skill leaked. Six of its eight giveaways came in the very first message: the list of subskills it announces before the diagnostic spelled out the answer, such as "-50% needs +100%" on the investing topic. Only two came later, both on the Bayes topic, at messages five and six.
 
-![The one-line prompt wins the first four tutor messages; the full Socratic Tutor skill wins 15 to 9 by message eight.](/images/blog/socratic-tutor-skill-vs-one-line-prompt/socratic-tutor-verdict-flips.png)
+Those counts come from the second reading. The same sessions ran on to eight tutor messages, in front of the same blind judge, and this time the judge leaned to the full skill, 15 comparisons to 9. The figure shows comparisons won out of 24 at each reading, with the two lines crossing.
+
+![The one-line prompt leads at four tutor messages; the Socratic Tutor skill wins 15 to 9 by message eight. Detailed below.](/images/blog/socratic-tutor-skill-vs-one-line-prompt/socratic-tutor-verdict-flips.png)
 
 Both sets of instructions beat the tutor with none, 24 to 0 each. The table has the rest of the eight-message reading.
 
-| After 8 tutor messages | Full SKILL.md (854 words) | One line (21 words) | No instructions |
+| After 8 tutor messages | Full skill (793-word body) | One line (21 words) | No instructions |
 |---|---|---|---|
 | Tutor gave away the key answer before the learner reasoned it out | 8 of 24 | 19 of 24 | 24 of 24 |
 | Learner stated the right understanding in their own words | 4 of 24 | 21 of 24 | 21 of 24 |
@@ -59,31 +61,31 @@ Both sets of instructions beat the tutor with none, 24 to 0 each. The table has 
 | Average words per tutor message | 125 | 241 | 330 |
 | Tutor messages asking exactly one question | 58% | 23% | 24% |
 
-Read it as a ledger, one feature at a time.
+Read it as a ledger, with one caution: each column is a whole set of instructions, so a row prices the file, never one section of it.
 
-Start with the diagnostic. It costs the first four messages, during which nobody learns anything, and it pays afterward. Once the teaching loop had started, the skill's tutor gave the key answer away in fewer than half as many sessions as the one line's tutor. That's the first row.
-
-The rule to ask "ONE question at a time" pays in the last two rows. The skill's messages are about half as long as the one line's, and more than twice as likely to hold exactly one question. On that last count, the one line does no better than no instructions.
+The skill's messages are about half as long as the one line's, and more than twice as likely to hold exactly one question. That fits the skill's "ONE question at a time" rule, but the test never removed the rule, so it can't say which part of the file does it. On that last count, the one line does no better than no instructions.
 
 arshxyz's line is the cheapest entry in the ledger, and it earns its keep. Read the judge's row from right to left: one sentence buys the first step up from nothing, and the rest of the file buys a second, smaller step. "Most of the effect" was a fair guess on that row. What the line can't buy is a quiet opening. It has no say until the learner is wrong, and by then the lecture has already happened.
 
-Then there's the guard, the section that tells the model to answer one-off questions normally and leave the tutoring loop alone. The test asked two of those ("what does HTTP 304 mean?" was one), three times per tutor. All 18 answers came back direct, under all three tutors. The guard did its job, and so did the model without it. On this test, that section bought nothing measurable.
+The second row cuts against the skill. After eight messages, few of its learners had put the right idea into their own words. The test can't say why. The diagnostic is one candidate; the learner's rule to accept any answer it's told is another. The skill is built for long mastery sessions, with a skill map, spaced review and a final assessment, and eight messages is early in that design. The test stopped there, so what happens next is unmeasured.
 
-The second row cuts against the skill, and it belongs in the ledger too. After eight messages, few of the skill's learners had put the right idea into their own words. That is the diagnostic's bill, still being paid. The skill is built for long mastery sessions, with a skill map, spaced review and a final assessment, and eight messages is early in that design. The test stopped there, so what happens next is unmeasured.
+One section of the skill, the guard, tells the model to answer one-off questions normally and leave the tutoring loop alone. The test asked two of those ("what does HTTP 304 mean?" was one), three times per tutor, and all 18 answers came back direct, with the guard and without it. On this test, that section bought nothing measurable.
 
-*Method: the notebook test ran on November 18, 2026, with Claude Opus 5.5 playing tutor, learner and judge, each call a fresh Claude Code subagent with no shared memory. It covered 72 tutoring sessions, compared head to head at both lengths. Its limits: the learner is simulated, the judge belongs to the same model family as the tutor, eight topics and three runs make a small sample, and a split this close on 24 comparisons is a lean. Length is counted in words, because the notebook didn't record tokens. The harness and transcripts aren't public; readers who want the protocol can ask Stan.*
+That leaves a verdict for each kind of session. For a short one, or quick help, the one line is enough. For a long mastery session, take the skill, knowing that nothing past eight messages was tested. For a one-off question you need neither.
+
+*Method: the notebook test ran on November 18, 2026, with Claude Opus 5.5 (arshxyz's comment mentions "Opus 5.5 on Medium") playing tutor, learner and judge, each call a fresh Claude Code subagent with no shared memory. It covered 72 tutoring sessions, compared head to head at both lengths. The skill's body was pasted in as the prompt, the way Jane Street's README describes for a plain chatbot; it wasn't installed as a skill. Its limits: the learner is simulated, and when a tutor asked several questions at once it answered only the first or the easiest; the judge belongs to the same model family as the tutor; eight topics and three runs make a small sample. Neither split is strong: 15 to 9 is a lean, and 14 to 10 is closer still. The 24 comparisons are eight topics run three times, and the runs of one topic tend to agree. What holds firmly is that both sets of instructions beat no instructions, 24 to 0 at eight messages. The judge isn't perfectly consistent either: reading the same first four messages twice, it changed its giveaway verdict for 6 of the 72 sessions. Length is counted in words, because the notebook didn't record tokens. The harness and transcripts aren't public; readers who want the protocol can ask the author.*
 
 *Disclosure: Skillpack is built by The Vibe Company, the author's company.*
 
 ## Your own skill has the same ledger, and you can fill it in
 
-Stan Girard, who picked this topic and asked for a real measurement, made the general argument on November 13, in the article on [measuring every change to a Claude skill](/blog/claude-skills-best-practices). In that article's words, the problem "isn't whether a skill is too long, it's that people don't measure what each change does to it."
+The article on [measuring every change to a Claude skill](/blog/claude-skills-best-practices), published November 13, puts it this way: the problem "isn't whether a skill is too long, it's that people don't measure what each change does to it."
 
-The Socratic Tutor thread is that sentence with a comment section attached. It asked whether 854 words were too many, and the test came back with three verdicts on one file. The diagnostic pays late. The one-question rule pays. The guard, here, didn't.
+The Socratic Tutor thread is that sentence with a comment section attached. It asked whether 854 words were too many, and the test came back with something to count. The readings suggest the diagnostic pays late and the one-question rule pays. The guard, here, bought nothing measurable.
 
-Microsoft's [SkillOpt](https://github.com/microsoft/SkillOpt) turns that habit into a rule: keep the target model frozen, and accept an edit to a skill only if it improves a score on held-out cases. Ties are rejected. Stan's public [Skill Creator skill](https://github.com/The-Vibe-Company/companion-skills/blob/main/skills/create-skill-tools/SKILL.md) puts the same idea in its default loop: "Build realistic eval prompts, run the skill against a baseline." Once the prompts exist, the next step is [checking agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
+In its default mode, Microsoft's [SkillOpt](https://github.com/microsoft/SkillOpt) turns that habit into a rule: keep the target model frozen, and accept an edit to a skill only if it improves a score on held-out cases. Ties are rejected. The public [Skill Creator skill](https://github.com/The-Vibe-Company/companion-skills/blob/main/skills/create-skill-tools/SKILL.md) puts the same idea in its default loop: "Build realistic eval prompts, run the skill against a baseline." Once the prompts exist, the next step is [checking agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
 
-So go back to arshxyz's comment, because it's the first half of an experiment: it pulls out the one sentence that seems to do most of the work. Do the same to your own skill. Open the SKILL.md you lean on most and copy out the line you'd bet on. Run the full file, the line and no instructions on the same prompts, graded by something that can't see which is which. Read the results twice, once early and once at the length your real sessions run. Then write, next to each section, what it cost and what it bought. A section with nothing in the second column, like the guard here, is the first one to try deleting. And if your one line wins at your length, ship the one line.
+So go back to arshxyz's comment, because it's the first half of an experiment: it pulls out the one sentence that seems to do most of the work. Do the same to your own skill. Open the SKILL.md you lean on most and copy out the line you'd bet on. Run the full file, the line and no instructions on the same prompts, graded by something that can't see which is which. Read the results twice, once early and once at the length your real sessions run. Then write down what the file cost and what it bought. To price one section, take it out and run again, the step this test skipped. A section that looks like it buys nothing, like the guard here, is the first one to try deleting. And if your one line wins at your length, ship the one line.
 
 arshxyz did the first half in a comment box. The second half is pressing run.
 
@@ -99,7 +101,7 @@ items:
   - question: "What is Jane Street's Socratic Tutor skill?"
     answer: "Jane Street's Socratic Tutor skill is a single SKILL.md file, published under the MIT license in the janestreet/agent_skills repository on GitHub. Its instructions tell a model to run a diagnostic before teaching, track a skill map with levels 0-5, ask one question at a time, interleave spaced review and finish with a final assessment. When the learner is wrong, the skill tells the model to withhold the answer and ask a narrower question."
   - question: "Can a one-line prompt replace the Socratic Tutor skill?"
-    answer: "It depends on how long the session runs. In the notebook test of November 18, 2026, a blind judge preferred the one-line prompt after four tutor messages and the full Socratic Tutor skill after eight, and both beat a model with no instructions in every comparison at eight messages. The test used a simulated learner and a small sample, and it measured nothing beyond eight messages."
+    answer: "It depends on how long the session runs. In the notebook test of November 18, 2026, a blind judge gave the one-line prompt a slight edge after four tutor messages, too close to call, and leaned to the full Socratic Tutor skill after eight. The firmer result is that both beat a model with no instructions in every comparison at eight messages. The test used a simulated learner and a small sample, and it measured nothing beyond eight messages."
   - question: "How do you use the Socratic Tutor skill in a plain chatbot?"
     answer: "Jane Street's README says to paste the body of the skill's SKILL.md into the chat, or into a custom or system prompt, followed by what you want it to do. The skill's description lists trigger phrases such as 'teach me', 'tutor me', 'quiz me', 'drill me' and 'help me master'. For a one-off question, the skill's guard section tells the model to answer normally and skip the tutoring loop."
 ```
