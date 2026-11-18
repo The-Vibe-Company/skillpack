@@ -146,31 +146,31 @@
     {
       "path": ".agents/skills/review-code-dev",
       "skillId": "b0780a97-6972-4a2b-8e88-f41a528900c7",
-      "version": "2.1.1",
+      "version": "2.2.0",
       "origin": "https://skillpack.app",
       "files": {
         "LICENSE": "1945665fdb6968a66ea29438ddee0aee23035365c862e5c4a75b62b303340acf",
-        "SKILL.md": "b3bef882a97e8638620422ed45c480ac44a10f2bb66ee0190cb5a2d78d58bbc7",
-        "UPSTREAM.md": "9019abf89219d39beddc3606c90ad2984cf333ea89595461484e0c2514206010",
-        "companion.json": "84e6cd2f40a1a79e0a0cc1ac73d8c00b4a7a06f26032817eec4b93b822fa6dc3",
+        "SKILL.md": "2b35d573fc4233ffa48409f740ae0271f02852fe9b9d3d12d36e3aca861cd7cc",
+        "UPSTREAM.md": "0711cee4639a545e5dcef347baafd1631d35d0baa376691d03549f1ab3cf9e45",
+        "companion.json": "f05f38574f7fb2de44dc78569d346a578b153f9bbb2768037555c9bb2ff5a0a5",
         "scripts/.gitignore": "862263fa1f46c20f0d1e4dac5ffcc75abd55c08211b2c3864c5f8764b9d87793",
-        "scripts/ocr.py": "e67ec21a0e6c9926f64363ff33054af304ee9cc829bd916c0b1761632a8096f7",
-        "scripts/test_ocr.py": "5756a0faf924f493cb00e23b5125b0fe7883716e7e725017532ada25ff962e79"
+        "scripts/ocr.py": "d489b89d3ade3528e8c6aecf1b84aebba039845e0c509548a091e3b21ed5f5fe",
+        "scripts/test_ocr.py": "ac8b85e9ddfa2991ecf1036ca239f11d63030de5de328234130dd71cf9ff3724"
       }
     },
     {
       "path": ".agents/skills/ship-pr-dev",
       "skillId": "bccb0c35-71bf-4fe8-ad7c-7a931889fa84",
-      "version": "1.6.1",
+      "version": "1.6.2",
       "origin": "https://skillpack.app",
       "files": {
-        "SKILL.md": "2db8a6018e4b4f355ab4f6647c7a1b044c84022b4bf046870231a4299560988b",
-        "companion.json": "35ddc2ec09a0b38c4f9230225636a04650fdbdf3085e225f7328d8ac41029207",
+        "SKILL.md": "4509bfd8a8663b2a4cb787b0e05f5519d2d53d1f17e3a7503af92db80cab39bb",
+        "companion.json": "993fb9f4a9b3f16caffc6a5005940305b1a5decb19fc1e143863e1a5433b1837",
         "evals/evals.json": "f7f726212a676c70bb5e95137f19374bbb12bb25c9aaf6bc011a90e009ac1519",
         "references/agent-routing.md": "a9d45d21db3c868f17d626f2bb47e819d6bfd2041ad03362a5d2c9e3a351b1a9",
         "references/pr-template.md": "41a2de2a78d70792b5b9929afe26d804588a272b7bb29f8170c59e98db11a165",
         "references/readiness-gates.md": "a374db47897a458e48f4ed7703e6a4bc86173e12149e5604c9d5037bb3d9aed3",
-        "references/review-gate.md": "6dff7b5a98757276d345866a1fbf187427283e93b2f38aec593d08af3300e0e5",
+        "references/review-gate.md": "94777eb778bd1ea8cfc4034a2e5c28d2522893fd75b9a09bef9efb16e201e4e7",
         "references/workflow.md": "7cb31dec7042324a5e3dd2c67c9aaeed683a2b03f39ed37d4d01159b5f77566d",
         "scripts/.gitignore": "6feaded4e28ea86e001a6751b4e3d960e8b7c31b9616ff9936b79297086e809b",
         "scripts/collect_ship_context.py": "f6d8e8f50f121637c6e019c77111d8cdfaf4a07dfcbdcee9a919a35e168b616b",
