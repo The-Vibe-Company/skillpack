@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Both tutors explained the 1/3 analogy and the cross-language point outright, but B gave a shorter opening, asked for a prediction right away, and kept the learner reasoning through a series of predict-then-verify challenges, while A opened with a long lecture and had the learner do less of the thinking, though B drifted into more depth than a junior developer needs."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

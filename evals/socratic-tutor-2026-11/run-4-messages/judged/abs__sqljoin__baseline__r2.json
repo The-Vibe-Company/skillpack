@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__baseline__r2.json",
+ "scenario": "sqljoin",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor's content was accurate and the practice was good, but it gave away the ON vs WHERE answer in a long opening lecture without first checking what the learner knew, and each later turn was mostly explanation, so the learner only restated the point in their own words briefly."
+ },
+ "usage": {}
+}

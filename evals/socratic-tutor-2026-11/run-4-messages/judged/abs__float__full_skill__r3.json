@@ -1,0 +1,17 @@
+{
+ "file": "float__full_skill__r3.json",
+ "scenario": "float",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 1,
+  "lecture_count": 0,
+  "overall": 6,
+  "why": "The tutor ran a careful, non-leaking diagnostic that included the key 1/3 lever and logged the learner's misconceptions, but the transcript ends still in diagnosis, with the learner not yet having noticed the base-10/base-2 parallel or let go of the JavaScript-only belief."
+ },
+ "usage": {}
+}

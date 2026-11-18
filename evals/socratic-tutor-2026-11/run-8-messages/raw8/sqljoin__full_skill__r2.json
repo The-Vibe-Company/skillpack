@@ -1,0 +1,73 @@
+{
+ "scenario": "sqljoin",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Help me master SQL joins, especially LEFT JOIN.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's how I've broken SQL joins down into subskills we'll work through:\n\n1. INNER JOIN basics: matching rows across tables on a key\n2. LEFT JOIN semantics: keeping unmatched left rows and where NULLs come from\n3. ON vs. WHERE with LEFT JOIN: where you put a filter changes the result\n4. Row multiplication: one-to-many and many-to-many matches, duplicate rows\n5. Anti-joins and finding missing data: `LEFT JOIN ... WHERE right.id IS NULL`, and how it compares to `NOT EXISTS` / `NOT IN`\n6. RIGHT and FULL OUTER JOIN: how they relate to LEFT JOIN\n7. Chaining multiple joins: how a LEFT JOIN early in a chain can be quietly undone later\n8. Aggregates over outer joins: `COUNT(*)` vs. `COUNT(col)`, and handling NULLs with `COALESCE`\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we've done those. Then I'll show you a skill map and suggest where to begin.\n\nQuestion 1. You have these two tables:\n\n    customers                orders\n    id | name                id | customer_id | amount\n    ---+-------              ---+-------------+-------\n    1  | Ana                 10 | 1           | 50\n    2  | Ben                 11 | 1           | 30\n    3  | Cai                 12 | 3           | 20\n                             13 | 4           | 99\n\nWhat will this query return? List every row it outputs:\n\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id;"
+  },
+  {
+   "role": "student",
+   "text": "I think it's Ana 50, Ana 30, Ben NULL, Cai 20. Order 13 doesn't show up since there's no customer 4 and it's a left join on customers."
+  },
+  {
+   "role": "tutor",
+   "text": "That's correct: all four rows, and the right reason for order 13 being dropped. I'll note it and move on.\n\nQuestion 2. Same tables. Here are two queries that differ only in where the filter `o.amount > 25` goes:\n\n    -- Query A\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id AND o.amount > 25;\n\n    -- Query B\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    WHERE o.amount > 25;\n\nList the rows each query returns, and explain why they differ (if they do)."
+  },
+  {
+   "role": "student",
+   "text": "I think they return the same thing: Ana 50, Ana 30, Ben NULL, Cai NULL. Cai's 20 order gets filtered out by amount > 25, and it doesn't really matter if the filter is in ON or WHERE since it's still a left join on customers."
+  },
+  {
+   "role": "tutor",
+   "text": "Your rows for Query A are right. Your claim that Query B returns the same thing is not, so ON vs. WHERE goes on the map as a gap. I won't explain it yet because we're still in the diagnostic. It'll be one of the first things we work on.\n\nQuestion 3. Same tables. What does this query return? List every row:\n\n    SELECT c.name, COUNT(*) AS n_star, COUNT(o.id) AS n_orders\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    GROUP BY c.name;"
+  },
+  {
+   "role": "student",
+   "text": "Ana 2 2, Ben 1 0, Cai 1 1. I think COUNT(*) counts Ben's row even though it's all NULLs on the orders side, but COUNT(o.id) skips the NULL so he gets 0."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on all three rows, and your explanation is right: COUNT(*) counts rows, COUNT(o.id) counts non-NULL values. I'm noting that as a strength.\n\nQuestion 4. Same tables. Write a query that returns the names of customers who have no orders at all. Use a LEFT JOIN, not a subquery. Also say which name(s) it should return."
+  },
+  {
+   "role": "student",
+   "text": "SELECT c.name FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.id IS NULL; That should just return Ben, since he's the only one with no matching orders so his order columns come back NULL."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. The query is right and so is the result: only Ben. Ben's row has no matching order, so every `o.` column is NULL and `o.id IS NULL` picks him out. Filtering on `o.id` is the right choice because it's the right table's primary key, which can't be NULL in a real matching row.\n\nOne last diagnostic question, a harder one. Then I'll show you the map.\n\nQuestion 5. Same `customers` and `orders` tables, plus a third table:\n\n    payments\n    id  | order_id\n    ----+---------\n    100 | 10\n    101 | 10\n    102 | 12\n\nWhat does this query return? List every row, and say which customers and orders from the original tables don't appear, and why:\n\n    SELECT c.name, o.id AS order_id, p.id AS payment_id\n    FROM customers c\n    LEFT JOIN orders o   ON o.customer_id = c.id\n    JOIN payments p      ON p.order_id = o.id;"
+  },
+  {
+   "role": "student",
+   "text": "I'd say Ana 10 100, Ana 10 101, Ana 11 NULL, Ben NULL NULL, Cai 12 102. Order 11 has no payment so it gets NULL, and Ben stays since we left joined from customers. Order 13 still doesn't show because there's no customer 4."
+  },
+  {
+   "role": "tutor",
+   "text": "Not quite. You're right that order 13 doesn't appear, but your answer has rows that this query won't return. I won't say which ones or why yet. It's the same kind of gap as Question 2, and we'll come back to this exact query.\n\nThat's the end of the diagnostic. Here's where you're starting from:\n\n    Topic: SQL joins (focus: LEFT JOIN)          overall: █████░░░░░ 48%\n    -------------------------------------------------------------------------\n    1. INNER JOIN basics           [██████░░░░]  3/5  inferred, not directly tested\n    2. LEFT JOIN semantics         [████████░░]  4/5  * strong (Q1, Q3)\n    3. ON vs. WHERE                [████░░░░░░]  2/5  Query A right, Query B wrong\n    4. Row multiplication          [██████░░░░]  3/5  one-to-many handled fine\n    5. Anti-joins / missing data   [██████░░░░]  3/5  LEFT JOIN version right; NOT EXISTS / NOT IN not tested\n    6. RIGHT / FULL OUTER JOIN     [░░░░░░░░░░]  0/5  not tested yet\n    7. Chaining multiple joins     [██░░░░░░░░]  1/5  Q5 wrong\n    8. Aggregates over outer joins [██████░░░░]  3/5  COUNT(*) vs. COUNT(col) solid; COALESCE not tested\n    -------------------------------------------------------------------------\n\nI suggest we start with **3. ON vs. WHERE**. It's your biggest gap, and I think the mistake in Question 5 comes from the same misunderstanding, so fixing it first should make **7. Chaining** much easier right after. Some of these levels are only placements from one question each, so I'll re-test them as we go.\n\nShould we start with ON vs. WHERE, or would you like to begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, let's start with ON vs. WHERE. Honestly I still think A and B should come out the same, so I'm curious what I'm missing."
+  },
+  {
+   "role": "tutor",
+   "text": "Good, let's dig into it. I'll let you find the gap yourself instead of just telling you.\n\nOne fact to work with: SQL builds the joined rows first, using the ON condition. WHERE runs afterwards, on the rows the join has already produced.\n\nYou already worked out what the join produces without any filter in Question 1:\n\n    Ana  | 50\n    Ana  | 30\n    Ben  | NULL\n    Cai  | 20\n\nFor Query B, take those four rows and apply `WHERE o.amount > 25` to each one. Which rows survive, and why does each one that gets dropped get dropped?"
+  },
+  {
+   "role": "student",
+   "text": "Ana 50 and Ana 30 stay since they're over 25, and Cai 20 gets dropped because 20 isn't over 25. Ben's NULL > 25 isn't true either, so... he gets dropped too? Wait, so B only gives the two Ana rows and Ben actually disappears, that's not what I expected."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right. Query B returns only:\n\n    Ana  | 50\n    Ana  | 30\n\nYou got there yourself, and for the right reason. `NULL > 25` isn't true. It's unknown, and WHERE only keeps rows where the condition is true. So Ben's NULL-padded row gets thrown out along with Cai's.\n\nNow compare that with Query A, which you already got right: Ben NULL and Cai NULL both survive there. Cai's only order (20) fails `amount > 25` in Query A too, but Cai still shows up instead of disappearing.\n\nIn your own words: why does failing the condition in the ON clause still leave Cai in the result, when failing it in the WHERE clause removes Cai completely?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "76f48e4ebb"
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Tutor B keeps asking the learner to predict outputs and answer guiding questions across several escalating puzzles (shared dict, stale timestamp, lambda capture, inheritance), so the learner does most of the reasoning, while Tutor A opens with a long lecture that corrects the misconception by fiat and then trails off into linter and grep tips."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

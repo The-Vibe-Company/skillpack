@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Tutor B used targeted questions so the learner worked out for themselves that the 90% describes only the sick group and then computed the 15%, while Tutor A lectured, gave each answer outright, and the learner's gut stayed anchored at 90% over several rounds."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

@@ -1,0 +1,12 @@
+{
+ "file": "guard_race__full_skill__r3.json",
+ "scenario": "guard_race",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply immediately defines a race condition with a brief example and fix, without quizzing the user or proposing a lesson."
+ },
+ "usage": {}
+}

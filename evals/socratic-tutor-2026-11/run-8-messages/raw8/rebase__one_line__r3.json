@@ -1,0 +1,73 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Deal. Here's how it'll work: I'll ask one question at a time, you answer in your own words, and we only move on once your answer holds up. If something you say doesn't add up, I won't hand you the right answer. I'll ask you a sharper question instead so you can spot the problem yourself.\n\nHere's the setup we'll keep coming back to:\n\n```\n          C---D        feature\n         /\n    A---B---E---F      main\n```\n\nYou branched `feature` off `main` at commit B and made commits C and D. Meanwhile, someone else pushed E and F to `main`.\n\n**Question 1:** You're on `feature` and you run `git merge main`. Draw (or describe) what the history looks like afterward. Specifically, does a new commit get created, and if so, how many parents does it have?\n\nTake your best shot. Being wrong is fine; that's how the drill works."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, I think merge makes one new merge commit on feature that has two parents, D and F. So C and D stay as they are, and the merge commit ties in E and F from main."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. `git merge main` creates one new merge commit (call it M) on `feature`, and it has two parents: D, the tip of `feature`, and F, the tip of `main`. C and D stay exactly as they were, same content and same hashes:\n\n```\n          C---D---M    feature\n         /       /\n    A---B---E---F      main\n```\n\nOne small refinement: M doesn't copy E and F. It points to F as a parent, so E and F become reachable from `feature`. Nothing is duplicated.\n\nNow the other side.\n\n**Question 2:** Start again from the original picture (before the merge). You're on `feature` and you run `git rebase main`. Describe the history afterward. In particular, are C and D still the same commits as before (same hashes)? Why or why not? And does any merge commit get created?"
+  },
+  {
+   "role": "student",
+   "text": "I think rebase just picks up the feature pointer and moves it so C and D sit on top of F, so it looks like A-B-E-F-C-D. C and D are the same commits with the same hashes, git just changes where the branch points, and no merge commit gets made."
+  },
+  {
+   "role": "tutor",
+   "text": "Two parts of that hold up. The result is linear, with C and D sitting after F, and no merge commit gets created. Good.\n\nThe part about the same commits with the same hashes needs another look. I'm not going to tell you what's wrong with it. Work through these instead:\n\n1. A commit's hash is computed from everything stored inside that commit: the snapshot (tree), author, message, and its **parent pointer(s)**. In the original picture, what is C's parent?\n\n2. In the history you described, `A-B-E-F-C-D`, what is C's parent?\n\n3. Put those two answers next to your claim that C keeps the same hash. Can both be true? What does that tell you about whether the C after the rebase is the *same object* as the C before it?\n\nBonus, if you get through 3: in your version of events, git \"just moves the branch pointer.\" A branch pointer points at one commit. If git only moved `feature`, which commit would it point at, and would that commit's history actually include E and F?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, in the original picture C's parent is B, since that's where I branched off. I'm still kind of assuming git just tracks the parent separately from the hash though, so I'm not sure it changes anything."
+  },
+  {
+   "role": "tutor",
+   "text": "Right, C's parent is B. That part's solid.\n\nNow let's test the assumption that git tracks the parent separately from the hash. Take it as true for a moment and follow it through.\n\nYou run `git log` on `feature`. Git starts at the tip, D, and walks backward one parent at a time until it reaches A. To take each step, it needs to know the parent of the commit it's on.\n\nSo here's the narrow question: **when git is looking at commit C and needs to know where to go next, where does it read C's parent from?**\n\nSome things to consider as you answer:\n\n- If the parent lives somewhere other than inside the commit object, where is that \"somewhere\"? Have you ever seen git keep a separate table that maps commits to their parents?\n- Earlier I said a commit's hash is computed from everything stored *inside* the commit, including its parent pointer(s). If the parent really were stored outside the commit, which part of that statement would have to be false?\n\nOnce you've answered, go back to step 2: in `A-B-E-F-C-D`, what is C's parent? Then hold both answers side by side and tell me whether \"same hash\" still holds up."
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I guess it reads the parent from inside the commit object itself, I've never actually seen a separate parent table anywhere. But if the parent is inside the commit and C's parent changes from B to F, then the hash would have to change too... so wait, are the rebased C and D actually brand new commits?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. You got there yourself, and your reasoning holds.\n\nThe parent pointer is stored inside the commit, and the hash is computed from everything inside the commit. So if C's parent changes from B to F, C's hash has to change. You can't get a different parent without getting a different commit. Rebase doesn't move C and D. It creates new commits, usually written C' and D', that have the same changes and messages but different parents and so different hashes:\n\n```\n                  C'--D'   feature\n                 /\n    A---B---E---F          main\n```\n\nThe original C and D still exist. Nothing points to them anymore, so `git log` won't show them, but they stick around for a while (you can find them with `git reflog`).\n\nLet's lock that in with the bonus, which you can now answer properly.\n\n**Question 3:** After the rebase, `feature` points at D'. Your teammate Sam had already pulled your old `feature` branch before you rebased, so Sam's copy still has C and D (the originals, with B as C's parent). You force-push the rebased `feature`, and Sam runs `git pull`.\n\nFrom git's point of view on Sam's machine, how are the old C/D and the new C'/D' related? Does git see them as the same work or as different commits? What do you expect Sam's history to look like after the pull?\n\nThink about it using what you just worked out about hashes."
+  },
+  {
+   "role": "student",
+   "text": "Since C' and D' have different hashes, git on Sam's machine would see them as totally different commits from C and D, even though the changes are the same. So I guess after the pull Sam ends up with both sets, like the old C and D plus the new C' and D', probably tied together with a merge commit?"
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. Git compares commits by hash, not by what they change. To Sam's git, C' and D' are completely unrelated to C and D. They just happen to have similar diffs.\n\nSo when Sam runs a plain `git pull` (fetch, then merge), git sees that Sam's local `feature` (ending at D) and the remote `feature` (ending at D') have split apart, and it merges them:\n\n```\n          C---D-----------M    Sam's feature\n         /               /\n    A---B---E---F---C'--D'\n```\n\nSam now has two copies of every change you made: C next to C', and D next to D'. `git log` shows each of your commit messages twice. If Sam had committed anything on top of the old D, it gets carried along too, and if you resolved conflicts differently during the rebase, Sam may have to resolve them again in M. Worse, if Sam pushes this, the duplicates end up back on the shared branch, undoing the cleanup you wanted from the rebase.\n\nThat's the real reason behind the usual rule: **don't rebase commits that other people already have.** It comes straight from what you worked out: rebase means new hashes, and new hashes look like new work to everyone else.\n\n**Question 4:** Turn that rule into a decision. Here are two situations:\n\n- (a) You have three local commits on `feature` that you've never pushed, and `main` has moved on. You want to catch up before opening a PR.\n- (b) `feature` was pushed a week ago, and two teammates have been committing on top of it. You want to bring in the latest `main`.\n\nFor each one, would you use rebase or merge? Give the reason in terms of hashes and who already has which commits, not just \"because that's the rule.\""
+  },
+  {
+   "role": "student",
+   "text": "For (a) I'd rebase, since nobody else has those three commits, so it doesn't matter that they get new hashes and I end up with a clean line on top of main. For (b) I'd merge, because my teammates already have the old hashes and their work sits on top of them, so rebasing would give them that duplicate mess like Sam's."
+  },
+  {
+   "role": "tutor",
+   "text": "Both calls are right, and so are your reasons. Notice that you explained them with hashes and with who already has which commits. That's the understanding we were after.\n\n- **(a) Rebase.** Those three commits exist only on your machine, so giving them new hashes costs nobody anything. You end up with a clean, linear branch on top of the latest `main`, which also makes the PR easier to review.\n- **(b) Merge.** Your teammates' commits have the old hashes as ancestors. If you rewrote those hashes, every teammate would end up in Sam's situation, and their own commits would sit on top of commits that no longer exist on the shared branch. A merge adds one new commit and leaves every existing hash alone, so nobody's history breaks.\n\nThe general principle is this: **rebase rewrites history, merge adds to it.** Rewriting is only safe when you're the only one who has that history.\n\nNow let's push on the edge of that rule.\n\n**Question 5:** Go back to situation (a). You rebased your three local commits onto `main` and pushed `feature`. You opened a PR. A day later, `main` moves on again, and nobody else has pulled or committed on `feature`. Only the PR page has seen it.\n\n1. Can you rebase again? Base your answer on the principle above (who actually has those hashes?), not on \"it's been pushed, so no.\"\n2. If you do rebase, a plain `git push` will be rejected. Why? Describe what the remote sees when it compares its `feature` with yours.\n3. Developers often use `git push --force-with-lease` here instead of `git push --force`. Given what happened to Sam, what do you think `--force-with-lease` protects you from that `--force` doesn't?\n\nTake them in order. Part 2 is the one to think through carefully."
+  },
+  {
+   "role": "student",
+   "text": "For part 1, I think yeah, I can rebase again, because nobody else actually has those hashes, only my machine and the PR page. Nobody's built anything on top of them, so there's no Sam situation to worry about."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, and your reason is the right one. The question isn't \"has it been pushed?\" It's \"has anyone built on these hashes, or do they have copies they'll try to reconcile?\" Here nobody has. No teammate pulled, and nobody committed on top. Rewriting those three commits again won't put anyone in Sam's position.\n\nThere's one thing to keep in mind, though. You said only your machine and the PR page have those hashes. The PR page is showing the `feature` branch on the remote, so the remote does have the old hashes, and the remote is the one that has to accept your new ones. That's where part 2 comes in.\n\n**Part 2:** After the second rebase, your local `feature` ends at new commits (call them C'', D'', and so on) sitting on top of the new `main`. The remote's `feature` still ends at the old rebased commits from yesterday.\n\nBy default, a `git push` is only accepted if it's a fast-forward. That means the remote's current tip has to be an ancestor of the commit you're pushing, so that updating the branch only adds commits and never drops any.\n\nSo work through it:\n\n1. Start at your new local tip and walk back one parent at a time. Do you ever reach the commit the remote's `feature` currently points to?\n2. If you don't, what would happen to the remote's current commits if it accepted your push anyway?\n3. Given that, why does the remote refuse?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "2bf0b53922"
+}

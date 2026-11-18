@@ -1,0 +1,17 @@
+{
+ "file": "rebase__baseline__r2.json",
+ "scenario": "rebase",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 6,
+  "why": "The tutor gave away that rebase creates new commits with new hashes in its first message, before learning what the learner believed, and then explained at length, although the hard questions it asked did get the learner to state the new-copies idea and the shared-history rule in their own words."
+ },
+ "usage": {}
+}

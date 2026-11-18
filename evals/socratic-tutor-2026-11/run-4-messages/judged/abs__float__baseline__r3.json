@@ -1,0 +1,17 @@
+{
+ "file": "float__baseline__r3.json",
+ "scenario": "float",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor's explanation was accurate and thorough, and the learner did restate the key idea in their own words, but the tutor gave the whole answer in a long first lecture without asking what the learner already knew or letting them notice the 1/3 analogy on their own."
+ },
+ "usage": {}
+}

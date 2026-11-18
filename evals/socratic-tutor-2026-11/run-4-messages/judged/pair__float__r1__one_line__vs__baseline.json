@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open with a long lecture, but A then uses targeted questions (e.g., noticing the stored 0.1 is above 0.1 yet the sum lands below 1.0) that lead the learner to discover per-operation rounding themselves, whereas B gives away prediction answers in its hint and spends turns lecturing on cents handling and tie-breaking, leaving the learner less reasoning to do."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

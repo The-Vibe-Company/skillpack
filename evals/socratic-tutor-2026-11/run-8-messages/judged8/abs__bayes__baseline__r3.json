@@ -1,0 +1,17 @@
+{
+ "file": "bayes__baseline__r3.json",
+ "scenario": "bayes",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 5,
+  "overall": 6,
+  "why": "The tutor opened with a full lecture that gave away the 9% answer and its base-rate explanation without checking what the learner knew first, but then guided the learner well through scaffolded count-based problems until the learner could explain in their own words that false alarms outnumber true cases."
+ },
+ "usage": {}
+}

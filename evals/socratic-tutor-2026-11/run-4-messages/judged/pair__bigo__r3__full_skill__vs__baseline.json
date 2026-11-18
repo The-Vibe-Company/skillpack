@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A's diagnostic questions got the learner to reveal the sequential-loops-multiply misconception in their own reasoning without the tutor correcting it by fiat, while B told the learner 'loops add' before the misconception came up, so the learner simply accepted the rule without reasoning through it and never examined the O(2n) belief."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

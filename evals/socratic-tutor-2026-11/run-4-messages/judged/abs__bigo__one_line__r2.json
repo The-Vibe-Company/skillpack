@@ -1,0 +1,17 @@
+{
+ "file": "bigo__one_line__r2.json",
+ "scenario": "bigo",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 6,
+  "why": "The tutor's later probes are good Socratic questions: they compare halving in the two cases and ask the learner to fill in a doubling table. But turn 2 had already stated that constants drop out, the learner still held the misconception at the end, and the two-sequential-loops misconception was never raised."
+ },
+ "usage": {}
+}

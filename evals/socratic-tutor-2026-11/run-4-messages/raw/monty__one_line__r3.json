@@ -1,0 +1,41 @@
+{
+ "scenario": "monty",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Fair enough. The usual \"1/3 vs 2/3\" line skips the step that actually matters, so let's go through it properly.\n\n**The setup**\n- There are three doors. A car is behind one, goats are behind the other two.\n- You pick a door, say Door 1.\n- The host knows where the car is. He opens one of the *other* doors, and it's always a goat. He never opens your door and he never shows the car.\n- He offers you the chance to switch to the remaining closed door.\n\n**The key point: the host isn't choosing at random**\nHis choice is limited by where the car is. That limit is where the information comes from. Just go through every case where you pick Door 1:\n\n| Car is behind | Host must open | If you stay | If you switch |\n|---|---|---|---|\n| Door 1 (1/3) | Door 2 or 3 | Win | Lose |\n| Door 2 (1/3) | Door 3 (forced) | Lose | Win |\n| Door 3 (1/3) | Door 2 (forced) | Lose | Win |\n\nSwitching wins in 2 of the 3 equally likely cases. Staying wins only when your first guess was right, and that happens 1/3 of the time. Nothing the host does can change that.\n\n**Another way to see it**\nWhen you switch, you're really betting that your first pick was wrong. You're wrong 2/3 of the time, so switching wins 2/3 of the time.\n\n**If it still feels off, scale it up**\nPicture 100 doors. You pick one. The host, who knows where the car is, opens 98 goat doors and leaves your door and one other, say #73, closed. Is it really 50/50 between your random pick and the one door he carefully avoided?\n\n**Try it yourself**\nTake three playing cards, one ace and two others, and have a friend play the host 30 times. Or I can give you a 10-line simulation to run.\n\nNow tell me exactly where it stops making sense to you. Is it something like \"two doors are left, so it must be 50/50\"? Or is it something else? Tell me the reasoning you find convincing and we'll test it on the table above."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, it's basically that. Once the goat door is open it's gone, so there are two closed doors and the car is behind one of them, which makes it 50/50 to me. I don't see why what happened before should matter now."
+  },
+  {
+   "role": "tutor",
+   "text": "Let's test \"50/50\" with one question.\n\nWhen you first picked Door 1, there was a 1/3 chance the car was behind it. You're saying that after the host opens a goat door, Door 1 is now 1/2.\n\nBut the host was always going to open a goat door. Whatever was behind Door 1, he's never allowed to open your door or show the car, so you knew in advance that you'd see a goat.\n\nSo what did you learn by watching him do the thing you already knew he would do that raised Door 1 from 1/3 to 1/2?"
+  },
+  {
+   "role": "student",
+   "text": "I learned which door has a goat, so there's one fewer option. Before there were three doors, now there are two, so it's 1/2 each. Odds change when the situation changes, right?"
+  },
+  {
+   "role": "tutor",
+   "text": "Let's test \"one fewer option means 1/2 each\" by itself.\n\nThe host is never allowed to open your door. So Door 1 could never have been the one that got removed. Whatever is behind it, it was always going to be one of the last two doors standing.\n\nHere's the narrower question. Before he opens anything, you already know for certain that Door 1 will survive and one other door will survive with it. If knowing that in advance doesn't make Door 1 a 1/2 shot, what extra fact about Door 1 itself do you learn when he actually opens Door 3 that moves it from 1/3 to 1/2?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I guess nothing about Door 1 itself changes. But once Door 3 is open, the car has to be behind Door 1 or Door 2, and I don't see why one of those should be favored over the other."
+  },
+  {
+   "role": "tutor",
+   "text": "Good, you've agreed that nothing about Door 1 changed. So let's look at whether Door 1 and Door 2 really got through the host's choice the same way.\n\nDoor 1 was protected. The host could never open it, so it would still be closed whatever was behind it. Door 2 had no protection. It was one of the two doors the host could pick from, and it's still closed.\n\nSo here's the narrower question. Suppose the car is behind Door 1. The host can open Door 2 or Door 3, so how often would he pick Door 3, as he just did? Now suppose the car is behind Door 2. How often would he pick Door 3 then?\n\nIf those two answers are different, can \"the car is behind Door 1\" and \"the car is behind Door 2\" really explain what you just saw equally well?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "6b2832f25a"
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B has the learner work out row-count bounds and edge cases for themselves, and when the WHERE-vs-ON misconception comes up it asks guided tracing questions so the learner finds the problem, whereas A lectures and corrects the same misconception outright with little reasoning asked of the learner."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

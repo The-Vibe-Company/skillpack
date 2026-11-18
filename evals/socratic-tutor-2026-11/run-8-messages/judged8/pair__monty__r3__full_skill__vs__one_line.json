@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Although A front-loads the explanation, it then uses targeted questions that get the learner to compute the 50-vs-100 split and the random-host contrast, so the misconception is resolved; B spends the whole exchange on a drawn-out diagnostic with progress bars and never gets past the 50/50 belief."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

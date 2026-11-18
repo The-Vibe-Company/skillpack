@@ -1,0 +1,73 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Here's how I've split the topic into subskills:\n\n1. What a commit is: snapshots, parents, and the commit graph\n2. What `git merge` does: fast-forward vs. merge commit\n3. What `git rebase` does: replaying commits, new hashes\n4. How the resulting history differs (shape, readability, `git log`)\n5. Conflicts: how each one surfaces and resolves them\n6. The golden rule: rewriting shared history, and force-push\n7. Choosing between them in real workflows (feature branches, `pull --rebase`, interactive rebase)\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until that's done. Just answer as best you can. \"I don't know\" is a useful answer too.\n\nQuestion 1: You're on branch `feature`, which you made from `main` a few days ago. Since then you've made 2 commits on `feature`, and teammates have pushed 3 commits to `main`. You run `git checkout feature` and then `git merge main`. Describe what your commit history looks like afterward. How many new commits exist, and what's special about any of them?"
+  },
+  {
+   "role": "student",
+   "text": "I think you'd get one new commit, a merge commit, that ties the 3 main commits into my feature branch. The special thing is it has two parents, I think, one from feature and one from main, and my 2 commits stay as they were."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold feedback until the diagnostic is done.\n\nQuestion 2: Same starting point. You're on `feature` with your 2 commits, and `main` has 3 new commits. This time you run `git rebase main` instead of merging. Afterward, what does the history of `feature` look like? Are your 2 commits the same commits they were before? How would you be able to tell?"
+  },
+  {
+   "role": "student",
+   "text": "I think rebase just picks up my branch and moves it so it starts from the tip of main, so it's a straight line with my 2 commits on top. They'd be the same commits, same hashes, it's really just the branch pointer moving. I guess I could check the hashes in the log and they'd match."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Still holding feedback until the diagnostic is done.\n\nQuestion 3: Suppose you rebased `feature` onto `main` and Git stopped partway through with a conflict while applying your first commit. You fix the file. What commands do you run next to finish the rebase? And how is this different from what you'd do if the same conflict had happened during a `git merge`?"
+  },
+  {
+   "role": "student",
+   "text": "I'd fix the file, then git add it and run git rebase --continue I think. With a merge I'd just add the file and make a commit myself to finish it. In the GUI it's mostly just clicking \"continue\" though."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. One more question after this one, then you'll get feedback and your skill map.\n\nQuestion 4: You rebased `feature` onto `main` on your laptop. But you had already pushed `feature` to the shared remote yesterday, and a teammate pulled it and started building on top of it. You now run `git push` and it gets rejected. Why is it rejected, what would you do to get your rebased branch onto the remote, and what problem does that create for your teammate?"
+  },
+  {
+   "role": "student",
+   "text": "I think it's rejected because my local branch is ahead or out of sync with the remote somehow, so I'd probably just force push it. I don't really see a problem for my teammate though, since the commits are the same ones with the same hashes, they'd just see the branch starting from a newer point on main."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Here's where you stand.\n\n**Q1 (merge):** Correct. One new merge commit with two parents, and your 2 commits stay exactly as they were. That's a solid answer.\n\n**Q3 (conflicts):** Mostly right. `git add` then `git rebase --continue` is correct. For a merge, `git add` plus `git commit` works (`git merge --continue` does the same thing). I'll still check whether you understand *why* a rebase can stop several times and a merge stops only once, since that's the part that matters.\n\n**Q2 (rebase):** Not right, and this is the key gap. Part of your answer is right: you get a straight line with your 2 commits on top of `main`. The part about the commits being \"the same commits, same hashes, just the pointer moving\" is wrong. I won't tell you why yet. You'll work it out.\n\n**Q4 (force-push):** You got the action right: rebased branches usually do need a force push. But you decided there's \"no problem for your teammate\" because of the same wrong belief from Q2. Once that belief is fixed, your answer to Q4 should change too.\n\n```\nTopic: git rebase vs merge                 overall: ████░░░░░░ 37%\n-----------------------------------------------------------------\n1 commits, parents, graph   [████░░░░░░]  2/5\n2 what merge does           [██████░░░░]  3/5\n3 what rebase does          [██░░░░░░░░]  1/5  <- proposed focus\n4 history shape / log       [████░░░░░░]  2/5\n5 conflicts                 [██████░░░░]  3/5\n6 golden rule / force-push  [██░░░░░░░░]  1/5\n7 choosing in real workflows[██░░░░░░░░]  1/5  (not tested yet)\n-----------------------------------------------------------------\n```\n\nNone of these are at 4 yet. A level only goes up after you've passed at least two separate checks, and so far each subskill has had at most one.\n\n**Proposed plan:** Start with #3 (what rebase does) and go through #1 (what a commit actually is) on the way, because your Q2 mistake comes from there. #6 should mostly fall into place after that. Then we'll firm up merge and conflicts, and finish with real workflows.\n\nDo you want to start with rebase as proposed, or would you rather pick a different subskill?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, let's start with rebase like you proposed. Honestly I'm a bit surprised I got it wrong though, I always thought it was just moving the pointer."
+  },
+  {
+   "role": "tutor",
+   "text": "That's a really common mental model, so don't worry about it. \"Just moving the pointer\" is close to describing something real in Git. It just isn't what rebase does. Let's take it apart.\n\nUse concrete names. When you created `feature`, `main` pointed at a commit we'll call `M0`. You then made `F1` and `F2` on `feature`. Meanwhile `main` moved ahead with `M1`, `M2`, `M3`.\n\n```\n          F1---F2        (feature)\n         /\n...---M0---M1---M2---M3  (main)\n```\n\nBefore the rebase, `F1`'s parent is `M0`. After `git rebase main`, your first commit sits right after `M3` in the straight line.\n\nQuestion: after the rebase, which commit is the parent of your first feature commit? Is that the same as before or different?"
+  },
+  {
+   "role": "student",
+   "text": "After the rebase it'd be M3, so different from before, where it was M0. But that's just where it's attached now, right? I'd still think it's the same commit underneath."
+  },
+  {
+   "role": "tutor",
+   "text": "Right. The parent changes from `M0` to `M3`. Now let's test the \"same commit underneath\" idea.\n\nHere's something you couldn't have worked out on your own. A commit's hash isn't a label attached to the commit afterward. Git computes it as a checksum of everything stored in the commit object: the snapshot of your files, the author, the timestamps, the message, and the hash of its parent (or parents). If any of those inputs changes, the result is a different hash, and so a different commit.\n\nQuestion: knowing that, what has to happen to the hash of your first feature commit when its parent changes from `M0` to `M3`? And what does that mean for your second commit, `F2`?"
+  },
+  {
+   "role": "student",
+   "text": "Oh... if the parent hash is one of the inputs, then F1 would have to get a different hash once its parent is M3. So it's not really the same commit anymore, it's a new one with the same changes. I guess F2 changes too then, since its parent is now that new F1?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, and you reasoned your way there yourself. F1's parent hash is one of its inputs, so changing the parent gives F1 a new hash. We'll call the new commit F1'. F2's parent is now F1', not F1, so F2 also gets a new hash: F2'. The change cascades all the way up the branch. Rebase doesn't move your commits. It creates new copies of them, one at a time, on top of `main`.\n\nOne correction on \"a new one with the same changes.\" That's close but not exact. The diff that F1' introduces is (usually) the same as F1's. But the snapshot stored in F1' is not the same, because it also contains everything from M1, M2 and M3. Keep that difference between \"same diff\" and \"same snapshot\" in mind. It will come back when we get to conflicts.\n\n```\n          F1---F2                 (old commits)\n         /\n...---M0---M1---M2---M3           (main)\n                       \\\n                        F1'---F2' (feature)\n```\n\nI'm not changing any levels yet. You were just told the key fact, so this was guided reasoning, not independent recall.\n\nQuestion: after the rebase, the `feature` label points at F2'. What happens to the original F1 and F2? Are they deleted, changed, or something else? And is there anywhere they might still be referenced?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "bcdca882c6"
+}

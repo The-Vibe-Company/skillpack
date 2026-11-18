@@ -1,0 +1,17 @@
+{
+ "file": "rebase__full_skill__r1.json",
+ "scenario": "rebase",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 7,
+  "why": "The tutor diagnosed carefully and held off on corrections, then used targeted questions so the learner tentatively worked out that a changed parent changes the hash; the transcript ends before the learner explains rebase creating new commits or why rewriting shared history causes problems."
+ },
+ "usage": {}
+}

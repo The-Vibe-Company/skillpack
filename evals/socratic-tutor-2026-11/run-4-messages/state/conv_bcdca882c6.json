@@ -1,0 +1,37 @@
+{
+ "id": "bcdca882c6",
+ "scenario": "rebase",
+ "kind": "tutor",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Here's how I've split the topic into subskills:\n\n1. What a commit is: snapshots, parents, and the commit graph\n2. What `git merge` does: fast-forward vs. merge commit\n3. What `git rebase` does: replaying commits, new hashes\n4. How the resulting history differs (shape, readability, `git log`)\n5. Conflicts: how each one surfaces and resolves them\n6. The golden rule: rewriting shared history, and force-push\n7. Choosing between them in real workflows (feature branches, `pull --rebase`, interactive rebase)\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until that's done. Just answer as best you can. \"I don't know\" is a useful answer too.\n\nQuestion 1: You're on branch `feature`, which you made from `main` a few days ago. Since then you've made 2 commits on `feature`, and teammates have pushed 3 commits to `main`. You run `git checkout feature` and then `git merge main`. Describe what your commit history looks like afterward. How many new commits exist, and what's special about any of them?"
+  },
+  {
+   "role": "learner",
+   "text": "I think you'd get one new commit, a merge commit, that ties the 3 main commits into my feature branch. The special thing is it has two parents, I think, one from feature and one from main, and my 2 commits stay as they were."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold feedback until the diagnostic is done.\n\nQuestion 2: Same starting point. You're on `feature` with your 2 commits, and `main` has 3 new commits. This time you run `git rebase main` instead of merging. Afterward, what does the history of `feature` look like? Are your 2 commits the same commits they were before? How would you be able to tell?"
+  },
+  {
+   "role": "learner",
+   "text": "I think rebase just picks up my branch and moves it so it starts from the tip of main, so it's a straight line with my 2 commits on top. They'd be the same commits, same hashes, it's really just the branch pointer moving. I guess I could check the hashes in the log and they'd match."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Still holding feedback until the diagnostic is done.\n\nQuestion 3: Suppose you rebased `feature` onto `main` and Git stopped partway through with a conflict while applying your first commit. You fix the file. What commands do you run next to finish the rebase? And how is this different from what you'd do if the same conflict had happened during a `git merge`?"
+  },
+  {
+   "role": "learner",
+   "text": "I'd fix the file, then git add it and run git rebase --continue I think. With a merge I'd just add the file and make a commit myself to finish it. In the GUI it's mostly just clicking \"continue\" though."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. One more question after this one, then you'll get feedback and your skill map.\n\nQuestion 4: You rebased `feature` onto `main` on your laptop. But you had already pushed `feature` to the shared remote yesterday, and a teammate pulled it and started building on top of it. You now run `git push` and it gets rejected. Why is it rejected, what would you do to get your rebased branch onto the remote, and what problem does that create for your teammate?"
+  }
+ ],
+ "pending": null
+}

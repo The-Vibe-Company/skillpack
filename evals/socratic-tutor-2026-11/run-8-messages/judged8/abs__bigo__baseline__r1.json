@@ -1,0 +1,17 @@
+{
+ "file": "bigo__baseline__r1.json",
+ "scenario": "bigo",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 3,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 5,
+  "overall": 5,
+  "why": "The tutor quizzed well and caught the O(3n) error, but it told the learner the answer that constants drop (first with log bases, then outright) instead of drawing it out, never covered the sequential-loops-vs-nested part of the misconception, and the learner never restated the correct idea in their own words."
+ },
+ "usage": {}
+}

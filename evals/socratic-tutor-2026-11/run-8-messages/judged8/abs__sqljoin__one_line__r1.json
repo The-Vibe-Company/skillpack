@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__one_line__r1.json",
+ "scenario": "sqljoin",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 5,
+  "overall": 7,
+  "why": "The tutor gave away the ON-vs-WHERE resolution in an opening lecture without first finding out what the learner knew, but once the misconception came up it used step-by-step questions well, so the learner worked out the NULL/WHERE behavior and the ON fix in their own words, although later turns drifted back into long explanations."
+ },
+ "usage": {}
+}

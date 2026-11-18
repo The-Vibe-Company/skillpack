@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "In A the tutor got the learner to say the 50/50 belief out loud and then asked targeted questions until the learner worked out the forced-host asymmetry and the random-host contrast on their own, while B handed over the full explanation up front and then ran on through several redundant goodbye turns."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

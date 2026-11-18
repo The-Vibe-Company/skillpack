@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Although B front-loads the table and answer, it then makes the learner derive the decisive step (opening a goat door can't move the car, so staying stays at ~100/300) and resolves the misconception efficiently, whereas A spends many turns on diagnostics and progress bars and never reaches a resolution."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

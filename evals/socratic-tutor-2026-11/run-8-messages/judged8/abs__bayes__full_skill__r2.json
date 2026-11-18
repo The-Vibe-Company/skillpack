@@ -1,0 +1,17 @@
+{
+ "file": "bayes__full_skill__r2.json",
+ "scenario": "bayes",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 5,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 1,
+  "lecture_count": 1,
+  "overall": 7,
+  "why": "The tutor diagnosed well and let the learner count their way to about 8%, but its long post-diagnostic feedback said outright that the learner had swapped 'catches 90% of sick people' with '90% of positives are sick' before the learner worked that out; good Socratic questioning afterwards then had the learner state the P(pos|D) vs P(D|pos) distinction in their own words."
+ },
+ "usage": {}
+}

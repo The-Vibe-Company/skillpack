@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__one_line__r2.json",
+ "scenario": "pydefault",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 7,
+  "overall": 5,
+  "why": "The tutor opened with a long lecture that gave away the key fact (defaults are evaluated once and shared) without first asking what the learner knew, though later turns used good prediction puzzles that let the learner apply and state the rule in their own words."
+ },
+ "usage": {}
+}

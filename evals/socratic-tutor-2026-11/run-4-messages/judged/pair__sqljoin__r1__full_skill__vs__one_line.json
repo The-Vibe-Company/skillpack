@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A had the learner trace Cara's row through the join, then WHERE, then GROUP BY until the learner found the misconception on their own, while Tutor B just said the answer was wrong and put off explaining it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

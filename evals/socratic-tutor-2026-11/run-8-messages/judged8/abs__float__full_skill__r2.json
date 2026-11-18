@@ -1,0 +1,17 @@
+{
+ "file": "float__full_skill__r2.json",
+ "scenario": "float",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 8,
+  "why": "The tutor used well-sequenced questions (1/3, denominators, base 2) that led the learner to discover on their own that 0.1 repeats in binary and to suspect other languages share the issue, though the transcript ends before the learner explains how the sum gets rounded, and the skill-map and IEEE 754 turns are lecture-heavy."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B drew out the learner's misconception and had them reason step by step through Cara's row, NULL > 30, and the WHERE drop, so they found the bug and wrote the fix themselves; A told them the answer up front and the learner mostly agreed with it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

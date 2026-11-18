@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A gets the learner to test the two-loops misconception directly by counting operations and comparing growth rates, so the learner does the reasoning, while B gives long lectures, never addresses the sequential-loops misconception, and corrects O(3n) by fiat."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

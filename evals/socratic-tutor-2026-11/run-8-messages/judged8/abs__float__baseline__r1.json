@@ -1,0 +1,17 @@
+{
+ "file": "float__baseline__r1.json",
+ "scenario": "float",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 6,
+  "overall": 4,
+  "why": "The tutor's explanations were accurate and the later prediction questions led to real reasoning, but the first message laid out the whole answer (the 1/3 analogy, binary rounding, and that this is not a JavaScript bug) before checking what the learner knew, so the learner's insights mostly repeated what they had just read."
+ },
+ "usage": {}
+}

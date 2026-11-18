@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A draws out the learner's 50/50 belief and uses targeted questions to move the learner's own reasoning forward, while Tutor B front-loads a full lecture that settles the misconception by explanation, so the learner does little of the reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

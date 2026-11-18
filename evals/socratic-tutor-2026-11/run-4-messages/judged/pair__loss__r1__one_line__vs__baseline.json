@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open with the same lecture that hands over the answer, but A then gets the learner to work the 40% drop and the back-to-back drops themselves, while B only confirms and keeps lecturing, so the learner in B does almost none of the reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

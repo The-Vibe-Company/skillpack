@@ -1,0 +1,37 @@
+{
+ "id": "984e8650b7",
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. Here's how I've broken \"Python function default arguments\" into subskills:\n\n1. Basic syntax and rules: defining defaults, ordering (defaults after non-defaults), overriding them\n2. Positional vs. keyword passing with defaults\n3. When defaults are evaluated (at definition time, not call time)\n4. The mutable default trap (`def f(x=[])`) and why it happens\n5. The `None` sentinel idiom, and custom sentinels for when `None` is a valid value\n6. Interaction with `*args`, `**kwargs`, keyword-only (`*`) and positional-only (`/`) parameters\n7. Introspection: `__defaults__`, `__kwdefaults__`, `inspect.signature`\n8. Defaults that capture variables: closures, lambdas in loops, and the deliberate `i=i` trick\n\nFirst I'll ask a few diagnostic questions, one at a time, to see what you already know. I won't teach anything until that's done, so just answer as best you can. \"I don't know\" is a useful answer too.\n\nQuestion 1: What does this code print, and why?\n\n```python\ndef greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"\n\nprint(greet(\"Ana\"))\nprint(greet(\"Ana\", \"Hi\"))\nprint(greet(greeting=\"Hey\", name=\"Ana\"))\n```"
+  },
+  {
+   "role": "learner",
+   "text": "First one prints \"Hello, Ana!\" since greeting falls back to the default. Second prints \"Hi, Ana!\" because \"Hi\" overrides it, and the third prints \"Hey, Ana!\" since keywords can be passed in any order."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, noted.\n\nQuestion 2: What does this code print, and why?\n\n```python\ndef add_item(item, items=[]):\n    items.append(item)\n    return items\n\nprint(add_item(\"a\"))\nprint(add_item(\"b\"))\nprint(add_item(\"c\", []))\nprint(add_item(\"d\"))\n```"
+  },
+  {
+   "role": "learner",
+   "text": "I think it prints ['a'], then ['b'], then ['c'], then ['d']. Each call that doesn't pass a list gets a brand new empty list from the default, so nothing carries over between calls."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to that one once the diagnostic is done.\n\nQuestion 3: What does this code print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda i=i: i)\n\nprint([f() for f in funcs])\n```"
+  },
+  {
+   "role": "learner",
+   "text": "I think the first one prints [0, 1, 2] since each lambda grabs i as the loop goes. The second one also prints [0, 1, 2], and the i=i thing just makes it explicit, though I'm not totally sure why you'd need it."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to the `i=i` question after the diagnostic.\n\nQuestion 4: Which of these calls work and which raise an error? For each one that fails, say why.\n\n```python\ndef connect(host, /, port=5432, *, timeout=10, **options):\n    return host, port, timeout, options\n\nconnect(\"db\", 5433)                   # A\nconnect(host=\"db\")                    # B\nconnect(\"db\", 5433, 30)               # C\nconnect(\"db\", timeout=5, retries=3)   # D\n```"
+  }
+ ],
+ "pending": null
+}

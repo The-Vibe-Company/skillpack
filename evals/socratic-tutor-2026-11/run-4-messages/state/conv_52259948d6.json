@@ -1,0 +1,37 @@
+{
+ "id": "52259948d6",
+ "scenario": "bayes",
+ "kind": "tutor",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to help. Let's start with the core idea, then find exactly where things go off track for you.\n\n**The formula**\n\nP(A | B) = P(B | A) × P(A) / P(B)\n\nIn words: to find how likely A is *given* you've seen B, take how likely B is when A is true, weight it by how common A was to begin with, and divide by how common B is overall.\n\n**The pieces**\n- **P(A)**, the *prior*: how likely A is before any evidence.\n- **P(B | A)**, the *likelihood*: how likely the evidence is if A is true.\n- **P(B)**, the *evidence*: how likely the evidence is overall, counting every way it could happen. Usually you compute it as P(B | A)·P(A) + P(B | not A)·P(not A).\n- **P(A | B)**, the *posterior*: your updated belief.\n\n**A classic example**\n\nA disease affects 1% of people. A test catches 90% of real cases (sensitivity) but also comes back positive for 5% of healthy people (false positives). You test positive. What's the chance you actually have the disease?\n\nTry it as counts with 1,000 people:\n- 10 have the disease, and 9 of them test positive.\n- 990 are healthy, and about 49.5 of them test positive.\n- Total positives: about 58.5.\n- So P(disease | positive) ≈ 9 / 58.5 ≈ **15%**.\n\nMost people guess around 90%. That gap is the whole lesson.\n\n**The two most common mistakes**\n1. **Mixing up P(A | B) and P(B | A).** \"The test is 90% accurate\" tells you P(positive | disease), not P(disease | positive).\n2. **Ignoring the base rate.** A rare condition stays fairly unlikely even after a positive result, because the false positives from the large healthy group swamp the true positives.\n\n**Your turn**\n\nBefore you work through it, tell me: in the example above, which number is the prior and which is the likelihood? Then show me how you'd usually set up a problem like this, step by step. Once I can see your reasoning I can point to exactly where it slips."
+  },
+  {
+   "role": "learner",
+   "text": "Okay, I think the prior is the 1% and the likelihood is the 90%? Honestly that 15% surprises me, my gut still says a positive on a 90% accurate test should mean you're pretty much sick, but I can see the counts add up."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got both right. The 1% is the prior, P(disease), and the 90% is the likelihood, P(positive | disease). Good.\n\nYour gut reaction is the useful part, so let's work on that. It isn't silly. It's the exact intuition Bayes' theorem corrects, and you'll learn more by finding the flaw yourself than by having me point to it.\n\nOne question. When you say a positive on a \"90% accurate\" test means you're pretty much sick, you're treating the 90% as an answer to a question. Which one?\n\n- (a) \"If I have the disease, how likely is a positive test?\"\n- (b) \"If I have a positive test, how likely is it that I have the disease?\"\n\nChoose one. Then go back to the 1,000 people and check which group the 90% was actually calculated from: everyone who tested positive, or everyone who has the disease?"
+  },
+  {
+   "role": "learner",
+   "text": "I guess (a)? The 90% came from the 10 sick people, 9 of them tested positive. But honestly in real life if my doctor said \"90% accurate test, you're positive\" I'd still assume that's basically my odds of being sick."
+  },
+  {
+   "role": "tutor",
+   "text": "Right, (a). And you found it yourself: the 90% was calculated only from the 10 sick people.\n\nNow hold that next to your real-life instinct. When your doctor says \"you're positive,\" you don't know yet which group you're in. You only know you're one of the roughly 58.5 people who tested positive.\n\nSo here's a narrower question: of those 58.5 positive people, how many are actually sick? And does a number calculated only from the 10 sick people tell you anything about the other 49.5 positives who are healthy?\n\nWork out that fraction, then tell me if \"90%\" is still the number you'd want your doctor to give you."
+  },
+  {
+   "role": "learner",
+   "text": "Okay, so only 9 of the 58.5 positives are actually sick, that's like 15%. Huh, so the 90% was never about people who tested positive at all, it's just about the sick ones. I guess I'd want my doctor to tell me the 15%, that's kind of unsettling."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right, and you put it well: the 90% was never about people who tested positive. It describes how the test behaves in sick people. The 15% describes people in your situation, which is the number you actually care about. That switch from P(positive | disease) to P(disease | positive) is the core of Bayes' theorem, and you worked it out yourself.\n\nIt's fair to find it unsettling, but here's some reassurance:\n\n- **The 15% isn't \"you're probably fine, ignore it.\"** Before the test your chance was 1%. After it, your chance is 15%. That's a 15-fold jump, so the test told you a lot. It just didn't make the disease certain.\n- **The prior depends on who's being tested.** The 1% assumes you were picked at random from the population. If you went to the doctor because you had symptoms, your starting probability is higher, and the same positive result would push you much higher than 15%.\n- **This is why doctors use follow-up tests.** Your 15% becomes the new prior. A second, independent positive result would raise it a lot. Try it later: rerun the counts starting from 15% instead of 1%.\n\n**Check yourself on a new one**\n\nSame test (catches 90% of real cases, 5% false positives), but now it's used in a clinic where 30% of patients actually have the disease. Out of 1,000 patients:\n\n1. How many are sick, and how many of them test positive?\n2. How many are healthy, and how many of them test positive?\n3. What's P(disease | positive)?\n\nBefore you calculate, make a guess: will the answer be higher or lower than 15%, and why? Then do the counts and see if your guess was right."
+  }
+ ],
+ "pending": null
+}

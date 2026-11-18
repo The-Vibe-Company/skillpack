@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Tutor B surfaced the learner's belief that a WHERE filter behaves like an ON filter and had them reason step by step through Cara's NULL row until they found for themselves that WHERE drops it, while Tutor A corrected the misconception by fiat in a long lecture and the learner just accepted it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

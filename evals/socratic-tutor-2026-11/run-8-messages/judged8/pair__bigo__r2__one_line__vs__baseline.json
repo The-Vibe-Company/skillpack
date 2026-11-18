@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Transcript B drew out both target misconceptions (O(n/2) being faster asymptotically, and two sequential loops being O(n^2)) and led the learner through the doubling test and their own earlier contradiction until they corrected themselves, while Transcript A never reached the misconceptions and mostly lectured, even answering bonus questions the learner had not attempted."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

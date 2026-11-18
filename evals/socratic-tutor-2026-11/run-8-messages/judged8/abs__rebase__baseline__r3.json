@@ -1,0 +1,17 @@
+{
+ "file": "rebase__baseline__r3.json",
+ "scenario": "rebase",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 6,
+  "overall": 6,
+  "why": "The tutor diagnosed the misconception well with an opening question, but then stated the key point outright (new hashes because the parent changes) instead of guiding the learner to it, and most later turns were long explanations; the learner did go on to apply the idea correctly in their own words (the 'ten Sams' answer)."
+ },
+ "usage": {}
+}

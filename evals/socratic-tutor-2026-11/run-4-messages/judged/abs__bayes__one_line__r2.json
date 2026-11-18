@@ -1,0 +1,17 @@
+{
+ "file": "bayes__one_line__r2.json",
+ "scenario": "bayes",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor opened with a lecture that already worked through the base-rate resolution (9/59 ≈ 15%) before probing the learner, then used good Socratic counting to get the learner to compute 2/3 for a 10% variant, but the learner never reasoned through the original 1%/9% case to reach ~9% themselves."
+ },
+ "usage": {}
+}

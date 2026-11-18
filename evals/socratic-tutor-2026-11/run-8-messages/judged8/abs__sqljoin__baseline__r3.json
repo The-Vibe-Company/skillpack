@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__baseline__r3.json",
+ "scenario": "sqljoin",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 5,
+  "overall": 5,
+  "why": "The tutor gave an accurate, well-organized explanation and handled the learner's later Exercise 3 mistake well, but the ON vs WHERE answer came in an unprompted opening lecture with no diagnosis, and most turns were exposition, not questions."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B draws out the learner's actual misconceptions (exact storage, JS-only bug) and has the learner reason step by step through 1/3, binary place values, and prime factors, while A opens with a full lecture that fixes the core misconception by fiat before the learner reasons at all, even though A's later Socratic follow-ups are strong and B is slower and padded with a progress dashboard."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

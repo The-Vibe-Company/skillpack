@@ -1,0 +1,17 @@
+{
+ "file": "bigo__baseline__r3.json",
+ "scenario": "bigo",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 1,
+  "lecture_count": 6,
+  "overall": 4,
+  "why": "The tutor gave away the rule that sequential loops add and constants drop before the learner worked on it. The learner only echoed it back ('I guess you're saying they add') and never restated in their own words that O(n^2/2) or O(2n) collapses after being corrected, while most tutor turns were long lectures."
+ },
+ "usage": {}
+}

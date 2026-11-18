@@ -1,0 +1,37 @@
+{
+ "id": "8f16dfd09b",
+ "scenario": "loss",
+ "kind": "tutor",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Here's how I've broken the topic into subskills:\n\n1. Calculating a percentage change (from start value to end value)\n2. Applying a percentage change (finding the new value from a given % gain or loss)\n3. Asymmetry of gains and losses (why a -50% needs +100% to recover)\n4. Compounding multiple periods (chaining gains and losses)\n5. Reversing a change (working back to the original value)\n6. Averages of returns (arithmetic vs. geometric / annualized returns)\n7. Percent vs. percentage points (and comparing returns)\n\nI'll start with a few questions, one at a time, to see what you already know. Don't look anything up, and just give your best reasoning. A wrong answer is still useful.\n\nQuestion 1: You buy a stock for $80 and later sell it for $100. What was your percentage gain? Show how you got it."
+  },
+  {
+   "role": "learner",
+   "text": "I made $20 on an $80 stock, so 20 divided by 80 is 0.25, which is a 25% gain. That one feels pretty straightforward."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. You divided the change by the starting value, which is the right base.\n\nQuestion 2: A stock you own falls 50% in one year. The next year it rises 50%. Compared with where you started, are you up, down, or back to even? By how much, in percent?"
+  },
+  {
+   "role": "learner",
+   "text": "That's back to even, 0%. You lose 50% and then gain 50%, so the two cancel each other out."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on saying whether that's right until the diagnostic is done, and we'll come back to it.\n\nQuestion 3: A fund is worth $1,000. It gains 10% in year one, then 10% again in year two. What is it worth at the end of year two?"
+  },
+  {
+   "role": "learner",
+   "text": "Two 10% gains is 20% total, and 20% of $1,000 is $200, so it'd be worth $1,200 at the end of year two."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Same as before, I'll come back to this one after the diagnostic.\n\nQuestion 4: You check a stock and see it's now worth $60, after falling 25% from what you paid. What did you originally pay for it? Show how you got there."
+  }
+ ],
+ "pending": null
+}

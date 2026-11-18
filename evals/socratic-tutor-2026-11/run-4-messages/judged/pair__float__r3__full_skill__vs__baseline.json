@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Although A lectures rather than eliciting reasoning, it uses the 1/3 analogy to actually resolve the learner's misconceptions (exact storage, JS-only bug) efficiently and pleasantly, whereas B surfaces the misconceptions but spends the whole exchange on a withholding diagnostic that leaves the learner frustrated and with no resolution."
+ },
+ "winner": "baseline",
+ "usage": {}
+}

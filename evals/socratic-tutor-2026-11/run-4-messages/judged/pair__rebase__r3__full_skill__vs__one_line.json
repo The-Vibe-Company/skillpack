@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B draws out the same-hash misconception and then uses targeted questions about parent pointers and hash inputs so the learner reasons toward the contradiction, while A only runs a diagnostic, gives no feedback, and never engages the misconception."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

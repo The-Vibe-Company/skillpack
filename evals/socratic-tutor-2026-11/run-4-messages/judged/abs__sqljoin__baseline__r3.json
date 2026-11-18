@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__baseline__r3.json",
+ "scenario": "sqljoin",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 4,
+  "why": "The tutor laid out the ON-vs-WHERE resolution in its very first lengthy lecture without probing the learner's prior understanding. It did correct the learner's lingering misconception clearly in turn 3, and the learner restated the truth, but the teaching was almost entirely exposition rather than guided reasoning."
+ },
+ "usage": {}
+}

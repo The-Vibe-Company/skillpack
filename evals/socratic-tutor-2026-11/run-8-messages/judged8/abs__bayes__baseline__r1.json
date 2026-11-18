@@ -1,0 +1,17 @@
+{
+ "file": "bayes__baseline__r1.json",
+ "scenario": "bayes",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 8,
+  "overall": 5,
+  "why": "The tutor gave the full 1,000-person worked answer (about 8%) in its first message without first asking what the learner knew, and every turn was long exposition that also printed the answer, though the guess-first exercises, the gut scorecard, and the two-number heuristic did get the learner to explain the base-rate effect in their own words."
+ },
+ "usage": {}
+}

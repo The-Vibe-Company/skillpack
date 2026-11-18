@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A has the learner work out the 1,000-person counts and leads them to find the base-rate error themselves, while Tutor B lectures at length, gives the answers itself, and corrects the 90% misconception by explaining it rather than letting the learner find it."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

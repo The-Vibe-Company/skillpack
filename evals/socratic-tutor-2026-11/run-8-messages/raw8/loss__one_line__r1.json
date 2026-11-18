@@ -1,0 +1,73 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Here's how it works, starting from the basics and moving to the parts that catch people out.\n\n**1. The basic formula**\n\nPercentage change = (New value - Old value) / Old value x 100\n\nYou buy a stock at $100 and it rises to $120: (120 - 100) / 100 = +20%.\nIt falls to $80 instead: (80 - 100) / 100 = -20%.\n\nThe key point is that the percentage is always measured against the value you started from, and that starting point changes after every move.\n\n**2. Gains and losses are not symmetric**\n\nThis is the most important idea. A loss of X% needs a gain of more than X% to get back to even, because the recovery starts from a smaller number.\n\n- $100 falls 50% to $50. Getting back to $100 means gaining $50 on a $50 base, which is +100%.\n- $100 falls 20% to $80. Getting back means gaining $20 on $80, which is +25%.\n\nRecovery gain needed = L / (1 - L), where L is the loss as a decimal:\n\n| Loss | Gain needed to break even |\n|------|---------------------------|\n| 10%  | 11.1%  |\n| 20%  | 25%    |\n| 33%  | 50%    |\n| 50%  | 100%   |\n| 75%  | 300%   |\n| 90%  | 900%   |\n\nThis is why limiting large losses matters so much.\n\n**3. Percentages multiply, they don't add**\n\nTo combine several periods, turn each change into a growth factor (1 + r) and multiply:\n\n- +50% then -50%: 1.5 x 0.5 = 0.75, so you're down 25%, not flat.\n- +10% then -10%: 1.1 x 0.9 = 0.99, down 1%.\n- +20%, +20%, +20%: 1.2^3 = 1.728, up 72.8%, not 60%.\n\nTotal return = (1 + r1) x (1 + r2) x ... x (1 + rn) - 1\n\n**4. Average return vs. what you actually earned**\n\nSince returns compound, the simple (arithmetic) average can mislead.\n\nYear 1: +100%, Year 2: -50%. Arithmetic average = +25% a year. But $100 -> $200 -> $100, so you earned 0%.\n\nThe figure that describes your real experience is the geometric average, also called the compound annual growth rate (CAGR):\n\nCAGR = (Ending value / Starting value)^(1/years) - 1\n\nHere that's (100/100)^(1/2) - 1 = 0%. When comparing investments over several years, use CAGR.\n\nRule of thumb: the more returns swing around (volatility), the further the geometric average falls below the arithmetic one. Roughly, geometric ≈ arithmetic - (variance / 2). Volatility costs you money even when the average looks good.\n\n**5. Percentage points vs. percent**\n\nIf a yield goes from 2% to 3%, it rose 1 percentage point, but that's a 50% increase. Watch which one is being quoted.\n\n**6. Things that change the real number**\n\n- **Dividends / income:** Total return = (End price - Start price + income received) / Start price. Price change on its own understates it.\n- **Fees:** A 1% annual fee comes out every year and compounds. Over 30 years at 7% gross, a 1% fee takes roughly a quarter of your final wealth.\n- **Inflation:** Real return ≈ nominal return - inflation. Exactly: (1 + nominal) / (1 + inflation) - 1. A 5% gain with 3% inflation is about 1.9% real.\n- **Taxes:** What you keep after tax is often what matters most.\n- **Adding or withdrawing money:** If you put money in or take it out partway through, simple percentage change no longer measures performance. Time-weighted return measures the investment itself. Money-weighted return (IRR) measures your result including when you added or withdrew.\n\n**7. Leverage and short positions**\n\n- With 2x leverage, a 10% move in the asset is roughly a 20% move in your equity, in both directions. A 50% drop wipes you out.\n- Daily-rebalanced leveraged ETFs compound each day's move, so over longer periods they can drift far from \"2x the index,\" especially when markets are choppy.\n- When you short, your maximum gain is 100% (the price goes to zero), but your possible loss has no upper limit.\n\n**Quick self-check**\n\n1. A stock drops 25%. What gain gets you back to even? (Answer: 33.3%)\n2. You make +30% then -30%. Net result? (Answer: 1.3 x 0.7 = 0.91, so -9%)\n3. $10,000 grows to $16,105 over 5 years. CAGR? (Answer: 1.6105^(1/5) - 1 ≈ 10%)\n\nIf you want, give me a real example from your own investments and we'll work through it together."
+  },
+  {
+   "role": "student",
+   "text": "Oh wow, so if my stock drops 50% I actually need it to double to get back to even, not just go up 50%? Okay, I get it now, I always thought a 50% bounce would cover it."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. A 50% drop needs a 100% gain, which means the price has to double, to get you back to even.\n\nHere's why a 50% bounce falls short: the bounce is measured from the new, lower price.\n\n- $100 drops 50% to $50\n- $50 rises 50%: $50 x 1.5 = $75\n- You're still down 25%\n\nIn growth factors: 0.5 x 1.5 = 0.75. To get back to 1.0 from 0.5, you need to multiply by 2, so the gain has to be +100%.\n\nLots of people make this mistake. It's also why fund managers and traders focus so much on avoiding big drawdowns: the deeper the hole, the faster the recovery gain needed grows (a 75% loss needs +300%).\n\nWant to try one? If a stock drops 40%, what gain do you need to get back to even?"
+  },
+  {
+   "role": "student",
+   "text": "Okay let me try with $100, so a 40% drop leaves me at $60. To get back to $100 I need $40 more on $60, so that's about 67%?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's right. $40 on a $60 base is 40 / 60 = 0.667, so you need about a 66.7% gain.\n\nYou can check it with the formula too: L / (1 - L) = 0.4 / 0.6 = 66.7%. Or with growth factors: 0.6 x 1.667 = 1.0, so you're back to even.\n\nThe method you used is the important part: work out where the drop leaves you, then measure the recovery from that lower number. It works for any loss.\n\nWant a harder one? Say a stock drops 20% one year and another 25% the next. What's your total loss, and what gain gets you back to even?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, with $100 again, a 20% drop takes me to $80, then 25% of $80 is $20, so I'm down to $60. So my total loss is 40%, not 45% like I'd have guessed from just adding them."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. $100 x 0.8 x 0.75 = $60, so your total loss is 40%. Adding them gave 45%, which is wrong because the second drop of 25% was taken from $80, not from $100.\n\nIn growth factors: 0.8 x 0.75 = 0.60, so you're left with 60% of what you started with.\n\nNow the second part: from $60, what gain gets you back to $100?"
+  },
+  {
+   "role": "student",
+   "text": "Same as the last one then, I need $40 on $60, so about 67%. Funny how I'd have guessed 45% before this."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. From $60 you need $40 more, and 40 / 60 ≈ 66.7%. Check: 0.4 / 0.6 = 66.7%.\n\nYou also noticed that this is the same answer as the last problem, and that's worth keeping. Once you know two drops of 20% and 25% leave you at 60% of where you started, the path you took doesn't matter. All that counts is the final growth factor, 0.6. Any combination of losses that multiplies to 0.6 needs the same +66.7% to recover, whether it's a single 40% drop or several smaller ones.\n\nSo your guess of 45% was off in two ways:\n- Adding the losses (20 + 25 = 45%) overstated the total loss, which was really 40%.\n- Then assuming the recovery equals the loss understated the gain you need, which is really 66.7%, not 40% or 45%.\n\nThe general method: multiply the growth factors to get where you ended up (F), then the gain needed to break even is 1/F - 1. Here that's 1/0.6 - 1 = 66.7%.\n\nWant to try one that mixes gains and losses? Say a stock goes +10%, then -30%, then +20%. Where are you overall, and what gain gets you back to even?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, $100 up 10% is $110, then 30% of $110 is $33 so I'm at $77, then 20% of $77 is about $15.40, so I end up around $92.40. So I'm down about 7.6% overall even though I'd have guessed flat."
+  },
+  {
+   "role": "tutor",
+   "text": "Spot on. $100 x 1.1 x 0.7 x 1.2 = $92.40, so you're down 7.6% overall.\n\nIn growth factors: 1.1 x 0.7 x 1.2 = 0.924. That's why you'd guess \"flat\": adding +10 - 30 + 20 gives 0. But the 30% drop hit a bigger number ($110), and the 20% rebound came from a smaller one ($77), so the loss outweighed the gains.\n\nYou've done the first half. What about the second: from $92.40, what gain gets you back to $100? (Hint: use 1/F - 1 with F = 0.924, or work it out in dollars like before.)"
+  },
+  {
+   "role": "student",
+   "text": "So I need $7.60 more on $92.40, which is 7.6 divided by 92.4, about 8.2%. A bit more than the 7.6% I lost, same pattern as before."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. 7.6 / 92.4 ≈ 0.0823, so you need about an 8.2% gain to get back to $100.\n\nCheck with the formula: 1 / 0.924 - 1 ≈ 0.0823, or 8.2%. And 92.40 x 1.0823 ≈ 100.\n\nYou've spotted the pattern too. The gain you need is always bigger than the loss, because it's measured from a smaller base. The gap is small for small losses (7.6% lost, 8.2% needed) and grows fast for big ones (50% lost, 100% needed). That's the L / (1 - L) curve at work: when L is small, 1 - L is close to 1, so the two numbers are nearly the same.\n\nYou now have the full toolkit:\n1. Turn each move into a growth factor (1 + r).\n2. Multiply them to get where you ended up (F).\n3. Your overall change is F - 1, and the gain needed to break even is 1/F - 1.\n\nWant to try a CAGR question next, or work through a real example from your own investments?"
+  },
+  {
+   "role": "student",
+   "text": "Let's do a CAGR one. I kind of skimmed that part, so I'm not totally sure how the \"to the power of 1/years\" bit works."
+  },
+  {
+   "role": "tutor",
+   "text": "Good call. The \"to the power of 1/years\" bit sounds scary, but it's the same growth-factor idea you've been using, just run backwards.\n\n**Start with what you already know (going forwards)**\n\nIf something grows 10% a year for 3 years, you multiply the growth factor once per year:\n\n1.1 x 1.1 x 1.1 = 1.1^3 = 1.331\n\nSo $100 becomes $133.10. The \"^3\" just means \"multiply by this factor 3 times.\"\n\n**CAGR asks the reverse question**\n\nNow flip it. You know the total growth factor (1.331) and the number of years (3), and you want the one yearly factor that, multiplied by itself 3 times, gives you 1.331.\n\nThat's what a root does. \"To the power of 1/3\" is the same as taking the cube root: it undoes \"^3.\"\n\n1.331^(1/3) = 1.1\n\nSubtract 1 and you get 0.10, or 10% a year. That's the CAGR.\n\nSo the full formula is just three steps:\n1. Total growth factor: F = Ending value / Starting value\n2. Undo the compounding: F^(1/years)\n3. Subtract 1 to turn the factor back into a percentage\n\n**A quick way to read it**\n\n- ^2 means \"two years of growth stacked up,\" and ^(1/2) (a square root) means \"split it back into two equal years.\"\n- ^5 means five years stacked, and ^(1/5) splits it into five equal years.\n\nThe key word is *equal*. CAGR is the steady yearly rate that would take you from start to finish, even if the real path was bumpy.\n\n**Why not just divide by the years?**\n\nSay $100 grows to $200 over 5 years. That's +100% total. Dividing gives 20% a year, but check it: 1.2^5 = 2.49, which would turn $100 into $249, not $200. Too high, because dividing ignores compounding.\n\nThe real answer: 2^(1/5) ≈ 1.149, so CAGR ≈ 14.9%. Check: 1.149^5 ≈ 2.0. That works.\n\n**On a calculator**\n\nMost calculators and spreadsheets have a power key (x^y, y^x, or ^). Type the factor, then the power key, then (1/5) in brackets. In Excel or Google Sheets: =2^(1/5)-1.\n\n**Your turn**\n\nYou invest $5,000 and after 4 years it's worth $7,320. What's the CAGR?\n\nDo it in the three steps: find F, take it to the power of 1/4, subtract 1. Then check your answer by raising your yearly factor to the 4th power and seeing if you get back to F."
+  }
+ ],
+ "usage": [],
+ "conv_id": "4ad0ac547a"
+}

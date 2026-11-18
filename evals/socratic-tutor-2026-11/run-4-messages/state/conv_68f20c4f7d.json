@@ -1,0 +1,37 @@
+{
+ "id": "68f20c4f7d",
+ "scenario": "sqljoin",
+ "kind": "tutor",
+ "opening": "Help me master SQL joins, especially LEFT JOIN.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. Here's how I've broken SQL joins down, with extra weight on LEFT JOIN:\n\n1. Join fundamentals: what a join does, ON conditions, matching rows\n2. INNER JOIN: which rows survive\n3. LEFT JOIN basics: keeping every row from the left table, and where NULLs come from\n4. Row multiplication: one-to-many matches and duplicated rows\n5. ON vs WHERE in a LEFT JOIN: where a filter goes changes the result\n6. Anti-joins: using LEFT JOIN ... IS NULL to find missing matches\n7. RIGHT and FULL OUTER JOIN, and how they relate to LEFT JOIN\n8. Multi-table chains: mixing LEFT and INNER joins, and aggregating after a join (COUNT(*) vs COUNT(col))\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Just answer as best you can. \"I don't know\" is a useful answer too.\n\nQuestion 1:\n\nYou have two tables:\n\n    customers                 orders\n    id | name                 id | customer_id | amount\n    ---+-------               ---+-------------+-------\n    1  | Ana                  10 | 1           | 50\n    2  | Ben                  11 | 1           | 20\n    3  | Cara                 12 | 3           | 70\n\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id;\n\nHow many rows does this query return, and what exactly is in each one?"
+  },
+  {
+   "role": "learner",
+   "text": "I think 4 rows: Ana 50, Ana 20, Ben with NULL for amount since he has no orders, and Cara 70. Ana shows up twice because she has two orders."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct: 4 rows, with Ben's amount as NULL.\n\nQuestion 2:\n\nSame tables. Here are two queries that differ only in where the `amount > 30` filter goes:\n\n    -- Query A\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id AND o.amount > 30;\n\n    -- Query B\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    WHERE o.amount > 30;\n\nWhat does each query return, row by row? If they're different, why?"
+  },
+  {
+   "role": "learner",
+   "text": "I think they return the same thing: Ana 50, Ben with NULL, and Cara 70, since Ana's 20 order gets filtered out. Putting the filter in ON or in WHERE is just a style choice as far as I know, it still filters the orders table either way."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That one isn't right, and it's one of the most important ideas in LEFT JOIN. I'll explain it once the diagnostic is finished, so I won't say more about it yet.\n\nQuestion 3:\n\nSame tables. Two counting queries:\n\n    -- Query C\n    SELECT c.name, COUNT(*) AS n\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    GROUP BY c.name;\n\n    -- Query D\n    SELECT c.name, COUNT(o.id) AS n\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    GROUP BY c.name;\n\nWhat value of n does each query give for Ana, Ben, and Cara? If the two queries differ for anyone, why?"
+  },
+  {
+   "role": "learner",
+   "text": "For Query C I'd say Ana 2, Ben 1, Cara 1, because Ben still has a row even though it's all NULLs on the orders side. For Query D I think Ben would be 0, since COUNT(o.id) doesn't count NULLs, so Ana 2, Ben 0, Cara 1."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on both: C gives Ana 2, Ben 1, Cara 1, and D gives Ana 2, Ben 0, Cara 1.\n\nQuestion 4:\n\nSame two tables. Write a query that returns the names of customers who have never placed an order. You can only use a LEFT JOIN. No subqueries, no NOT IN, no NOT EXISTS."
+  }
+ ],
+ "pending": null
+}

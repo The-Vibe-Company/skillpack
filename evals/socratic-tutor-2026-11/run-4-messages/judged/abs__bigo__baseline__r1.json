@@ -1,0 +1,17 @@
+{
+ "file": "bigo__baseline__r1.json",
+ "scenario": "bigo",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 5,
+  "why": "The tutor quizzed first and gave accurate, specific feedback, but the session never reached O(2n) or sequential vs nested loops, so the learner's actual misconception was neither surfaced nor resolved, and the later turns leaned toward explanation."
+ },
+ "usage": {}
+}

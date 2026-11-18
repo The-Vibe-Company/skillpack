@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A gets the learner to find the hash misconception through targeted questions about parent pointers, while Tutor B simply states that the hashes change, which corrects the core misconception by fiat even though B then covers more ground efficiently."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

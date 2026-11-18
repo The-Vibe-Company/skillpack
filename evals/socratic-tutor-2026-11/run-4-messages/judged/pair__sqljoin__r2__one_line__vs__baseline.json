@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner trace the Dan case and question their own OR o.id IS NULL assumption step by step, while B gives the Dave counterexample and long reference dumps outright, so the learner reasons less."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

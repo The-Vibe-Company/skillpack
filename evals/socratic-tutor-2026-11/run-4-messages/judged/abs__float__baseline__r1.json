@@ -1,0 +1,17 @@
+{
+ "file": "float__baseline__r1.json",
+ "scenario": "float",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor's first message explained everything, including the 1/3 analogy, before the learner did any reasoning, and every later turn was also mostly lecture, so the learner's correct restatements came after the answer had already been given rather than from their own discovery."
+ },
+ "usage": {}
+}

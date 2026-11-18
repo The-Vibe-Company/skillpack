@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B front-loads the table, but afterwards the learner does the counting, uncovers why the 50/50 intuition fails, works through the random-host and biased-host variants and ends up convinced, while A spends a long stretch on diagnostics and a skill map and stops before the misconception is resolved."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

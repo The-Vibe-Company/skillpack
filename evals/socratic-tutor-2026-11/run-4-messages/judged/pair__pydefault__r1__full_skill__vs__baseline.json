@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A gets the learner to state the fresh-list misconception through their own prediction instead of giving it away, while B opens with a long lecture that hands over the answer, so its later exercises only confirm what it already told the learner."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

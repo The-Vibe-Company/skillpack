@@ -1,0 +1,41 @@
+{
+ "scenario": "monty",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Fair enough. The usual explanation often skips the part that actually matters, so let's build it from the ground up.\n\n**The setup**\n- There are 3 doors. A car is behind one and goats are behind the other two.\n- You pick a door, say Door 1.\n- The host knows where the car is. He opens one of the other doors, and it always has a goat. He never opens your door and never shows the car.\n- He then offers you a switch to the remaining closed door.\n\n**A way to see it without hand-waving: list every case**\n\nSay you always pick Door 1. The car is equally likely to be behind any of the three doors.\n\n| Car is behind | Host opens | If you STAY | If you SWITCH |\n|---|---|---|---|\n| Door 1 | Door 2 or 3 | Win | Lose |\n| Door 2 | Door 3 (forced) | Lose | Win |\n| Door 3 | Door 2 (forced) | Lose | Win |\n\nStaying wins in 1 of 3 cases. Switching wins in 2 of 3.\n\n**Why it works:** switching loses only when your first pick was right, and your first pick is right only 1/3 of the time. In the other 2/3, the host has to avoid the car, so the door he leaves closed is the car.\n\n**The key ingredient** is that the host *knows* where the car is and *must* reveal a goat. His choice isn't random, so it tells you something. If he opened a door at random and just happened to show a goat, the odds really would be 50/50.\n\n**Try it with 100 doors:** you pick one, and the host, who knows where the car is, opens 98 goat doors and leaves one other door closed. Would you stick with your original 1-in-100 guess?\n\nNow I'd like to find exactly where you get off the train. Most people who doubt this think \"two doors are left, so it must be 50/50.\" If that's your view, here's a question: **when you first picked Door 1, what was the chance the car was behind it? And did the host opening a door (which he could always do, whatever was behind your door) change anything about your door specifically?**\n\nTell me your answer, or tell me which row of the table looks wrong to you, and we'll go from there."
+  },
+  {
+   "role": "student",
+   "text": "Sure, when I first picked it was 1/3. But once a door is opened that's new information, and now there are two closed doors with one car, so I don't see why it isn't 50/50 at that point. Your table just looks like it's assuming the answer."
+  },
+  {
+   "role": "tutor",
+   "text": "You're right that opening a door is new information. The real question is what that information tells you, so let's test the 50/50 claim directly instead of trusting my table.\n\nImagine you play this game 300 times and always pick Door 1. The car is placed at random each time.\n\n1. In about how many of those 300 games is the car behind Door 1?\n2. In any of those games, does the host opening a goat door move the car? If the car was behind Door 1 before he opened a door, is it still there afterward?\n3. So in about how many of the 300 games does staying with Door 1 win?\n\nIf two closed doors really meant 50/50, staying would have to win about 150 of the 300 games. Does your answer to question 3 match that? If it doesn't, which of your three answers would you change?"
+  },
+  {
+   "role": "student",
+   "text": "About 100 of the 300, since it's random and I always pick Door 1. But I still feel like after he opens a door the odds should get redistributed between the two that are left."
+  },
+  {
+   "role": "tutor",
+   "text": "Let's hold that feeling up against what you just said.\n\nYou said staying with Door 1 wins in about 100 of the 300 games. If the odds were redistributed to 50/50 after the host opens a door, staying would have to win about 150 of them.\n\nBoth can't be true. So here's a narrower question: **name one game where staying wins that wasn't already among the ~100 games where the car started behind Door 1.**\n\nFor staying to reach 150 wins, the host opening a door would have to put the car behind Door 1 in about 50 extra games. Can his opening a goat door ever do that?"
+  },
+  {
+   "role": "student",
+   "text": "Hm, no, opening a goat door can't move the car into Door 1, so staying is still stuck at about 100. Which means switching wins the other ~200... okay, that's actually hard to argue with."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly. You just worked out the whole thing yourself: staying wins in about 100 of the 300 games, so switching wins the other ~200. Switching wins 2/3 of the time.\n\nThat also tells you where your \"redistribution\" intuition was half right. The host opening a door *is* new information, and the odds *do* shift. They just don't shift evenly:\n\n- **Your door stays at 1/3.** The host could always open a goat door, whatever was behind your door. Seeing him do it tells you nothing new about Door 1.\n- **The door he opened drops to 0.** You now know it's a goat.\n- **The door he left closed picks up the rest: 2/3.** That door is the one that gets the new information. The host had to avoid the car, so in every game where the car was behind Door 2 or 3, he was forced to leave that exact door shut.\n\nSo the information doesn't spread across both closed doors. All of it lands on the door the host *chose not to open*.\n\n**Where 50/50 really is the right answer:** if the host didn't know where the car was and opened a door at random, he'd sometimes reveal the car. In the games where he happens to show a goat, staying and switching really are 50/50. The 2/3 comes entirely from the host's knowledge and the rule that he never reveals the car.\n\nIf you want to make it stick, try it with three playing cards (one ace as the car) and a friend playing host. Twenty rounds of always switching, then twenty of always staying, and the gap shows up fast."
+  }
+ ],
+ "usage": [],
+ "conv_id": "c887cfac7b"
+}

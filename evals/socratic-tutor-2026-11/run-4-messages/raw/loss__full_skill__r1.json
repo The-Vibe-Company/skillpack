@@ -1,0 +1,41 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do this properly. Here's how I've broken the topic into subskills:\n\n1. Calculating a percentage gain or loss from start and end values\n2. Gain/loss asymmetry (why a 50% loss needs more than a 50% gain to recover)\n3. Compounding sequential returns (multiplying, not adding)\n4. Average return vs. actual return (arithmetic vs. geometric mean, volatility drag)\n5. Annualizing returns (CAGR over multi-year periods)\n6. Percent vs. percentage points (and relative vs. absolute changes)\n\nI'll start by asking a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Just answer as best you can. \"I don't know\" is a perfectly useful answer.\n\nQuestion 1: A stock goes from $80 to $100. What's the percentage gain? Then it falls from $100 back to $80. What's the percentage loss? Show how you got each number."
+  },
+  {
+   "role": "student",
+   "text": "The gain is $20 on $80, so 20 divided by 80 is 25%. Then it drops the same $20 back down, so that's a 25% loss, which makes sense since you end up right where you started."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, I've noted your answer and your reasoning. I'm not going to say yet whether it's right. We'll come back to it once the diagnostic is done.\n\nQuestion 2: You invest $1,000. In year one it gains 10%, and in year two it loses 10%. How much money do you have at the end of year two, and what's your total percentage gain or loss over the two years?"
+  },
+  {
+   "role": "student",
+   "text": "You'd have $1,000 at the end, so 0% total. The 10% gain and the 10% loss just cancel each other out."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. As before, I'll hold off on saying whether that's right until the diagnostic is finished.\n\nQuestion 3: Over three years, a fund returns +50%, then -50%, then +50%. A friend says, \"The average annual return is about 16.7%, so the fund grew about 16.7% per year.\" What does $1,000 invested at the start actually end up as, and is your friend's claim reasonable? Explain your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "The first +50% and -50% cancel out, so you're back at $1,000, then the last +50% takes you to $1,500. That's 50% total over three years, so about 16.7% a year sounds pretty reasonable to me."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to this one too once the diagnostic is done.\n\nQuestion 4: Your savings account's interest rate goes from 2% to 3%. Your bank's ad says \"rates up 1%!\" and a news headline says \"rates up 50%!\" Which one is right, and why?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "1eece31970"
+}

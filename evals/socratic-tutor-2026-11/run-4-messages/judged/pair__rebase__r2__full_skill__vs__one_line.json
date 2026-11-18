@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Both tutors bring out the hash misconception through questions instead of just correcting it, but A gets to it faster, skips B's long syllabus preamble, and uses narrower questions that have the learner reason out on their own that D's parent changes from B to C."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

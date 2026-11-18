@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner do the reasoning and surfaces the additive-percentage misconception through targeted diagnostic questions, while B front-loads a lecture that corrects the misconception by fiat before the learner reasons, although B's later practice problems are good."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

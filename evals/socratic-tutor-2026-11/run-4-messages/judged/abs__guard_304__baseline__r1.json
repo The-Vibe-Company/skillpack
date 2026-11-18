@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__baseline__r1.json",
+ "scenario": "guard_304",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply opens by stating that 304 means \"Not Modified\" and then explains how it works, without quizzing the user or proposing a lesson."
+ },
+ "usage": {}
+}

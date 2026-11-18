@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B lets the misconception surface and then uses narrow questions (what is D's parent before and after) so the learner works out the new hashes, while A states up front that rebase creates new hashes and then corrects the learner by fiat."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

@@ -1,0 +1,41 @@
+{
+ "scenario": "monty",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me the Monty Hall problem, I don't buy the usual explanation.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good. Not buying the usual explanation is a better place to start than nodding along to it. We won't use the standard explanation here. You'll work it out yourself until you can defend the answer, or until you find a real hole in it.\n\nHere's how I'm splitting the topic:\n\n1. The exact rules of the game (what the host knows and what he must do)\n2. Probability of your first pick\n3. What the host's action actually tells you (conditional probability)\n4. Why the host's behavior matters (variants such as a host who opens doors at random)\n5. Checking it by listing every case or by simulation\n6. Generalizing to N doors\n7. Spotting the tempting wrong arguments (for example, \"two doors left, so it's 50/50\")\n\nI'll start with a few questions, one at a time, to see where you are. I won't teach anything until we're done with those.\n\nFirst question: if you switch, what do you think your chance of winning the car is, and what reasoning makes that answer feel right to you?"
+  },
+  {
+   "role": "student",
+   "text": "Switching gives you 50/50, same as staying. Once the host opens a goat door there are two closed doors left and the car is behind one of them, so each one is equally likely. The usual \"2/3\" explanation just feels like it's ignoring that the situation changed."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. That's your starting position, and it's the answer most people give. I won't tell you yet whether it's right. We're still in the diagnostic, so I'm only placing you, not teaching.\n\nSecond question: you pick Door 1. Before the host does anything, what's the chance the car is behind Door 1? Then the host opens Door 3 and shows a goat. Has the chance that the car is behind Door 1 changed? If it has, what specifically about the host opening Door 3 changed it?"
+  },
+  {
+   "role": "student",
+   "text": "Before the host does anything it's 1/3 for Door 1, sure. But once Door 3 is open with a goat, there are only two doors left, so Door 1 goes up to 1/2. The host just removed a losing option, so the odds get split again between the two left."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You're saying the host removed a losing option, so the probability gets split again evenly between the two doors that are left. I'm not judging that yet. Two more diagnostic questions and then we'll start.\n\nThird question: change the game. There are 100 doors. You pick Door 1. The host knows where the car is, and he opens 98 of the other doors, all goats, leaving only Door 1 and Door 57 closed. He never opens your door and never opens the car. What's the chance the car is behind Door 1, and what's the chance it's behind Door 57? Does your \"split evenly between what's left\" reasoning feel as convincing here as it did with 3 doors?"
+  },
+  {
+   "role": "student",
+   "text": "Huh, okay, with 100 doors that feels different. My pick was 1/100 when I made it, and the host had to carefully avoid the car while opening 98 doors, so Door 57 surviving seems really suspicious, like 99/100. But then I don't see why three doors would be any different, which is bugging me."
+  },
+  {
+   "role": "tutor",
+   "text": "That tension is worth keeping. You've given two answers that can't both be right: \"split evenly between what's left\" for 3 doors, and \"Door 57 is about 99/100\" for 100 doors. I won't settle it for you. Resolving it yourself is what we'll be working toward.\n\nBefore that, one last diagnostic question, and then I'll show you the skill map.\n\nKeep the 100-door game, with one change. This time the host has no idea where the car is. He opens 98 of the other doors at random, and by pure luck every one of them is a goat, so Door 1 and Door 57 are left closed. Is Door 57 still \"really suspicious\" at about 99/100, or is it something else? What's your reasoning?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "0eef23128a"
+}

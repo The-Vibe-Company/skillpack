@@ -1,0 +1,17 @@
+{
+ "file": "rebase__full_skill__r1.json",
+ "scenario": "rebase",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 5,
+  "why": "The tutor runs a clean, non-flattering diagnostic with well-targeted questions and correctly withholds judgment on the hash misconception, but its opening syllabus already states that rebase is 'replaying commits and creating new SHAs', and the transcript ends before the learner reasons their way to the truth."
+ },
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "monty__one_line__r1.json",
+ "scenario": "monty",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 6,
+  "why": "The first tutor message gave away the full case table, the reason about host knowledge, and the 100-door argument before asking what the learner thought; the 300-game questioning after that was strong and got the learner to the 2/3 answer in their own words, though later turns slipped back into exposition."
+ },
+ "usage": {}
+}

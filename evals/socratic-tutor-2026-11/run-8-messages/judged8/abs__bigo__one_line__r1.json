@@ -1,0 +1,17 @@
+{
+ "file": "bigo__one_line__r1.json",
+ "scenario": "bigo",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor used a good Socratic scaling test so the learner found on their own that constant factors drop (n^2/2 vs n^2), but never tested the sequential-loops misconception, gave long explanations after each answer, and moved on to unrelated topics, so the learner only fixed part of the misconception."
+ },
+ "usage": {}
+}

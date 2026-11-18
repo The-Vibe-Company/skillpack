@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brings out the learner's belief that constants matter (O(n/2) vs O(n)) and uses the learner's own Question 1 result and a doubling table to get them to resolve the contradiction, while Tutor B only notes the O(n^3) and space errors, delays all teaching and opens with a long, inefficient syllabus."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

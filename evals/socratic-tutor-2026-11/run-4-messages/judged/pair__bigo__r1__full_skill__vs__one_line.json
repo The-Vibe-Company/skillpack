@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brings out the constant-factor misconception and has the learner work through it with a doubling-ratio calculation they do themselves, while Tutor B only runs a long diagnostic, holds back all feedback and never deals with the learner's wrong O(n^2) answer for sequential loops."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

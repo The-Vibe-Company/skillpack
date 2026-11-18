@@ -1,0 +1,17 @@
+{
+ "file": "bigo__full_skill__r1.json",
+ "scenario": "bigo",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 5,
+  "why": "The tutor diagnosed carefully and did not give away the answer, but the transcript ends mid-diagnostic, so the learner never confronts or fixes the misconception about sequential loops and constant factors."
+ },
+ "usage": {}
+}

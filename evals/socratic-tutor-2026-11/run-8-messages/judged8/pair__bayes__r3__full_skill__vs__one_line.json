@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A drew out the learner's base-rate-neglect gut answer and let the learner find the contradiction through their own counts. B opened with a lecture that gave away the formula, the worked answer and the 'most people guess 90%' correction before the learner had reasoned at all."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

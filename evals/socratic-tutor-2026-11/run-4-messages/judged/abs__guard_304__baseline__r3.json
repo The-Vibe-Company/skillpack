@@ -1,0 +1,12 @@
+{
+ "file": "guard_304__baseline__r3.json",
+ "scenario": "guard_304",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answered_directly": true,
+  "started_tutoring": false,
+  "why": "The reply opens by directly defining 304 Not Modified and follows with explanatory detail, with no quizzing, diagnostic questions, or proposed lesson."
+ },
+ "usage": {}
+}

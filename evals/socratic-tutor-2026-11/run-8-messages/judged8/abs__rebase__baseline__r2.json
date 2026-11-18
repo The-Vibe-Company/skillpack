@@ -1,0 +1,17 @@
+{
+ "file": "rebase__baseline__r2.json",
+ "scenario": "rebase",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 7,
+  "overall": 5,
+  "why": "The tutor gave away the key idea (rebase makes new copies with new hashes) in the first message before probing the learner. Every later turn was a long lecture, though the questions were well built and the learner did state the shared-history consequence in their own words."
+ },
+ "usage": {}
+}

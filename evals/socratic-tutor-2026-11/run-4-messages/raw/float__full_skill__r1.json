@@ -1,0 +1,41 @@
+{
+ "scenario": "float",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me why 0.1 + 0.2 is not equal to 0.3 in my code. I want to really understand it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good. We'll go through this properly instead of me just handing you the answer.\n\nHere's what I think you need to know to really understand it:\n\n1. **Place value in other bases**: what digits after the \"point\" mean in base 10 and in base 2\n2. **Terminating vs. repeating fractions**: why some fractions end and others repeat forever, depending on the base\n3. **Finite storage**: computers keep a fixed number of bits (IEEE 754 doubles), so values have to be rounded\n4. **What `0.1` really is**: the exact value the computer stores when you type `0.1`\n5. **How rounding errors add up**: why the stored 0.1 plus the stored 0.2 doesn't give the stored 0.3\n6. **Why printing hides it**: why `0.1` prints as `0.1` even though it isn't exactly 0.1\n7. **What to do about it**: comparing with a tolerance, decimal types, and using integers (like cents)\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Then I'll show you a map of where you stand, and we'll pick a starting point.\n\nQuestion 1: When you write `0.1` in your code, what do you think the computer actually stores in memory? Describe it as best you can, even if you're guessing."
+  },
+  {
+   "role": "student",
+   "text": "I mean, I assume it just stores 0.1, like the actual number 0.1, maybe in binary somehow but exact. That's why I figured this is a JavaScript bug, since I don't think Python or Java mess this up."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, so your current picture is \"exact 0.1, stored in binary somehow.\" I'm writing that down, along with your guess that this is a JavaScript-specific bug. I'm not going to say yet whether either one is right. We'll test both directly once the diagnostic is done, so keep them in mind.\n\nQuestion 2: Write 1/3 as a decimal number in base 10. How many digits do you need to write it down exactly, and why?"
+  },
+  {
+   "role": "student",
+   "text": "It's 0.3333... forever, so you can't actually write it exactly, you'd need infinite 3s. You just stop somewhere and round it off."
+  },
+  {
+   "role": "tutor",
+   "text": "Right: in base 10, 1/3 never ends, so any finite version of it is rounded. Keep that \"you just stop somewhere and round it off\" in mind.\n\nQuestion 3: Which of these fractions can be written exactly as a finite decimal in base 10, and which can't: 1/2, 1/4, 1/5, 1/6, 1/8, 1/7? What do you think decides whether a fraction ends or repeats forever?"
+  },
+  {
+   "role": "student",
+   "text": "Ok so 1/2 is 0.5, 1/4 is 0.25, 1/5 is 0.2 and 1/8 is 0.125, those all end. 1/6 and 1/7 just keep going forever I think. Not totally sure what decides it though, maybe something about the bottom number?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your sorting is correct: 1/2, 1/4, 1/5 and 1/8 end, and 1/6 and 1/7 repeat. Your guess that it depends on the bottom number points the right way. I'm noting the rule itself as \"not yet pinned down,\" and we'll work it out properly later.\n\nQuestion 4: In base 10, the digits after the point stand for tenths, hundredths, thousandths, and so on. Computers work in base 2. What do you think the binary number `0.101` equals as an ordinary decimal number? Show how you got there, even if you're unsure."
+  }
+ ],
+ "usage": [],
+ "conv_id": "8bffa31e0a"
+}

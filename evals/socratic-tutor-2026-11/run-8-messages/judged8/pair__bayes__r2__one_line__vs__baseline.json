@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A repeatedly had the learner predict first, then count both boxes, so the learner found and fixed their own one-sided reasoning at each step, whereas Tutor B lectured at length and fully solved the learner's own 9% base-rate-neglect case for them, correcting the misconception by fiat instead of letting the learner uncover it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

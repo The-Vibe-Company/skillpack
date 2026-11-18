@@ -1,0 +1,37 @@
+{
+ "id": "584f34f56b",
+ "scenario": "bigo",
+ "kind": "tutor",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's get you ready for that interview. Here's how I'll break Big-O down:\n\n1. What Big-O actually means (growth rate, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops: sequential vs. nested, and loops whose bounds depend on each other\n4. Recognizing logarithmic behavior (halving and doubling patterns)\n5. Recursion: recurrence relations and recursion trees\n6. Space complexity, including the recursion call stack\n7. Best, average and worst case, plus amortized analysis\n8. Big-O vs. Big-Omega vs. Big-Theta\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we've finished those. After that I'll show you a skill map and suggest where to start.\n\nQuestion 1: What is the time complexity of this function, and why?\n\n    def f(arr):\n        n = len(arr)\n        total = 0\n        for i in range(n):\n            total += arr[i]\n        for i in range(n):\n            for j in range(10):\n                total += arr[i] * j\n        return total"
+  },
+  {
+   "role": "learner",
+   "text": "I think it's O(n^2), because there are two loops going over the whole array, so that's n times n. And the second one even has a loop inside it, so if anything it's slower than that."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'm not going to say yet whether that's right. We'll come back to this function once the diagnostic is done, so hold on to your reasoning.\n\nQuestion 2: What is the time complexity of this function, and why?\n\n    def g(n):\n        count = 0\n        i = 1\n        while i < n:\n            i = i * 2\n            count += 1\n        return count"
+  },
+  {
+   "role": "learner",
+   "text": "Hmm, there's only one loop so my first thought is O(n), but i doubles each time instead of going up by 1, so it finishes way faster. I think that makes it O(log n)?"
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. As with the first one, I'll hold off on saying whether that's right until the diagnostic is done.\n\nQuestion 3: What are the time complexity and the space complexity of this function, and why?\n\n    def h(n):\n        if n <= 1:\n            return 1\n        return h(n - 1) + h(n - 1)"
+  },
+  {
+   "role": "learner",
+   "text": "Each call makes two more calls, so it kind of branches out like a tree, which I think makes the time O(2^n). For space I'm less sure, maybe also O(2^n) since there are that many calls?"
+  },
+  {
+   "role": "tutor",
+   "text": "Thanks. I'll come back to both parts of that answer once the diagnostic is done.\n\nQuestion 4 (last one before the skill map): Appending to a Python list is usually described as O(1), but every so often the list runs out of room and has to copy all of its elements into a bigger block of memory, which is O(n). How can appending still be called O(1)? What has to be true about how the list grows for that claim to hold?"
+  }
+ ],
+ "pending": null
+}

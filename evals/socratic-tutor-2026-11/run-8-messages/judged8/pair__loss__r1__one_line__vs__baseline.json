@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open by stating the answer outright, but A then has the learner work through a series of harder problems (40% drop, chained losses, mixed gains and losses), so the learner does the reasoning, while B drifts into one-way advice and drawn-out goodbyes with almost no learner work."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

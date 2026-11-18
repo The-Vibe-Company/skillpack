@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__full_skill__r1.json",
+ "scenario": "pydefault",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 4,
+  "why": "The tutor diagnosed carefully without flattery or lecturing, but its opening subskill list already stated that defaults are evaluated at definition time and named the mutable default trap, and the transcript ends before the learner confronts or corrects the misconception."
+ },
+ "usage": {}
+}

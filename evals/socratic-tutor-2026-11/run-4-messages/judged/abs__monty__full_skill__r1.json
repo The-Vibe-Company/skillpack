@@ -1,0 +1,17 @@
+{
+ "file": "monty__full_skill__r1.json",
+ "scenario": "monty",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 5,
+  "why": "The tutor diagnosed carefully and asked well-chosen probing questions (host constraint, random-host variant) without leaking the answer, but spent all four turns on diagnosis, never built on the learner's key admission that the host is forced when they picked a goat, and the learner ends still believing 50/50."
+ },
+ "usage": {}
+}

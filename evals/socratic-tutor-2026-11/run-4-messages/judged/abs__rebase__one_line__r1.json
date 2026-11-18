@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r1.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 7,
+  "why": "The tutor gave the learner the key fact that a commit's hash includes its parent's hash, and the learner worked out on their own that D must get a new hash; the transcript ends before the learner reaches the rest of the topic, that rebasing pushed shared history forces others to reconcile."
+ },
+ "usage": {}
+}

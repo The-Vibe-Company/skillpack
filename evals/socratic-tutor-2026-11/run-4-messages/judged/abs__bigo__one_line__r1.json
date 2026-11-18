@@ -1,0 +1,17 @@
+{
+ "file": "bigo__one_line__r1.json",
+ "scenario": "bigo",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 7,
+  "why": "The tutor surfaced the constant-factor misconception and guided the learner to check it with the scaling calculation instead of stating the answer, but the transcript ends before the learner gets there, and the sequential-loops misconception never came up."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B has the learner predict and explain each answer step by step, keeps the answers hidden and gives guiding hints, while A delivers long lectures with the answers attached, so the learner mostly reads instead of reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

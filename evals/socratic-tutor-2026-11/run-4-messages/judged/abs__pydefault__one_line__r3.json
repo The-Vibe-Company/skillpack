@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__one_line__r3.json",
+ "scenario": "pydefault",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 5,
+  "why": "The opening message lectured and gave away the evaluated-once and shared-mutable-default resolution before probing the learner; later turns were good targeted Socratic questioning, but the learner only grasped aliasing and never restated the shared-default truth themselves."
+ },
+ "usage": {}
+}

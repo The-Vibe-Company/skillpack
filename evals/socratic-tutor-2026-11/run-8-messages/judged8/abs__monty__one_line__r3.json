@@ -1,0 +1,17 @@
+{
+ "file": "monty__one_line__r3.json",
+ "scenario": "monty",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 7,
+  "why": "The first tutor message gave away the full 2/3 enumeration before asking what the learner thought, but the middle turns used strong, narrowing Socratic questions that led the learner to say in their own words that the host's knowledge, not the number of doors, drives the 2/3."
+ },
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "rebase__full_skill__r3.json",
+ "scenario": "rebase",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 7,
+  "why": "Strong diagnostic and well-scaffolded reasoning led the learner to derive new hashes from the parent change, but the subskill list ('new hashes') and the feedback explicitly flagged 'same hashes' as wrong before the learner reasoned it out, and the shared-history/force-push consequence was not yet reached."
+ },
+ "usage": {}
+}

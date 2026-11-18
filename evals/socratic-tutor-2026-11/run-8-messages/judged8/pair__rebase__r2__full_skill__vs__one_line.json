@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "Both tutors surface the hash misconception Socratically via the parent link, but B does it more efficiently and gets the learner to reason through the downstream consequence (duplicate commits after the teammate's pull), whereas A repeats sub-questions and ends before the learner reaches the shared-history consequence."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

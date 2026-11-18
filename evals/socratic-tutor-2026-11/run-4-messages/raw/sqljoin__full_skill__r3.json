@@ -1,0 +1,41 @@
+{
+ "scenario": "sqljoin",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Help me master SQL joins, especially LEFT JOIN.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's how I've split \"SQL joins, with a focus on LEFT JOIN\" into subskills:\n\n1. INNER JOIN basics: matching rows on a key\n2. LEFT JOIN semantics: keeping unmatched left rows, with NULL-filled right columns\n3. Row multiplication: what one-to-many and many-to-many matches do to row counts\n4. ON vs WHERE in outer joins: where a filter goes, and why it can quietly turn a LEFT JOIN into an INNER JOIN\n5. NULL handling after joins: COUNT(*) vs COUNT(col), COALESCE, IS NULL checks\n6. Anti-joins: \"find rows with no match\" using LEFT JOIN ... IS NULL, and how that compares to NOT EXISTS / NOT IN\n7. RIGHT, FULL OUTER, CROSS, and self joins, and how they relate to LEFT JOIN\n8. Chaining joins: mixing INNER and LEFT joins across 3+ tables without losing rows\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until that's done. Then I'll show you a skill map and suggest where to start.\n\nQuestion 1. You have two tables:\n\n    customers(id, name)          orders(id, customer_id, amount)\n    1  Ana                       10  1  50\n    2  Ben                       11  1  30\n    3  Cara                      12  3  20\n\nHow many rows does this query return, and what does each row contain?\n\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id;"
+  },
+  {
+   "role": "student",
+   "text": "I think it's 4 rows: Ana 50, Ana 30, Ben with NULL for amount since he has no orders, and Cara 20. Ana shows up twice because she has two orders."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. Next one.\n\nQuestion 2. Same two tables. Here are two queries that differ only in where the `amount > 25` condition goes:\n\n    -- Query A\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id AND o.amount > 25;\n\n    -- Query B\n    SELECT c.name, o.amount\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    WHERE o.amount > 25;\n\nFor each query, how many rows come back, and what are they? If the two results are different, explain why."
+  },
+  {
+   "role": "student",
+   "text": "I think they're the same, 3 rows each: Ana 50, Ana 30, and Ben with NULL since he has no matching order. Cara's only order is 20, so she drops out. It doesn't really matter whether the filter goes in ON or WHERE, it's just filtering the orders."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. We'll come back to this one after the diagnostic.\n\nQuestion 3. Same two tables. This query is supposed to show how many orders each customer has placed:\n\n    SELECT c.name, COUNT(*) AS num_orders\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    GROUP BY c.name;\n\nWhat does it return for each customer? Is any of those numbers wrong, and if so, how would you fix it?"
+  },
+  {
+   "role": "student",
+   "text": "I'd say Ana 2, Ben 0, and Cara 1. Ben has no orders so he gets 0, so those numbers look right to me and I don't think anything needs fixing."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. Two more questions and then the diagnostic is done.\n\nQuestion 4. Same two tables. You want to list the customers who have never placed an order. A colleague writes this:\n\n    SELECT c.name\n    FROM customers c\n    LEFT JOIN orders o ON o.customer_id = c.id\n    WHERE o.amount = NULL;\n\nWhat does this query return? If it doesn't do what your colleague wants, how would you write it instead?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "5099d030b3"
+}

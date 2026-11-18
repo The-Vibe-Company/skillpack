@@ -1,0 +1,41 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Deal. Here's the ground we'll cover:\n\n1. Commit graph basics: commits, parents, branches as pointers, HEAD\n2. What `git merge` actually does: fast-forward vs. three-way merge, merge commits\n3. What `git rebase` actually does: replaying commits, new hashes\n4. Resulting history shape: linear vs. branching, what `git log` shows\n5. Conflict handling in each: when conflicts show up and how often\n6. The golden rule: rewriting shared history, force-push, and the danger it creates\n7. Interactive rebase: squash, reorder, edit, fixup\n8. Choosing between them: team workflows, pull `--rebase`, and the trade-offs\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until that's done. Then I'll show you a skill map and suggest where to start.\n\nQuestion 1:\n\nYou're on branch `feature`, which split off from `main` three commits ago. Since then, `main` has gotten two new commits. In your own words, what is a branch in git, physically? What actually gets stored when you create one?"
+  },
+  {
+   "role": "student",
+   "text": "I think a branch is basically just a pointer to a commit, like a label with the commit hash in it. When I make a new commit on it, the pointer just moves forward to the new one."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. A branch is just a small ref holding one commit hash, and committing moves it forward. I'll come back later to check what \"forward\" means for the parent links.\n\nQuestion 2:\n\nSame setup. `feature` has 3 commits of its own, and `main` has 2 new commits since the split. You're on `feature` and run `git merge main`. Describe the commit graph afterward. Is there a new commit? If so, how many parents does it have, and which commits are they? Where do `feature` and `main` point now?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, I think there's a new merge commit on feature, and it has two parents: my last feature commit and the latest commit on main. Then feature moves to point at that merge commit, and main stays where it was."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. The merge commit has two parents, your last `feature` commit and the tip of `main`. `feature` moves to it and `main` stays put.\n\nQuestion 3:\n\nBack to the starting point, before any merge. You're on `feature` (3 commits of its own, `main` has 2 new ones) and you run `git rebase main` instead. Describe the graph afterward. What happens to your 3 feature commits? Do they keep their original commit hashes? Where do `feature` and `main` point now?"
+  },
+  {
+   "role": "student",
+   "text": "My 3 feature commits get moved over on top of the latest main commit, so the history looks like a straight line. They keep the same hashes since it's the same commits, git just moves the feature pointer to sit after main's tip. Main stays where it was."
+  },
+  {
+   "role": "tutor",
+   "text": "You got part of it right. The result is a straight line, `feature` ends up after `main`'s tip, and `main` doesn't move. But the claim that the commits keep their hashes is the part I want to test, so I'm not going to tell you yet whether it's right.\n\nQuestion 3b:\n\nA commit's hash is computed from the commit object's contents. List everything you think goes into a commit object. Then tell me: before the rebase, what was the parent of your first feature commit, and what is its parent after the rebase?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "21952a3edf"
+}

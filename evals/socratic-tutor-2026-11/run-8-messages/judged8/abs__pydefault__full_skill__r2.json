@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__full_skill__r2.json",
+ "scenario": "pydefault",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 6,
+  "why": "The tutor diagnosed carefully and did not give the answer away. It set up a good empirical test (the 1/0 default), but the five-question diagnostic was long, it withheld feedback, its subskill labels hinted at the answer, and the learner never reached the correct understanding within the transcript."
+ },
+ "usage": {}
+}

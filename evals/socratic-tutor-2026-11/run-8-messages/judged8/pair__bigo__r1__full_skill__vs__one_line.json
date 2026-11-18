@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "In A, the learner worked out with scaling arithmetic why the constant factor drops, and the exchange stayed efficient and encouraging; B did surface the sequential-loops misconception, but it held back feedback for a long diagnostic and a skill map and never resolved the misconception."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

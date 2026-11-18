@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Transcript B surfaces the learner's 50/50 objection and walks them through enumerating 300 games, so they rebuild the table themselves; Transcript A front-loads every explanation and the learner mostly agrees."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

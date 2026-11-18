@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B draws out the learner's 50/50 misconception and has them count cases (100 of 300 stay wins, opening a goat door can't move the car) until they reach 2/3 on their own, while A gives the full explanation in one lecture and the learner just agrees with it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}
