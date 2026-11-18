@@ -16,7 +16,7 @@ allowed-tools: Bash Read Edit Write Glob Grep Agent
 <!-- skillpack:usage:start -->
 ## Skillpack runtime
 
-Usage is observed locally by skillpack-runtime when installed through Skillpack. Package: bccb0c35-71bf-4fe8-ad7c-7a931889fa84@1.6.1, origin: https://skillpack.app.
+Usage is observed locally by skillpack-runtime when installed through Skillpack. Package: bccb0c35-71bf-4fe8-ad7c-7a931889fa84@1.6.2, origin: https://skillpack.app.
 Do not send activation reports, run tracking commands, or install hooks during this skill's execution. Setup and updates belong to Skillpack. Continue the task when collection is unavailable. SKILLPACK_TELEMETRY=0 disables collection for this session.
 <!-- skillpack:usage:end -->
 
