@@ -110,11 +110,7 @@
       "schemaVersion": 1,
       "skillId": "bccb0c35-71bf-4fe8-ad7c-7a931889fa84",
       "version": "1.6.2",
-      "origin": "https://skillpack.app",
-      "migration": {
-        "parentVersion": "1.6.0",
-        "parentChecksum": "sha256:233a6a18fae5076ca3983a2ce88b7d66e7532a1f44a7bd0b968e1c5c177fcbd5"
-      }
+      "origin": "https://skillpack.app"
     }
   },
   "environment": {
