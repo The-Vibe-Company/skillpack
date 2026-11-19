@@ -118,7 +118,7 @@ A cleanup order that held up in our tests:
 3. If you edited a copy by hand, the CLI refuses to overwrite it. In our earlier tests, `skillpack install` stopped with `local customization detected; existing files preserved` (exit 9) even with `--force`. Put the edit in the source skill and publish a new version instead.
 4. Run `skillpack sync --frozen` and the script above again. Each name should appear once.
 
-To catch drift in code review instead of by hand, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
+To catch drift in [code review](/blog/best-claude-code-skills-code-review) instead of by hand, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
 
 ```cta
 title: "One copy of each skill, in the folder each agent reads"
