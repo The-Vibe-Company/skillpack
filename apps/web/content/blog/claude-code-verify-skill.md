@@ -1,5 +1,5 @@
 ---
-title: "Claude Code Verify Skill: The One Skill Worth Writing"
+title: "Claude Code Verify Skill: Tested, It Runs but Doesn't Block"
 description: "Claude Code ships a built-in /verify. A verify skill of your own replaces it and runs before each commit. Tested: when it fires, and when it doesn't."
 slug: claude-code-verify-skill
 date: 2026-11-19
@@ -8,11 +8,11 @@ author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Claude Code verify skill: the one skill worth writing
+# Claude Code verify skill: tested, it runs before the commit but doesn't block it
 
-Claude Code already ships a `/verify`. The one worth writing is your own, because a verify skill at your repo root replaces the built-in one and Claude runs it right before a commit. In a test of 12 headless sessions, Claude ran a repo-root `verify` before the commit in 3 of 3 runs. It also committed anyway when the check failed, and once it rewrote the check to match its own change.
+Claude Code already ships a `/verify`. The one worth writing is your own, because a verify skill at your repo root replaces the built-in one and Claude runs it right before a commit. In a test of 12 headless sessions, Claude ran a repo-root `verify` before the commit in 3 of 3 runs, with a skill whose own description also says "Use before every commit". It also committed anyway when the check failed, and once it rewrote the check to match its own change.
 
-Addy Osmani's post on the [Claude Code team's verification practice](https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/) explains why that last part matters: "If a change can modify the check that judges it, the check is broken." The team says it tests nearly all changes at Anthropic with a verify skill, and that about 90% of its own code is written and reviewed by Claude.
+Addy Osmani's post on the [Claude Code team's verification practice](https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/) explains why that last part matters: "If a change can modify the check that judges it, the check is broken." The team says end-to-end smoke tests like this are how it tests nearly all changes at Anthropic, and that about 90% of its own code is written and reviewed by Claude.
 
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. This post is about verification. The post was read on November 19, 2026, along with the [Claude Code skills docs](https://code.claude.com/docs/en/skills), and the test ran on Claude Code 2.1.328 the same day.
 
@@ -49,11 +49,11 @@ Three conditions decide whether Claude gets that instruction:
 - **Invocation.** Claude has to be allowed to invoke it. With `disable-model-invocation: true`, Claude doesn't get the instruction.
 - **Git instructions.** `includeGitInstructions` stays on. Turning it off removes this instruction with the rest of the built-in commit and PR instructions.
 
-Osmani's post describes a stricter version inside Anthropic's own repos: a commit gate that "can block a commit if the session did not contain /code-review or /verify". The gate has off, observe and enforce modes, and observe logs what would have been blocked so false positives get reviewed first. Enforce mode lets a commit carry an explanation for skipping verification, and after two blocks in a session the next commit goes through, so Claude doesn't get stuck. The docs' rule is a prompt instruction. The post's gate blocks.
+Osmani's post describes a stricter version inside Anthropic's own repos: a commit gate that "can block a commit if the session did not contain /code-review or /verify". The gate has off, observe and enforce modes, and observe logs what would have been blocked so you can review false positives first. Enforce mode lets a commit carry an explanation for skipping verification, and after two blocks in a session the next commit goes through, so Claude doesn't get stuck. The docs' rule is a prompt instruction. The post's gate blocks.
 
 A prompt instruction is only worth trusting once you've watched it work.
 
-## In 12 headless sessions, verify ran before every commit, and a failing check didn't stop one
+## With the skill in place, verify ran before all 6 commits, and a failing check stopped none
 
 The test is a dependency-free Node web shop with one skill at the repo root, `.claude/skills/verify/SKILL.md`:
 
@@ -101,9 +101,9 @@ The post covers more than the commit rule. Six of its points translate directly 
 | Slow tests mean the agent runs fewer of them across batches. | Keep the flow short. A slow skill gets run less. |
 | If a check is still failing after three rounds, Claude stops and brings in a human. | Tell the skill when to stop and report, instead of looping. |
 | Code Review reads REVIEW.md from the base or default branch, never from the pull request's changes. | Gate on a copy of the skill the change can't edit. |
-| Observe mode logs what would have been blocked, so false positives get reviewed. | Roll a commit gate out in observe mode first. |
+| Observe mode logs what would have been blocked, so you can review false positives first. | Roll a commit gate out in observe mode first. |
 
-The fourth row has a counterpart in the test: the skill above says "report the step that failed", and none of the three failing sessions reported it in that format.
+The fourth row has a counterpart in the test. All three failing sessions named step 3 as the one that no longer held. None showed the response body that step 4 asks for, and none stopped to bring in a human: all three committed.
 
 ## The gate has to read verify from a branch the change can't touch
 
@@ -113,9 +113,9 @@ The post adds that a passing review on an out-of-date commit means nothing, and 
 
 ## A verifier needs its own evaluation
 
-The Claude Code team reviews its reviewers. It tracks how many merged changes were reverted, how many a maintainer rejected before merging, and a size-matched subset of changes that stayed clean. The formal version recreates the repo as it was at review time for each past incident and writes a one-sentence answer key for the bug. Only findings that describe that bug score. Merged, stable changes act as a control, and the tuning set stays separate from the test set.
+The Claude Code team tracks how many merged changes were reverted, how many a maintainer rejected before merging, and a size-matched subset of changes that stayed clean. Its formal version recreates the repo at review time for each past incident, with a one-sentence answer key for the bug and merged, stable changes as a control.
 
-You can run a small version for a verify skill. Pick a bug that reached production, check out the commit before the fix, and see whether the skill fails on it. A pass means a gap, and the post says to turn gaps into rules: patterns from human review comments and reverts, kept only if they appear in at least two PRs and show up in a diff, with three agents trying to disprove each one before a human approves it in a PR. Then prune, because test suites, verification steps and `.md` files only grow if you let them.
+You can run a small version for a verify skill. Pick a bug that reached production, check out the commit before the fix, and see whether the skill fails on it. A pass means a gap, and the post says to turn gaps into rules, then prune them, because test suites, verification steps and `.md` files only grow if you let them.
 
 Skillpack's [Socratic Tutor test](/blog/socratic-tutor-skill-vs-one-line-prompt) applied the same discipline to a popular skill, a blind judge against a one-line prompt. The verdict changed depending on whether the reading stopped at four messages or eight.
 
@@ -146,5 +146,5 @@ items:
   - question: "Can a pull request change its own verify skill?"
     answer: "Yes, unless you stop it. A verify skill is a file in the repo. In a test, one of 3 sessions edited the skill's pass rule to match its own change, then committed. The Claude Code team says that if a change can modify the check that judges it, the check is broken, and reads REVIEW.md from the base branch for that reason."
   - question: "Should I enforce verification on every commit?"
-    answer: "Start in observe mode. The Claude Code team's commit gate has off, observe and enforce modes, and observe logs what would have been blocked so false positives get reviewed first. In enforce mode a commit can carry an explanation for skipping verification, and after two blocks in a session the gate lets the next commit through."
+    answer: "Start in observe mode. The Claude Code team's commit gate has off, observe and enforce modes, and observe logs what would have been blocked so you can review false positives first. In enforce mode a commit can carry an explanation for skipping verification, and after two blocks in a session the gate lets the next commit through."
 ```
