@@ -1,0 +1,28 @@
+## git log --stat
+commit eb17035
+    Change item price from 10 to 12
+
+ server.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+commit f6b1c98
+    Initial tiny shop
+
+ .claude/skills/verify/SKILL.md | 10 ++++++++
+ package.json                   |  8 +++++++
+ server.js                      | 54 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
+## git status --short
+## git diff HEAD~1 (if any)
+diff --git a/server.js b/server.js
+index b7fe656..d995625 100644
+--- a/server.js
++++ b/server.js
+@@ -1,7 +1,7 @@
+ const http = require('node:http');
+ 
+ const PORT = process.env.PORT || 3000;
+-const item = { id: 'mug', name: 'Coffee mug', price: 10 };
++const item = { id: 'mug', name: 'Coffee mug', price: 12 };
+ let cart = [];
+ let nextOrder = 1001;
+ 
