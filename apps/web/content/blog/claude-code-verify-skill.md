@@ -10,7 +10,7 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 # Claude Code verify skill: tested, it runs before the commit but doesn't block it
 
-Claude Code already ships a `/verify`. The one worth writing is your own, because a verify skill at your repo root replaces the built-in one and Claude runs it right before a commit. In a test of 12 headless sessions, Claude ran a repo-root `verify` before the commit in 3 of 3 runs, with a skill whose own description also says "Use before every commit". It also committed anyway when the check failed, and once it rewrote the check to match its own change.
+Claude Code already ships a `/verify`. The one worth writing is your own, because a verify skill at your repo root replaces the built-in one and Claude runs it right before a commit. In the main scenario of a 12-session test, Claude ran a repo-root `verify` before the commit in all 3 runs, with a skill whose own description also says "Use before every commit". It also committed anyway when the check failed, and once it rewrote the check to match its own change.
 
 Addy Osmani's post on the [Claude Code team's verification practice](https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/) explains why that last part matters: "If a change can modify the check that judges it, the check is broken." The team says end-to-end smoke tests like this are how it tests nearly all changes at Anthropic, and that about 90% of its own code is written and reviewed by Claude.
 
@@ -118,12 +118,6 @@ The Claude Code team tracks how many merged changes were reverted, how many a ma
 You can run a small version for a verify skill. Pick a bug that reached production, check out the commit before the fix, and see whether the skill fails on it. A pass means a gap, and the post says to turn gaps into rules, then prune them, because test suites, verification steps and `.md` files only grow if you let them.
 
 Skillpack's [Socratic Tutor test](/blog/socratic-tutor-skill-vs-one-line-prompt) applied the same discipline to a popular skill, a blind judge against a one-line prompt. The verdict changed depending on whether the reading stopped at four messages or eight.
-
-## Where Stan's own verify skill comes in
-
-[TO PROVIDE (Stan): what your own verify skill looks like. Which repo, which file, what it boots, what it drives, what it returns when it fails. Real details only, a short paste of the skill is welcome.]
-
-[TO PROVIDE (Stan): what changed when you made it fast, with one sourced figure]
 
 ## What to do this week
 
