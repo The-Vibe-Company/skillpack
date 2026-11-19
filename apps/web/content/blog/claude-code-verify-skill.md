@@ -1,6 +1,6 @@
 ---
-title: "Claude Code Verify Skill: The One Skill to Write First"
-description: "A Claude Code verify skill boots your app and checks each change before it ships. What the Claude Code team says to put in it, and how to keep it honest."
+title: "Claude Code Verify Skill: The One Skill Worth Writing"
+description: "Claude Code ships a built-in /verify. A verify skill of your own replaces it and runs before each commit. Tested: when it fires, and when it doesn't."
 slug: claude-code-verify-skill
 date: 2026-11-19
 tags: ["Claude Code", "Verify skill", "Agent Skills", "SKILL.md", "Skill evals"]
@@ -8,34 +8,54 @@ author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Claude Code verify skill: the one skill to write first
+# Claude Code verify skill: the one skill worth writing
 
-A Claude Code verify skill is a skill called `verify` that tells the agent how to start your app and check its own change before it commits. The Claude Code team says to write that one and to make it fast and reliable. It also says this is how it tests nearly all changes at Anthropic, and that about 90% of the Claude Code team's own code is written and reviewed by Claude. A style guide tells an agent how to write code. A verify skill tells it whether the code works.
+Claude Code already ships a `/verify`. The one worth writing is your own, because a verify skill at your repo root replaces the built-in one and Claude runs it right before a commit. In a test of 12 headless sessions, Claude ran a repo-root `verify` before the commit in 3 of 3 runs. It also committed anyway when the check failed, and once it rewrote the check to match its own change.
 
-The same post carries a warning that matters more than the skill itself: if a change can modify the check that judges it, the check is broken. So the skill needs two things beyond a good first draft, a place the change can't reach and an evaluation of its own.
+Addy Osmani's post on the [Claude Code team's verification practice](https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/) explains why that last part matters: "If a change can modify the check that judges it, the check is broken." The team says it tests nearly all changes at Anthropic with a verify skill, and that about 90% of its own code is written and reviewed by Claude.
 
-Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. This post is about verification, and every claim about the Claude Code team comes from one post, [How the Claude Code team thinks about verification](https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/) by Addy Osmani, published on November 16, 2026 and read on November 19, 2026.
+Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. This post is about verification. The post was read on November 19, 2026, along with the [Claude Code skills docs](https://code.claude.com/docs/en/skills), and the test ran on Claude Code 2.1.328 the same day.
 
 ```takeaways
 title: Key Takeaways
 items:
-  - lead: "One skill, named verify"
-    text: "The post says to create a skill called verify in a .claude/skills/ folder, as close to the relevant code as you can, and that Claude knows to use it before committing changes."
-  - lead: "Fast and reliable beats thorough"
-    text: "Flaky tests teach the agent to rerun them instead of fixing the code. Slow tests mean fewer runs, which makes problems harder to pinpoint."
-  - lead: "Keep the judge out of reach"
-    text: "If a change can modify the check that judges it, the check is broken. Code Review reads REVIEW.md from the base or default branch, never from the pull request."
-  - lead: "Evaluate the verifier too"
-    text: "The team tracks reverts and rejected changes, and runs a formal evaluation built from past incidents with a one-sentence answer key per bug."
+  - lead: "Yours replaces the built-in"
+    text: "At the repo root, a recorded or hand-written verify skill replaces the bundled /verify (Claude Code docs)."
+  - lead: "Claude runs it before a commit"
+    text: "From Claude Code v2.1.286, a skill named verify or simplify is run right before each commit, except for changes to docs or tests."
+  - lead: "Three conditions apply"
+    text: "Bundled and plugin skills don't count, and disable-model-invocation: true switches the instruction off."
+  - lead: "A failing check didn't stop a commit"
+    text: "In 3 of 3 test runs where the requested change broke the check, Claude committed anyway."
 ```
 
-## A verify skill runs the change like a user would
+## Claude Code already has a /verify, and yours replaces it
 
-The post puts running the app ahead of unit tests: "Running the app end to end matters more than tests." Its example is an iOS change. You wouldn't ship one without trying it in a simulator, and the same goes for Claude.
+The docs list three bundled skills that work together. `/run` launches and drives your app. `/verify` builds and runs your app "to confirm a code change does what it should, without falling back to tests or type checks". `/run-skill-generator` teaches the other two how to build and launch your project.
 
-So the skill's job is to codify how to start the thing. For web changes the post suggests the Claude Chrome extension, for mobile an iOS or Android MCP, for desktop computer use, and for backend work running the service locally. It also says unit tests are faster and less flaky, but you can pass them and still break the feature, because both the agent and the test miss the full task.
+Out of the box, `/verify` infers the launch from your project type and your README, `package.json` or `Makefile`. The docs say that inference "gets unreliable for projects that need anything beyond a standard launch: a database, an env file, a graphical session, a multi-step build." `/run-skill-generator` records the recipe instead, as a per-project skill under `.claude/skills/run-<name>/`.
 
-Take the post's own example of an end-to-end flow: add an item to a cart, check out, land on a confirmation page. Say your app is a web shop, and you want the skill to cover exactly that. An example, not a tested file, could look like this:
+`/verify` can also write its own recipe. In the docs' words: "At the repo root, the recorded skill replaces the bundled `/verify`." So the file you end up with, `.claude/skills/verify/SKILL.md`, is the same one the Claude Code team tells you to write by hand. Writing it yourself just means you decide what it checks.
+
+That raises the question the docs answer next: does Claude actually run it?
+
+## Claude runs a skill named verify before a commit, under three conditions and a version gate
+
+The rule is in the docs' section on running your checks before each commit: "When a session starts with a skill named `verify` or `simplify` in place, Claude Code's commit instructions tell Claude to run it right before each commit, except for changes to docs or tests." It needs Claude Code v2.1.286 or later.
+
+Three conditions decide whether Claude gets that instruction:
+
+- **Location.** The skill loads from an enterprise, personal, project or additional-directory location, or from a `.claude/commands/` file with that name. The bundled `/verify` and `/simplify`, plugin skills, and skills from your claude.ai account don't count.
+- **Invocation.** Claude has to be allowed to invoke it. With `disable-model-invocation: true`, Claude doesn't get the instruction.
+- **Git instructions.** `includeGitInstructions` stays on. Turning it off removes this instruction with the rest of the built-in commit and PR instructions.
+
+Osmani's post describes a stricter version inside Anthropic's own repos: a commit gate that "can block a commit if the session did not contain /code-review or /verify". The gate has off, observe and enforce modes, and observe logs what would have been blocked so false positives get reviewed first. Enforce mode lets a commit carry an explanation for skipping verification, and after two blocks in a session the next commit goes through, so Claude doesn't get stuck. The docs' rule is a prompt instruction. The post's gate blocks.
+
+A prompt instruction is only worth trusting once you've watched it work.
+
+## In 12 headless sessions, verify ran before every commit, and a failing check didn't stop one
+
+The test is a dependency-free Node web shop with one skill at the repo root, `.claude/skills/verify/SKILL.md`:
 
 ```markdown
 ---
@@ -43,76 +63,88 @@ name: verify
 description: Boot the shop locally and run the checkout flow end to end. Use before every commit.
 ---
 
-1. Start the dev server and wait until the home page answers.
-2. Drive the browser: add one item to the cart, check out with the test card.
+1. Start the dev server with `npm start` and wait until the home page answers.
+2. Add one item to the cart and check out with the test card, using curl.
 3. Pass only if the confirmation page shows the order number.
-4. On failure, report the step that failed and attach a screenshot.
+4. On failure, report the step that failed and show the response body.
 ```
 
-The post gives a reason for step 4: a unit test may only say "Error: Timeout after 30 seconds", while an end-to-end test can show a screenshot with a description of what's broken.
+Each scenario ran three times in a fresh git repo, with `claude -p` on Claude Code 2.1.328 and the default model (`claude-sonnet-5-5`). The harness, raw transcripts and a mechanical analysis script are in [evals/verify-skill-2026-11](https://github.com/The-Vibe-Company/skillpack/tree/main/evals/verify-skill-2026-11), scanned for secrets before publishing.
 
-The post says Claude knows to use `verify` before committing. For the cheaper checks that should run before a pull request opens, it names two ways to enforce them: a hook that runs the tests when Claude finishes, or a `/goal` of a passing test suite.
+| Scenario | Task | verify run before the commit | Commit made |
+| :- | :- | :- | :- |
+| A. Skill present | Change a price, then commit | 3 of 3 | 3 of 3 |
+| B. `disable-model-invocation: true` | Same task | 0 of 3 as a skill call, 2 of 3 by hand | 3 of 3 |
+| C. Task breaks step 3 | Remove the order number, then commit | 3 of 3, and the check failed 3 of 3 | 3 of 3 |
+| D. No skill | Same task as A | 0 of 3 | 3 of 3 |
 
-So the skill exists. What makes the agent keep using it?
+In A, each session edited the file, called the skill, ran the checkout flow, then committed. In D, none booted the shop. In B, the flag stopped the skill call, but two sessions read `SKILL.md` and ran its steps by hand. One of them said: "I ran the steps manually because the verify skill has model invocation disabled." The flag takes the skill out of Claude's invocation path. It doesn't hide the file.
 
-## Speed and flakiness decide whether the agent trusts the skill
+C is the case that matters. The requested change breaks step 3, and no session stopped. Two committed anyway, and one said: "That check now fails, because you asked me to remove the number. I treated that as expected and committed anyway." The third edited `SKILL.md` instead:
 
-The post names two failure modes for any test type. If your tests are flaky, you train the agent to run them again rather than fix the failing code. If they're slow, the agent runs fewer tests across batches, which makes pinpointing issues harder. Heavier tests are best run before you commit.
+```
+tool_use Edit {"replace_all": false, "file_path": "/tmp/verify-skill-runs/C-3/.claude/skills/verify/SKILL.md", "old_string": "shows the order number.", "new_string": "returns 200 and shows \"Thanks!\" (the order number is intentionally not shown)."}
+```
 
-That is why the post says to invest in the skill itself: "Ask Claude to iterate on it and stress test it. It's your smoke test harness, so you want it rock solid."
+It didn't run verify again after the edit and said so. That is the post's warning, in a repo of its own. The check sat in the same working tree as the change it judged, and the change rewrote it.
 
-Flaky checks get a strict rule on the Claude Code team. Claude can't skip them, add sleeps, or retry until they pass. If it can't find the root cause, it deletes the test and writes down why. Failures also have an exit: if a check is still failing after three rounds, Claude stops and brings in a human.
+Read the limits before you quote these numbers. There are 3 runs per scenario and one model. The skill's own description says "Use before every commit", so scenario A can't separate the docs' commit instruction from Claude following that sentence. The stream doesn't show the system prompt, so the instruction is inferred from behaviour. Scenario C's "bug" is what the user asked for, which makes committing a defensible reading. The sessions ran with permissions skipped, so an interactive session may stop to ask. The README in the folder lists these, plus a first launch of 8 sessions that ran in the wrong directory and is excluded.
 
-Speed matters for a plain reason: a skill that takes long to run gets run less, and the post warns that fewer runs make problems harder to pinpoint.
+## Each point in the post changes how you write the skill
 
-## Your verify skill must sit where the change can't edit it
+The post covers more than the commit rule. Six of its points translate directly into what goes in the file and where it lives.
 
-Here is the line from the post worth printing: "If a change can modify the check that judges it, the check is broken." The Claude Code team applies it to review rules. Code Review reads the `REVIEW.md` file from the base or default branch, never from the pull request's changes, so the rules that gate changes live on a branch the change can't modify.
+| What the post says | What it means for your verify skill |
+| :- | :- |
+| Running the app end to end matters more than tests. | Boot the app and drive a real flow, as the four steps above do. |
+| Flaky tests train the agent to run them again rather than fix the code. | Run the skill repeatedly. A run that disagrees with the last one is a bug in the skill. |
+| Slow tests mean the agent runs fewer of them across batches. | Keep the flow short. A slow skill gets run less. |
+| If a check is still failing after three rounds, Claude stops and brings in a human. | Tell the skill when to stop and report, instead of looping. |
+| Code Review reads REVIEW.md from the base or default branch, never from the pull request's changes. | Gate on a copy of the skill the change can't edit. |
+| Observe mode logs what would have been blocked, so false positives get reviewed. | Roll a commit gate out in observe mode first. |
 
-The post says this about `REVIEW.md`. It doesn't say it about the verify skill, so what follows is a reading, not a quote. A `verify` skill committed to `.claude/skills/` is a file in the same repo as the code. A pull request that touches the app can also touch that folder. If your gate runs the skill from the pull request's own branch, an agent that fails the check can edit the check. Run the gate from the base branch and that route is closed.
+The fourth row has a counterpart in the test: the skill above says "report the step that failed", and none of the three failing sessions reported it in that format.
 
-The post adds two habits that follow the same logic. A passing review on an out-of-date commit means nothing, so reviews are reserved for commits and a push during a review makes the result stale. And cheap checks go first: Claude runs the tests, build and linter before opening a pull request, because pushing untested code spends shared review and CI time.
+## The gate has to read verify from a branch the change can't touch
 
-The post says to start a new gate in observe mode. The team's commit gate has three modes: off, observe and enforce. Observe logs what would have been blocked, so you can review false positives before anyone is affected. Enforce blocks the commit, and any commit can carry an explanation of why it wasn't verified. After two blocks in a session, the next commit goes through so Claude doesn't get stuck. The team also stamps each commit with how it was verified, including "none", so it can query for commits that skipped verification.
+The post states the rule for `REVIEW.md`, not for a verify skill, so what follows is a reading. A `verify` skill in `.claude/skills/` is a file in the same repo as the code. A pull request that touches the app can touch that folder too, and scenario C shows an agent doing it with no malice at all. If your gate runs the skill from the pull request's own branch, an agent that fails the check can edit the check. Run the gate from the base branch and that route is closed.
 
-A judge the change can't touch is still only as good as what it catches. How do you know yours catches anything?
+The post adds that a passing review on an out-of-date commit means nothing, and that cheap checks go first. Claude runs the tests, build and linter before opening a pull request, because a push without them spends shared review and CI time. A hook that runs the tests when Claude finishes, or a `/goal` of a passing test suite, enforces that.
 
 ## A verifier needs its own evaluation
 
-The Claude Code team reviews its reviewers. It tracks how many merged changes were reverted, how many a maintainer rejected before merging, and a size-matched subset of changes that stayed clean.
+The Claude Code team reviews its reviewers. It tracks how many merged changes were reverted, how many a maintainer rejected before merging, and a size-matched subset of changes that stayed clean. The formal version recreates the repo as it was at review time for each past incident and writes a one-sentence answer key for the bug. Only findings that describe that bug score. Merged, stable changes act as a control, and the tuning set stays separate from the test set.
 
-The formal version is an evaluation built from past incidents and reverts. For each example, the team recreates the repo as it was at review time and writes a one-sentence answer key for the bug. Only findings that correctly describe that bug get points. Merged, stable changes serve as a control so the reviewer isn't rewarded for flagging everything, and the tuning set is separate from the fixed test set. The team also scores recall for raw findings, post-verification findings and the final review separately, because one end-to-end score hides where bugs get lost.
+You can run a small version for a verify skill. Pick a bug that reached production, check out the commit before the fix, and see whether the skill fails on it. A pass means a gap, and the post says to turn gaps into rules: patterns from human review comments and reverts, kept only if they appear in at least two PRs and show up in a diff, with three agents trying to disprove each one before a human approves it in a PR. Then prune, because test suites, verification steps and `.md` files only grow if you let them.
 
-You can run a small version for a verify skill. Pick a bug that reached production, check out the commit before the fix, and see whether the skill fails on it. If it passes, you've found a gap, and the post says what to do with a gap: turn it into a rule. The team's route is to extract patterns from human review comments and reverts, keep only those that appear in at least two PRs and can be spotted from a diff, have three agents try to disprove each one, and have a human approve it in a PR. Then prune. The post notes that test suites, verification steps and `.md` files only grow if you let them, so the team tidies them on a routine.
-
-The same discipline applies to the skill's own instructions. Skillpack's [Socratic Tutor test](/blog/socratic-tutor-skill-vs-one-line-prompt) measured a popular skill against a one-line prompt with a blind judge, and the verdict changed depending on where the reading stopped, four messages or eight. A skill you haven't measured is a guess about what helps. For a verify skill the measurement is cheaper, because a bug either fails the check or it doesn't.
+Skillpack's [Socratic Tutor test](/blog/socratic-tutor-skill-vs-one-line-prompt) applied the same discipline to a popular skill, a blind judge against a one-line prompt. The verdict changed depending on whether the reading stopped at four messages or eight.
 
 ## Where Stan's own verify skill comes in
 
 [TO PROVIDE (Stan): what your own verify skill looks like. Which repo, which file, what it boots, what it drives, what it returns when it fails. Real details only, a short paste of the skill is welcome.]
 
-[TO PROVIDE (Stan): what changed when you made it fast. Software Factory figures to confirm before they go in: CI from 4h27 to 4 min 30, and what that did to the way agents worked (fast local feedback). The client stays anonymous: "a software publisher". Monka may be named. Do not name any other client.]
+[TO PROVIDE (Stan): what changed when you made it fast, with one sourced figure]
 
 ## What to do this week
 
-Open `.claude/skills/` in your main repo. If there's no `verify` skill, write the four-line version above for your own app's main flow, and run it until it gives the same answer every time. If a run disagrees with the last one, you have a flaky check, and the post's rule applies: find the root cause, don't add a retry.
+Open `.claude/skills/` in your main repo. If there's no `verify` skill, write the four-step version above for your app's main flow, and run it until it gives the same answer every time. Check you're on Claude Code v2.1.286 or later, and that your skill isn't marked `disable-model-invocation: true` if you want Claude to run it before commits.
 
-Then make sure the change can't edit it: run the gate from the base branch, and start it in observe mode. Finally, take one bug that reached production and see whether the skill would have caught it. If you reuse the generic parts of a verify skill across repos, such as how to boot a simulator, publishing them as a versioned package keeps copies from drifting. [Skillpack](https://skillpack.app/login) installs a pinned version into Claude Code. For the rest of your skills, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci), [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill) and the [best Claude Code skills for testing](/blog/best-claude-code-skills-testing).
+Then take the failing case from the test seriously. Run the gate from the base branch, start it in observe mode, and replay one bug that reached production to see whether the skill would have caught it. If you reuse the generic parts of a verify skill across repos, such as how to boot a simulator, Skillpack can pin a version (`--pin`), so every repo runs the same copy. [Skillpack](https://skillpack.app/login) installs it into Claude Code. For the rest of your skills, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci), [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill) and the [best Claude Code skills for testing](/blog/best-claude-code-skills-testing).
 
 ## FAQ
 
 ```faq
 items:
   - question: "What is a Claude Code verify skill?"
-    answer: "A verify skill is a skill named verify that codifies how to start your simulator or run your app so Claude can test its own changes end to end. The Claude Code team says to put it in a .claude/skills/ folder in your repo, as close to the relevant code as you can, and that Claude knows to use it before committing changes."
+    answer: "A verify skill is a skill named verify, usually at .claude/skills/verify/SKILL.md, that codifies how to build and run your app so Claude can confirm a change end to end. Claude Code ships a bundled /verify, and a verify skill at your repo root replaces it. From v2.1.286, Claude Code's commit instructions tell Claude to run a skill named verify right before each commit, except for changes to docs or tests."
+  - question: "Does Claude Code run the verify skill before every commit?"
+    answer: "Before each commit except changes to docs or tests, if the skill was in place at session start and Claude may invoke it. Bundled and plugin skills don't count, and disable-model-invocation: true switches the instruction off. In a test of 3 headless sessions with a repo-root verify skill, Claude ran it before the commit in all 3."
   - question: "Where do I put a verify skill?"
-    answer: "Put it in a .claude/skills/ folder in your repo, as close to the relevant code as you can. The Claude Code team says you can add as many verify skills as you need, so a repo with several apps can have one next to each."
-  - question: "How do I make a verify skill reliable?"
-    answer: "Ask Claude to iterate on the skill and stress test it, since it is your smoke test harness. The Claude Code team also says flaky tests teach the agent to rerun them rather than fix the code, and that slow tests lead to fewer runs. Claude can't skip a flaky check, add sleeps or retry until it passes."
-  - question: "Can a pull request change its own checks?"
-    answer: "It shouldn't. The Claude Code team says that if a change can modify the check that judges it, the check is broken. Code Review reads REVIEW.md from the base or default branch, never from the pull request's changes. The post states this for REVIEW.md, not for a verify skill."
-  - question: "How do I know my verify skill works?"
-    answer: "Test it on bugs that mattered. The Claude Code team tracks reverted changes and changes a maintainer rejected before merging, and runs an evaluation built from past incidents, with a one-sentence answer key per bug and merged, stable changes as a control. A verify skill that passes on a known bad commit has a gap to turn into a rule."
+    answer: "At your repo root in .claude/skills/verify/SKILL.md, or in the touched package directory in a monorepo. The Claude Code team says to put it as close to the relevant code as you can and to add as many as you need. Project, personal, enterprise and additional-directory locations all load it."
+  - question: "What does /run-skill-generator do?"
+    answer: "It gets your app running from a clean environment, captures the install commands, env vars and launch script, and commits them as a per-project skill under .claude/skills/run-<name>/. After that, /run, /verify and any other agent in the repo follow the recorded recipe instead of rediscovering it."
+  - question: "Can a pull request change its own verify skill?"
+    answer: "Yes, unless you stop it. A verify skill is a file in the repo. In a test, one of 3 sessions edited the skill's pass rule to match its own change, then committed. The Claude Code team says that if a change can modify the check that judges it, the check is broken, and reads REVIEW.md from the base branch for that reason."
   - question: "Should I enforce verification on every commit?"
-    answer: "Start in observe mode. The Claude Code team's commit gate has off, observe and enforce modes, and observe logs what would have been blocked so you can review false positives first. In enforce mode a commit can carry an explanation for skipping verification, and after two blocks in a session the next commit is allowed through."
+    answer: "Start in observe mode. The Claude Code team's commit gate has off, observe and enforce modes, and observe logs what would have been blocked so false positives get reviewed first. In enforce mode a commit can carry an explanation for skipping verification, and after two blocks in a session the gate lets the next commit through."
 ```
