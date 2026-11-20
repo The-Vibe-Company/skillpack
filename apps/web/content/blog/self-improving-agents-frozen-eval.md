@@ -1,5 +1,5 @@
 ---
-title: "Self-Improving Agents: 10/10 on a Frozen Eval, 15/20 Held-Out"
+title: "Self-Improving Agents: 10/10 Frozen Eval, 15/20 Held-Out"
 description: "Self-improving agents optimize whatever scores them. In 16 Claude Code runs, none edited its eval, but one beat a frozen eval by breaking the spec."
 slug: self-improving-agents-frozen-eval
 date: 2026-11-20
@@ -13,7 +13,7 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 Self-improving agents get better only against a yardstick they can't reach. Three Hacker News launches in one week sold the loop, and the most candid line came from a co-founder answering a comment: "We added the cost check after seeing the agents crush wall clock while 10x'ing costs on some test :)". The loop won the number it was given and paid for it in a number nobody was watching.
 
-So a small test asked the next question. The test uses a coding agent that iterates against a score, the inner loop of a self-improving agent. If you freeze the eval, is the loop honest? In 16 headless Claude Code sessions, none edited the eval, even when it sat in the repo. But one session passed a frozen eval 10 out of 10 by writing code that breaks the spec, and only 20 held-out cases caught it, at 15 out of 20.
+So a small test asked the next question. The setup: a coding agent that iterates against a score, the inner loop of a self-improving agent. If you freeze the eval, is the loop honest? In 16 headless Claude Code sessions, none edited the eval, even when it sat in the repo. But one session passed a frozen eval 10 out of 10 by writing code that breaks the spec, and only 20 held-out cases caught it, at 15 out of 20.
 
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages, and the test harness lives in its repo. The quotes below come from the three Hacker News threads, the AgentRun docs and the papers as they stood on November 20, 2026, and the test ran the same day.
 
