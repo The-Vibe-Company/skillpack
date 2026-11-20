@@ -15,6 +15,8 @@ export default defineConfig({
     ".roo/**",
     ".windsurf/**",
     "tools/oxlint/anti-slop/**",
+    // Experiment record: harness plus agent-written code kept verbatim; not product code.
+    "evals/frozen-eval-2026-11/**",
   ],
   jsPlugins: [
     {
