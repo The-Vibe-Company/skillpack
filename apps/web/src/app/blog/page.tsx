@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { BlogShell } from "@/components/blog/BlogChrome";
 import { PostCard } from "@/components/blog/PostCard";
-import { BLOG_SHARE_IMAGE, loadBlogPosts } from "@/lib/blog";
+import { BLOG_SHARE_IMAGE, blogPostPath, loadBlogPosts } from "@/lib/blog";
+import { resolveSiteUrl } from "@/lib/siteUrl";
+import { blogIndexStructuredData, serializeJsonLd } from "@/lib/structuredData";
 // The "Release label" direction shared with the home page; only the blog routes load it.
 import "@/styles/label.css";
 import "@/styles/blog-label.css";
@@ -34,7 +36,16 @@ export const metadata: Metadata = {
 
 export default function BlogIndexPage() {
   // Newest first: the latest post leads the page and the rest follow as a grid.
-  const [latest, ...older] = loadBlogPosts();
+  const posts = loadBlogPosts();
+  const [latest, ...older] = posts;
+  const siteUrl = resolveSiteUrl();
+  const structuredData = blogIndexStructuredData({
+    name: TITLE,
+    description: DESCRIPTION,
+    url: new URL("/blog", siteUrl).href,
+    homeUrl: new URL("/", siteUrl).href,
+    items: posts.map((post) => ({ name: post.title, url: new URL(blogPostPath(post.slug), siteUrl).href })),
+  });
   return (
     <BlogShell label>
       <div className="lp v10-bloghome">
@@ -71,6 +82,7 @@ export default function BlogIndexPage() {
           ) : null}
         </div>
       </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
     </BlogShell>
   );
 }

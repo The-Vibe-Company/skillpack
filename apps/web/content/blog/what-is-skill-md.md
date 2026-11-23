@@ -62,8 +62,8 @@ Two fields are required. Everything else is optional:
 
 | Field | Required | Rules |
 |---|---|---|
-| `name` | Yes | 1–64 chars, lowercase letters, numbers and hyphens; no leading, trailing or double hyphens; must match the folder name |
-| `description` | Yes | 1–1024 chars; what the skill does **and when to use it** |
+| `name` | Yes | 1 to 64 chars, lowercase letters, numbers and hyphens; no leading, trailing or double hyphens; must match the folder name |
+| `description` | Yes | 1 to 1024 chars; what the skill does **and when to use it** |
 | `license` | No | License name or bundled license file |
 | `compatibility` | No | Up to 500 chars; environment requirements |
 | `metadata` | No | Free-form string key/value map |

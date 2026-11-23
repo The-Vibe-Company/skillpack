@@ -3,7 +3,7 @@
 import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import PrivacyPage from "./page";
+import PrivacyPage, { metadata } from "./page";
 
 // SAFETY: React's test harness reads this documented global flag; the test owns its boolean value.
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -50,5 +50,35 @@ describe("public privacy page", () => {
         (link) => link.textContent?.trim() === "Back to Skillpack",
       ),
     ).toBe(true);
+  });
+
+  it("renders one JSON-LD WebPage with a breadcrumb", async () => {
+    const container = await renderPrivacy();
+    const scripts = container.querySelectorAll('script[type="application/ld+json"]');
+    expect(scripts).toHaveLength(1);
+
+    const data = JSON.parse(scripts[0]?.textContent ?? "");
+    const graph = data["@graph"];
+    const page = graph.find((node: { "@type": string }) => node["@type"] === "WebPage");
+    const crumbs = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
+
+    expect(page).toMatchObject({
+      name: "Privacy Policy",
+      description: metadata.description,
+      isPartOf: { "@id": "https://skillpack.app/#website" },
+      publisher: { "@id": "https://skillpack.app/#org" },
+    });
+    expect(page?.url).toMatch(/\/privacy$/);
+    expect(crumbs?.itemListElement.map((crumb: { name: string }) => crumb.name)).toEqual([
+      "Home",
+      "Privacy Policy",
+    ]);
+  });
+
+  it("has a descriptive meta description without em or en dashes", () => {
+    const description = String(metadata.description);
+    expect(description.length).toBeGreaterThanOrEqual(140);
+    expect(description.length).toBeLessThanOrEqual(160);
+    expect(description).not.toMatch(/[\u2013\u2014]/);
   });
 });

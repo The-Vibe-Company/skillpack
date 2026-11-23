@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -168,8 +168,15 @@ describe("blog post loading", () => {
     });
     expect(post?.body).toBe(fileBody);
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
-      "f94b728e8427d0dcb5badc63a5a1403e7700d218c15b4e01991b9335255823d7",
+      "34a8f57d56bd863ebd4222653b9ea53acb3596ed6af4876a1560c02e51babb3a",
     );
+  });
+
+  it("keeps em and en dashes out of every published post", () => {
+    const files = readdirSync(BLOG_CONTENT_DIR).filter((file) => file.endsWith(".md"));
+    expect(files.length).toBeGreaterThan(0);
+    const offenders = files.filter((file) => /[\u2013\u2014]/.test(readFileSync(join(BLOG_CONTENT_DIR, file), "utf8")));
+    expect(offenders).toEqual([]);
   });
 
   it("formats the publication day without shifting it across time zones", () => {

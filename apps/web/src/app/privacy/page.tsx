@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { resolveSiteUrl } from "@/lib/siteUrl";
+import { privacyPageStructuredData, serializeJsonLd } from "@/lib/structuredData";
+
+const TITLE = "Privacy Policy";
+const DESCRIPTION =
+  "How Skillpack handles your information: the Gmail scopes it requests, how data is used, shared and protected, how long it is kept, and how to revoke access.";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "How Skillpack handles your information and protects your privacy.",
+  title: TITLE,
+  description: DESCRIPTION,
 };
 
 const POLICY_SECTIONS = [
@@ -30,6 +36,13 @@ const POLICY_SECTIONS = [
 ] as const;
 
 export default function PrivacyPage() {
+  const siteUrl = resolveSiteUrl();
+  const structuredData = privacyPageStructuredData({
+    name: TITLE,
+    description: DESCRIPTION,
+    url: new URL("/privacy", siteUrl).href,
+    homeUrl: new URL("/", siteUrl).href,
+  });
   return (
     <div className="v10-landing v10-privacy">
       <a className="v10-skip" href="#privacy-content">Skip to content</a>
@@ -106,6 +119,7 @@ export default function PrivacyPage() {
           </span>
         </div>
       </footer>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
     </div>
   );
 }
