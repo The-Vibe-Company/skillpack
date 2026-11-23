@@ -102,6 +102,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     headline: post.title,
     description: post.description,
     datePublished: post.date,
+    dateModified: post.updated,
     url: new URL(blogPostPath(post.slug), siteUrl).href,
     image: new URL(blogPostImagePath(post.slug), siteUrl).href,
     keywords: post.tags,
@@ -124,6 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               authorRole={post.authorRole}
               date={post.date}
               dataCollected={post.dataCollected}
+              updated={post.updated}
               minutes={minutes}
               tags={post.tags}
             />
@@ -147,6 +149,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   author={author}
                   authorRole={post.authorRole}
                   dataCollected={post.dataCollected}
+                  updated={post.updated}
                 />
                 <TagList tags={post.tags} />
               </header>

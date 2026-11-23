@@ -92,6 +92,21 @@ describe("blog post parsing", () => {
     );
   });
 
+  it("reads an optional revision day that is not before publication", () => {
+    expect(parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-11-23`), "a-post.md").updated).toBe("2026-11-23");
+    expect(parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-10-13`), "a-post.md").updated).toBe("2026-10-13");
+    expect(parseBlogPost(postSource(VALID_FRONTMATTER), "a-post.md")).not.toHaveProperty("updated");
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-10-12`), "a-post.md")).toThrow(
+      "a-post.md: invalid frontmatter (updated: updated must not be before date)",
+    );
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-11-31`), "a-post.md")).toThrow(
+      /updated: updated must be a real day/,
+    );
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: Nov 23 2026`), "a-post.md")).toThrow(
+      /updated: updated must be YYYY-MM-DD/,
+    );
+  });
+
   it("fails the build when a heading takes a block's fixed anchor", () => {
     const takeaways = "```takeaways\ntitle: Key Takeaways\nitems:\n  - { lead: One., text: Two. }\n```";
     const body = `\n# Title\n\n## Key Takeaways\n\n${takeaways}\n`;

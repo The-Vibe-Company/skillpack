@@ -34,10 +34,15 @@ describe("technical SEO routes", () => {
     expect(entries).toEqual([
       { url: "https://skillpack.app/" },
       { url: "https://skillpack.app/privacy" },
-      { url: "https://skillpack.app/blog", lastModified: posts[0]?.date },
-      ...posts.map((post) => ({ url: `https://skillpack.app/blog/${post.slug}`, lastModified: post.date })),
+      { url: "https://skillpack.app/blog", lastModified: posts.map((post) => post.updated ?? post.date).sort().at(-1) },
+      ...posts.map((post) => ({ url: `https://skillpack.app/blog/${post.slug}`, lastModified: post.updated ?? post.date })),
     ]);
     expect(entries).toContainEqual({ url: "https://skillpack.app/blog/what-is-skill-md", lastModified: "2026-10-13" });
+    // A revised post is listed with its revision day, not its publication day.
+    expect(entries).toContainEqual({
+      url: "https://skillpack.app/blog/claude-code-subagents-vs-skills",
+      lastModified: "2026-11-23",
+    });
   });
 
   it("never lists or fetches the catalog while its default-off flag is unset", async () => {

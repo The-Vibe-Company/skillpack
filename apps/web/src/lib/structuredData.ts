@@ -53,6 +53,8 @@ export type BlogPostingFacts = {
   headline: string;
   description: string;
   datePublished: string;
+  /** The post's revision day, stated only when the frontmatter sets `updated`. */
+  dateModified?: string;
   url: string;
   /** Absolute URL of the post's generated share image. */
   image: string;
@@ -89,6 +91,7 @@ export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocume
     headline: facts.headline,
     description: facts.description,
     datePublished: facts.datePublished,
+    ...(facts.dateModified ? { dateModified: facts.dateModified } : {}),
     url: facts.url,
     mainEntityOfPage: facts.url,
     image: facts.image,
