@@ -209,3 +209,81 @@ export function catalogIndexStructuredData(input: {
     ],
   };
 }
+
+type Crumb = { name: string; url: string };
+
+function breadcrumbList(trail: readonly Crumb[]): JsonLdNode {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
+  };
+}
+
+/**
+ * The blog index as a CollectionPage of the posts it lists, in page order, with its breadcrumb
+ * trail. Only the page's own title, description and listed posts are stated.
+ */
+export function blogIndexStructuredData(input: {
+  name: string;
+  description: string;
+  url: string;
+  homeUrl: string;
+  items: { name: string; url: string }[];
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: input.name,
+        description: input.description,
+        url: input.url,
+        isPartOf: { "@id": WEBSITE_ID },
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: input.items.map((item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.name,
+            url: item.url,
+          })),
+        },
+      },
+      breadcrumbList([
+        { name: "Home", url: input.homeUrl },
+        { name: "Blog", url: input.url },
+      ]),
+    ],
+  };
+}
+
+/** The privacy policy page and its breadcrumb trail, published by the Skillpack organization. */
+export function privacyPageStructuredData(input: {
+  name: string;
+  description: string;
+  url: string;
+  homeUrl: string;
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: input.name,
+        description: input.description,
+        url: input.url,
+        isPartOf: { "@id": WEBSITE_ID },
+        publisher: { "@id": ORGANIZATION_ID },
+      },
+      breadcrumbList([
+        { name: "Home", url: input.homeUrl },
+        { name: input.name, url: input.url },
+      ]),
+    ],
+  };
+}
