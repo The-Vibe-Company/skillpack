@@ -19,7 +19,7 @@ const POLICY_SECTIONS = [
   },
   {
     heading: "Data use",
-    body: "These permissions are used solely to let your AI assistant, at your direction: search and read email threads to answer questions and summarize conversations; and create drafts in your own mailbox for you to review and send yourself. Skillpack never sends email on your behalf — drafts are created in your own Gmail mailbox and you send them yourself.",
+    body: "These permissions are used solely to let your AI assistant, at your direction: search and read email threads to answer questions and summarize conversations; and create drafts in your own mailbox for you to review and send yourself. Skillpack never sends email on your behalf: drafts are created in your own Gmail mailbox and you send them yourself.",
   },
   {
     heading: "Data sharing",
@@ -27,11 +27,11 @@ const POLICY_SECTIONS = [
   },
   {
     heading: "Data protection",
-    body: "Your OAuth access and refresh tokens are stored encrypted at rest using envelope encryption, are never returned by any API, and are never logged. All data access is scoped by organization with forced row-level security and least-privilege database roles. All transport uses TLS. You can revoke access at any time by disconnecting the Gmail integration in Skillpack settings or via your Google Account permissions page — revocation deletes stored credentials immediately.",
+    body: "Your OAuth access and refresh tokens are stored encrypted at rest using envelope encryption, are never returned by any API, and are never logged. All data access is scoped by organization with forced row-level security and least-privilege database roles. All transport uses TLS. You can revoke access at any time by disconnecting the Gmail integration in Skillpack settings or via your Google Account permissions page: revocation deletes stored credentials immediately.",
   },
   {
     heading: "Retention and deletion",
-    body: "OAuth credentials are retained only while the Gmail integration remains connected. Disconnecting the integration — or revoking access from your Google Account permissions page — deletes stored credentials from our systems immediately and permanently. Gmail content referenced in a conversation transcript is retained only as long as your Skillpack conversation exists, and is permanently deleted when you delete the companion or the conversation. Deleting your account deletes all associated data, including stored credentials and transcripts.",
+    body: "OAuth credentials are retained only while the Gmail integration remains connected. Disconnecting the integration (or revoking access from your Google Account permissions page) deletes stored credentials from our systems immediately and permanently. Gmail content referenced in a conversation transcript is retained only as long as your Skillpack conversation exists, and is permanently deleted when you delete the companion or the conversation. Deleting your account deletes all associated data, including stored credentials and transcripts.",
   },
 ] as const;
 
