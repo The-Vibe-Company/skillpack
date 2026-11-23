@@ -1,5 +1,5 @@
 ---
-title: "GitHub Copilot Skills: How to Add One in 5 Minutes"
+title: "GitHub Copilot skills: add one in 5 minutes, no ceremony"
 description: "GitHub Copilot skills are SKILL.md folders Copilot loads when a task matches. Where to put them, how to call one, and how to install a stranger's skill safely."
 slug: github-copilot-skills
 date: 2026-11-23
@@ -12,18 +12,18 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 Your friend with Claude Code keeps saying "I made a skill for that." You use Copilot. Good news: you can do the exact same thing.
 
-A GitHub Copilot skill is a folder with a `SKILL.md` file inside. Put it in `.github/skills/` in your repo, or in `~/.copilot/skills/` for every project. Copilot reads the description, and when your request matches, it loads the instructions. You can also call it by name with a slash. It works in the Copilot CLI, the Copilot app, agent mode in VS Code, and the cloud agent and code review on GitHub.com, according to [GitHub's docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills).
+A GitHub Copilot skill is a folder with a `SKILL.md` file inside. Put it in `.github/skills/` in your repo, or in `~/.copilot/skills/` for your local work. Personal skills may not reach the cloud agent; check its [setup guide](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills). Copilot reads the description, and when your request matches, it loads the instructions. You can also call it by name with a slash. It works in the Copilot CLI, the Copilot app, agent mode in VS Code, and the cloud agent and code review on GitHub.com, according to [GitHub's docs](https://docs.github.com/en/copilot/concepts/customizations/agent-skills).
 
-That's the whole idea. Here's the 5-minute version.
+Here's the 5-minute version, plus the one command to run before you install a stranger's skill.
 
-Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. The commands below come from the GitHub and VS Code docs as they stood on November 23, 2026.
+Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. The commands below come from the [GitHub cloud agent](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills), [Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills) and [VS Code](https://code.visualstudio.com/docs/agent-customization/agent-skills) docs as they stood on November 23, 2026.
 
 ## Where do Copilot skills live?
 
 In one of two places, depending on who should get the skill.
 
 - **Project skills**, shared with everyone who clones the repo: `.github/skills/`, `.claude/skills/` or `.agents/skills/`.
-- **Personal skills**, just for you, in every project: `~/.copilot/skills/` or `~/.agents/skills/`.
+- **Personal skills**, just for you, in every project: `~/.copilot/skills/` or `~/.agents/skills/`. Personal skills may not reach the cloud agent.
 
 Each skill gets its own subfolder, named in lowercase with hyphens. So the path looks like `.github/skills/release-notes/SKILL.md`. The file must be called `SKILL.md`. Not `skill.md`. Not `instructions.md`. Copilot is picky here, and honestly, fair.
 
@@ -47,7 +47,7 @@ The `name` should match the folder name. The `description` is the important bit,
 
 Need a script? Drop it in the same folder and tell the skill when to run it. Copilot makes every file in the skill's folder available alongside the instructions.
 
-## How do you call a skill in Copilot?
+## Two ways to call a skill in Copilot
 
 Two ways. Let Copilot pick it on its own when your request matches the description. Or name it yourself with a slash:
 
@@ -55,7 +55,7 @@ Two ways. Let Copilot pick it on its own when your request matches the descripti
 Use the /release-notes skill for everything merged this week.
 ```
 
-In the Copilot CLI, a few commands save you from guessing:
+In the [Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills), a few commands save you from guessing:
 
 - `/skills list` shows what's available.
 - `/skills reload` picks up a skill you just added, no restart.
@@ -63,11 +63,11 @@ In the Copilot CLI, a few commands save you from guessing:
 
 Prefer the terminal? `copilot skill list` does the same outside a session.
 
-In VS Code, type `/` in chat and your skills show up next to your prompts. Two frontmatter switches control that menu. `disable-model-invocation: true` means "only when I ask." `user-invocable: false` hides it from the slash menu and leaves it to Copilot.
+In [VS Code](https://code.visualstudio.com/docs/agent-customization/agent-skills), type `/` in chat and your skills show up next to your prompts. Two frontmatter switches control that menu. `disable-model-invocation: true` means "only when I ask." `user-invocable: false` hides it from the slash menu and leaves it to Copilot.
 
 ## Can you install a stranger's skill without regrets?
 
-GitHub CLI now has a `gh skill` command, in public preview, for GitHub CLI 2.90.0 or later. It searches, previews, installs and updates skills straight from GitHub repos.
+[GitHub CLI](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) now has a `gh skill` command, in public preview, for GitHub CLI 2.90.0 or later. It searches, previews, installs and updates skills straight from GitHub repos.
 
 ```shell
 gh skill search changelog
@@ -75,7 +75,7 @@ gh skill preview github/awesome-copilot documentation-writer
 gh skill install github/awesome-copilot documentation-writer
 ```
 
-Do not skip the `preview` line. GitHub says it plainly: skills are not verified by GitHub and may contain prompt injections or malicious scripts. `preview` shows you the `SKILL.md` and its files before anything lands on your disk. Reading a skill takes a minute. Cleaning up after a sketchy one takes your afternoon.
+Do not skip the `preview` line. [GitHub says it plainly](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills): skills are not verified by GitHub and may contain prompt injections or malicious scripts. `preview` shows you the `SKILL.md` and its files before anything lands on your disk. Reading a skill takes a minute. Cleaning up after a sketchy one takes your afternoon.
 
 Two more habits worth stealing:
 
@@ -92,7 +92,7 @@ Bonus for reviewers: Copilot code review on GitHub.com can use skills in `.githu
 
 ## Skill or custom instructions?
 
-Copilot also has custom instructions, like `.github/copilot-instructions.md`. GitHub's docs suggest an easy split. Instructions for things that apply to almost every task, like "use tabs" or "tests live in `/spec`". Skills for detailed workflows that matter some of the time, like release notes or debugging a failing GitHub Actions run.
+Copilot also has custom instructions, like `.github/copilot-instructions.md`. GitHub's docs suggest an easy split. Instructions for things that apply to almost every task, like your own house rules (for example, "use tabs" or "tests live in `/spec`"). Skills for detailed workflows that matter some of the time, like release notes or debugging a failing GitHub Actions run.
 
 Instructions are always in the room. Skills walk in when they're needed. That keeps Copilot's context light and your skill files short.
 
@@ -103,7 +103,7 @@ Instructions are always in the room. Skills walk in when they're needed. That ke
 3. Open the Copilot CLI and run `/skills list`, or type `/` in VS Code chat.
 4. Ask for this week's release notes and watch it go.
 
-If the skill never shows up, check the folder name, the exact file name and the frontmatter first. The usual suspects are covered in [why skills don't load](/blog/claude-code-skills-not-working). And when you want a starter pack of ready-made skills, the guide to [installing skills in Claude Code](/blog/how-to-install-skills-in-claude-code) walks through four ways to get them. The skills are plain `SKILL.md` folders, so they're not locked to one tool.
+If the skill never shows up, check the folder name, the exact file name and the frontmatter first. [Why skills don't load](/blog/claude-code-skills-not-working) walks through the usual suspects. And when you want a starter pack of ready-made skills, the guide to [installing skills in Claude Code](/blog/how-to-install-skills-in-claude-code) walks through four ways to get them. The skills are plain `SKILL.md` folders, so they're not locked to one tool.
 
 ```faq
 items:
@@ -112,5 +112,5 @@ items:
   - question: "How do I use a skill in GitHub Copilot?"
     answer: "Copilot loads a skill on its own when your request matches its description. You can also call it by name with a slash, for example \"Use the /release-notes skill\". In the Copilot CLI, `/skills list` shows what's available."
   - question: "Do Claude Code skills work with GitHub Copilot?"
-    answer: "Project skills do. Copilot reads `.claude/skills/` in your repository, and both tools use the same SKILL.md format. Personal skills need to live in `~/.copilot/skills/` or `~/.agents/skills/` for Copilot to see them."
+    answer: "Project skills do. Copilot reads `.claude/skills/` in your repository, and both tools use the same SKILL.md format. Personal skills are the catch: GitHub's docs list `~/.copilot/skills/` and `~/.agents/skills/`, so a skill that only lives in `~/.claude/skills/` may need a copy."
 ```
