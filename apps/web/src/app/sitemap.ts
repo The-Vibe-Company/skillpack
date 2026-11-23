@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { blogPostPath, loadBlogPosts } from "@/lib/blog";
+import { blogPostLastModified, blogPostPath, loadBlogPosts } from "@/lib/blog";
 import { CATALOG_PATH, catalogSkillPath, isPublicCatalogEnabled, listAllPublicCatalogSkills } from "@/lib/publicCatalog";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 
@@ -30,11 +30,15 @@ async function catalogEntries(siteUrl: URL): Promise<MetadataRoute.Sitemap> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = resolveSiteUrl();
   const posts = loadBlogPosts();
+  // The index changed when its newest post was published or any post was last revised.
+  const blogLastModified = posts.map(blogPostLastModified).sort().at(-1);
   return [
     ...SITEMAP_PATHS.map((path) => ({ url: new URL(path, siteUrl).href })),
-    // Posts are sorted newest first, so the index changed when the first post was published.
-    { url: new URL("/blog", siteUrl).href, lastModified: posts[0]?.date },
-    ...posts.map((post) => ({ url: new URL(blogPostPath(post.slug), siteUrl).href, lastModified: post.date })),
+    { url: new URL("/blog", siteUrl).href, lastModified: blogLastModified },
+    ...posts.map((post) => ({
+      url: new URL(blogPostPath(post.slug), siteUrl).href,
+      lastModified: blogPostLastModified(post),
+    })),
     ...(await catalogEntries(siteUrl)),
   ];
 }

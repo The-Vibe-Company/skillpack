@@ -89,6 +89,14 @@ describe("blog post structured data", () => {
     });
   });
 
+  it("states dateModified only when the post was revised", () => {
+    expect(blogPostingStructuredData(FACTS)["@graph"][0]).not.toHaveProperty("dateModified");
+    expect(blogPostingStructuredData({ ...FACTS, dateModified: "2026-11-23" })["@graph"][0]).toMatchObject({
+      datePublished: "2026-10-13",
+      dateModified: "2026-11-23",
+    });
+  });
+
   it("credits a named author as a person and omits keywords for an untagged post", () => {
     const [posting] = blogPostingStructuredData({
       ...FACTS,

@@ -53,6 +53,8 @@ export type BlogPostingFacts = {
   headline: string;
   description: string;
   datePublished: string;
+  /** The post's revision day, stated only when the frontmatter sets `updated`. */
+  dateModified?: string;
   url: string;
   /** Absolute URL of the post's generated share image. */
   image: string;
@@ -66,6 +68,19 @@ export type BlogPostingFacts = {
 
 type JsonLdPerson = { "@type": "Person"; name: string; url?: string; image?: string; jobTitle?: string; sameAs?: string[] };
 type JsonLdAuthor = JsonLdPerson | { "@type": "Organization"; name: string; url: string };
+
+type BlogPostingNode = {
+  "@type": "BlogPosting";
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  url?: string;
+  mainEntityOfPage?: string;
+  image?: string;
+  author?: JsonLdAuthor;
+  publisher?: JsonLdNode;
+};
 
 function authorNode(author: BlogAuthor): JsonLdAuthor {
   if (author.kind === "organization") return { "@type": "Organization", name: author.name, url: author.url };
@@ -84,17 +99,18 @@ function authorNode(author: BlogAuthor): JsonLdAuthor {
  * the credited author, the site publisher, and the share image the site generates for it.
  */
 export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocument {
-  const posting = {
+  const posting: BlogPostingNode = {
     "@type": "BlogPosting",
     headline: facts.headline,
     description: facts.description,
     datePublished: facts.datePublished,
-    url: facts.url,
-    mainEntityOfPage: facts.url,
-    image: facts.image,
-    author: authorNode(facts.author),
-    publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: "Skillpack", url: PRODUCTION_SITE_URL },
   };
+  if (facts.dateModified) posting.dateModified = facts.dateModified;
+  posting.url = facts.url;
+  posting.mainEntityOfPage = facts.url;
+  posting.image = facts.image;
+  posting.author = authorNode(facts.author);
+  posting.publisher = { "@type": "Organization", "@id": ORGANIZATION_ID, name: "Skillpack", url: PRODUCTION_SITE_URL };
   const trail = [
     { name: "Home", url: facts.homeUrl },
     { name: "Blog", url: facts.blogUrl },

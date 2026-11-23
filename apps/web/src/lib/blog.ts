@@ -38,11 +38,22 @@ const blogFrontmatterSchema = z
       .regex(ISO_DAY_RE, "dataCollected must be YYYY-MM-DD")
       .refine(isCalendarDay, "dataCollected must be a real day")
       .optional(),
+    // The day the post was last revised, when it differs from publication.
+    updated: z
+      .string()
+      .regex(ISO_DAY_RE, "updated must be YYYY-MM-DD")
+      .refine(isCalendarDay, "updated must be a real day")
+      .optional(),
   })
   .strict()
   .refine((frontmatter) => frontmatter.authorRole === undefined || frontmatter.author !== undefined, {
     message: "authorRole needs an author",
     path: ["authorRole"],
+  })
+  // ISO days compare as strings, so this keeps a revision on or after publication.
+  .refine((frontmatter) => frontmatter.updated === undefined || frontmatter.updated >= frontmatter.date, {
+    message: "updated must not be before date",
+    path: ["updated"],
   });
 
 export type BlogPost = z.infer<typeof blogFrontmatterSchema> & {
@@ -140,6 +151,11 @@ export function loadBlogPosts(dir: string = BLOG_CONTENT_DIR): BlogPost[] {
     .filter((fileName) => fileName.endsWith(".md"))
     .map((fileName) => parseBlogPost(readFileSync(join(dir, fileName), "utf8"), fileName));
   return posts.sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+}
+
+/** The day a post last changed: its revision day when set, else its publication day. */
+export function blogPostLastModified(post: Pick<BlogPost, "date" | "updated">): string {
+  return post.updated ?? post.date;
 }
 
 export function findBlogPost(slug: string, dir: string = BLOG_CONTENT_DIR): BlogPost | undefined {

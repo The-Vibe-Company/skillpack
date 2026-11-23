@@ -10,6 +10,7 @@ import BlogPostPage, { dynamicParams, generateMetadata, generateStaticParams } f
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const SLUG = "what-is-skill-md";
+const UPDATED_SLUG = "claude-code-subagents-vs-skills";
 const roots: Root[] = [];
 
 function routeProps(slug: string) {
@@ -183,6 +184,32 @@ describe("public blog post page", () => {
         ],
       },
     ]);
+  });
+
+  it("shows the revision day in the byline and states dateModified for an updated post", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("COMPANION_WEB_URL", "https://skillpack.app");
+    const container = await renderPost(UPDATED_SLUG);
+    const header = container.querySelector(".v10-post__header");
+
+    expect(Array.from(header?.querySelectorAll(".v10-postmeta time") ?? []).map((time) => time.parentElement?.textContent)).toEqual([
+      "Published October 27, 2026",
+      "Updated November 23, 2026",
+    ]);
+    expect(Array.from(header?.querySelectorAll(".v10-postmeta time") ?? []).map((time) => time.getAttribute("dateTime"))).toEqual([
+      "2026-10-27",
+      "2026-11-23",
+    ]);
+    const data = JSON.parse(container.querySelector("script[type='application/ld+json']")?.textContent ?? "{}");
+    expect(data["@graph"][0]).toMatchObject({ datePublished: "2026-10-27", dateModified: "2026-11-23" });
+  });
+
+  it("leaves dateModified and the Updated label out for a post that was never revised", async () => {
+    const container = await renderPost(SLUG);
+    const data = JSON.parse(container.querySelector("script[type='application/ld+json']")?.textContent ?? "{}");
+
+    expect(data["@graph"][0]).not.toHaveProperty("dateModified");
+    expect(container.querySelector(".v10-post__header .v10-postmeta")?.textContent).not.toContain("Updated");
   });
 
   it("gives each post its own title, description, canonical and article Open Graph data", async () => {

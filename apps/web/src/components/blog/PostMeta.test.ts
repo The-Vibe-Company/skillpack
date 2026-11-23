@@ -40,4 +40,13 @@ describe("post byline", () => {
     expect(plain).not.toContain("<a ");
     expect(plain).not.toContain("<img");
   });
+
+  it("labels the publication day and shows the revision day when the post was updated", () => {
+    const plain = renderToStaticMarkup(createElement(PostMeta, { date: "2026-10-27", minutes: 4 }));
+    expect(plain).not.toContain("Updated");
+
+    const html = renderToStaticMarkup(createElement(PostMeta, { date: "2026-10-27", minutes: 4, updated: "2026-11-23" }));
+    expect(html).toContain('Published <time dateTime="2026-10-27">October 27, 2026</time>');
+    expect(html).toContain('Updated <time dateTime="2026-11-23">November 23, 2026</time>');
+  });
 });
