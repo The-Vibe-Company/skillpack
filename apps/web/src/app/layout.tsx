@@ -24,7 +24,7 @@ export const metadata: Metadata = {
         url: "/brand/og.png",
         width: 1200,
         height: 630,
-        alt: "Skillpack — Share skills with your whole team.",
+        alt: "Skillpack: share skills with your whole team.",
       },
     ],
   },
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: HOME_TITLE,
     description: HOME_DESCRIPTION,
-    images: [{ url: "/brand/og.png", alt: "Skillpack — Share skills with your whole team." }],
+    images: [{ url: "/brand/og.png", alt: "Skillpack: share skills with your whole team." }],
   },
   icons: {
     icon: [
