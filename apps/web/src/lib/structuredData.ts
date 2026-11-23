@@ -212,7 +212,7 @@ export function catalogIndexStructuredData(input: {
 
 type Crumb = { name: string; url: string };
 
-function breadcrumbList(trail: readonly Crumb[]): JsonLdNode {
+function breadcrumbList(trail: readonly Crumb[]) {
   return {
     "@type": "BreadcrumbList",
     itemListElement: trail.map((crumb, index) => ({

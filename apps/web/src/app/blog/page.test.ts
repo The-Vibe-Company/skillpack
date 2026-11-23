@@ -98,10 +98,10 @@ describe("public blog index", () => {
     expect(scripts).toHaveLength(1);
 
     const data = JSON.parse(scripts[0]?.textContent ?? "");
-    const graph: Record<string, unknown>[] = data["@graph"];
+    const graph = data["@graph"];
     const posts = loadBlogPosts();
-    const collection = graph.find((node) => node["@type"] === "CollectionPage") as Record<string, any>;
-    const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList") as Record<string, any>;
+    const collection = graph.find((node: { "@type": string }) => node["@type"] === "CollectionPage");
+    const crumbs = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
 
     expect(data["@context"]).toBe("https://schema.org");
     expect(collection.name).toBe(metadata.title);
@@ -109,14 +109,14 @@ describe("public blog index", () => {
     expect(collection.url).toMatch(/\/blog$/);
     expect(collection.isPartOf).toEqual({ "@id": "https://skillpack.app/#website" });
     expect(collection.mainEntity["@type"]).toBe("ItemList");
-    const items: Record<string, any>[] = collection.mainEntity.itemListElement;
+    const items = collection.mainEntity.itemListElement;
     expect(items).toHaveLength(posts.length);
-    items.forEach((item, index) => {
+    items.forEach((item: { "@type": string; position: number; name: string; url: string }, index: number) => {
       expect(item["@type"]).toBe("ListItem");
       expect(item.position).toBe(index + 1);
       expect(item.name).toBe(posts[index]?.title);
       expect(item.url).toMatch(new RegExp(`/blog/${posts[index]?.slug}$`));
     });
-    expect(crumbs.itemListElement.map((crumb: Record<string, unknown>) => crumb.name)).toEqual(["Home", "Blog"]);
+    expect(crumbs.itemListElement.map((crumb: { name: string }) => crumb.name)).toEqual(["Home", "Blog"]);
   });
 });

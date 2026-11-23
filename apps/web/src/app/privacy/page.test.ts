@@ -58,9 +58,9 @@ describe("public privacy page", () => {
     expect(scripts).toHaveLength(1);
 
     const data = JSON.parse(scripts[0]?.textContent ?? "");
-    const graph: Record<string, any>[] = data["@graph"];
-    const page = graph.find((node) => node["@type"] === "WebPage");
-    const crumbs = graph.find((node) => node["@type"] === "BreadcrumbList");
+    const graph = data["@graph"];
+    const page = graph.find((node: { "@type": string }) => node["@type"] === "WebPage");
+    const crumbs = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
 
     expect(page).toMatchObject({
       name: "Privacy Policy",
@@ -69,7 +69,7 @@ describe("public privacy page", () => {
       publisher: { "@id": "https://skillpack.app/#org" },
     });
     expect(page?.url).toMatch(/\/privacy$/);
-    expect(crumbs?.itemListElement.map((crumb: Record<string, unknown>) => crumb.name)).toEqual([
+    expect(crumbs?.itemListElement.map((crumb: { name: string }) => crumb.name)).toEqual([
       "Home",
       "Privacy Policy",
     ]);
