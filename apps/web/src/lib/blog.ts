@@ -250,5 +250,5 @@ export const BLOG_SHARE_IMAGE = {
   url: "/brand/og.png",
   width: 1200,
   height: 630,
-  alt: "Skillpack — Share skills with your whole team.",
+  alt: "Skillpack: share skills with your whole team.",
 } as const;
