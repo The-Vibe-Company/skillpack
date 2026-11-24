@@ -1,5 +1,5 @@
 ---
-title: "Claude Code Hooks vs Skills: Which One Do You Need?"
+title: "Claude Code hooks vs skills: the coach and the bouncer"
 description: "Claude Code hooks vs skills in plain words: a skill is advice Claude can skip, a hook runs every time. When to use each, plus a 5-minute formatter hook."
 slug: claude-code-hooks-vs-skills
 date: 2026-11-24
@@ -12,7 +12,7 @@ authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 
 You wrote a skill that says "always run the formatter." Claude ran it twice, then forgot. Rude? A bit. Surprising? Nope.
 
-Here's the short answer. A skill is a coach: it tells Claude how to do a job, and Claude decides when to use it. A hook is a bouncer: a shell command that Claude Code runs at a fixed moment, like right after a file edit, whether Claude feels like it or not. Anthropic's own [skills docs](https://code.claude.com/docs/en/skills) say it plainly: if Claude skipped a rule that must hold every time, move that rule into a hook.
+A skill is a coach: it tells Claude how to do a job, and Claude decides when to use it. A hook is a bouncer: a shell command that Claude Code runs at a fixed moment, like right after a file edit, whether Claude feels like it or not. Anthropic's own [skills docs](https://code.claude.com/docs/en/skills) say it plainly: if Claude skipped a rule that must hold every time, move that rule into a hook.
 
 Skills for know-how, hooks for "this must always happen." Below: the difference in plain words, then a hook you can add in 5 minutes.
 
@@ -20,7 +20,7 @@ Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md
 
 ## What does a Claude Code skill do?
 
-It teaches Claude a procedure. A skill is a folder with a `SKILL.md` file: a short frontmatter with a `name` and a `description`, then the instructions. Claude reads the description, and when your request matches, it loads the rest. You can also call it yourself with `/skill-name`.
+It teaches Claude a procedure. A skill is a folder with a `SKILL.md` file: a short frontmatter with a `description` (and an optional `name`), then the instructions. Claude reads the description, and when your request matches, it loads the rest. You can also call it yourself with `/skill-name`.
 
 The key word is "decides." That's great for judgment calls like "write release notes" or "review this diff." It's a weak spot for rules with zero exceptions. A model can always pick wrong.
 
@@ -32,7 +32,7 @@ It runs your command at a fixed point in Claude Code's life. Hooks are user-defi
 
 You pick an event, like `PostToolUse` (after a tool runs), `PreToolUse` (before), `Notification` (Claude is waiting for you) or `SessionStart`. You add a `matcher` to narrow it down, say `Edit|Write` for file edits. Then you give the command. It all lives in a `hooks` block inside a settings file: `~/.claude/settings.json` for you, or `.claude/settings.json` in a project.
 
-No prompt. No mood. The event fires, the command runs.
+The event fires and the command runs, no prompt involved.
 
 ## Hooks vs skills: which one do you need?
 
@@ -45,7 +45,7 @@ For rules that need a bit of judgment, the guide also covers prompt-based and ag
 
 Gut check: annoyed when Claude skips it? Hook. Annoyed when Claude does it at the wrong moment? Skill.
 
-## How do you add your first hook in 5 minutes?
+## Your first hook in 5 minutes
 
 Take the classic: auto-format after every edit. Put this in `.claude/settings.json` at your project root:
 
@@ -81,7 +81,7 @@ Now delete the "always run the formatter" line from your skill. The bouncer has 
 
 ## Can a hook block Claude?
 
-Yes, and it's the fun part. A `PreToolUse` hook runs before the tool. If your script exits with code 2, the action is blocked, and the message your script writes to stderr goes back to Claude as feedback so it can try another way.
+Yes. A `PreToolUse` hook runs before the tool. If your script exits with code 2, the action is blocked, and the message your script writes to stderr goes back to Claude as feedback so it can try another way.
 
 The guide's example blocks edits to `.env`, `package-lock.json` and anything in `.git/`. One honest catch from the same page: Claude can still change those files with shell commands, so pair the hook with deny rules in your permissions if it really matters.
 
