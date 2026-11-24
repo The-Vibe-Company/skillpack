@@ -9,7 +9,7 @@ author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Cursor skills: how to use, create and install them
+# Cursor skills: how to find, install and create them
 
 A Cursor skill is a folder with a `SKILL.md` file that teaches Cursor's agent one workflow, like deploying to staging or writing a migration. Cursor finds skills in `.agents/skills` or `.cursor/skills` in your repo, and in the same folders under your home directory. The agent picks a skill when your request matches it, or you call it by typing `/` and its name.
 
