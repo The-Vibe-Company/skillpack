@@ -196,7 +196,7 @@ If a skill is installed but never used, walk the checklist in [Claude Code skill
 5. Install into a scratch repo and run `skillpack skills validate ./path-to-skill`.
 6. Write three prompts you expect to trigger it, then decide if the description would match them.
 
-The same `SKILL.md` works in Codex if you keep to the shared fields. Codex reads `.agents/skills` in the repo and `~/.agents/skills` on your machine ([Codex skills docs](https://developers.openai.com/codex/skills)). Claude Code reads `.claude/skills`. A project install from Skillpack writes the shared copy plus the host copies so you don't maintain them by hand. More on that in [how to use skills in Codex](/blog/how-to-use-skills-in-codex).
+The same `SKILL.md` works in Codex if you keep to the [shared fields](/blog/agent-skills-open-standard-vs-vendor-folders). Codex reads `.agents/skills` in the repo and `~/.agents/skills` on your machine ([Codex skills docs](https://developers.openai.com/codex/skills)). Claude Code reads `.claude/skills`. A project install from Skillpack writes the shared copy plus the host copies so you don't maintain them by hand. More on that in [how to use skills in Codex](/blog/how-to-use-skills-in-codex).
 
 When the skill is worth keeping across repos, [create a free Skillpack workspace](/login) and publish or lock it so every machine runs the same version.
 
