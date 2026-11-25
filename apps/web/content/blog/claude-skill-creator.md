@@ -14,15 +14,13 @@ The laziest way to make a Claude skill is to ask Claude to make it. Anthropic ev
 
 Install it in Claude Code with `/plugin install skill-creator@claude-plugins-official`, then say "help me make a skill for X." It asks you a few questions, writes the `SKILL.md`, and offers to test it. You don't touch YAML. Your only job is to read the result and fix the bits it got wrong, which is usually the description.
 
-Below: the 5-minute version, then the two lines worth checking before you trust it.
-
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. Everything below comes from Anthropic's [skill-creator SKILL.md](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) and the [Claude Code docs](https://code.claude.com/docs/en/skills) as they stood on November 25, 2026.
 
 ## What is the Claude skill creator?
 
 It's a skill whose job is making other skills. Anthropic describes it as a way to "create new skills, modify and improve existing skills, and measure skill performance." You'll find it in Anthropic's [skills repo](https://github.com/anthropics/skills/tree/main/skills/skill-creator) and as a plugin in the official [Claude Code marketplace](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/skill-creator).
 
-Think of it as a patient coworker who has read every skill guide so you don't have to. You bring the chore. It brings the folder.
+Think of it as a patient coworker who has read every skill guide and turns your chore into a folder.
 
 ## Install it in one command
 
@@ -32,7 +30,7 @@ In a Claude Code session, run:
 /plugin install skill-creator@claude-plugins-official
 ```
 
-Claude Code opens the `/plugin` panel on the plugin's details so you can look it over and pick a scope. Accept, and Claude Code reloads plugins when the panel closes. The official marketplace gets added the first time you open an interactive session, so there's nothing else to set up.
+Claude Code opens the `/plugin` panel on the plugin's details so you can look it over and pick a scope. Accept, and Claude Code reloads plugins when the panel closes. If that would invalidate the prompt cache, the plugin stays pending, and `/reload-plugins --force` turns it on anyway. Per the [plugin install docs](https://code.claude.com/docs/en/discover-plugins#install-a-plugin), the official marketplace gets added the first time you start an interactive terminal session, so there's nothing else to set up.
 
 Prefer your terminal? Same thing, shell flavor:
 
@@ -50,24 +48,30 @@ Pick a chore you keep retyping. Release notes. A commit message format. "Summari
 4. **Test or skip.** It offers to run a few test prompts and show you the results. In a hurry? Its own instructions say that if you tell it "just vibe with me," it drops the formal evals.
 5. **Save it where Claude looks.** `~/.claude/skills/<name>/SKILL.md` makes it yours in every project. `.claude/skills/<name>/SKILL.md` in a repo shares it with your team once you commit it.
 
-That's it. The skill now loads by itself when a matching task shows up, or when you type `/<name>`.
+The skill now loads by itself when a matching task shows up, or when you type `/<name>`.
 
 ## The two lines to fix before you trust it
 
-The skill creator writes a good first draft. "Good first draft" still means you read it.
+The skill creator writes a good first draft. Read it anyway.
 
-**Line 1: the description.** This is the only part Claude sees before it decides to load your skill. Fun detail: the skill creator writes descriptions on the "pushy" side on purpose, because its instructions note that Claude tends to "undertrigger" skills. Pushy is fine. Too broad is not. If your release-notes skill now fires every time you mention git, trim the trigger words.
+**Line 1: the description.** Along with the name, it's [what Claude reads](https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short) to decide whether to load your skill. Fun detail: the skill creator writes descriptions on the "pushy" side on purpose, because its instructions note that Claude tends to ["undertrigger"](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) skills. Pushy is fine, as long as it isn't too broad. If your release-notes skill now fires every time you mention git, trim the trigger words.
+
+Quick check before you save:
+
+- A pushy description that doesn't fire every time you mention git.
+- A short name, since it becomes the folder and the `/command`.
+- A `SKILL.md` under 500 lines, with the rest in reference files.
 
 **Line 2: the name.** It becomes the folder and the `/command` you type. `release-notes` beats `git-diff-to-user-facing-changelog-generator`. Your fingers will thank you.
 
-While you're in there, glance at the length. The skill creator itself aims to keep `SKILL.md` under 500 lines and move the rest into reference files. If your skill for "write a commit message" is 400 lines, something got excited.
+While you're in there, glance at the length. The skill creator itself aims to keep `SKILL.md` [under 500 lines](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) and move the rest into reference files. If your skill for "write a commit message" is 400 lines, something got excited.
 
 ## Common mistakes (all very human)
 
 - **Asking for a skill that does everything.** "A skill for my whole job" gets you a vague skill. One chore per skill.
 - **Skipping the interview.** If you answer "whatever you think," you get whatever it thinks. Two concrete examples of good output beat ten adjectives.
 - **Never testing the trigger.** Ask a question that should fire the skill, without naming it. If nothing happens, the description is the problem. The [skills not working guide](/blog/claude-code-skills-not-working) covers the rest.
-- **Installing a stranger's skill blind.** Anthropic's marketplace README says to trust a plugin before you install it. The same goes for any `SKILL.md` you download. Read it first.
+- **Installing a stranger's skill blind.** Anthropic's [marketplace README](https://github.com/anthropics/claude-plugins-official/blob/main/README.md) says to trust a plugin before you install it. The same goes for any `SKILL.md` you download. Read it first.
 
 ## Even lazier: record yourself instead
 
@@ -79,4 +83,4 @@ Sometimes the skill creator is overkill. A five-line skill ("always write commit
 
 Whichever way you build it, `skillpack skills validate ./my-skill` checks the name and description locally before you share it. Then the same folder installs in Claude Code, Codex and OpenCode.
 
-Now go find that prompt you've typed 40 times this month. It's about to become a skill.
+Now go find that prompt you've typed 40 times this month. It's about to become a skill, and when it's worth sharing, [create a free Skillpack workspace](/login) so your team installs the same one.
