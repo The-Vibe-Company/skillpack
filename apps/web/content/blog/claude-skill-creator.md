@@ -30,7 +30,7 @@ In a Claude Code session, run:
 /plugin install skill-creator@claude-plugins-official
 ```
 
-Claude Code opens the `/plugin` panel on the plugin's details so you can look it over and pick a scope. Accept, and Claude Code reloads plugins when the panel closes. If that would invalidate the prompt cache, the plugin stays pending, and `/reload-plugins --force` turns it on anyway. Per the [plugin install docs](https://code.claude.com/docs/en/discover-plugins#install-a-plugin), the official marketplace gets added the first time you start an interactive terminal session, so there's nothing else to set up.
+Claude Code opens the `/plugin` panel on the plugin's details so you can look it over and pick a scope. Accept, and Claude Code reloads plugins when the panel closes. If that would invalidate the prompt cache, Claude Code warns you and the plugin stays pending, and `/reload-plugins --force` turns it on anyway. Per the [plugin install docs](https://code.claude.com/docs/en/discover-plugins#install-a-plugin), the official marketplace gets added the first time you start an interactive terminal session, so there's nothing else to set up.
 
 Prefer your terminal? Same thing, shell flavor:
 
@@ -54,17 +54,17 @@ The skill now loads by itself when a matching task shows up, or when you type `/
 
 The skill creator writes a good first draft. Read it anyway.
 
-**Line 1: the description.** Along with the name, it's [what Claude reads](https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short) to decide whether to load your skill. Fun detail: the skill creator writes descriptions on the "pushy" side on purpose, because its instructions note that Claude tends to ["undertrigger"](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) skills. Pushy is fine, as long as it isn't too broad. If your release-notes skill now fires every time you mention git, trim the trigger words.
+**Line 1: the description.** Along with the name, it's [what Claude reads](https://code.claude.com/docs/en/skills#skill-descriptions-are-cut-short) to decide whether to load your skill. Fun detail: the skill creator writes descriptions on the "pushy" side on purpose, because its instructions note that Claude tends to ["undertrigger"](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md#L67) skills. Pushy is fine, as long as it isn't too broad. If your release-notes skill now fires every time you mention git, trim the trigger words.
 
 Quick check before you save:
 
-- A pushy description that doesn't fire every time you mention git.
+- A pushy description that won't fire on every git mention.
 - A short name, since it becomes the folder and the `/command`.
 - A `SKILL.md` under 500 lines, with the rest in reference files.
 
 **Line 2: the name.** It becomes the folder and the `/command` you type. `release-notes` beats `git-diff-to-user-facing-changelog-generator`. Your fingers will thank you.
 
-While you're in there, glance at the length. The skill creator itself aims to keep `SKILL.md` [under 500 lines](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) and move the rest into reference files. If your skill for "write a commit message" is 400 lines, something got excited.
+While you're in there, glance at the length. The skill creator itself aims to keep `SKILL.md` [under 500 lines](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md#L96) and move the rest into reference files. If your skill for "write a commit message" is 400 lines, something got excited.
 
 ## Common mistakes (all very human)
 
