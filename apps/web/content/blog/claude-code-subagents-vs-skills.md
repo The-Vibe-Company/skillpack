@@ -121,7 +121,7 @@ Put simply: a subagent with skills is a specialist with reference material. A fo
 
 ## Example: an end-to-end test subagent that uses a skill
 
-Here is the first pattern, built in an empty repo. The skill is Anthropic's `webapp-testing`, which drives a local web app with Playwright. It's one of the skills compared in [best Claude Code skills for testing](/blog/best-claude-code-skills-testing). Install it into the project with the Skillpack CLI:
+Here is the first pattern, built in an empty repo. The skill is Anthropic's `webapp-testing`, which drives a local web app with Playwright. It's one of the skills compared in [best Claude Code skills for testing](/blog/best-claude-code-skills-testing). Install it into the project with [the Skillpack CLI](/):
 
 ```sh
 skillpack install github:anthropics/skills/skills/webapp-testing --scope project --tools claude-code
