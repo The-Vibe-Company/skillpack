@@ -17,7 +17,7 @@ The best Claude skills for Claude Code, by installs on skills.sh on November 10,
 Disclosure: Skillpack is built by The Vibe Company, the author's company. Skillpack is the open-source CLI used throughout this page to install and share skills. It doesn't rank skills, and it isn't ranked here.
 
 ```cta
-title: "Install any skill on this page with one command, and share it with your team."
+title: "Install any skill on this page with one command, and [share it with your team](/)."
 text: "`skillpack install github:mattpocock/skills/skills/productivity/grill-me` works without an account. Create a free Skillpack workspace to share skills across your organization."
 primary: { label: "Create a free Skillpack workspace", href: /login }
 ```
@@ -260,7 +260,7 @@ license:
 focus: "SEO audit"
 install: "skillpack install github:coreyhaines31/marketingskills/skills/seo-audit --scope project"
 description: |
-  seo-audit is the most-installed skill from Marketing Skills, Corey Haines' collection for marketers. Its description tells the agent to start here "when someone just says their SEO is bad". It also fires when someone asks why traffic dropped, why a page won't rank, or whether canonicals, hreflang or redirects are set up right.
+  seo-audit is the most-installed skill from Marketing Skills, [Corey Haines' collection for marketers](/blog/seo-geo-skill-packs-claude-code). Its description tells the agent to start here "when someone just says their SEO is bad". It also fires when someone asks why traffic dropped, why a page won't rank, or whether canonicals, hreflang or redirects are set up right.
 
   It audits in a fixed priority order: crawlability and indexation, technical foundations, on-page optimization, content quality, then authority and links. Every finding comes back with its impact, evidence, fix and priority. It warns that `curl` and `web_fetch` can miss JSON-LD schema markup that a CMS plugin injects with JavaScript. Instead, it points to the browser tool, the Rich Results Test or a Screaming Frog export.
 

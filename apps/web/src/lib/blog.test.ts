@@ -168,7 +168,7 @@ describe("blog post loading", () => {
     });
     expect(post?.body).toBe(fileBody);
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
-      "34a8f57d56bd863ebd4222653b9ea53acb3596ed6af4876a1560c02e51babb3a",
+      "57a6ce3df5ccb9d33ccf2000c507a14d7ff9e15e78bf4a621dc03a75a01f8cda",
     );
   });
 
