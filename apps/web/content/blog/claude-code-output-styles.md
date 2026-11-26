@@ -1,5 +1,5 @@
 ---
-title: "Claude Code output styles: pick yours in 5 minutes"
+title: "Claude Code output styles: pick the right one in 5 minutes"
 description: "Claude Code output styles in plain words: what Concise, Proactive, Explanatory and Learning change, and how to switch or write your own in 5 minutes."
 slug: claude-code-output-styles
 date: 2026-11-26
@@ -8,13 +8,13 @@ author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Claude Code output styles: pick yours in 5 minutes
+# Claude Code output styles: pick the right one in 5 minutes
 
 You asked Claude Code a yes-or-no question. You got a warm-up paragraph before the answer and a recap after it.
 
 There's a setting for that. An output style is a set of instructions that shapes Claude's tone and response format for every response in a session. Type `/output-style concise` and replies lead with the result. Claude Code includes four built-in styles besides Default, and you can write your own in a small Markdown file.
 
-Below: how to pick one and switch, then a custom style to copy.
+Two things trip people up: the `outputStyle` value is case-sensitive, and in the terminal a style file you edit mid-session needs a restart.
 
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. The facts here come from the [Claude Code output styles docs](https://code.claude.com/docs/en/output-styles) as they stood on November 26, 2026.
 
@@ -24,7 +24,7 @@ An output style is a set of instructions that sets Claude's role, tone and respo
 
 Default means no style is selected. Claude then works from Claude Code's standard software engineering instructions. The four others are Proactive, Concise, Explanatory and Learning.
 
-One limit to know. Styles apply to the main conversation and to forks. Other [subagents](/blog/claude-code-subagents-vs-skills) run their own system prompt, so your style doesn't change them.
+One limit to know. [Styles apply to the main conversation and to forks](https://code.claude.com/docs/en/output-styles#how-output-styles-work). Other [subagents](/blog/claude-code-subagents-vs-skills) run their own system prompt, so your style doesn't change them.
 
 ## Which built-in style should you pick?
 
@@ -36,11 +36,20 @@ Pick by what bugs you about Default. Too wordy? Concise. Too many questions? Pro
 - **Explanatory: "tell me why."** Same work as Default, plus short `Insight` blocks of two or three points on why Claude made its choices.
 - **Learning: "teach me."** You get the `Insight` blocks too. Claude also leaves small pieces of code for you to write, marked with a `TODO(human)` comment, then stops and waits until you say you're done. Yes, homework.
 
-## How do you switch styles?
+The docs show this `Insight` block, written after Claude added an API endpoint:
+
+```text
+★ Insight ─────────────────────────────────────
+- Every route in this repo goes through the withAuth wrapper, so the new endpoint gets session checks without its own middleware.
+- Rate limits are set per route in limits.ts, which is why this change adds an entry there rather than a global default.
+─────────────────────────────────────────────────
+```
+
+## Switch styles: command, menu or settings file
 
 Type `/output-style` and a name, for example `/output-style concise`. Run it with no argument and it lists the styles and marks the current one.
 
-Prefer menus? Run `/config`, then choose Output style. In the VS Code extension, open the `/` menu and choose Output styles. The command and the menus save your choice to `.claude/settings.local.json`.
+Prefer menus? Run `/config`, then choose Output style. In the VS Code extension (v2.1.257 or later), open the `/` menu and choose Output styles. The command and the menus [save your choice](https://code.claude.com/docs/en/output-styles#change-your-output-style) to `.claude/settings.local.json`.
 
 Switch mid-session and the new style applies from your next message. That's the behaviour since v2.1.251. Older versions needed `/clear` or a new session.
 
@@ -52,15 +61,15 @@ You can also write it into a settings file yourself:
 }
 ```
 
-Here's the sneaky part. That value is case-sensitive: `Proactive`, `Concise`, `Explanatory`, `Learning`. Write `explanatory` and you silently get Default. No error, no hint. The `/output-style` command ignores case, so the trap only bites in the file.
+The sneaky part: that value is case-sensitive. Write `explanatory` and you get Default instead. The built-in names are `Proactive`, `Concise`, `Explanatory` and `Learning`. The `/output-style` command ignores case, so the trap only bites in the file.
 
 Want one style in all your projects? Set `outputStyle` in `~/.claude/settings.json`. A project's own settings win over it.
 
-## How do you make your own style in 5 minutes?
+## Make your own style in 5 minutes
 
-Create a Markdown file in `~/.claude/output-styles` (just for you) or `.claude/output-styles` (for a project). Frontmatter goes on top, instructions go below.
+[Create a Markdown file](https://code.claude.com/docs/en/output-styles#create-a-custom-output-style) in `~/.claude/output-styles` (just for you) or `.claude/output-styles` (for a project). Frontmatter goes on top, instructions go below.
 
-Here's an example file to adapt, saved as `~/.claude/output-styles/explain-like-im-new.md`:
+Save this example as `~/.claude/output-styles/explain-like-im-new.md` and adapt it:
 
 ```markdown
 ---
@@ -77,11 +86,11 @@ What those lines do:
 
 - `name` is optional. Without it, the file name becomes the style name.
 - `description` says what the style is for.
-- `keep-coding-instructions: true` keeps Claude Code's built-in software engineering instructions. The default is `false`, so leave the line in if Claude should code the way it did before.
+- `keep-coding-instructions: true` keeps Claude Code's built-in software engineering instructions. The default is `false`, so leave the line in if Claude should code the way it did before. One catch: the shorter system prompt doesn't include that section, so the field has no effect there.
 
 Two gotchas. A misspelled field is ignored without an error, so check your spelling. And in the terminal, Claude Code reads style files when it starts. Created or edited one during a session? Restart Claude Code, then switch to your style.
 
-If it still looks ignored, you have company: a GitHub issue titled "Custom Output Style Completely Ignored by CLI" sits on page one of the search results. Start with the exact name and the restart.
+If it still looks ignored, you have company: an old GitHub issue titled "[Custom Output Style Completely Ignored by CLI](https://github.com/anthropics/claude-code/issues/7545)" still sits on page one of the search results. It was closed on September 16, 2025. Start with the exact name and the restart.
 
 ## Output style vs skill vs hook: which one do you need?
 
@@ -106,3 +115,4 @@ items:
 ## Next step
 
 Open Claude Code and type `/output-style`. Try Concise for a day. If you miss the explanations, switch back with the same command. And when your best instructions turn out to be task recipes instead, put them in skills and [create a free Skillpack workspace](/login) to share them.
+
