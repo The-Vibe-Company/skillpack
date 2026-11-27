@@ -5,6 +5,7 @@ import { Fragment } from "react";
 import { Icon } from "@/components/Icon";
 import { isPublicCatalogEnabled } from "@/lib/publicCatalog";
 import { HOME_STRUCTURED_DATA, SKILLPACK_GITHUB_URL, serializeJsonLd } from "@/lib/structuredData";
+import { Avatar } from "./Avatar";
 import { Comparison } from "./Comparison";
 import { FaqSection } from "./FaqSection";
 import { LandingMotion } from "./LandingMotion";
@@ -142,6 +143,22 @@ const AGENTS = [
   { name: "Codex", tool: "codex" },
   { name: "OpenCode", tool: "opencode" },
 ] as const;
+
+const SHARE_AVATARS = [
+  { who: "Marie", tone: "violet" },
+  { who: "Jonas", tone: "blue" },
+  { who: "Sam", tone: "amber" },
+  { who: "Léa", tone: "teal" },
+  { who: "Tom", tone: "terracotta" },
+];
+
+const SCATTER = [
+  { name: "SKILL.md", tag: "copied from Slack" },
+  { name: "code-review/", tag: "which version?" },
+  { name: "deploy-final-v2.md", tag: "outdated" },
+  { name: "triage.md", tag: "API key inside" },
+  { name: "release-notes/", tag: "only on one laptop" },
+];
 
 /* Posts on main that extend the page's topics; slugs are checked against content/blog in tests. */
 export const HOME_BLOG_LINKS = [
@@ -349,16 +366,115 @@ function Agents({ c }: { c: Copy }) {
 function Problem({ c }: { c: Copy }) {
   return (
     <section className="hm-sec hm-sec--subtle" id="problem" data-screen-label="the-problem">
-      <div className="hm-sec__body">
-        <p className="lp-kick">{c.problemKick}</p>
-        <h2 className="lp-h2 v5-reveal">
-          {c.problemTitlePre}
-          <Em>{c.problemTitleMark}</Em>
-        </h2>
-        <p className="lp-sub v5-reveal">{c.problemSub}</p>
-        <p className="lp-punch v5-reveal">{c.problemPunch}</p>
+      <div className="hm-sec__body hm-split hm-split--problem">
+        <div>
+          <p className="lp-kick">{c.problemKick}</p>
+          <h2 className="lp-h2 v5-reveal">
+            {c.problemTitlePre}
+            <Em>{c.problemTitleMark}</Em>
+          </h2>
+          <p className="lp-sub v5-reveal">{c.problemSub}</p>
+          <p className="lp-punch v5-reveal">{c.problemPunch}</p>
+        </div>
+        <ul className="hm-returns v5-reveal">
+          {SCATTER.map((f) => (
+            <li className="hm-returns__row" key={f.name}>
+              <Icon name="file-text" size={14} />
+              <code>{f.name}</code>
+              <span className="hm-returns__tag">
+                <Icon name="alert-triangle" size={12} />
+                {f.tag}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
+  );
+}
+
+function StepVisual({ n }: { n: string }) {
+  if (n === "01") {
+    return (
+      <div className="hm-vis hm-vis--validate" aria-hidden="true">
+        <pre className="hm-vis__code">
+          <span className="lp-tok-c">---</span>
+          {"\n"}
+          <span className="lp-tok-k">name</span>: <span className="lp-tok-s">code-review</span>
+          {"\n"}
+          <span className="lp-tok-k">version</span>: <span className="lp-tok-n">1.3.0</span>
+          {"\n"}
+          <span className="lp-tok-c">---</span>
+        </pre>
+        <ul className="hm-checks">
+          {["SKILL.md is valid", "Archive is safe", "Dependencies resolved", "Secrets encrypted"].map((t) => (
+            <li key={t}>
+              <Icon name="circle-check" size={14} /> {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+  if (n === "02") {
+    return (
+      <div className="hm-vis hm-vis--share" aria-hidden="true">
+        <div className="hm-lib">
+          <span className="hm-lib__label">
+            <Icon name="lock" size={12} /> My Skills
+          </span>
+          <span className="hm-chip">code-review</span>
+        </div>
+        <span className="hm-share-arrow">
+          <Icon name="arrow-right" size={16} />
+        </span>
+        <div className="hm-lib hm-lib--org">
+          <span className="hm-lib__label">
+            <Icon name="users" size={12} /> Organization
+          </span>
+          <span className="hm-chip hm-chip--on">
+            code-review <code>v1.3.0</code>
+          </span>
+          <span className="hm-versions">
+            <code>v1.2.0</code>
+            <code>v1.1.0</code>
+            <span>immutable</span>
+          </span>
+          <span className="hm-avatars">
+            {SHARE_AVATARS.map((m) => (
+              <Avatar who={m.who} tone={m.tone} sm key={m.who} />
+            ))}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  if (n === "03") {
+    return (
+      <div className="hm-vis hm-vis--lock" aria-hidden="true">
+        <div className="hm-vis__file">.companion/skills.lock.json · excerpt</div>
+        <pre className="hm-vis__code">
+          <span className="lp-tok-k">&quot;code-review&quot;</span>: {"{"}
+          {"\n  "}
+          <span className="lp-tok-k">&quot;version&quot;</span>: <span className="lp-tok-s">&quot;1.3.0&quot;</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;checksum&quot;</span>: <span className="lp-tok-s">&quot;sha256:9f3c…a71e&quot;</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;pinned&quot;</span>: <span className="lp-tok-n">null</span>,{"\n  "}
+          <span className="lp-tok-k">&quot;targets&quot;</span>: [{"{ "}
+          <span className="lp-tok-k">&quot;tool&quot;</span>: <span className="lp-tok-s">&quot;codex&quot;</span>, …{" }"}, …]
+          {"\n}"}
+        </pre>
+      </div>
+    );
+  }
+  const bars = [30, 36, 33, 44, 41, 52, 48, 60, 56, 68, 64, 78, 74, 92];
+  return (
+    <div className="hm-vis hm-vis--usage" aria-hidden="true">
+      <div className="hm-bars">
+        {bars.map((b, i) => (
+          <span key={i} style={{ height: `${b}%` }} className={i === bars.length - 1 ? "hm-bar hm-bar--now" : "hm-bar"} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -374,9 +490,12 @@ function How({ c }: { c: Copy }) {
         <ol className="hm-bento">
           {c.steps.map((s) => (
             <li className="lp-step hm-tile v5-reveal" key={s.n}>
-              <span className="hm-tile__n" aria-hidden="true">{s.n}</span>
-              <h3>{s.title}</h3>
-              <p>{s.desc}</p>
+              <div className="hm-tile__text">
+                <span className="hm-tile__n" aria-hidden="true">{s.n}</span>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </div>
+              <StepVisual n={s.n} />
             </li>
           ))}
         </ol>

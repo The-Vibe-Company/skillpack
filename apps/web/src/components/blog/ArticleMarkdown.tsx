@@ -23,6 +23,9 @@ function codeLanguage(className: HastClassName): string | null {
 }
 
 const ARTICLE_COMPONENTS: Components = {
+  input({ type, checked, disabled }) {
+    return <input type={type} checked={checked} disabled={disabled} aria-label="Checklist item" />;
+  },
   // Wide tables scroll inside the column instead of widening the page on small screens. The
   // wrapper takes focus so keyboard users can scroll it too.
   table({ children }) {

@@ -44,12 +44,35 @@
   --color-accent-ink: var(--hm-tint-ink);
 }
 
-.lp-label .v10-wrap { max-width: 1120px; }
 .lp-label :is(h1, h2, h3, h4, h5, h6) { text-wrap: balance; }
 .lp-label .lp-sub { max-width: 68ch; color: var(--hm-ink-2); }
 .lp-label .lp-em { color: var(--hm-accent); text-decoration: none; }
 .lp-label .lp-kick { color: var(--hm-accent); letter-spacing: 0.05em; }
 .lp-label .lp-kick::before { content: none; }
+.lp-label :is(.hm-hero__badge, .v10-bloghome__intro .lp-kick, .v10-rankhead__eyebrow) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 20px;
+  padding: 5px 12px;
+  background: var(--hm-tint);
+  border: 1px solid var(--hm-tint-border);
+  border-radius: 999px;
+  color: var(--hm-tint-ink);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.lp-label :is(.hm-hero__badge, .v10-bloghome__intro .lp-kick, .v10-rankhead__eyebrow)::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--hm-accent);
+}
+
 .lp-label code { font-family: var(--font-mono); }
 .lp-label .lp-tok-k { color: #1e40af; }
 .lp-label .lp-tok-s { color: #166534; }
