@@ -1,0 +1,41 @@
+{
+ "scenario": "sqljoin",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Help me master SQL joins, especially LEFT JOIN.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's build this up properly, starting with one small dataset that we'll use throughout.\n\n**Sample tables**\n\n```\ncustomers                    orders\nid | name                    id | customer_id | amount\n---+-------                  ---+-------------+-------\n1  | Ana                     10 | 1           | 50\n2  | Ben                     11 | 1           | 20\n3  | Cara                    12 | 2           | 70\n                             13 | 9           | 15   -- customer 9 doesn't exist\n```\n\n**1. INNER JOIN: only rows that match**\n\n```sql\nSELECT c.name, o.amount\nFROM customers c\nJOIN orders o ON o.customer_id = c.id;\n```\nResult: Ana 50, Ana 20, Ben 70. Cara has no orders, so she's dropped. Order 13 has no matching customer, so it's dropped too.\n\n**2. LEFT JOIN: keep every row from the left table**\n\n```sql\nSELECT c.name, o.amount\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id;\n```\nResult: Ana 50, Ana 20, Ben 70, Cara NULL.\n\nThe rule is that every left row appears at least once. If it matches several right rows, it appears once per match (Ana shows up twice). If it matches none, it appears once with NULLs in all the right-side columns.\n\n**3. RIGHT JOIN and FULL OUTER JOIN**\n- `RIGHT JOIN` is a LEFT JOIN with the table order swapped. Most people just write a LEFT JOIN instead.\n- `FULL OUTER JOIN` keeps unmatched rows from both sides: Cara with NULL, plus order 13 with a NULL name.\n\n**4. The anti-join pattern: find rows with no match**\n\n```sql\nSELECT c.name\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.id IS NULL;      -- returns: Cara\n```\nTest a column that can't be NULL in a real match. The primary key is the safest choice. `NOT EXISTS` does the same job and is often clearer.\n\n**5. The most common LEFT JOIN bug: ON vs WHERE**\n\n```sql\n-- A: the filter is in WHERE\nSELECT c.name, o.amount\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.amount > 30;\n-- Ana 50, Ben 70   (Cara is gone!)\n\n-- B: the filter is in ON\nSELECT c.name, o.amount\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id AND o.amount > 30;\n-- Ana 50, Ben 70, Cara NULL\n```\nWHERE runs after the join. For Cara, `o.amount` is NULL, and `NULL > 30` isn't true, so WHERE throws her row away. That quietly turns your LEFT JOIN into an INNER JOIN. Filters on the right table go in `ON`. Filters on the left table usually go in `WHERE`.\n\n**6. Row multiplication when aggregating**\n\n```sql\nSELECT c.name, COUNT(o.id) AS n_orders, COALESCE(SUM(o.amount), 0) AS total\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nGROUP BY c.name;\n-- Ana 2 70 | Ben 1 70 | Cara 0 0\n```\n- Use `COUNT(o.id)`, not `COUNT(*)`. `COUNT(*)` would give Cara a count of 1, because her NULL-padded row still counts as a row.\n- If you LEFT JOIN two one-to-many tables at once (for example orders and payments), the rows multiply and inflate your sums. Aggregate each table in a subquery or CTE first, then join the results.\n\n**7. Chaining LEFT JOINs**\nOnce a table has been LEFT JOINed, any later join against it should usually also be a LEFT JOIN. If you add `INNER JOIN order_items i ON i.order_id = o.id` after a LEFT JOIN to orders, Cara gets dropped again.\n\n**Practice (try these before checking)**\n1. List every customer with the amount of their largest order, showing 0 if they have none.\n2. Find orders whose customer doesn't exist.\n3. List every customer with the number of orders over 30. Cara should appear with 0.\n\nSend me your answers and I'll go through them with you. If one of them doesn't do what you expected, we'll work out why."
+  },
+  {
+   "role": "student",
+   "text": "I'll start with number 3: SELECT c.name, COUNT(o.id) FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE o.amount > 30 GROUP BY c.name. I know you said ON vs WHERE matters in section 5, but honestly I've always thought they come out the same for a LEFT JOIN, since it's still a LEFT JOIN so Cara should stay in with 0, right?"
+  },
+  {
+   "role": "tutor",
+   "text": "Good choice to start with #3. Before you run it, let's test that belief on one row instead of the whole query.\n\nSQL processes this in order: FROM/JOIN first, then WHERE, then GROUP BY. So take it step by step for Cara only.\n\n1. Right after the LEFT JOIN, before WHERE runs, what does Cara's row look like? What value is in `o.amount` for her?\n\n2. Now WHERE checks `o.amount > 30` on that row. Put in the value you just gave. Is the condition true, false, or something else? And what does WHERE do with any row where the condition isn't true?\n\n3. Once WHERE has finished, is there still a Cara row for GROUP BY to count as 0?\n\nWork through those three, then tell me if you still think \"it's still a LEFT JOIN\" keeps her in. Another way to check: at which step does the word LEFT have any effect, and is that before or after the WHERE filter?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, for step 1, right after the LEFT JOIN Cara's row would be Cara with NULL for o.amount, since she has no orders. That part I'm sure about."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. After the LEFT JOIN, Cara's row is `Cara | NULL`. That's the LEFT JOIN doing its job, and so far she's still in.\n\nNow step 2. WHERE checks `o.amount > 30` against that row, so put in your value:\n\n`NULL > 30`\n\n- Is that true, false, or something else? (Think about what NULL means: \"unknown.\" Is \"unknown is greater than 30\" something SQL can call true?)\n- WHERE keeps a row only when its condition is **true**. What happens to a row whose condition comes out as anything other than true?\n\nOnce you have that, go to step 3. After WHERE finishes, is there still a Cara row left for GROUP BY to count?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, NULL > 30 would be unknown I guess, since you can't compare nothing to 30. So it's not true, which means WHERE would drop that row... wait, really?"
+  },
+  {
+   "role": "tutor",
+   "text": "Really. You just worked it out yourself, and every step is right:\n\n- `NULL > 30` is **unknown**, not false. SQL uses three-valued logic: true, false, unknown.\n- WHERE keeps only rows where the condition is **true**. False rows and unknown rows both get dropped.\n- So Cara's row `Cara | NULL` is removed at the WHERE step.\n\nThat also answers my last question. The word LEFT only matters during the join. It made sure Cara got a row. WHERE runs *after* that, and it has no idea the NULL came from a LEFT JOIN. To WHERE it's just a row that fails the test. So the LEFT JOIN did keep her in, and then WHERE took her out.\n\n**Step 3:** after WHERE, there's no Cara row left. GROUP BY can't count a group that doesn't exist, so your query returns:\n\n```\nAna  | 1\nBen  | 1\n```\n\nCara is missing completely. She doesn't show up with 0. She just isn't there.\n\n**Your turn to fix it.** Your goal is for Cara's row to survive the join, so that only *orders* over 30 get filtered out, not *customers*. Going back to section 5, where could you put `o.amount > 30` so it limits which orders get matched instead of which result rows are kept? Rewrite the query and tell me what you expect each customer's count to be. Then check it: what does `COUNT(o.id)` give for Cara, and why?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "320245fd90"
+}

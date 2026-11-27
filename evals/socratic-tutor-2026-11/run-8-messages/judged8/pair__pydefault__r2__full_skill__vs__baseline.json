@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "A uses diagnostic questions and a falsifiable experiment to surface the learner's belief that defaults are re-created on every call, so the learner does the reasoning; B corrects the misconception by fiat with a long lecture and then mostly confirms answers the learner read off its own explanations."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

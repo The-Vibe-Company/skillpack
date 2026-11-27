@@ -4,6 +4,8 @@ description: "Install skills in Claude Code by hand, with the Skillpack CLI, a C
 slug: how-to-install-skills-in-claude-code
 date: 2026-10-13
 tags: ["Claude Code", "Agent Skills", "Skillpack CLI"]
+author: "Stan Girard"
+authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
 # How to install skills in Claude Code: 4 methods, tested

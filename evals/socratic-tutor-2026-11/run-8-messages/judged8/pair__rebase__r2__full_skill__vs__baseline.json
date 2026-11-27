@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A got the learner to bring out the belief that hashes stay the same, then asked questions until the learner worked out for themselves that the parent hash changes and what that does to a teammate, while Tutor B stated the answer up front, corrected the misconception directly and wrote long lectures."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

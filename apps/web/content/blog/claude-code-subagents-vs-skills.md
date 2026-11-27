@@ -1,8 +1,9 @@
 ---
 title: "Claude Code Subagents vs Skills: When to Use Each (2026)"
-description: "Claude Code subagents vs skills: what each one is, how they load context, when to pick which, and how to combine them with skills: and context: fork."
+description: "Claude Code subagents vs skills in plain words: what each one does, when to pick a tool, a skill or a subagent, and how to make them work together."
 slug: claude-code-subagents-vs-skills
 date: 2026-10-27
+updated: 2026-11-23
 tags: ["Claude Code", "Subagents", "Agent Skills", "SKILL.md"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
@@ -73,6 +74,16 @@ Claude Code also ships built-in subagents. Explore and Plan are read-only and se
 
 Context is the biggest difference. A skill works with everything you and Claude have said so far. A subagent starts from a short delegation message that Claude writes. That's why the docs keep quick, iterative work in the main conversation, and send self-contained, noisy work to subagents.
 
+## Tool, skill or subagent: which one do you need?
+
+A tool is an action Claude can take. A skill is the know-how for a job. A subagent is a separate worker that does the job elsewhere and reports back.
+
+- **Claude needs to reach something new**, like a database, an API or a browser? Add a tool. Read, Edit and Bash are built in, and MCP servers add more.
+- **Claude should follow the same steps every time?** Write a skill.
+- **The job would flood your chat, or needs fewer tools?** Hand it to a subagent.
+
+They stack. A subagent picks which tools it may use and can preload the skills that explain how to use them. For tools versus skills in more depth, see [Agent Skills vs MCP](/blog/agent-skills-vs-mcp).
+
 ## When to use a skill
 
 Use a skill when:
@@ -110,7 +121,7 @@ Put simply: a subagent with skills is a specialist with reference material. A fo
 
 ## Example: an end-to-end test subagent that uses a skill
 
-Here is the first pattern, built in an empty repo. The skill is Anthropic's `webapp-testing`, which drives a local web app with Playwright. It's one of the skills we compared in [best Claude Code skills for testing](/blog/best-claude-code-skills-testing). Install it into the project with the Skillpack CLI:
+Here is the first pattern, built in an empty repo. The skill is Anthropic's `webapp-testing`, which drives a local web app with Playwright. It's one of the skills compared in [best Claude Code skills for testing](/blog/best-claude-code-skills-testing). Install it into the project with [the Skillpack CLI](/):
 
 ```sh
 skillpack install github:anthropics/skills/skills/webapp-testing --scope project --tools claude-code
@@ -134,9 +145,9 @@ You test the local web app. Start the dev server, run the flows you were given, 
 
 The skill holds the how-to: Playwright usage and helper scripts. The subagent holds the role: limited tools, a focused prompt, and its own context so test logs stay out of your main conversation. Ask Claude to "use the e2e-tester agent to check the signup flow", and you get back a list of failures instead of a wall of output.
 
-Two limits from the docs: you can't preload a skill that sets `disable-model-invocation: true`, and the `skills` field only controls what is preloaded. The subagent can still call other skills through the Skill tool unless `Skill` is left out of its tools. Our `e2e-tester` lists its tools explicitly and doesn't include `Skill`, so it only gets the skill we preloaded.
+Two limits from the docs: you can't preload a skill that sets `disable-model-invocation: true`, and the `skills` field only controls what is preloaded. The subagent can still call other skills through the Skill tool unless `Skill` is left out of its tools. The `e2e-tester` above lists its tools explicitly and doesn't include `Skill`, so it only gets the preloaded skill.
 
-Both files were written on the box we use for testing. We didn't run Claude Code there, so the delegation step above follows the docs rather than a live run.
+Both files were written on a test machine. Claude Code wasn't run there, so the delegation step above follows the docs rather than a live run.
 
 ```cta
 title: "Keep the skills your subagents depend on in sync"
@@ -162,6 +173,8 @@ Skills change more often than subagent definitions, and they're the piece other 
 items:
   - question: "What is the difference between Claude Code subagents and skills?"
     answer: "A skill is a set of instructions that loads into your current conversation when needed. A subagent is a separate worker with its own context window, system prompt, tools and permissions, which does a task and returns a summary."
+  - question: "Should I use a tool, a skill or a subagent?"
+    answer: "Add a tool when Claude needs to reach a new system, such as an API through an MCP server. Write a skill when Claude should follow the same steps every time. Use a subagent when the job is noisy or needs fewer tools, and let it preload the skills it needs."
   - question: "When should I use a subagent instead of a skill?"
     answer: "Use a subagent when the task produces verbose output you don't need, when you want to restrict tools or permissions, or when the work is self-contained and a summary is enough. Use a skill for reusable workflows that run in the main conversation."
   - question: "Can a subagent use skills?"

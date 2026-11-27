@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A has the learner work out the power-of-2 denominator rule themselves through a series of prediction questions, and it ends by asking them to test their own rule on 5/10; Transcript B front-loads the whole explanation, including the 1/3 analogy, and spends the rest of the session on practical cents-handling advice with little learner reasoning about the core concept."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

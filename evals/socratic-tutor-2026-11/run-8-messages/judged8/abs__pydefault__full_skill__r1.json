@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__full_skill__r1.json",
+ "scenario": "pydefault",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 7,
+  "why": "Strong diagnostic and a well-isolated experiment led the learner to discover that defaults are evaluated once at definition time, but the opening subskill list already stated 'at definition time, not call time', the tutor then spelled out the shared-object consequence itself, and the transcript ends before the learner applies it to the mutable list or the None sentinel."
+ },
+ "usage": {}
+}

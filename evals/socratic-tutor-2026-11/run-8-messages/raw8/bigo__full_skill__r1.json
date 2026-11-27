@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's get you ready for that interview. Here's how I'll break Big-O down:\n\n1. What Big-O actually means (growth rate, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops: sequential vs. nested, and loops whose bounds depend on each other\n4. Recognizing logarithmic behavior (halving and doubling patterns)\n5. Recursion: recurrence relations and recursion trees\n6. Space complexity, including the recursion call stack\n7. Best, average and worst case, plus amortized analysis\n8. Big-O vs. Big-Omega vs. Big-Theta\n\nI'll start with a few questions, one at a time, to see what you already know. I won't teach anything until we've finished those. After that I'll show you a skill map and suggest where to start.\n\nQuestion 1: What is the time complexity of this function, and why?\n\n    def f(arr):\n        n = len(arr)\n        total = 0\n        for i in range(n):\n            total += arr[i]\n        for i in range(n):\n            for j in range(10):\n                total += arr[i] * j\n        return total"
+  },
+  {
+   "role": "student",
+   "text": "I think it's O(n^2), because there are two loops going over the whole array, so that's n times n. And the second one even has a loop inside it, so if anything it's slower than that."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'm not going to say yet whether that's right. We'll come back to this function once the diagnostic is done, so hold on to your reasoning.\n\nQuestion 2: What is the time complexity of this function, and why?\n\n    def g(n):\n        count = 0\n        i = 1\n        while i < n:\n            i = i * 2\n            count += 1\n        return count"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, there's only one loop so my first thought is O(n), but i doubles each time instead of going up by 1, so it finishes way faster. I think that makes it O(log n)?"
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. As with the first one, I'll hold off on saying whether that's right until the diagnostic is done.\n\nQuestion 3: What are the time complexity and the space complexity of this function, and why?\n\n    def h(n):\n        if n <= 1:\n            return 1\n        return h(n - 1) + h(n - 1)"
+  },
+  {
+   "role": "student",
+   "text": "Each call makes two more calls, so it kind of branches out like a tree, which I think makes the time O(2^n). For space I'm less sure, maybe also O(2^n) since there are that many calls?"
+  },
+  {
+   "role": "tutor",
+   "text": "Thanks. I'll come back to both parts of that answer once the diagnostic is done.\n\nQuestion 4 (last one before the skill map): Appending to a Python list is usually described as O(1), but every so often the list runs out of room and has to copy all of its elements into a bigger block of memory, which is O(n). How can appending still be called O(1)? What has to be true about how the list grows for that claim to hold?"
+  },
+  {
+   "role": "student",
+   "text": "I guess it's because the copying doesn't happen very often, so most appends are fast and it kind of averages out? I think the list has to grow by a lot each time, like doubling, but I'm not totally sure why that matters versus just adding a fixed amount."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the diagnostic done. Here's where you stand:\n\n- Q2 (doubling loop): Correct, and you gave the right reason. Because `i` doubles each time, the loop ends quickly.\n- Q3 (recursion): Your time answer is right, but you got there by intuition and didn't count anything. Your space answer is not right.\n- Q4 (list append): You're heading the right way with \"it averages out\" and \"doubling\". You couldn't say why doubling works and a fixed increment doesn't, though, and that's the part an interviewer will push on.\n- Q1 (two loops): Not right. The reasoning has a flaw that's very common in interviews, so we'll start there.\n\n    Topic: Big-O notation                       overall: ███░░░░░░░ 33%\n    -----------------------------------------------------------------\n    1. What Big-O means (drop constants)  [████░░░░░░]  2/5\n    2. Complexity classes and ranking     [████░░░░░░]  2/5\n    3. Analyzing loops                    [██░░░░░░░░]  1/5  <- proposed start\n    4. Logarithmic patterns               [██████░░░░]  3/5\n    5. Recursion / recurrences            [████░░░░░░]  2/5\n    6. Space complexity (incl. stack)     [██░░░░░░░░]  1/5\n    7. Best/avg/worst, amortized          [████░░░░░░]  2/5\n    8. Big-O vs Omega vs Theta            [░░░░░░░░░░]  0/5  (not tested yet)\n    -----------------------------------------------------------------\n\nThese levels are cautious, and you earn each one by answering several separate checks correctly. For example, logarithmic patterns is at 3 and not higher because one correct answer isn't enough yet.\n\nI suggest we start with loop analysis (subskill 3) and fold in dropping constants (subskill 1) along the way. Q1 depends on both, and loop questions come up in almost every interview. After that we'd move to space complexity and the recursion stack, then amortized analysis.\n\nDo you want to start with loops, or would you rather begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, let's start with loops. Honestly though I'm still pretty sure Q1 is O(n^2), since two loops over the array has to be n times n, right?"
+  },
+  {
+   "role": "tutor",
+   "text": "Good, loops it is. I won't tell you yet whether O(n^2) is right. Let's test the \"n times n\" idea by counting instead of reasoning by shape.\n\nLook at Q1 again:\n\n    def f(arr):\n        n = len(arr)\n        total = 0\n        for i in range(n):\n            total += arr[i]\n        for i in range(n):\n            for j in range(10):\n                total += arr[i] * j\n        return total\n\nSay `arr` has 1,000 elements. Exactly how many times does a `total += ...` line run in the whole function? Give the count for the first loop, then for the second loop, then the total. And if the answer really were n times n, what number would you expect to get?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, the first loop is easy, that one runs 1,000 times since it just goes through the array once."
+  },
+  {
+   "role": "tutor",
+   "text": "Right, the first loop runs `total += arr[i]` exactly 1,000 times.\n\nNow the second loop. With 1,000 elements, how many times does the outer loop run, how many times does the inner `for j in range(10)` loop run for each pass of the outer loop, and so how many times does `total += arr[i] * j` run in total?"
+  },
+  {
+   "role": "student",
+   "text": "The outer loop runs 1,000 times and the inner one runs 10 times for each of those, so that's 10,000 times for the second loop. So the whole thing is 1,000 + 10,000 = 11,000, which still feels like a lot, so I'd still lean toward O(n^2)."
+  },
+  {
+   "role": "tutor",
+   "text": "Your counts are right: 1,000 + 10,000 = 11,000. But \"feels like a lot\" isn't how Big-O works. Big-O is about how the count grows as n grows, not how big it is at one size.\n\nEarlier I also asked what number you'd expect if it really were n times n, and you skipped that part. For n = 1,000, n times n is 1,000,000, and your actual count is 11,000. So let's see how the count grows.\n\nDouble the array to 2,000 elements. Exactly how many times does a `total += ...` line run now? By what factor did the count go up from 11,000? And by what factor would it have gone up if the function were really O(n^2)?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "584f34f56b"
+}

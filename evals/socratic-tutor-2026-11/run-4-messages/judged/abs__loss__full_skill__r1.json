@@ -1,0 +1,17 @@
+{
+ "file": "loss__full_skill__r1.json",
+ "scenario": "loss",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 4,
+  "why": "The tutor ran a well-targeted, neutral diagnostic that surfaced the learner's additive-percentage misconception without leaking the answer, but the transcript ends before any teaching or learner reasoning toward the +100% recovery insight occurs."
+ },
+ "usage": {}
+}

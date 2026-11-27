@@ -1,0 +1,17 @@
+{
+ "file": "bayes__baseline__r1.json",
+ "scenario": "bayes",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor opened by working the exact base-rate example through to the ~8% answer and then gave long lectures in every turn, so the learner repeated the result but kept anchoring on the test's 90% (guessing 60-70% at a 5% prior) and never showed they had internalized it."
+ },
+ "usage": {}
+}

@@ -1,0 +1,17 @@
+{
+ "file": "monty__baseline__r1.json",
+ "scenario": "monty",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 4,
+  "why": "The content is accurate and the learner ends up restating the key idea, but the tutor opened with a full lecture that gave the whole resolution (enumeration, 100 doors, host-knowledge caveat) without probing first, and later answered its own check question instead of letting the learner reason."
+ },
+ "usage": {}
+}

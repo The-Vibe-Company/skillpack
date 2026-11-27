@@ -1,0 +1,17 @@
+{
+ "file": "monty__one_line__r3.json",
+ "scenario": "monty",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 5,
+  "why": "The first tutor message laid out the whole answer (case table, 2/3, 100 doors) before finding out what the learner thought; the later turns were well-targeted Socratic questions about the host's constrained choice, but the learner never stated the 2/3 conclusion themselves."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Although A front-loads a long lecture, it then surfaces the learner's specific misconception (mutation vs. assignment) and guides them via targeted prediction questions to reason it out, whereas B only runs a diagnostic quiz that records the misconception without engaging it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

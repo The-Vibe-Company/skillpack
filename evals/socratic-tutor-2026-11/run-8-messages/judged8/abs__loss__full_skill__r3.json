@@ -1,0 +1,17 @@
+{
+ "file": "loss__full_skill__r3.json",
+ "scenario": "loss",
+ "condition": "full_skill",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 2,
+  "lecture_count": 1,
+  "overall": 7,
+  "why": "The tutor diagnosed carefully and guided the learner to discover through concrete dollars that +50% after -50% leaves them at $750, but its opening syllabus already announced that a 50% loss needs more than a 50% gain, and the learner never got to articulating that a +100% gain is required."
+ },
+ "usage": {}
+}

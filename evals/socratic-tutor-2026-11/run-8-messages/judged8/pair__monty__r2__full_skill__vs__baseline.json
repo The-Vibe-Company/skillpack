@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B makes the learner state and test the 50/50 belief, fill in the host's options and count the 300-game cases until they find the contradiction themselves, while A gives every explanation up front and the learner just agrees, even though B's diagnostic and skill-map overhead slows it down."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
+  BLOG_AUTHOR_PROFILES,
   BLOG_CONTENT_DIR,
   type BlogPost,
   blogPostAuthor,
@@ -91,6 +92,21 @@ describe("blog post parsing", () => {
     );
   });
 
+  it("reads an optional revision day that is not before publication", () => {
+    expect(parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-11-23`), "a-post.md").updated).toBe("2026-11-23");
+    expect(parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-10-13`), "a-post.md").updated).toBe("2026-10-13");
+    expect(parseBlogPost(postSource(VALID_FRONTMATTER), "a-post.md")).not.toHaveProperty("updated");
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-10-12`), "a-post.md")).toThrow(
+      "a-post.md: invalid frontmatter (updated: updated must not be before date)",
+    );
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: 2026-11-31`), "a-post.md")).toThrow(
+      /updated: updated must be a real day/,
+    );
+    expect(() => parseBlogPost(postSource(`${VALID_FRONTMATTER}\nupdated: Nov 23 2026`), "a-post.md")).toThrow(
+      /updated: updated must be YYYY-MM-DD/,
+    );
+  });
+
   it("fails the build when a heading takes a block's fixed anchor", () => {
     const takeaways = "```takeaways\ntitle: Key Takeaways\nitems:\n  - { lead: One., text: Two. }\n```";
     const body = `\n# Title\n\n## Key Takeaways\n\n${takeaways}\n`;
@@ -152,8 +168,15 @@ describe("blog post loading", () => {
     });
     expect(post?.body).toBe(fileBody);
     expect(createHash("sha256").update(post?.body ?? "").digest("hex")).toBe(
-      "f94b728e8427d0dcb5badc63a5a1403e7700d218c15b4e01991b9335255823d7",
+      "57a6ce3df5ccb9d33ccf2000c507a14d7ff9e15e78bf4a621dc03a75a01f8cda",
     );
+  });
+
+  it("keeps em and en dashes out of every published post", () => {
+    const files = readdirSync(BLOG_CONTENT_DIR).filter((file) => file.endsWith(".md"));
+    expect(files.length).toBeGreaterThan(0);
+    const offenders = files.filter((file) => /[\u2013\u2014]/.test(readFileSync(join(BLOG_CONTENT_DIR, file), "utf8")));
+    expect(offenders).toEqual([]);
   });
 
   it("formats the publication day without shifting it across time zones", () => {
@@ -174,7 +197,23 @@ describe("blog post presentation", () => {
       name: "The Vibe Company",
       url: "https://thevibecompany.co",
     });
-    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toMatchObject({ name: "The Vibe Company" });
+    expect(blogPostAuthor(findBlogPost("what-is-skill-md") ?? {})).toEqual({
+      kind: "person",
+      name: "Stan Girard",
+      url: "https://www.thevibecompany.co/en/about",
+      jobTitle: "Co-founder",
+      sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+      avatar: "/images/authors/stan.webp",
+      imagePath: "/images/authors/stan-400.webp",
+    });
+  });
+
+  it("ships every author profile's avatar and portrait under public/", () => {
+    for (const profile of BLOG_AUTHOR_PROFILES.values()) {
+      for (const path of [profile.avatar, profile.imagePath]) {
+        expect(existsSync(join(process.cwd(), "public", path)), path).toBe(true);
+      }
+    }
   });
 
   it("splits off the leading H1 line without rewriting either half", () => {

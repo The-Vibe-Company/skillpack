@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the misconception about identical hashes and gives just enough of a hint (the parent hash is part of the commit hash) for the learner to work out for themselves that rebased commits get new hashes, while B spends its turns on a long syllabus and diagnostic questions and puts off the misconception without the learner making any progress on it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

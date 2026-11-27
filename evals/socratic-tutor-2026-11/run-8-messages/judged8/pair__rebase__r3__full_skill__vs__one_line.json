@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B surfaced the same-hash misconception and had the learner test their own 'parent tracked separately' assumption until they concluded the commits are new, then had them work out the force-push consequences for a teammate and apply the rule to real decisions, while A spent many turns on a delayed-feedback diagnostic and progress bars and covered less."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

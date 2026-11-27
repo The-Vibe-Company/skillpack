@@ -1,0 +1,73 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's fix that properly. Here's how I've split Bayes' theorem into subskills. We'll track each one from 0 to 5:\n\n1. Conditional probability: what P(A|B) actually means\n2. Direction: telling P(A|B) apart from P(B|A)\n3. Priors and base rates: why the starting probability matters\n4. Total probability: building the denominator P(B)\n5. Applying Bayes to real problems (medical tests, spam filters, etc.)\n6. Sequential updating: using a posterior as the next prior\n7. Odds form and likelihood ratios\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything yet. Answer in your own words, and don't worry about getting things wrong. That's what the diagnostic is for.\n\nQuestion 1: In plain English, what's the difference between \"the probability that someone is a smoker, given they have lung cancer\" and \"the probability that someone has lung cancer, given they are a smoker\"? Would you expect those two numbers to be roughly the same, or very different, and why?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I think they're basically the same thing just worded differently? Smoking and lung cancer are strongly linked, so I'd guess both numbers are pretty high and roughly similar."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, noted. I won't tell you yet whether that's right. We're still in the diagnostic, so let's keep going.\n\nQuestion 2: Imagine a town of 1,000 people. 200 of them are smokers. 10 people in the town have lung cancer, and 8 of those 10 are smokers.\n\nUsing just those numbers, what fraction of the people with lung cancer are smokers? And what fraction of the smokers have lung cancer?"
+  },
+  {
+   "role": "student",
+   "text": "Okay, of the 10 people with lung cancer, 8 are smokers, so that's 8 out of 10, about 80%. That feels about what I'd expect given how linked they are."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You answered the first half. Question 2 also asked a second thing, and I need that before we move on.\n\nUsing the same town (1,000 people, 200 smokers, 10 with lung cancer, 8 of whom smoke): what fraction of the smokers have lung cancer?"
+  },
+  {
+   "role": "student",
+   "text": "Oh, so that's 8 smokers with cancer out of 200 smokers total... 8 out of 200 is like 4%? Huh, that's way lower than I expected, but I guess it's because there are so many more smokers than cancer cases."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'm keeping my comments on your answers until the diagnostic is done, so on to the next one.\n\nQuestion 3: A disease affects 1 in 1,000 people. A test for it comes back positive for 99% of people who have the disease. It also comes back positive, wrongly, for 5% of people who don't have it.\n\nA randomly chosen person takes the test and it comes back positive. Roughly what's the chance they actually have the disease? Give your best rough number and explain how you got it."
+  },
+  {
+   "role": "student",
+   "text": "I'd say around 95%. The test catches 99% of people who have it and only gets it wrong 5% of the time, so if it says positive it's probably right about 95% of the time."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. Still no verdict from me. One more diagnostic question after this one, then I'll show you where you stand and we'll start working.\n\nQuestion 4: Same disease and same test as before (1 in 1,000 people have it, the test is positive for 99% of people who have it, and wrongly positive for 5% of people who don't).\n\nA person tests positive, and then takes the same test again. It comes back positive a second time, and assume the two results are independent. Without working out an exact number, how would you go about figuring out the new chance that they have the disease? What would you use as your starting point for the second calculation?"
+  },
+  {
+   "role": "student",
+   "text": "I guess I'd just start from the first answer, so around 95%, and then since it came back positive twice it'd be even more certain, maybe 99% or so? Honestly I'm not sure what you mean by a starting point for the second calculation."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Here's my read, without giving away any answers yet.\n\n- Q1 and Q2 don't agree. In Q1 you said the two probabilities are \"basically the same thing.\" In Q2 you worked them out yourself and got 80% and 4%. Your arithmetic in Q2 was right. Your Q1 intuition was what failed.\n- Q3: your answer of 95% is a long way off. Your reasoning used only the test's accuracy and ignored the \"1 in 1,000\" part. That's the most common Bayes mistake there is, and it's the one we'll fix.\n- Q4: you did start from your first answer, but you weren't sure why that's the right starting point. Since your first answer was off, the second one inherits that.\n- Odds form wasn't tested, so I've left it at 0 for now.\n\nTopic: Bayes' theorem                   overall: ██░░░░░░░░ 17%\n-----------------------------------------------------------------\n1 Conditional probability   [████░░░░░░]  2/5\n2 Direction (A|B vs B|A)    [██░░░░░░░░]  1/5  <- proposed focus\n3 Priors and base rates     [██░░░░░░░░]  1/5\n4 Total probability P(B)    [░░░░░░░░░░]  0/5\n5 Applying Bayes            [██░░░░░░░░]  1/5\n6 Sequential updating       [██░░░░░░░░]  1/5\n7 Odds form / LRs           [░░░░░░░░░░]  0/5  (untested)\n-----------------------------------------------------------------\n\nI suggest we start with subskill 2, direction. Mixing up P(A|B) and P(B|A) is behind both Q1 and Q3, so everything else builds on fixing it first. Base rates come right after.\n\nShall we start with direction, or would you rather begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Sure, let's start with direction. Though honestly I'm still a bit surprised the medical one isn't close to 95%, so I'm curious where that's going."
+  },
+  {
+   "role": "tutor",
+   "text": "Good. Hold on to that surprise about the medical test. It comes from the same direction mix-up we're about to work on, and we'll come back to it once direction is solid.\n\nWe'll start from your own Q2 numbers. In the town you got 8 out of 10 (80%) for \"smoker, given lung cancer\" and 8 out of 200 (4%) for \"lung cancer, given smoker.\"\n\nBoth fractions have the same top number, 8. So the whole difference between 80% and 4% comes from the bottom number. In each phrase, which word or part tells you which group goes on the bottom? Put it as a general rule you could apply to any \"probability of X, given Y\" statement."
+  },
+  {
+   "role": "student",
+   "text": "I think it's the part after \"given\" that goes on the bottom? Like \"given lung cancer\" means you only look at the 10 cancer people, and \"given smoker\" means you only look at the 200 smokers."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. Whatever comes after \"given\" is the group you restrict yourself to, so it goes on the bottom. The top is the overlap, the people who are in both groups. That's why both fractions had 8 on top but different bottoms.\n\nThat's one correct check. I'm not moving the level yet, because you need to show it holds up on a new case.\n\nSo let's take it back to the medical test from Q3. The problem said: \"the test comes back positive for 99% of people who have the disease.\" Then it asked: \"a person tests positive. What's the chance they actually have the disease?\"\n\nWrite each of those as \"probability of ___, given ___\". Using your rule, which group is on the bottom in each one? Are they the same quantity?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "7a7388f13e"
+}

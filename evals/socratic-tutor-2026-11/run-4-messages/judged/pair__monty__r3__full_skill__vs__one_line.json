@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Although A front-loads the explanation, its follow-up questions directly target the learner's 50/50 reasoning and move the learner to concede key points, whereas B stalls in a repetitive diagnostic that refuses to engage with the misconception and makes little progress."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

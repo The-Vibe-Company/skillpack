@@ -4,6 +4,8 @@ description: "Agent Skills vs MCP, measured: what each puts in context at sessio
 slug: agent-skills-vs-mcp
 date: 2026-10-14
 tags: ["Agent Skills", "MCP", "Claude Code"]
+author: "Stan Girard"
+authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
 # Agent Skills vs MCP: context cost measured, and when to use each

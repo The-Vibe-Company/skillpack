@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A gets the learner to work through both misconceptions (that constants matter and that sequential loops give n^2) using tables the learner fills in and contrasts with earlier answers, whereas Tutor B spends most of the exchange on a long diagnostic with withheld feedback and a progress dashboard, and has only started on the misconceptions by the end."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

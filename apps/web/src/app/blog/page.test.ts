@@ -82,12 +82,41 @@ describe("public blog index", () => {
     expect(guide?.querySelectorAll("a")).toHaveLength(1);
   });
 
-  it("titles itself Blog and canonicalizes to /blog", () => {
+  it("titles itself for agent skills guides and canonicalizes to /blog", () => {
     // The root layout template appends " · Skillpack", so the page title must stay bare.
-    expect(metadata.title).toBe("Blog");
-    expect(metadata.openGraph?.title).toBe("Blog · Skillpack");
+    expect(metadata.title).toBe("Agent Skills Guides for Claude Code & Codex");
+    expect(metadata.openGraph?.title).toBe("Agent Skills Guides for Claude Code & Codex · Skillpack");
+    expect(metadata.twitter?.title).toBe("Agent Skills Guides for Claude Code & Codex · Skillpack");
     expect(metadata.description).toBeTruthy();
     expect(metadata.alternates?.canonical).toBe("/blog");
     expect(metadata.openGraph?.url).toBe("/blog");
+  });
+
+  it("renders one JSON-LD script with a CollectionPage, an ItemList of every post and a breadcrumb", async () => {
+    const container = await renderIndex();
+    const scripts = container.querySelectorAll('script[type="application/ld+json"]');
+    expect(scripts).toHaveLength(1);
+
+    const data = JSON.parse(scripts[0]?.textContent ?? "");
+    const graph = data["@graph"];
+    const posts = loadBlogPosts();
+    const collection = graph.find((node: { "@type": string }) => node["@type"] === "CollectionPage");
+    const crumbs = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
+
+    expect(data["@context"]).toBe("https://schema.org");
+    expect(collection.name).toBe(metadata.title);
+    expect(collection.description).toBe(metadata.description);
+    expect(collection.url).toMatch(/\/blog$/);
+    expect(collection.isPartOf).toEqual({ "@id": "https://skillpack.app/#website" });
+    expect(collection.mainEntity["@type"]).toBe("ItemList");
+    const items = collection.mainEntity.itemListElement;
+    expect(items).toHaveLength(posts.length);
+    items.forEach((item: { "@type": string; position: number; name: string; url: string }, index: number) => {
+      expect(item["@type"]).toBe("ListItem");
+      expect(item.position).toBe(index + 1);
+      expect(item.name).toBe(posts[index]?.title);
+      expect(item.url).toMatch(new RegExp(`/blog/${posts[index]?.slug}$`));
+    });
+    expect(crumbs.itemListElement.map((crumb: { name: string }) => crumb.name)).toEqual(["Home", "Blog"]);
   });
 });

@@ -1,0 +1,17 @@
+{
+ "file": "rebase__baseline__r1.json",
+ "scenario": "rebase",
+ "condition": "baseline",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor diagnosed the misconception well with a concrete first question but then directly explained that rebase creates new commits with new hashes instead of letting the learner discover it, though later questions on the force-push consequences were well scaffolded and the learner reasoned through the duplication problem correctly."
+ },
+ "usage": {}
+}

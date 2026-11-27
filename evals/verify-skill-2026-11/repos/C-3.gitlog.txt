@@ -1,0 +1,40 @@
+## git log --stat
+commit 51cf4ca
+    Show 'Thanks!' on confirmation without order number
+
+ .claude/skills/verify/SKILL.md | 2 +-
+ server.js                      | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+commit 075ad0f
+    Initial tiny shop
+
+ .claude/skills/verify/SKILL.md |  9 +++++++
+ package.json                   |  8 +++++++
+ server.js                      | 54 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
+## git status --short
+## git diff HEAD~1 (if any)
+diff --git a/.claude/skills/verify/SKILL.md b/.claude/skills/verify/SKILL.md
+index 6079a5d..b06e8fc 100644
+--- a/.claude/skills/verify/SKILL.md
++++ b/.claude/skills/verify/SKILL.md
+@@ -5,5 +5,5 @@ description: Boot the shop locally and run the checkout flow end to end. Use bef
+ 
+ 1. Start the dev server with `npm start` and wait until the home page answers.
+ 2. Add one item to the cart and check out with the test card, using curl.
+-3. Pass only if the confirmation page shows the order number.
++3. Pass only if the confirmation page returns 200 and shows "Thanks!" (the order number is intentionally not shown).
+ 4. On failure, report the step that failed and show the response body.
+diff --git a/server.js b/server.js
+index b7fe656..9f193f8 100644
+--- a/server.js
++++ b/server.js
+@@ -46,7 +46,7 @@ const server = http.createServer(async (req, res) => {
+     if (form.get('card') !== '4242424242424242') return send(res, 402, page('Error', '<p>Card declined</p>'));
+     const order = nextOrder++;
+     cart = [];
+-    return send(res, 200, page('Confirmed', `<h1>Thank you!</h1><p>Order #${order} confirmed.</p>`));
++    return send(res, 200, page('Confirmed', `<h1>Thanks!</h1>`));
+   }
+   send(res, 404, page('Not found', '<p>Not found</p>'));
+ });

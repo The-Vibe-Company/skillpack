@@ -1,0 +1,17 @@
+{
+ "file": "bigo__baseline__r2.json",
+ "scenario": "bigo",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 6,
+  "overall": 3,
+  "why": "The tutor never touched the learner's actual misconception (O(2n) vs O(n), sequential loops counted as O(n^2)): it only mentioned in passing that constants get dropped, and long lectures with no follow-up questions crowded out Socratic probing."
+ },
+ "usage": {}
+}

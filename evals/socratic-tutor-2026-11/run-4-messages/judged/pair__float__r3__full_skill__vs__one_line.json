@@ -1,0 +1,16 @@
+{
+ "scenario": "float",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner do the reasoning and brings their misconceptions into the open (that 0.1 is stored exactly, that this is a JavaScript-only bug) without simply correcting them, whereas B delivers the whole explanation as a lecture up front and only later asks the learner to work things out, even though A's long diagnostic is slow and the learner is getting impatient."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

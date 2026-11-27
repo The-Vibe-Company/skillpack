@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A brings out the ON-vs-WHERE misconception through diagnostic questions and has the learner reason through how each row is evaluated, while B lectures the answer up front, so the learner falls back into the same misconception (Exercise 3) and has to be corrected by explanation again."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

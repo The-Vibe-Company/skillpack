@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r1.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 8,
+  "why": "The tutor supplied only the premise that a commit's hash includes its parent's hash, and the learner worked out on their own that rebasing creates new commits and why that harms collaborators; some turns ran long on explanation, and the session ended before case 2 was finished."
+ },
+ "usage": {}
+}

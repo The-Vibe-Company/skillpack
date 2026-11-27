@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__one_line__r1.json",
+ "scenario": "sqljoin",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 1,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The opening message lectured and gave away the ON vs WHERE answer before checking what the learner knew. The later turns were good Socratic steps that got the learner to see WHERE drops Cara's NULL row, but the learner never said in their own words that the ON filter keeps her, and the tutor explained the conclusion again for them."
+ },
+ "usage": {}
+}

@@ -1,0 +1,37 @@
+{
+ "id": "6a51d3b615",
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do it properly. Here's how I've broken the topic into subskills:\n\n1. Syntax and ordering rules (where defaults can go, how they mix with positional, keyword, `*args`, keyword-only, and `**kwargs`)\n2. When defaults are evaluated (definition time vs. call time)\n3. The mutable default trap (lists, dicts, and objects shared across calls)\n4. The `None` sentinel idiom and its limits\n5. Custom sentinel objects (for when `None` is a valid input)\n6. Introspection (`__defaults__`, `__kwdefaults__`, `inspect.signature`)\n7. Defaults used for early binding (`lambda i=i:` in loops and closures)\n\nBefore teaching anything, I'll ask you a few questions, one at a time, to see what you already know. Answer as best you can. \"I don't know\" is a useful answer too.\n\n**Question 1:** Without running it, what does this print, and why?\n\n```python\ndef add_item(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add_item(1))\nprint(add_item(2))\n```"
+  },
+  {
+   "role": "learner",
+   "text": "It prints [1] and then [2]. The bucket=[] gives you a fresh empty list each time you call the function, so each call just has its own item in it."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on saying whether that's right until the diagnostic is done, and then we'll come back to it.\n\n**Question 2:** Which of these function definitions are valid Python, and for each invalid one, what rule does it break?\n\n```python\ndef a(x=1, y): ...\ndef b(x, y=2, *args, z): ...\ndef c(x, *, y=2, z): ...\ndef d(x=1, *args, y, **kwargs): ...\n```"
+  },
+  {
+   "role": "learner",
+   "text": "The first one, a, is invalid because you can't put a parameter without a default after one that has a default, so y would need a default too. I'm less sure about the others with the star stuff."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. You gave a reason for `a` and said you're unsure about the starred ones. I'll take both of those into account. We'll come back to all four definitions properly once the diagnostic is done.\n\n**Question 3:** Without running it, what does this print, and why?\n\n```python\ncounter = 0\n\ndef next_id():\n    global counter\n    counter += 1\n    return counter\n\ndef make_record(name, record_id=next_id()):\n    return (name, record_id)\n\nprint(make_record(\"a\"))\nprint(make_record(\"b\"))\nprint(counter)\n```"
+  },
+  {
+   "role": "learner",
+   "text": "I think it prints (\"a\", 1) then (\"b\", 2) and then 2. Since the default gets worked out each time you call make_record, next_id() runs on every call and bumps the counter."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You're predicting that `next_id()` runs again on every call to `make_record`. I'll come back to this one after the diagnostic too.\n\n**Question 4:** Without running it, what does this print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n```"
+  }
+ ],
+ "pending": null
+}

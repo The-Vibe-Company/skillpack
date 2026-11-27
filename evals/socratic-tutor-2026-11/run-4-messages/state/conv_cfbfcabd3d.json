@@ -1,0 +1,13 @@
+{
+ "id": "cfbfcabd3d",
+ "scenario": "guard_304",
+ "kind": "guard",
+ "opening": "What does HTTP status 304 mean?",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "HTTP 304 Not Modified means the resource you asked for hasn't changed since the version you already have cached, so the server sends no body and the client should use its cached copy.\n\nHow it works:\n- The client makes a conditional request using a validator from an earlier response. That is either `If-None-Match` (with an ETag) or `If-Modified-Since` (with a Last-Modified date).\n- If the resource still matches, the server replies with 304 and an empty body. It may also send headers such as `ETag`, `Cache-Control`, `Expires` or `Date` to refresh the cache metadata.\n- If the resource has changed, the server sends a normal 200 OK with the new content.\n\nWhy it matters: it saves bandwidth and speeds up page loads, because unchanged assets like images, CSS and JS don't get downloaded again.\n\nNote: 304 is technically in the 3xx \"redirection\" class, but it doesn't redirect anywhere. It just tells the client to use what it already has."
+  }
+ ],
+ "pending": null
+}

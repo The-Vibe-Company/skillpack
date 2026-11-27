@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A gets the learner to work out on their own that new parents mean new hashes, then has them reason through the shared-branch fallout and arrive at the golden rule, while B spends turns on a long diagnostic and a progress dashboard, leaves the force-push misconception unresolved, and adds more lecture-style corrections."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

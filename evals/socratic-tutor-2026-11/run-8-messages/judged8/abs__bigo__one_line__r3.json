@@ -1,0 +1,17 @@
+{
+ "file": "bigo__one_line__r3.json",
+ "scenario": "bigo",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 2,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 7,
+  "why": "The tutor patiently used doubling tables and narrow questions to lead the learner to discover both that constants drop and that sequential loops add, though it pre-stated 'halving the work doesn't change the Big-O class' in its first feedback and delivered several lengthy expository summaries."
+ },
+ "usage": {}
+}

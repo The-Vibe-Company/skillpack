@@ -1,0 +1,73 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do this properly. Here's how I've broken the topic into subskills:\n\n1. Calculating a percentage change (from start value to end value)\n2. Applying a percentage change (finding the new value from a given % gain or loss)\n3. Asymmetry of gains and losses (why a -50% needs +100% to recover)\n4. Compounding multiple periods (chaining gains and losses)\n5. Reversing a change (working back to the original value)\n6. Averages of returns (arithmetic vs. geometric / annualized returns)\n7. Percent vs. percentage points (and comparing returns)\n\nI'll start with a few questions, one at a time, to see what you already know. Don't look anything up, and just give your best reasoning. A wrong answer is still useful.\n\nQuestion 1: You buy a stock for $80 and later sell it for $100. What was your percentage gain? Show how you got it."
+  },
+  {
+   "role": "student",
+   "text": "I made $20 on an $80 stock, so 20 divided by 80 is 0.25, which is a 25% gain. That one feels pretty straightforward."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. You divided the change by the starting value, which is the right base.\n\nQuestion 2: A stock you own falls 50% in one year. The next year it rises 50%. Compared with where you started, are you up, down, or back to even? By how much, in percent?"
+  },
+  {
+   "role": "student",
+   "text": "That's back to even, 0%. You lose 50% and then gain 50%, so the two cancel each other out."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on saying whether that's right until the diagnostic is done, and we'll come back to it.\n\nQuestion 3: A fund is worth $1,000. It gains 10% in year one, then 10% again in year two. What is it worth at the end of year two?"
+  },
+  {
+   "role": "student",
+   "text": "Two 10% gains is 20% total, and 20% of $1,000 is $200, so it'd be worth $1,200 at the end of year two."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Same as before, I'll come back to this one after the diagnostic.\n\nQuestion 4: You check a stock and see it's now worth $60, after falling 25% from what you paid. What did you originally pay for it? Show how you got there."
+  },
+  {
+   "role": "student",
+   "text": "It fell 25% to get to $60, so I just add the 25% back. 25% of $60 is $15, so I'd say I originally paid $75."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. As with the last two, I'll come back to this one once the diagnostic is done.\n\nLast diagnostic question. Question 5: Last year your savings account paid 2% interest. This year it pays 3%. Your friend says, \"The rate went up by 1%.\" Is your friend's description accurate? If not, how would you describe the increase more precisely?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, I think that's accurate. It went from 2% to 3%, so it's up by 1%."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Before we start: questions 2 through 5 each had a flaw in the reasoning. I won't tell you what the flaws are yet. You'll find them yourself as we go, and that sticks much better than me correcting you.\n\nHere's where I'd place you right now:\n\n    Topic: Percentage gains & losses on investments    overall: ███░░░░░░░ 26%\n    ---------------------------------------------------------------------------\n    1. Calculating a % change       [██████░░░░]  3/5\n    2. Applying a % change          [████░░░░░░]  2/5\n    3. Gain/loss asymmetry          [██░░░░░░░░]  1/5\n    4. Compounding multiple periods [██░░░░░░░░]  1/5\n    5. Reversing a change           [██░░░░░░░░]  1/5\n    6. Averages of returns          [░░░░░░░░░░]  0/5  (not tested yet)\n    7. Percent vs. percentage points[██░░░░░░░░]  1/5\n    ---------------------------------------------------------------------------\n\nSome notes on these levels:\n- Subskill 1 is your strongest. You got it right and used the correct base. Moving above 3 will take a couple more checks, including some trickier cases.\n- Subskills 3, 4 and 5 trip on the same underlying idea, so I suspect fixing one will help the others.\n- Subskill 6 builds on 3 and 4, so we'll leave it until later.\n\nMy proposal is to start with subskill 2 (applying a % change). It's the foundation for 3, 4 and 5, and getting it solid should make the others much easier. After that we'd go to 3, then 4, then 5.\n\nShall we start there, or would you rather begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Sure, starting with subskill 2 sounds good. Honestly I'm a bit surprised some of those were wrong, especially the 50% one, but let's go."
+  },
+  {
+   "role": "tutor",
+   "text": "Being surprised is fine. It usually means there's an assumption worth looking at, and we'll get to the 50% one soon.\n\nSubskill 2: applying a percentage change.\n\nA stock is worth $200 and rises 15%. What is its new value? Then the harder part: can you get that answer with a single multiplication, meaning $200 times one number? What is that number, and why does it work?"
+  },
+  {
+   "role": "student",
+   "text": "15% of $200 is $30, so it'd be worth $230. For one multiplication I guess you'd do $200 times 1.15, since the 1 keeps the original $200 and the 0.15 adds the 15% on top."
+  },
+  {
+   "role": "tutor",
+   "text": "Both right: $230, and the multiplier is 1.15. Your reason is the right one too. The 1 keeps the original amount and the 0.15 adds the gain, so you get the new value in one step.\n\nNow the other direction. A stock worth $200 falls 15%. What single number do you multiply $200 by to get the new value, and why that number?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "8f16dfd09b"
+}

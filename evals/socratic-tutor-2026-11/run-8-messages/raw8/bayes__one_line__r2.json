@@ -1,0 +1,73 @@
+{
+ "scenario": "bayes",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Tutor me on Bayes' theorem, I keep getting it wrong.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Happy to help. Let's start with the core idea, then find exactly where things go off track for you.\n\n**The formula**\n\nP(A | B) = P(B | A) × P(A) / P(B)\n\nIn words: how likely A is once you've seen B equals how likely B would be if A were true, times how likely A was to begin with, divided by how likely B is overall.\n\n- **P(A)** is the *prior*: what you believed before the evidence.\n- **P(B | A)** is the *likelihood*: how well A explains the evidence.\n- **P(B)** is the *evidence*: how common B is across all cases. You usually have to build it yourself: P(B) = P(B | A)·P(A) + P(B | not A)·P(not A).\n- **P(A | B)** is the *posterior*: your updated belief.\n\n**The classic example**\n\nA disease affects 1% of people. A test catches 90% of real cases (sensitivity) and gives a false positive 5% of the time. You test positive. How likely is it that you're sick?\n\nTry counting people instead of using the formula. Imagine 1,000 people:\n- 10 are sick, and 9 of them test positive.\n- 990 are healthy, and about 50 of them test positive anyway.\n- That's 59 positives in total, and only 9 are really sick.\n\nSo P(sick | positive) = 9/59 ≈ 15%. Most people guess 90%, and that's the most common mistake: mixing up P(positive | sick) with P(sick | positive). They're different questions.\n\n**Common mistakes to watch for**\n1. Swapping P(A|B) and P(B|A).\n2. Ignoring the prior, or base rate. A rare condition stays fairly unlikely even after a positive test.\n3. Forgetting the false positives when you work out P(B).\n\n**Your turn**\n\nSame setup, but this time the disease affects 10% of people. What's P(sick | positive)? Walk me through your reasoning step by step, not just the number. That will show me exactly where it's going wrong for you, so we can fix that specific step."
+  },
+  {
+   "role": "student",
+   "text": "Ok so the test catches 90% of sick people, and now the disease is way more common, so the base rate thing shouldn't drag it down much anymore. I'd say a positive means roughly 90% chance you're sick, maybe a bit under, like 85%?"
+  },
+  {
+   "role": "tutor",
+   "text": "Good, you're thinking about the base rate, which is the right instinct. Before we settle on a number, let's test the \"it won't drag it down much anymore\" idea with the same counting trick from before.\n\nPicture 1,000 people again, with the disease now at 10%:\n\n1. How many of them are sick, and how many of those test positive?\n2. How many are healthy, and how many of *those* test positive anyway, with the 5% false-positive rate?\n\nOnce you have both numbers, ask yourself: out of everyone holding a positive result, what fraction is actually sick? If your answer is around 85-90%, the healthy people with false positives would have to be only a small slice of the positive group. Does your count in step 2 back that up?"
+  },
+  {
+   "role": "student",
+   "text": "Ok, 10% of 1,000 is 100 sick people, and 90% of those test positive, so 90 sick people with a positive. That's already a lot of positives, so I'm still thinking it lands up near 85-90%."
+  },
+  {
+   "role": "tutor",
+   "text": "Your 90 is right: 100 sick people, and 90 of them test positive. But \"that's already a lot of positives\" only counts one side of the group. Whether 90 is a lot depends on what it's being compared to.\n\nSo let's finish step 2 before we pick a number:\n\n- If 100 people are sick, how many of the 1,000 are healthy?\n- With a 5% false-positive rate, how many of those healthy people test positive anyway?\n\nOnce you have that number, compare it with your 90. For the answer to be 85-90%, the healthy positives would need to be roughly 10-15 people. Is your number anywhere near that small?"
+  },
+  {
+   "role": "student",
+   "text": "Ok, 900 are healthy, and 5% of 900 is 45 who test positive anyway. Huh, that's way more than 10-15, so it's 90 sick out of 135 positives, which is only about two thirds, not 85-90%."
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly right. 90 sick positives out of 135 total positives is 90/135 = 2/3, or about 67%. You worked that out yourself, and it's the full Bayes calculation:\n\nP(sick | positive) = (0.90 × 0.10) / (0.90 × 0.10 + 0.05 × 0.90) = 0.09 / 0.135 ≈ 0.67\n\n**Where it went wrong before**\n\nYour instinct that the base rate matters less now was partly right. The answer did jump from about 15% to about 67%. The mistake was stopping after you'd counted only the sick people. \"90 positives is a lot\" can't be judged alone, because the posterior is always a ratio:\n\ntrue positives / (true positives + false positives)\n\nEven a small false-positive rate (5%) applies to the much larger healthy group (900 people), so it still produced 45 false alarms. That's half as many as the real cases.\n\n**The habit to build**\n\nBefore you guess a number, always fill in both boxes: sick and positive, and healthy and positive. Then divide. If you only have one box filled in, you aren't ready to answer yet.\n\n**Quick check to lock it in**\n\nKeep the 10% base rate and the 90% sensitivity, but suppose the false-positive rate drops from 5% to 1%. Before calculating, predict whether P(sick | positive) goes up or down, and roughly by how much. Then count it out with 1,000 people and see if your prediction holds."
+  },
+  {
+   "role": "student",
+   "text": "I'd guess it goes up, since there are fewer false alarms, maybe to around 80%? Counting it out, 1% of the 900 healthy people is 9 false positives, so it's 90 out of 99, which is about 91%. Wow, that's a lot higher than I guessed, so the false positive rate matters way more than I thought."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right: 90 out of 99 is about 91%. Your direction was correct too. Fewer false alarms means a higher posterior.\n\n**Why it jumped more than you expected**\n\nLook at what happened to the false positives:\n\n- At 5%: 45 false positives next to 90 true positives\n- At 1%: 9 false positives next to 90 true positives\n\nLowering the rate from 5% to 1% sounds small, only 4 percentage points. But it cut the false-alarm box by a factor of 5, from 45 people to 9. The healthy group is large (900 people), so any change to the false-positive rate gets multiplied by a big number. That's why it moves the answer so much.\n\nThe ratio to watch is false positives compared to true positives:\n\n- 45 : 90 means 1 false alarm for every 2 real cases, so about 67%\n- 9 : 90 means 1 false alarm for every 10 real cases, so about 91%\n\n**The general lesson**\n\nWhen a condition is fairly rare, the false-positive rate usually matters more than the sensitivity, because it applies to the much bigger group. A test with 99% sensitivity and a 5% false-positive rate can still give a poor posterior for a rare disease.\n\n**One more to test the idea**\n\nGo back to the 1% base rate from the first example (10 sick, 990 healthy), keep 90% sensitivity, and use the improved 1% false-positive rate. Predict first, then count:\n\n1. How many true positives?\n2. How many false positives?\n3. What's P(sick | positive)?\n\nThen compare it with the 15% we got at the start with the 5% false-positive rate. Did lowering false positives help as much here as it did at the 10% base rate?"
+  },
+  {
+   "role": "student",
+   "text": "I'm predicting it jumps way up again, like it did last time, maybe to 80% or so. For the first one, 10 people are sick and 90% of them test positive, so that's 9 true positives."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, 9 true positives is right: 10 sick people, and 90% of them test positive.\n\nBefore you go to step 2, check your 80% prediction against that 9. If 80% of the positives are really sick, the 9 true positives make up 80% of everyone who tests positive. So how many false positives would fit that? Work it out. It's a very small number, roughly 2.\n\nNow do step 2 for real. There are 990 healthy people, and 1% of them test positive anyway. How many false positives is that? Is it close to 2?\n\nHere's what to think about. Last time the 1% false-positive rate was applied to 900 healthy people, and there were 90 true positives to compare against. What changed this time on each side of that ratio?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, 1% of 990 is about 10 false positives, which is nowhere near 2. So it's 9 sick out of about 19 positives, which is under 50%, way lower than my 80% guess."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. 1% of 990 is 9.9, so call it about 10 false positives. That gives 9 / (9 + 9.9) ≈ 48%. You got the boxes right, and you caught the gap between your guess and the count yourself.\n\n**Why your prediction missed**\n\nYou expected the same jump as last time, but the two sides of the ratio are different now:\n\n- **At the 10% base rate:** 90 true positives vs. 9 false positives, so real cases outnumber false alarms 10 to 1.\n- **At the 1% base rate:** 9 true positives vs. about 10 false positives, so it's roughly 1 to 1.\n\nThe 1% false-positive rate barely changed between the two cases, because the healthy group is about the same size (900 vs. 990). What collapsed was the true-positive side, which went from 90 to 9. With so few sick people, even a very good test produces about as many false alarms as real cases.\n\n**Did lowering false positives help?**\n\nYes, a lot in relative terms. It went from about 15% to about 48%, more than triple. But it still couldn't get you anywhere near 80-90%. When a condition is rare, the base rate sets a ceiling that a better test can only push against. That's why doctors often order a second, independent test after a positive result for a rare disease.\n\n**The pattern to remember**\n\nThe posterior depends on **true positives : false positives**, and that ratio is driven by:\n- the base rate times sensitivity (the sick side)\n- the healthy fraction times the false-positive rate (the healthy side)\n\nChange either one and the answer moves. Don't predict from one side alone.\n\n**Want to try that second-test idea?** Take your 48% as the new prior and test the same person again with the same test (90% sensitivity, 1% false positives). Predict first, then count it out with 1,000 people. What's P(sick | two positives)?"
+  },
+  {
+   "role": "student",
+   "text": "Ok, since we're starting near 50/50 now, I'd predict it jumps a lot, maybe to around 90%. Counting it out, 480 of the 1,000 are sick and 432 of them test positive, then 520 are healthy and only about 5 test positive, so it's 432 out of 437, which is about 99%. So the second test is way more convincing than I expected because the false positive box is tiny now."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. 432 out of about 437 is about 98.8%, so roughly 99%. You set it up correctly too: the old posterior became the new prior, and you filled in both boxes before dividing.\n\n**Why it beat your 90% prediction**\n\nLook at the ratio again:\n\n- **First test (1% base rate):** 9 true positives vs. about 10 false positives, roughly 1 to 1.\n- **Second test (48% prior):** 432 true positives vs. about 5 false positives, roughly 86 to 1.\n\nThe test didn't change. What changed was who was being tested. After the first positive, the group is about half sick instead of 1% sick. The 1% false-positive rate now applies to only 520 healthy people instead of 990, and the 90% sensitivity applies to 480 sick people instead of 10. Both sides of the ratio moved in your favour at once. That's why the jump was bigger than you expected.\n\nYou can also see it as odds, which makes repeated tests easy:\n\n- Each positive multiplies the odds by sensitivity / false-positive rate = 0.90 / 0.01 = 90.\n- Prior odds of about 1 : 1 (48%) times 90 gives about 86 : 1, which is about 99%.\n\n**One caveat**\n\nThis only works if the two tests are *independent*: whatever caused a false positive the first time must not make one more likely the second time. If the same person always triggers a false alarm (for example, because of something in their blood chemistry), retesting with the same test adds much less information. That's why doctors often confirm with a *different* kind of test.\n\n**Where you are now**\n\nLook at how your predictions have gone: 85-90% (actually 67%), 80% (91%), 80% (48%), 90% (99%). Every time, the count fixed the guess. Your gut is still predicting from one side of the ratio, but your method is now reliable. Keep the habit of counting both boxes before you trust a number, and Bayes problems will stop catching you out."
+  }
+ ],
+ "usage": [],
+ "conv_id": "2b965973e5"
+}

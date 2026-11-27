@@ -1,0 +1,37 @@
+{
+ "id": "1c898683b4",
+ "scenario": "bigo",
+ "kind": "tutor",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's get you ready for it. Here's how I'll break Big-O down for interview prep:\n\n1. What Big-O actually means (upper bound, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops (sequential vs. nested, loops whose step isn't 1)\n4. Analyzing recursion (recursion trees, divide-and-conquer)\n5. Space complexity (including the call stack)\n6. Complexity of common data structures and algorithms (hash maps, heaps, sorting, BST operations)\n7. Amortized, best, worst, and average case (and Big-O vs. Big-Theta vs. Big-Omega)\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Then I'll show you a skill map and suggest where to start.\n\nQuestion 1: A function has one loop that runs n times. After it finishes, a second, separate loop runs n times, and inside that loop there's another loop that also runs n times. What's the Big-O of the whole function, and why?"
+  },
+  {
+   "role": "learner",
+   "text": "I think it's O(n^3). The nested part is already n^2, and since there's another loop over the array on top of that, you multiply by n again, same way two separate loops would give you n^2."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on whether that's right until the diagnostic is done, and we'll come back to it.\n\nQuestion 2: Here's a loop:\n\n    i = 1\n    while i < n:\n        i = i * 2\n\nHow many times does the loop body run as a function of n, and what's the Big-O?"
+  },
+  {
+   "role": "learner",
+   "text": "Since i doubles every time, it goes 1, 2, 4, 8... so it hits n after about log base 2 of n steps. So I'd say O(log n)."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Next one.\n\nQuestion 3: Here's a recursive function:\n\n    def f(n):\n        if n <= 1:\n            return 1\n        return f(n - 1) + f(n - 1)\n\nWhat's the time complexity of f(n), and what's its space complexity? Explain how you got each one."
+  },
+  {
+   "role": "learner",
+   "text": "Each call makes two more calls, so the number of calls doubles at every level and you get O(2^n) time. For space I'd also say O(2^n), since all those calls have to be stored somewhere."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to this one after the diagnostic too.\n\nQuestion 4: You append n items, one at a time, to a dynamic array (like a Python list or Java ArrayList). When the array is full, it allocates a new array twice the size and copies every existing element over. A single append can therefore cost O(n) when it triggers a resize. What's the total time to do all n appends, and what does that work out to per append? Explain your reasoning."
+  }
+ ],
+ "pending": null
+}

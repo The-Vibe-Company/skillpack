@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Although B opens with a lecture, it then has the learner enumerate 300 games and rebuild the case table themselves, which resolves the 50/50 misconception efficiently; A stays in a long diagnostic, raises the tension and never helps the learner resolve it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

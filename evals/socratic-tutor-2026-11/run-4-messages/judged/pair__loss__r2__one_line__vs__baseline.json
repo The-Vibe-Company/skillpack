@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both open with a lecture that corrects the misconception by fiat, but A then poses unanswered practice problems the learner reasons through and even holds them to an unfinished part, whereas B supplies answers alongside its check questions and drifts into lengthy portfolio advice where the learner does little reasoning."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

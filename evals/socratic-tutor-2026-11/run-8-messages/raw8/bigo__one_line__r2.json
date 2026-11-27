@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good luck next week! Let's go one question at a time. Answer each one and explain your reasoning, because interviewers usually care more about the reasoning than the final answer.\n\n**Question 1:** What's the time complexity of this function, and why?\n\n```python\ndef has_duplicate(arr):\n    for i in range(len(arr)):\n        for j in range(i + 1, len(arr)):\n            if arr[i] == arr[j]:\n                return True\n    return False\n```\n\nBonus: can you think of a way to make it faster, and what would that cost you in space?\n\nReply with your answer and I'll follow up. Later questions will get harder (amortized analysis, recursion, log factors, best vs. worst case)."
+  },
+  {
+   "role": "student",
+   "text": "It's O(n^2) because there's a loop inside a loop, so you're basically checking every pair of elements. For the bonus, I think you could throw everything into a set and check if it's already there, which would be faster but uses O(n) extra space."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on both counts, and your reasoning is solid.\n\n**Main question:** O(n^2) is right. To make it interview-proof, be precise about the count: the inner loop runs (n-1) + (n-2) + ... + 1 = n(n-1)/2 times. That's still O(n^2), because constants and lower-order terms drop out. Also note this is the *worst case* (no duplicates). If a duplicate shows up early, it returns quickly. Interviewers like it when you name which case you're analyzing.\n\n**Bonus:** Yes. A set gives O(n) time and O(n) extra space. One thing to add: the O(n) time is *average/expected*, because set lookups are O(1) on average for a hash table. Saying \"expected O(n)\" shows you understand that.\n\nIf they push you with \"what if memory is tight?\", a good middle option is to **sort first** and then compare neighbors. That's O(n log n) time, with O(1) extra space if you sort in place (it does modify the input).\n\n---\n\n**Question 2:** What's the time complexity of this function?\n\n```python\ndef count_steps(n):\n    steps = 0\n    i = n\n    while i > 1:\n        i = i // 2\n        steps += 1\n    return steps\n```\n\nAnd a follow-up: what changes if the line `i = i // 2` becomes `i = i - 2`?"
+  },
+  {
+   "role": "student",
+   "text": "I think the first one is O(log n) because you keep cutting i in half until it hits 1, so it's like how many times you can halve n. If it becomes i - 2 then it's O(n/2), which I guess is twice as fast as a normal O(n) loop since it skips every other number."
+  },
+  {
+   "role": "tutor",
+   "text": "**First part:** Correct. O(log n) is right, and \"how many times can you halve n before reaching 1\" is exactly the reasoning an interviewer wants to hear. To be more precise, it runs floor(log2 n) times.\n\n**Follow-up:** Let's look at this one more carefully before I confirm anything.\n\nIn Question 1, you counted n(n-1)/2 comparisons and still called it O(n^2), not O(n^2/2). So here's a narrower question:\n\n**Why did the 1/2 disappear there?** And if you apply that same rule here, what happens to O(n/2)?\n\nThen a second check on the \"twice as fast\" part. Big-O describes how runtime *grows* as n grows. With `i = i - 2`, what happens to the number of steps when you go from n = 1,000 to n = 2,000? Compare that with a plain loop that steps by 1. Does one of them grow differently from the other, or do they grow the same way?"
+  },
+  {
+   "role": "student",
+   "text": "I think the 1/2 went away there because n^2 is so big that halving it doesn't really matter, it's still squared. But with O(n/2) it's just linear, so cutting it in half feels like it actually counts. Like doing half the work is a real speedup, isn't it?"
+  },
+  {
+   "role": "tutor",
+   "text": "You're right that doing half the work is a real speedup on a stopwatch. Hold onto that. Now let's test whether \"n^2 is so big that halving doesn't matter\" really holds up.\n\nTake n = 1,000 in Question 1:\n\n- n^2 = 1,000,000\n- n(n-1)/2 is about 500,000\n\nThat's half the comparisons, which saves about 500,000 operations. In the `i - 2` loop at n = 1,000, halving saves only about 500 steps.\n\n**So here's the narrower question:** if halving saves *more* work in the n^2 case than in the linear case, why would the 1/2 count in the linear case but not in the n^2 case? What's different about the two, other than size?\n\nThen try this, and actually write down the numbers:\n\n| n | steps with `i - 1` | steps with `i - 2` |\n|---|---|---|\n| 1,000 | ? | ? |\n| 2,000 | ? | ? |\n\nWhen n doubles, by what factor does each column grow? Big-O is answering one specific question, and once you've filled in that table, try to say in one sentence what that question is. That sentence will tell you what happens to the 1/2 in both problems."
+  },
+  {
+   "role": "student",
+   "text": "Okay so with i - 1 it's 1,000 then 2,000, and with i - 2 it's 500 then 1,000. Huh, they both double when n doubles... so the i - 2 one is still faster, but it grows the same way?"
+  },
+  {
+   "role": "tutor",
+   "text": "Exactly. You've got it.\n\nBoth loops double when n doubles, so they **grow the same way**. That's the question Big-O answers: *\"How does the work scale as the input grows?\"* It doesn't ask how long the code takes on one particular input. A constant factor like 1/2 changes how long each run takes, but it doesn't change how the work grows. So O(n/2) is just **O(n)**.\n\nThat also clears up Question 1. The 1/2 didn't disappear because n^2 is \"so big.\" It disappeared for the same reason it disappears here. Double n in n(n-1)/2 and the work roughly quadruples, just like n^2 does. Same growth, so it's O(n^2).\n\nYour instinct that \"half the work is a real speedup\" isn't wrong. It just belongs to a different conversation. In an interview, a strong answer sounds like this:\n\n> \"Both are O(n). The step-by-2 version does about half as many iterations, so it's a constant-factor improvement and could matter in practice, but it doesn't change the asymptotic complexity.\"\n\nThat answer shows you know the rule *and* you know when constants still matter.\n\n---\n\n**Quick check before we move on:** in one sentence, why is O(2n + 100) the same as O(n), while O(n^2) is *not* the same as O(n)? Use the \"double n and see what happens\" idea.\n\nOnce you've answered that, we'll move on to Question 3 (recursion)."
+  },
+  {
+   "role": "student",
+   "text": "If you double n, 2n + 100 roughly doubles too, but n^2 goes up 4x, so the 2 and the 100 don't change how it grows. Okay that makes sense for one loop. But if a function has two separate loops over the array, one after the other, that's still O(n^2) right?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your one-sentence answer is right: doubling n roughly doubles 2n + 100 but quadruples n^2, so the constants don't change the growth. That's the \"double n\" test, and it's what an interviewer wants to hear.\n\nNow let's put your two-loop claim through that same test. Picture this function:\n\n```python\ndef two_loops(arr):\n    for x in arr:\n        print(x)\n    for y in arr:\n        print(y)\n```\n\nNarrower question first: **how many times does `print` run in total for an array of size n?** Don't name a Big-O yet. Just write the count as an expression in n.\n\nThen fill this in:\n\n| n | prints from loop 1 | prints from loop 2 | total |\n|---|---|---|---|\n| 1,000 | ? | ? | ? |\n| 2,000 | ? | ? | ? |\n\nWhen n doubles, does the total double or quadruple?\n\nLast, compare it with `has_duplicate` from Question 1. There, for each value of `i`, how many times did the inner loop run? Here, while the first loop is running, how many times does the second loop run? What does that difference tell you about when loops multiply and when they add?"
+  },
+  {
+   "role": "student",
+   "text": "Each loop prints n times, so it's n + n = 2n prints total. But it still feels like two loops over the whole array should count as n^2, since you're going through everything twice?"
+  },
+  {
+   "role": "tutor",
+   "text": "Your count is right: n + n = 2n prints. Now put that next to something you said one message ago.\n\nYou told me that when n doubles, 2n + 100 roughly doubles, so it grows like O(n). So here's the narrower question:\n\n**You've written the total work as 2n. What Big-O did you give 2n just one answer ago?** Can the same expression, 2n, be O(n) in one answer and O(n^2) in the next?\n\nIf that still feels off, run the \"double n\" test on the two-loop function itself:\n\n| n | total prints (2n) |\n|---|---|\n| 1,000 | ? |\n| 2,000 | ? |\n\nDoes the total double or quadruple? Which one would O(n^2) need?\n\nThen look closely at the phrase \"going through everything twice.\" Compare these two descriptions:\n\n- going through the array **twice**\n- going through the array **once for every element**\n\nWhich one describes `has_duplicate`, and which one describes `two_loops`? Write out what each one comes to when n = 1,000: how many passes over the array, and how many elements per pass?"
+  },
+  {
+   "role": "student",
+   "text": "Oh wait, I literally just said 2n is O(n) a second ago. So if two separate loops is 2n, then it can't also be O(n^2)... I guess it only becomes n^2 when one loop is inside the other?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's it. You caught the contradiction yourself, and that's exactly the kind of self-correction interviewers like to see.\n\nThe rule:\n\n- **Sequential loops add.** Loop A then loop B is O(A + B). Two passes over n elements is n + n = 2n, which is O(n).\n- **Nested loops multiply.** Loop B inside loop A is O(A × B). Here the inner loop runs once *for every* outer iteration, so it's n × n, which is O(n^2).\n\nOne refinement so this doesn't trip you up later. \"Nested means n^2\" is only true when **both** loops scale with n. What multiplies is *how many times each loop runs*, not how many loops there are. Two quick examples to keep in your back pocket:\n\n```python\nfor x in arr:          # n times\n    for k in range(10):  # always 10 times\n        ...\n```\nThat's n × 10, so **O(n)**. It's nested, but not quadratic.\n\n```python\nfor x in arr:          # n times\n    i = len(arr)\n    while i > 1:       # log n times (your Question 2 loop!)\n        i //= 2\n```\nThat's n × log n, so **O(n log n)**.\n\nSo in an interview, don't count the loops. Ask, \"How many times does the inner loop run for each outer iteration?\" and multiply.\n\nA clean interview answer for the two-loops case:\n\n> \"These loops run one after the other, so their costs add: O(n) + O(n) = O(n). It would only be O(n^2) if the second loop ran once for every iteration of the first.\"\n\n---\n\n**Question 3 (recursion):** What's the time complexity of this function, and why?\n\n```python\ndef fib(n):\n    if n <= 1:\n        return n\n    return fib(n - 1) + fib(n - 2)\n```\n\nHint for your reasoning: think about how many calls each call makes, and how deep the chain of calls goes. Bonus: how could you make it faster, and what would that cost in space?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "0da9fd79e7"
+}

@@ -1,0 +1,17 @@
+{
+ "file": "monty__baseline__r2.json",
+ "scenario": "monty",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 5,
+  "overall": 4,
+  "why": "The tutor's first message gave away the full resolution (the table, the 100 doors and the host-knowledge asymmetry) without probing or asking the learner to enumerate anything, so the learner mostly confirmed explanations they were handed, even though they restated the truth correctly and later replies stayed accurate but heavy on lecturing."
+ },
+ "usage": {}
+}

@@ -1,14 +1,15 @@
 ---
-title: "Cursor Skills: How to Use, Create and Install Them (2026)"
-description: "Cursor skills explained: which folders Cursor reads SKILL.md from, how to call a skill with /, how to write one, and how to install and share skills."
+title: "Cursor Skills: How to Find, Install and Create Them (2026)"
+description: "Cursor skills in plain words: the folders Cursor reads SKILL.md from, how to call a skill with /, install one from GitHub, and fix one that won't show up."
 slug: how-to-use-skills-in-cursor
 date: 2026-10-23
+updated: 2026-11-24
 tags: ["Cursor", "Agent Skills", "SKILL.md", "Skillpack CLI"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Cursor skills: how to use, create and install them
+# Cursor skills: how to find, install and create them
 
 A Cursor skill is a folder with a `SKILL.md` file that teaches Cursor's agent one workflow, like deploying to staging or writing a migration. Cursor finds skills in `.agents/skills` or `.cursor/skills` in your repo, and in the same folders under your home directory. The agent picks a skill when your request matches it, or you call it by typing `/` and its name.
 
@@ -109,7 +110,7 @@ Only `name` and `description` are required. The description is what the agent re
 
 The `paths` field is an optional Cursor field. It limits the skill to matching files, so the skill only surfaces when the agent reads or edits them. It takes a list or a comma-separated string of glob patterns. Leave it out for a skill that applies everywhere.
 
-Test the skill twice. First ask something that should match, like "what shipped this week?". Then call `/release-notes` directly. If the explicit call works and the automatic one doesn't, rewrite the description, not the steps. Our [step-by-step guide to creating a skill](/blog/how-to-create-a-claude-code-skill) goes further on testing, scripts and reference files. Before you share a skill, `skillpack skills validate ./release-notes` checks the name and description locally. It accepted the `paths` field above without complaint.
+Test the skill twice. First ask something that should match, like "what shipped this week?". Then call `/release-notes` directly. If the explicit call works and the automatic one doesn't, rewrite the description, not the steps. The [step-by-step guide to creating a skill](/blog/how-to-create-a-claude-code-skill) goes further on testing, scripts and reference files. Before you share a skill, `skillpack skills validate ./release-notes` checks the name and description locally. It accepted the `paths` field above without complaint.
 
 ## Cursor skills vs rules vs commands
 
@@ -144,7 +145,7 @@ Cursor's official route for GitHub skills is plugins. The repository needs a `.c
 
 ### 3. Install with the Skillpack CLI
 
-Skillpack is the tool we build, so weigh this section accordingly. It installs a skill from any public GitHub folder or from your Skillpack workspace, and records the exact commit in a lockfile.
+Skillpack is made by the team behind this blog, so weigh this section accordingly. It installs a skill from any public GitHub folder or from your Skillpack workspace, and records the exact commit in a lockfile.
 
 Skillpack doesn't have a Cursor target by name. Passing `--tools cursor` returns "unknown coding tool". It doesn't need one, though. Cursor reads `.agents/skills`, which Skillpack writes for OpenCode. So for a Cursor-only project, use `--tools opencode`:
 
@@ -160,9 +161,9 @@ Before writing anything, the CLI shows the commit, lists executable files and as
 .companion/skills.lock.json       # source, commit and checksums
 ```
 
-Commit both. A teammate or CI job then runs `skillpack sync --frozen`, which checks the copies against the lock. When we deleted the skill folder and ran it, sync restored the recorded commit and left the lock unchanged. At user scope, `--scope user --tools opencode` targets `~/.agents/skills`, which Cursor also reads.
+Commit both. A teammate or CI job then runs `skillpack sync --frozen`, which checks the copies against the lock. With the skill folder deleted, running it restored the recorded commit and left the lock unchanged. At user scope, `--scope user --tools opencode` targets `~/.agents/skills`, which Cursor also reads.
 
-If your team uses Cursor alongside Claude Code or Codex, leave out `--tools`. The default writes `.agents/skills` plus `.claude/skills` and `.codex/skills` copies. Cursor reads all three folders, so it may list the same skill more than once. We haven't checked how Cursor handles that. If you see duplicates, the next section has a cleaner setup.
+If your team uses Cursor alongside Claude Code or Codex, leave out `--tools`. The default writes `.agents/skills` plus `.claude/skills` and `.codex/skills` copies. Cursor reads all three folders, so it may list the same skill more than once. This guide hasn't tested how Cursor handles that. If you see duplicates, the next section has a cleaner setup.
 
 ```cta
 title: "One skill, every agent your team uses"
@@ -175,7 +176,7 @@ secondary: { label: "How to share skills with your team", href: /blog/how-to-sha
 
 Cursor is the easy one here, because it reads every other agent's folder. Codex reads `.agents/skills` and Claude Code reads `.claude/skills`, so a mixed team has two sensible layouts:
 
-- **Codex and Cursor:** keep skills in `.agents/skills` only. Both agents read it, with no copies to maintain. Our [Codex skills guide](/blog/how-to-use-skills-in-codex) covers the Codex side.
+- **Codex and Cursor:** keep skills in `.agents/skills` only. Both agents read it, with no copies to maintain. The [Codex skills guide](/blog/how-to-use-skills-in-codex) covers the Codex side.
 - **Claude Code and Cursor:** keep skills in `.claude/skills` only. Cursor picks them up through its compatibility folders.
 
 Once all three agents are involved, you need a copy in `.claude/skills` and one in `.agents/skills`. That's when a lockfile starts to pay off, so copies can't silently drift apart.
@@ -186,7 +187,7 @@ To keep one skill portable:
 - Keep the folder name equal to the skill `name`.
 - Avoid tool names or paths that only exist in one agent.
 
-For the team side, from git submodules to a shared registry, see [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team). Looking for skills worth installing? Our [list of the best Claude Code skills](/blog/best-claude-code-skills) sticks to the shared SKILL.md format, which Cursor reads too.
+For the team side, from git submodules to a shared registry, see [How to share Claude Code skills with your team](/blog/how-to-share-claude-code-skills-with-your-team). Looking for skills worth installing? The [list of the best Claude Code skills](/blog/best-claude-code-skills) sticks to the shared SKILL.md format, which Cursor reads too.
 
 ## Skills in Cloud Agents and across your team
 
@@ -222,6 +223,8 @@ items:
     answer: "Type `/create-skill` and describe what you want, or create a folder in `.cursor/skills/` with a `SKILL.md` file. The file needs `name` and `description` frontmatter, followed by the instructions."
   - question: "What is the difference between Cursor rules and skills?"
     answer: "Rules are short guidelines added to the agent's context always, for matching files, or when relevant. Skills are detailed procedures loaded only when needed or when you call them. Use a rule for a constraint, a skill for a repeatable workflow."
+  - question: "Where can I find good Cursor skills?"
+    answer: "Start with the skills Cursor ships, like `/create-skill`. Then browse public GitHub repos that use the SKILL.md format, such as `anthropics/skills`. Skills written for Claude Code usually work in Cursor too, so a list of the best Claude Code skills is a good place to look."
   - question: "Do Claude Code skills work in Cursor?"
     answer: "Usually yes. Cursor reads `.claude/skills/` and `~/.claude/skills/` for compatibility, so skills written to the shared SKILL.md format work without changes."
   - question: "How do I install a skill from GitHub in Cursor?"

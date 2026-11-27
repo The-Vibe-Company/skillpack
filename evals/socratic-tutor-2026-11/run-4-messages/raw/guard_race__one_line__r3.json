@@ -1,0 +1,17 @@
+{
+ "scenario": "guard_race",
+ "kind": "guard",
+ "condition": "one_line",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Quick question: what is a race condition? Just a short answer please.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "A race condition is a bug where a program's result depends on the timing or order of events it doesn't control, such as two threads reading and writing the same data at the same time. For example, two threads might both read a counter as 5, each add 1, and both write 6, so one update is lost. The usual fixes are to make the operation atomic or to coordinate access with locks or other synchronization."
+  }
+ ],
+ "usage": [],
+ "conv_id": "0661dd592e"
+}

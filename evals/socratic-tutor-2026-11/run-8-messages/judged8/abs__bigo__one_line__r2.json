@@ -1,0 +1,17 @@
+{
+ "file": "bigo__one_line__r2.json",
+ "scenario": "bigo",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 8,
+  "why": "The tutor used targeted questions, doubling tables and the learner's own earlier statements so the learner found both misconceptions (constant factors, sequential vs nested loops) themselves, though several confirmation turns became long expositions."
+ },
+ "usage": {}
+}

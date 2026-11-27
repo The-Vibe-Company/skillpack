@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B has the learner do the reasoning and brings the misconception into the open through targeted diagnostic questions, while A lectures and corrects it by fiat with a long info dump, though B is slow and has not resolved the misconception yet."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

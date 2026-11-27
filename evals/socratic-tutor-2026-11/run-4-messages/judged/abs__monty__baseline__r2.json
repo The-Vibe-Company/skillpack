@@ -1,0 +1,17 @@
+{
+ "file": "monty__baseline__r2.json",
+ "scenario": "monty",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 4,
+  "why": "The tutor's explanations were accurate and well chosen (case table, 100 doors, the host's knowledge), but the first message gave the whole resolution in one lecture without asking what the learner already thought, so the learner only confirmed reasoning they had been handed instead of building it themselves."
+ },
+ "usage": {}
+}

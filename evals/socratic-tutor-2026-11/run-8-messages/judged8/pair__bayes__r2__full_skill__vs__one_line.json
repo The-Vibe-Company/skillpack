@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A brings out the base-rate-neglect misconception by having the learner count to 9/108 themselves, then guides them to tell P(pos|disease) from P(disease|pos); B opens by lecturing the formula and handing over the classic answer, and its later turns are long and lecture-heavy despite good count-based prompting."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

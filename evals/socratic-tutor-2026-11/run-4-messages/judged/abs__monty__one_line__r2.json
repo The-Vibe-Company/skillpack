@@ -1,0 +1,17 @@
+{
+ "file": "monty__one_line__r2.json",
+ "scenario": "monty",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 2,
+  "overall": 6,
+  "why": "The tutor gave away the full table, the host-information argument, and the 100-door analogy before asking what the learner thought; the 300-games questioning that followed was strong Socratic work that got the learner to reconstruct the 2/3 result and the host's constraint himself, but the tutor then lectured again at the end."
+ },
+ "usage": {}
+}

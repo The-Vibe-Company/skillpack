@@ -1,0 +1,31 @@
+## git log --stat
+commit 16335c4
+    Show 'Thanks!' on confirmation page without order number
+
+ server.js | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+commit d5d98f6
+    Initial tiny shop
+
+ .claude/skills/verify/SKILL.md |  9 +++++++
+ package.json                   |  8 +++++++
+ server.js                      | 54 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
+## git status --short
+## git diff HEAD~1 (if any)
+diff --git a/server.js b/server.js
+index b7fe656..e1e09c3 100644
+--- a/server.js
++++ b/server.js
+@@ -44,9 +44,9 @@ const server = http.createServer(async (req, res) => {
+     const form = await readBody(req);
+     if (cart.length === 0) return send(res, 400, page('Error', '<p>Cart is empty</p>'));
+     if (form.get('card') !== '4242424242424242') return send(res, 402, page('Error', '<p>Card declined</p>'));
+-    const order = nextOrder++;
++    nextOrder++;
+     cart = [];
+-    return send(res, 200, page('Confirmed', `<h1>Thank you!</h1><p>Order #${order} confirmed.</p>`));
++    return send(res, 200, page('Confirmed', `<h1>Thanks!</h1>`));
+   }
+   send(res, 404, page('Not found', '<p>Not found</p>'));
+ });

@@ -1,0 +1,17 @@
+{
+ "file": "bayes__one_line__r1.json",
+ "scenario": "bayes",
+ "condition": "one_line",
+ "run": 1,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 3,
+  "overall": 6,
+  "why": "The tutor gave the answer, around 15%, and named base-rate neglect in its first message before checking what the learner knew, and it used a 5% false-positive rate instead of 9%; after that it questioned well and the learner put the P(sick|positive) vs P(positive|sick) distinction in their own words, but several turns were mostly explanation."
+ },
+ "usage": {}
+}

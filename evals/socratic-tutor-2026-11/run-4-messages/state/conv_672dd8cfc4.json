@@ -1,0 +1,37 @@
+{
+ "id": "672dd8cfc4",
+ "scenario": "rebase",
+ "kind": "tutor",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. I'll ask one question at a time. Answer in your own words, and when something doesn't add up I'll push back with a narrower question instead of just giving you the answer.\n\nHere's the setup we'll keep coming back to:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\nYou're on `feature` and you want C in your branch.\n\n**Question 1:** If you run `git merge main` from `feature`, what does the history look like afterward? Specifically:\n- Do commits D and E still exist with the same commit hashes?\n- Is there a new commit? If so, how many parents does it have, and which commits are they?\n\nSketch the graph if you can, even roughly. Then we'll do the same thing with `git rebase main` and compare."
+  },
+  {
+   "role": "learner",
+   "text": "With merge, D and E stay exactly the same hashes, and you get a new merge commit M on top of E with two parents, E and C. So it's like A-B-C on main, D-E on feature, and M joining E and C."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct. D and E keep their original hashes, and M has two parents, E and C:\n\n```\nmain:     A---B---C\n               \\   \\\nfeature:        D---E---M\n```\n\nThe main thing to notice is that merge only adds to history. Nothing that already existed gets changed.\n\n**Question 2:** Start from the original setup again (before the merge). On `feature` you run `git rebase main` instead.\n\n- What does the graph look like afterward?\n- Do D and E still have their original hashes? If not, why not? Think about what a commit hash is computed from.\n- Is there a merge commit this time?"
+  },
+  {
+   "role": "learner",
+   "text": "With rebase it'd look like A-B-C-D-E in a straight line, no merge commit. D and E keep the same hashes though, rebase just picks up the feature branch pointer and moves it so it starts from C instead of B. That's why I figured it's fine to rebase even after pushing, nothing actually changes about the commits."
+  },
+  {
+   "role": "tutor",
+   "text": "You've got the shape right: a straight line, A-B-C-D-E, with no merge commit. Before we get to pushing, though, I want to check the hash part with two narrower questions.\n\n**Question 2a:** A commit stores a snapshot of the tree, an author, a message, and one more thing that links it into history. What's that last thing? For D in the original graph, what is its value?\n\n**Question 2b:** Now look at your rebased graph, `A---B---C---D---E`. In that line, what is D's value for the same field?\n\nCompare your two answers. Then tell me whether D can still have the same hash, given that a hash is computed from the commit's contents. Once you've worked that out, we'll come back to whether rebasing after a push is \"fine.\""
+  },
+  {
+   "role": "learner",
+   "text": "That'd be the parent commit, right? In the original graph D's parent is B."
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. Every commit records its parent (or parents), and in the original graph D's parent is B.\n\nThat's half of it. Now finish the comparison:\n\n**Question 2b:** In your rebased line, `A---B---C---D---E`, what is D's parent?\n\nOnce you have that, put the two answers side by side. D's parent is part of what gets hashed. If it changed, can D's hash be the same? And if D's hash changes, what happens to E's parent, and so to E's hash?"
+  }
+ ],
+ "pending": null
+}

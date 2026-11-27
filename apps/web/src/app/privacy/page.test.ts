@@ -3,7 +3,7 @@
 import React, { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
-import PrivacyPage from "./page";
+import PrivacyPage, { metadata } from "./page";
 
 // SAFETY: React's test harness reads this documented global flag; the test owns its boolean value.
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -32,10 +32,10 @@ describe("public privacy page", () => {
     const paragraphs = Array.from(container.querySelectorAll(".v10-privacy__section p"));
     const disclosures = [
       "When you connect the Gmail integration, Skillpack requests exactly two OAuth scopes and no others: gmail.readonly (read your mailbox) and gmail.compose (create drafts). No Gmail send, delete or modify permission is ever requested, and no other Google service is accessed.",
-      "These permissions are used solely to let your AI assistant, at your direction: search and read email threads to answer questions and summarize conversations; and create drafts in your own mailbox for you to review and send yourself. Skillpack never sends email on your behalf — drafts are created in your own Gmail mailbox and you send them yourself.",
+      "These permissions are used solely to let your AI assistant, at your direction: search and read email threads to answer questions and summarize conversations; and create drafts in your own mailbox for you to review and send yourself. Skillpack never sends email on your behalf: drafts are created in your own Gmail mailbox and you send them yourself.",
       "Your Gmail data is accessed directly from Google's Gmail API through Google's hosted Gmail endpoint. It is never sold, rented, shared, transferred, or disclosed to any third party other than Google. It is never used to train machine learning models, never used for advertising, and never combined with other data. The only copy of Gmail content that exists outside Google is inside your private Skillpack conversation transcript, which is visible only to you and workspace members you explicitly invite, and is never shared.",
-      "Your OAuth access and refresh tokens are stored encrypted at rest using envelope encryption, are never returned by any API, and are never logged. All data access is scoped by organization with forced row-level security and least-privilege database roles. All transport uses TLS. You can revoke access at any time by disconnecting the Gmail integration in Skillpack settings or via your Google Account permissions page — revocation deletes stored credentials immediately.",
-      "OAuth credentials are retained only while the Gmail integration remains connected. Disconnecting the integration — or revoking access from your Google Account permissions page — deletes stored credentials from our systems immediately and permanently. Gmail content referenced in a conversation transcript is retained only as long as your Skillpack conversation exists, and is permanently deleted when you delete the companion or the conversation. Deleting your account deletes all associated data, including stored credentials and transcripts.",
+      "Your OAuth access and refresh tokens are stored encrypted at rest using envelope encryption, are never returned by any API, and are never logged. All data access is scoped by organization with forced row-level security and least-privilege database roles. All transport uses TLS. You can revoke access at any time by disconnecting the Gmail integration in Skillpack settings or via your Google Account permissions page: revocation deletes stored credentials immediately.",
+      "OAuth credentials are retained only while the Gmail integration remains connected. Disconnecting the integration (or revoking access from your Google Account permissions page) deletes stored credentials from our systems immediately and permanently. Gmail content referenced in a conversation transcript is retained only as long as your Skillpack conversation exists, and is permanently deleted when you delete the companion or the conversation. Deleting your account deletes all associated data, including stored credentials and transcripts.",
     ];
 
     expect(paragraphs.map((paragraph) => paragraph.textContent)).toEqual(
@@ -50,5 +50,35 @@ describe("public privacy page", () => {
         (link) => link.textContent?.trim() === "Back to Skillpack",
       ),
     ).toBe(true);
+  });
+
+  it("renders one JSON-LD WebPage with a breadcrumb", async () => {
+    const container = await renderPrivacy();
+    const scripts = container.querySelectorAll('script[type="application/ld+json"]');
+    expect(scripts).toHaveLength(1);
+
+    const data = JSON.parse(scripts[0]?.textContent ?? "");
+    const graph = data["@graph"];
+    const page = graph.find((node: { "@type": string }) => node["@type"] === "WebPage");
+    const crumbs = graph.find((node: { "@type": string }) => node["@type"] === "BreadcrumbList");
+
+    expect(page).toMatchObject({
+      name: "Privacy Policy",
+      description: metadata.description,
+      isPartOf: { "@id": "https://skillpack.app/#website" },
+      publisher: { "@id": "https://skillpack.app/#org" },
+    });
+    expect(page?.url).toMatch(/\/privacy$/);
+    expect(crumbs?.itemListElement.map((crumb: { name: string }) => crumb.name)).toEqual([
+      "Home",
+      "Privacy Policy",
+    ]);
+  });
+
+  it("has a descriptive meta description without em or en dashes", () => {
+    const description = String(metadata.description);
+    expect(description.length).toBeGreaterThanOrEqual(140);
+    expect(description.length).toBeLessThanOrEqual(160);
+    expect(description).not.toMatch(/[\u2013\u2014]/);
   });
 });

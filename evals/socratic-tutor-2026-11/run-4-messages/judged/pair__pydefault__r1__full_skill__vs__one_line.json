@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A has the learner predict the output first, so the fresh-list misconception (and a late-binding one) comes out in the learner's own words; B opens with a lecture that states the answer by fiat, so the learner just confirms what was already explained."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

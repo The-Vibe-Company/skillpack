@@ -23,6 +23,7 @@ export function RankingHeader({
   authorRole,
   date,
   dataCollected,
+  updated,
   minutes,
   tags,
 }: {
@@ -34,6 +35,7 @@ export function RankingHeader({
   authorRole?: string;
   date: string;
   dataCollected?: string;
+  updated?: string;
   minutes: number;
   tags: readonly string[];
 }) {
@@ -61,7 +63,7 @@ export function RankingHeader({
           <BlockMarkdown>{lead}</BlockMarkdown>
         </div>
       ) : null}
-      <PostMeta date={date} minutes={minutes} author={author} authorRole={authorRole} dataCollected={dataCollected} />
+      <PostMeta date={date} minutes={minutes} author={author} authorRole={authorRole} dataCollected={dataCollected} updated={updated} />
       <TagList tags={tags} />
     </header>
   );

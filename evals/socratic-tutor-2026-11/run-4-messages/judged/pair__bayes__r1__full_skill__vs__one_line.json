@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Although B front-loads a lecture and reveals the answer, it then uses targeted Socratic questions that lead the learner to surface and resolve the base-rate/direction misconception with counts, whereas A stays in a rigid diagnostic, withholds all feedback, and never addresses the misconception."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

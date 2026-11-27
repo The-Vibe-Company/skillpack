@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__full_skill__r2.json",
+ "scenario": "sqljoin",
+ "condition": "full_skill",
+ "run": 2,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 8,
+  "why": "The tutor ran a careful diagnostic and gave only the ON-before-WHERE evaluation-order fact, so the learner found on their own that WHERE drops Ben's NULL-extended row; the transcript ends before the learner explains why the ON filter keeps all left rows."
+ },
+ "usage": {}
+}

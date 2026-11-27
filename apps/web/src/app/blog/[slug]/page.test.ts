@@ -10,6 +10,7 @@ import BlogPostPage, { dynamicParams, generateMetadata, generateStaticParams } f
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const SLUG = "what-is-skill-md";
+const UPDATED_SLUG = "claude-code-subagents-vs-skills";
 const roots: Root[] = [];
 
 function routeProps(slug: string) {
@@ -60,8 +61,14 @@ describe("public blog post page", () => {
     ]);
 
     const meta = header?.querySelector(".v10-postmeta");
-    expect(meta?.querySelector(".v10-postmeta__author")?.textContent).toBe("By The Vibe Company");
-    expect(meta?.querySelector(".v10-postmeta__author a")?.getAttribute("href")).toBe("https://thevibecompany.co");
+    expect(meta?.querySelector(".v10-postmeta__author")?.textContent).toBe(
+      "By Stan Girard, co-founder of The Vibe Company, which builds Skillpack",
+    );
+    expect(meta?.querySelector(".v10-postmeta__author a")?.textContent).toBe("Stan Girard");
+    expect(meta?.querySelector(".v10-postmeta__author a")?.getAttribute("href")).toBe("https://www.thevibecompany.co/en/about");
+    const avatar = meta?.querySelector(".v10-postmeta__author img");
+    expect(avatar?.getAttribute("src")).toBe("/images/authors/stan.webp");
+    expect(avatar?.getAttribute("alt")).toBe("Stan Girard");
     expect(meta?.querySelector("time")?.getAttribute("datetime")).toBe("2026-10-13");
     expect(meta?.textContent).toMatch(/\d+ min read$/);
     expect(Array.from(header?.querySelectorAll(".v10-tags li") ?? []).map((tag) => tag.textContent)).toEqual([
@@ -148,7 +155,14 @@ describe("public blog post page", () => {
         mainEntityOfPage: "https://skillpack.app/blog/what-is-skill-md",
         image: "https://skillpack.app/blog/what-is-skill-md/opengraph-image",
         keywords: ["SKILL.md", "Agent Skills"],
-        author: { "@type": "Organization", name: "The Vibe Company", url: "https://thevibecompany.co" },
+        author: {
+          "@type": "Person",
+          name: "Stan Girard",
+          url: "https://www.thevibecompany.co/en/about",
+          image: "https://skillpack.app/images/authors/stan-400.webp",
+          jobTitle: "Co-founder",
+          sameAs: ["https://www.linkedin.com/in/stan-girard/", "https://x.com/_stangirard", "https://github.com/StanGirard"],
+        },
         publisher: {
           "@type": "Organization",
           "@id": "https://skillpack.app/#org",
@@ -172,6 +186,32 @@ describe("public blog post page", () => {
     ]);
   });
 
+  it("shows the revision day in the byline and states dateModified for an updated post", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("COMPANION_WEB_URL", "https://skillpack.app");
+    const container = await renderPost(UPDATED_SLUG);
+    const header = container.querySelector(".v10-post__header");
+
+    expect(Array.from(header?.querySelectorAll(".v10-postmeta time") ?? []).map((time) => time.parentElement?.textContent)).toEqual([
+      "Published October 27, 2026",
+      "Updated November 23, 2026",
+    ]);
+    expect(Array.from(header?.querySelectorAll(".v10-postmeta time") ?? []).map((time) => time.getAttribute("dateTime"))).toEqual([
+      "2026-10-27",
+      "2026-11-23",
+    ]);
+    const data = JSON.parse(container.querySelector("script[type='application/ld+json']")?.textContent ?? "{}");
+    expect(data["@graph"][0]).toMatchObject({ datePublished: "2026-10-27", dateModified: "2026-11-23" });
+  });
+
+  it("leaves dateModified and the Updated label out for a post that was never revised", async () => {
+    const container = await renderPost(SLUG);
+    const data = JSON.parse(container.querySelector("script[type='application/ld+json']")?.textContent ?? "{}");
+
+    expect(data["@graph"][0]).not.toHaveProperty("dateModified");
+    expect(container.querySelector(".v10-post__header .v10-postmeta")?.textContent).not.toContain("Updated");
+  });
+
   it("gives each post its own title, description, canonical and article Open Graph data", async () => {
     const metadata = await generateMetadata(routeProps(SLUG));
 
@@ -183,7 +223,7 @@ describe("public blog post page", () => {
       type: "article",
       publishedTime: "2026-10-13",
       title: "SKILL.md Format: Specification, Fields and Examples (2026)",
-      authors: ["The Vibe Company"],
+      authors: ["Stan Girard"],
       tags: ["SKILL.md", "Agent Skills"],
     });
     // Open Graph gets the generated image from ./opengraph-image.tsx; X is pointed at the same file.

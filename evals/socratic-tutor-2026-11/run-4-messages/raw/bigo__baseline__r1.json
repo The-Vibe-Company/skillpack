@@ -1,0 +1,41 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it! I'll ask one question at a time. You answer, then I'll tell you if you're right, explain why, and give you the next one. The questions get harder as we go.\n\n**Question 1 (warm-up):**\nWhat is the time complexity of this function?\n\n```python\ndef find_max(arr):\n    best = arr[0]\n    for x in arr:\n        if x > best:\n            best = x\n    return best\n```\n\nGive the Big-O and a one-sentence reason. That's good practice for interviews, because they usually care about your reasoning as much as the answer.\n\nHere's what's coming so you know what to expect:\n- Nested loops, and loops where the inner bound depends on the outer one\n- Logarithmic patterns (binary search, halving loops)\n- Recursion (naive Fibonacci, merge sort)\n- Space complexity\n- Amortized analysis (dynamic array appends, hash tables)\n- Common trick questions (e.g., O(2n) vs O(n), O(n + m) vs O(n²))\n\nIf you want to focus on one of those, or you'd rather get several questions at once, just say so. Go ahead with Question 1 when you're ready!"
+  },
+  {
+   "role": "student",
+   "text": "O(n), because it just goes through the array once and checks each element. Easy one, hit me with something harder!"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct! **O(n)**: the loop touches each element once and does constant work per element. Your reason was clear and to the point, which is what interviewers like to hear. One small extra you could mention: it's O(1) space, since it only keeps one variable no matter how big the array is.\n\nLet's step it up.\n\n**Question 2 (nested loops):**\nWhat is the time complexity of this function?\n\n```python\ndef count_pairs(arr):\n    n = len(arr)\n    count = 0\n    for i in range(n):\n        for j in range(i + 1, n):\n            if arr[i] + arr[j] == 0:\n                count += 1\n    return count\n```\n\nWatch out: the inner loop doesn't run n times on every pass. Give the Big-O and explain how you got there. Bonus points if you can say roughly how many times the `if` check actually runs."
+  },
+  {
+   "role": "student",
+   "text": "O(n^2), because it's a loop inside a loop so you're basically checking every pair of elements. The inner loop shrinks each time, so I think the if runs about n*(n-1)/2 times, but you drop the constant so it's still n squared."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on both counts! **O(n²)**, and your count is exactly right: the `if` runs **n(n-1)/2** times.\n\nHere's where that number comes from, in case they ask you to show it. When i = 0, the inner loop runs n-1 times. When i = 1, it runs n-2 times. This keeps going down to 0. So the total is (n-1) + (n-2) + ... + 1 + 0 = n(n-1)/2, which is (n² - n)/2. Drop the constant 1/2 and the smaller n term, and you get O(n²).\n\nOne thing to tighten in your wording: \"a loop inside a loop\" doesn't always mean O(n²). For example, if the inner loop always ran 5 times, the whole thing would be O(n). The real reason is that the number of pairs grows like n². You got there anyway by counting, and counting is the habit interviewers want to see.\n\n**Question 3 (logarithmic):**\nWhat is the time complexity of this function?\n\n```python\ndef count_halvings(n):\n    steps = 0\n    while n > 1:\n        n = n // 2\n        steps += 1\n    return steps\n```\n\nGive the Big-O and your reasoning. Follow-up for bonus points: what changes (if anything) if the line were `n = n // 3` instead?"
+  },
+  {
+   "role": "student",
+   "text": "O(log n), because n gets cut in half every time so it only takes like log2(n) steps to get down to 1. If it was // 3 I think it'd be log base 3, which is a bit faster, but I'm not sure if that counts as a different Big-O or not."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct! **O(log n)**. Each pass halves n, so after k steps n has become n / 2^k. The loop stops when that reaches 1, which happens when k = log₂(n).\n\nOn your follow-up: with `// 3` it's still **O(log n)**, not a different Big-O. Your instinct that it's \"a bit faster\" is right, because it takes about log₃(n) steps instead of log₂(n). But every log base differs from every other base only by a constant factor:\n\nlog₃(n) = log₂(n) / log₂(3) ≈ 0.63 · log₂(n)\n\nBig-O drops constant factors, so log₂(n), log₃(n) and log₁₀(n) all count as O(log n). That's why people usually leave the base off. Halving, cutting into thirds, or dividing by 10 each step all give logarithmic time. If they ask you this in an interview, the change-of-base formula above is a great one-line answer.\n\nYou're 3 for 3. Now we move into recursion.\n\n**Question 4 (recursion):**\nWhat is the time complexity of this function?\n\n```python\ndef fib(n):\n    if n <= 1:\n        return n\n    return fib(n - 1) + fib(n - 2)\n```\n\nGive the Big-O and your reasoning. Hint: try drawing the tree of calls for something like `fib(5)` and see how it grows. Bonus: what's the **space** complexity? (Careful, it isn't the same as the time.)"
+  }
+ ],
+ "usage": [],
+ "conv_id": "9c12193ac3"
+}

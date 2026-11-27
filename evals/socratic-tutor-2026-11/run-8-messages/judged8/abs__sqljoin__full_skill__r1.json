@@ -1,0 +1,17 @@
+{
+ "file": "sqljoin__full_skill__r1.json",
+ "scenario": "sqljoin",
+ "condition": "full_skill",
+ "run": 1,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": true,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 8,
+  "why": "The tutor ran a clean diagnostic, held back the answer, and used focused questions so the learner worked out that WHERE drops Ben's NULL row while ON keeps him, though the tutor stated the 'behaves like an INNER JOIN' generalization rather than eliciting it."
+ },
+ "usage": {}
+}

@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "full_skill",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A has the learner bring out their own misconceptions and work out the key numbers (80% vs 4%, the 'given' rule), while Tutor B opens by lecturing the 1%/90% answer outright and keeps giving worked solutions before the learner tries, so the learner mostly guesses and peeks rather than reasons."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

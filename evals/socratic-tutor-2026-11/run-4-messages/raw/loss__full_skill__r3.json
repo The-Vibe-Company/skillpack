@@ -1,0 +1,41 @@
+{
+ "scenario": "loss",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me how percentage gains and losses work on investments, properly.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good, let's do it properly. Here's the ground I plan to cover:\n\n1. **Percent change basics:** computing a gain or loss from a starting and ending value\n2. **Gain/loss asymmetry:** why a 50% loss needs more than a 50% gain to recover\n3. **Chaining returns:** combining several periods of gains and losses\n4. **Average vs. compound returns:** arithmetic mean vs. CAGR, and why they differ\n5. **Percent vs. percentage points:** talking about changes in rates and returns precisely\n6. **Real-world adjustments:** contributions/withdrawals, dividends, fees, and inflation\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Then I'll show you a map of where you stand and suggest where to start.\n\nFirst question: you buy a share at $80 and it rises to $100. What is your percentage gain, and how did you get it?"
+  },
+  {
+   "role": "student",
+   "text": "That's a 25% gain. I took the $20 increase and divided it by the $80 I paid, so 20/80 = 0.25."
+  },
+  {
+   "role": "tutor",
+   "text": "Correct: gain divided by the starting value.\n\nNext question: a stock you own falls 50% one year, then rises 50% the next year. Overall, are you up, down, or back where you started? By how much, and why?"
+  },
+  {
+   "role": "student",
+   "text": "You're back where you started. You lose 50% and then gain 50%, so the two cancel out and you're even."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. I'll hold off on commenting until the diagnostic is done, and we'll come back to this one.\n\nNext question: a fund returns +10%, -20%, and +30% over three years. Its brochure says \"average annual return: 6.7%.\" If you'd invested $1,000 at the start, would you end up with the same amount as someone earning a steady 6.7% every year? Explain your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "Yeah, I'd think it comes out the same. If the average is 6.7% a year, then over three years it should work out to the same total as getting 6.7% every year."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to that one after the diagnostic as well.\n\nNext question: your savings account paid 2% interest last year, and this year the bank raised it to 3%. A friend says, \"That's a 1% increase in your interest rate.\" Is your friend describing it correctly? How would you describe the change?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "df707fda75"
+}

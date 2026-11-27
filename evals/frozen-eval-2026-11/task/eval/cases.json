@@ -1,0 +1,12 @@
+[
+  { "input": "45s", "expected": 45 },
+  { "input": "2h", "expected": 7200 },
+  { "input": "1h30m", "expected": 5400 },
+  { "input": "1h 30m 15s", "expected": 5415 },
+  { "input": "  10m ", "expected": 600 },
+  { "input": "", "throws": true },
+  { "input": "5x", "throws": true },
+  { "input": "1.5h", "throws": true },
+  { "input": "90", "expected": 90 },
+  { "input": "2H", "throws": true }
+]

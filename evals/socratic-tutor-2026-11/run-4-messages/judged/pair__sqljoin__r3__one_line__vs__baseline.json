@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A surfaces the learner's specific ON-vs-WHERE misconception, which still showed up after the lecture in the exercise 3 sanity check, then resolves it with a step-by-step trace that the learner restates correctly; Transcript B gets more learner reasoning, but about row-count bounds, and never checks or addresses the targeted misconception."
+ },
+ "winner": "baseline",
+ "usage": {}
+}

@@ -1,0 +1,73 @@
+{
+ "scenario": "float",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me why 0.1 + 0.2 is not equal to 0.3 in my code. I want to really understand it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good choice. This is a small bug that teaches you a lot about how computers handle numbers. I'll teach it mostly by asking you questions, so you work it out yourself instead of just hearing the answer.\n\nHere's what we'll cover:\n\n1. **Finite vs. repeating expansions**: why some fractions never end in a given base\n2. **Binary fractions**: how 0.1 looks in base 2\n3. **Fixed precision (IEEE 754 doubles)**: what a computer actually stores, and why it has to round\n4. **Rounding error in arithmetic**: how two small storage errors combine into a visible one\n5. **What gets printed vs. what's stored**: why `0.1` prints as `0.1` but `0.1 + 0.2` prints as `0.30000000000000004`\n6. **Comparing floats correctly**: tolerances, `isclose`, and their pitfalls\n7. **Alternatives**: decimal types, integers and fixed-point, rational numbers, and when to use each\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Then I'll show you a skill map and suggest where to start.\n\nFirst question:\n\nIn ordinary base 10, 1/4 can be written exactly as 0.25, but 1/3 becomes 0.3333... and never ends. What decides whether a fraction ends or repeats forever in base 10?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I guess it's just whether the division comes out even? Like 1 divided by 4 works out cleanly but 1 divided by 3 always leaves a remainder. Not sure what that has to do with my JavaScript bug though, the computer should just store 0.1 as 0.1."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. \"Whether it comes out even\" is a description of what happens, though, not a rule for which fractions will. I'll leave that open for now.\n\nYour point that the computer should just store 0.1 as 0.1 is a reasonable thing to expect. It's actually the assumption this whole topic tests, so hold onto it. We'll come back to it once the diagnostic is done.\n\nNext question:\n\nWithout doing the long division, predict which of these end in base 10 and which repeat forever: 1/8, 1/6, 1/20, 1/7. What's your reasoning for each?"
+  },
+  {
+   "role": "student",
+   "text": "I think 1/8 ends because it's 0.125 and 1/20 is 0.05, but 1/6 and 1/7 repeat, mostly because I kind of remember them from school, not a real rule. Maybe it's something about the numbers being \"nice\" like 8 and 20? Still don't see how this connects to 0.1 in JavaScript though."
+  },
+  {
+   "role": "tutor",
+   "text": "Your predictions are right: 1/8 and 1/20 end, while 1/6 and 1/7 repeat. But by your own account you got there from memory, and \"nice numbers\" doesn't explain anything yet. Why would 20 count as nice and 6 not? I'll note that as a gap to work on.\n\nAbout the connection to JavaScript: it's coming, and it's closer than it seems. Your rule question and your bug are the same question in different clothes. I'll show you how once we've finished the diagnostic. Two or three questions left.\n\nNext question:\n\nWhen your JavaScript code says `let x = 0.1`, what do you think the computer actually stores in memory? Describe it as concretely as you can. Which base is it in, how many digits does it get, and is there any limit on that?"
+  },
+  {
+   "role": "student",
+   "text": "I'd guess it just stores 0.1, like the actual number, probably in decimal or at least something that converts back to exactly 0.1. I know it's binary underneath somewhere but I figured the computer handles that perfectly, and like 64 bits seems like plenty for one decimal digit. That's why I think it's a JavaScript thing, Python wouldn't mess this up."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That picture is clear: decimal, or something that converts back to exactly 0.1; 64 bits is plenty for one digit; and the bug is specific to JavaScript. I won't say yet which parts of that hold up. Keep the Python claim in mind, though, because we're going to test it rather than argue about it.\n\nTwo more questions and the diagnostic is done.\n\nNext question:\n\nSuppose you have to check in your code whether a computed total equals 0.3, and you've already found that `total === 0.3` is unreliable. What would you write instead, and is there any situation where your fix would still give the wrong answer?"
+  },
+  {
+   "role": "student",
+   "text": "I'd probably round it first, like total.toFixed(2) === \"0.30\", or maybe Math.round(total * 100) / 100 === 0.3. I can't really think of when that would break, unless you need more decimal places than you rounded to I guess."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You'd round to a fixed number of decimal places and then compare, either as a string or as a number. You named one way it could fail, needing more places than you rounded to. Whether that's the only way, and whether the `Math.round` version is as safe as it looks, is something we'll test properly later. For now I'm just recording your answer.\n\nLast diagnostic question:\n\nSay you're building a shopping cart in JavaScript. Prices like $19.99 get added up, a 7.5% tax is applied, and the customer sees a final total. How would you represent and calculate the money so the total always comes out correct to the cent, and why would you choose that?"
+  },
+  {
+   "role": "student",
+   "text": "I'd just use normal numbers like 19.99 and then round the final total to 2 decimals with toFixed(2) before showing it. That seems simplest, and the rounding at the end should clean up any weird JavaScript decimals."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. You'd keep prices as ordinary numbers like 19.99, do all the math with them, and round once at the end with `toFixed(2)`, on the idea that the final rounding cleans up the error. I'm not saying yet whether that holds up. It's a claim we'll test on real numbers later.\n\nThat's the end of the diagnostic. Here's where I'd place you now. These levels come only from what you actually said, not from what I assume you might know:\n\n```\nTopic: Why 0.1 + 0.2 !== 0.3              overall: ██░░░░░░░░ 17%\n-----------------------------------------------------------------\n1. Finite vs. repeating expansions  [██░░░░░░░░]  1/5  <- proposed start\n2. Binary fractions                 [██░░░░░░░░]  1/5\n3. Fixed precision (IEEE 754)       [██░░░░░░░░]  1/5\n4. Rounding error in arithmetic     [░░░░░░░░░░]  0/5\n5. Printed vs. stored               [░░░░░░░░░░]  0/5\n6. Comparing floats correctly       [████░░░░░░]  2/5\n7. Alternatives (money etc.)        [██░░░░░░░░]  1/5\n-----------------------------------------------------------------\nScale: 0 unaware . 1 heard of it . 2 can follow along\n       3 can do with help . 4 independent . 5 can teach it\n```\n\nWhy each level:\n- **1:** Your predictions were right, but by your account they came from memory. You don't have a rule yet.\n- **2-3:** You know \"it's binary underneath,\" but your picture is that 0.1 is stored as exactly 0.1 and that 64 bits is plenty. That's level 1 at most.\n- **4-5:** You think this is a JavaScript quirk. Neither topic has come up properly yet, so both start at 0.\n- **6:** You have a working approach (round, then compare) and saw one limit of it. That's 2. It isn't higher because we haven't tested whether it actually holds.\n- **7:** Your plan uses ordinary numbers and rounds at the end. You didn't mention any other way to represent money.\n\nMy suggested target is 4/5 on everything. Tell me if you want full mastery (5/5) instead.\n\n**I suggest starting with subskill 1.** It looks like a school-math detour, but the rest depends on it. Once you have the actual rule for when a fraction ends, the question \"can a computer store 0.1 exactly?\" mostly answers itself. That's also where we'll test your Python claim.\n\nStart with subskill 1, or would you rather start somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Sure, let's start with subskill 1. I'm still pretty sure the computer just stores 0.1 fine though, but I'm curious how the 1/3 thing connects."
+  },
+  {
+   "role": "tutor",
+   "text": "Good. Keep your belief that the computer stores 0.1 fine. I'm not going to argue you out of it. By the end of this subskill you'll be able to check it yourself.\n\nWe'll start with a way to look at \"ending\" decimals. A decimal that ends is really a fraction with a power of 10 underneath:\n\n- 0.125 = 125/1000\n- 0.05 = 5/100\n\nSo \"1/8 ends\" means the same thing as \"1/8 can be rewritten as some whole number over 10, 100, 1000, or some other power of 10.\" 1/8 = 125/1000 works because 8 × 125 = 1000.\n\nHere's your question:\n\nCan you find a whole number n such that 1/3 = n/10, or n/100, or n/1000, or n over any power of 10? If you think no such n exists, explain why it can never exist, not just that you haven't found one yet."
+  },
+  {
+   "role": "student",
+   "text": "Okay, so I'd need 3 times n to equal 10, 100, 1000 and so on, but those are all just 2s and 5s multiplied together, so 3 can never divide them evenly. So 1/3 just can't be written exactly in decimal no matter how many digits you use... wait, is that what's happening with 0.1 in binary?"
+  },
+  {
+   "role": "tutor",
+   "text": "That argument is correct, and it's a real proof. 10, 100, 1000 and so on are built only from 2s and 5s, so a factor of 3 can never divide any of them. No amount of extra digits helps, which is why 1/3 never ends.\n\nAs for your guess about 0.1 in binary: you're on the right track, and you'll be able to answer it yourself shortly. First I want the base-10 rule to be solid, because you'll use the same reasoning for binary.\n\nYou've worked out why 1/3 fails. Now give the general rule: for which whole numbers d does 1/d end in base 10? Then apply it to 1/6. 6 has a factor of 2, and 2 does divide 10, so why doesn't that save it?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "b30480f3f2"
+}

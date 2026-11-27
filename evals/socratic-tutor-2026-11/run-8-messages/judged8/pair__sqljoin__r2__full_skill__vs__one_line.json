@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A surfaced the ON-vs-WHERE misconception through a diagnostic and had the learner discover for themselves that Ben's NULL row fails the WHERE filter, while Tutor B stated the answer in an upfront lecture so the learner only accepted it, and B's later Socratic work on Dan built on a correction already given."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

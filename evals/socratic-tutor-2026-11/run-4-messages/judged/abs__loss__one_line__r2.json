@@ -1,0 +1,17 @@
+{
+ "file": "loss__one_line__r2.json",
+ "scenario": "loss",
+ "condition": "one_line",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 4,
+  "why": "The tutor opened with a long lecture that stated the -50%/+100% answer outright without probing the learner first, so the learner only repeated it; later turns used good targeted practice questions and the learner applied the idea correctly."
+ },
+ "usage": {}
+}

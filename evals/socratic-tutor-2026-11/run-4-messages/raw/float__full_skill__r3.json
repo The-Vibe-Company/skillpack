@@ -1,0 +1,41 @@
+{
+ "scenario": "float",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me why 0.1 + 0.2 is not equal to 0.3 in my code. I want to really understand it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Good choice. This is a small bug that teaches you a lot about how computers handle numbers. I'll teach it mostly by asking you questions, so you work it out yourself instead of just hearing the answer.\n\nHere's what we'll cover:\n\n1. **Finite vs. repeating expansions**: why some fractions never end in a given base\n2. **Binary fractions**: how 0.1 looks in base 2\n3. **Fixed precision (IEEE 754 doubles)**: what a computer actually stores, and why it has to round\n4. **Rounding error in arithmetic**: how two small storage errors combine into a visible one\n5. **What gets printed vs. what's stored**: why `0.1` prints as `0.1` but `0.1 + 0.2` prints as `0.30000000000000004`\n6. **Comparing floats correctly**: tolerances, `isclose`, and their pitfalls\n7. **Alternatives**: decimal types, integers and fixed-point, rational numbers, and when to use each\n\nFirst I'll ask a few questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Then I'll show you a skill map and suggest where to start.\n\nFirst question:\n\nIn ordinary base 10, 1/4 can be written exactly as 0.25, but 1/3 becomes 0.3333... and never ends. What decides whether a fraction ends or repeats forever in base 10?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I guess it's just whether the division comes out even? Like 1 divided by 4 works out cleanly but 1 divided by 3 always leaves a remainder. Not sure what that has to do with my JavaScript bug though, the computer should just store 0.1 as 0.1."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. \"Whether it comes out even\" is a description of what happens, though, not a rule for which fractions will. I'll leave that open for now.\n\nYour point that the computer should just store 0.1 as 0.1 is a reasonable thing to expect. It's actually the assumption this whole topic tests, so hold onto it. We'll come back to it once the diagnostic is done.\n\nNext question:\n\nWithout doing the long division, predict which of these end in base 10 and which repeat forever: 1/8, 1/6, 1/20, 1/7. What's your reasoning for each?"
+  },
+  {
+   "role": "student",
+   "text": "I think 1/8 ends because it's 0.125 and 1/20 is 0.05, but 1/6 and 1/7 repeat, mostly because I kind of remember them from school, not a real rule. Maybe it's something about the numbers being \"nice\" like 8 and 20? Still don't see how this connects to 0.1 in JavaScript though."
+  },
+  {
+   "role": "tutor",
+   "text": "Your predictions are right: 1/8 and 1/20 end, while 1/6 and 1/7 repeat. But by your own account you got there from memory, and \"nice numbers\" doesn't explain anything yet. Why would 20 count as nice and 6 not? I'll note that as a gap to work on.\n\nAbout the connection to JavaScript: it's coming, and it's closer than it seems. Your rule question and your bug are the same question in different clothes. I'll show you how once we've finished the diagnostic. Two or three questions left.\n\nNext question:\n\nWhen your JavaScript code says `let x = 0.1`, what do you think the computer actually stores in memory? Describe it as concretely as you can. Which base is it in, how many digits does it get, and is there any limit on that?"
+  },
+  {
+   "role": "student",
+   "text": "I'd guess it just stores 0.1, like the actual number, probably in decimal or at least something that converts back to exactly 0.1. I know it's binary underneath somewhere but I figured the computer handles that perfectly, and like 64 bits seems like plenty for one decimal digit. That's why I think it's a JavaScript thing, Python wouldn't mess this up."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That picture is clear: decimal, or something that converts back to exactly 0.1; 64 bits is plenty for one digit; and the bug is specific to JavaScript. I won't say yet which parts of that hold up. Keep the Python claim in mind, though, because we're going to test it rather than argue about it.\n\nTwo more questions and the diagnostic is done.\n\nNext question:\n\nSuppose you have to check in your code whether a computed total equals 0.3, and you've already found that `total === 0.3` is unreliable. What would you write instead, and is there any situation where your fix would still give the wrong answer?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "b30480f3f2"
+}

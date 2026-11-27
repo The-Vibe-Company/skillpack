@@ -1,0 +1,17 @@
+{
+ "file": "rebase__one_line__r3.json",
+ "scenario": "rebase",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": false,
+  "leak_turn": null,
+  "learner_reached_truth": false,
+  "diagnosed_first": true,
+  "flattery_count": 0,
+  "lecture_count": 0,
+  "overall": 7,
+  "why": "The tutor probed first and used pointed questions about parent pointers being part of the hash without stating the conclusion, but the transcript ends before the learner gives up the same-hash belief or touches on what rebasing shared history costs other people."
+ },
+ "usage": {}
+}

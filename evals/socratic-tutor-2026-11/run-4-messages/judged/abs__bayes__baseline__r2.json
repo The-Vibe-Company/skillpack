@@ -1,0 +1,17 @@
+{
+ "file": "bayes__baseline__r2.json",
+ "scenario": "bayes",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 4,
+  "why": "The tutor's explanations were accurate and the count-based practice problems helped, but it answered the learner's actual 9% problem itself instead of having the learner count it out, so the learner never stated the ~9% result or the base-rate correction in their own words."
+ },
+ "usage": {}
+}

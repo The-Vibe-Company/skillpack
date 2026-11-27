@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A has the learner predict query results so the ON-vs-WHERE misconception comes out in their own answer, while B explains the trap up front in a lecture and the learner just accepts it, even though B's later Socratic follow-up on OR o.id IS NULL is good."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

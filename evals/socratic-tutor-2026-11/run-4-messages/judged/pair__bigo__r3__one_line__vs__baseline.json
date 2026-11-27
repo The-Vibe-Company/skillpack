@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A brings the constant-factor misconception into the open and makes the learner face the n/2 vs n^2/2 inconsistency themselves, while Tutor B states 'sequential loops add' as a rule and accepts the learner's passive 'I get it now' without checking that they understand it."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

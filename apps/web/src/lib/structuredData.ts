@@ -53,6 +53,8 @@ export type BlogPostingFacts = {
   headline: string;
   description: string;
   datePublished: string;
+  /** The post's revision day, stated only when the frontmatter sets `updated`. */
+  dateModified?: string;
   url: string;
   /** Absolute URL of the post's generated share image. */
   image: string;
@@ -64,11 +66,32 @@ export type BlogPostingFacts = {
   blogUrl: string;
 };
 
-type JsonLdAuthor = { "@type": "Person"; name: string } | { "@type": "Organization"; name: string; url: string };
+type JsonLdPerson = { "@type": "Person"; name: string; url?: string; image?: string; jobTitle?: string; sameAs?: string[] };
+type JsonLdAuthor = JsonLdPerson | { "@type": "Organization"; name: string; url: string };
+
+type BlogPostingNode = {
+  "@type": "BlogPosting";
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  url?: string;
+  mainEntityOfPage?: string;
+  image?: string;
+  author?: JsonLdAuthor;
+  publisher?: JsonLdNode;
+};
 
 function authorNode(author: BlogAuthor): JsonLdAuthor {
-  if (author.kind === "person") return { "@type": "Person", name: author.name };
-  return { "@type": "Organization", name: author.name, url: author.url };
+  if (author.kind === "organization") return { "@type": "Organization", name: author.name, url: author.url };
+  // Only the profile facts the author has are stated; an unprofiled author stays name-only.
+  const person: JsonLdPerson = { "@type": "Person", name: author.name };
+  if (author.url) person.url = author.url;
+  // The portrait is served by skillpack.app, so self-hosted deployments still point at a real file.
+  if (author.imagePath) person.image = new URL(author.imagePath, PRODUCTION_SITE_URL).href;
+  if (author.jobTitle) person.jobTitle = author.jobTitle;
+  if (author.sameAs && author.sameAs.length > 0) person.sameAs = [...author.sameAs];
+  return person;
 }
 
 /**
@@ -76,17 +99,18 @@ function authorNode(author: BlogAuthor): JsonLdAuthor {
  * the credited author, the site publisher, and the share image the site generates for it.
  */
 export function blogPostingStructuredData(facts: BlogPostingFacts): JsonLdDocument {
-  const posting = {
+  const posting: BlogPostingNode = {
     "@type": "BlogPosting",
     headline: facts.headline,
     description: facts.description,
     datePublished: facts.datePublished,
-    url: facts.url,
-    mainEntityOfPage: facts.url,
-    image: facts.image,
-    author: authorNode(facts.author),
-    publisher: { "@type": "Organization", "@id": ORGANIZATION_ID, name: "Skillpack", url: PRODUCTION_SITE_URL },
   };
+  if (facts.dateModified) posting.dateModified = facts.dateModified;
+  posting.url = facts.url;
+  posting.mainEntityOfPage = facts.url;
+  posting.image = facts.image;
+  posting.author = authorNode(facts.author);
+  posting.publisher = { "@type": "Organization", "@id": ORGANIZATION_ID, name: "Skillpack", url: PRODUCTION_SITE_URL };
   const trail = [
     { name: "Home", url: facts.homeUrl },
     { name: "Blog", url: facts.blogUrl },
@@ -198,6 +222,84 @@ export function catalogIndexStructuredData(input: {
           })),
         },
       },
+    ],
+  };
+}
+
+type Crumb = { name: string; url: string };
+
+function breadcrumbList(trail: readonly Crumb[]) {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: trail.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
+  };
+}
+
+/**
+ * The blog index as a CollectionPage of the posts it lists, in page order, with its breadcrumb
+ * trail. Only the page's own title, description and listed posts are stated.
+ */
+export function blogIndexStructuredData(input: {
+  name: string;
+  description: string;
+  url: string;
+  homeUrl: string;
+  items: { name: string; url: string }[];
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        name: input.name,
+        description: input.description,
+        url: input.url,
+        isPartOf: { "@id": WEBSITE_ID },
+        mainEntity: {
+          "@type": "ItemList",
+          itemListElement: input.items.map((item, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            name: item.name,
+            url: item.url,
+          })),
+        },
+      },
+      breadcrumbList([
+        { name: "Home", url: input.homeUrl },
+        { name: "Blog", url: input.url },
+      ]),
+    ],
+  };
+}
+
+/** The privacy policy page and its breadcrumb trail, published by the Skillpack organization. */
+export function privacyPageStructuredData(input: {
+  name: string;
+  description: string;
+  url: string;
+  homeUrl: string;
+}): JsonLdDocument {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: input.name,
+        description: input.description,
+        url: input.url,
+        isPartOf: { "@id": WEBSITE_ID },
+        publisher: { "@id": ORGANIZATION_ID },
+      },
+      breadcrumbList([
+        { name: "Home", url: input.homeUrl },
+        { name: input.name, url: input.url },
+      ]),
     ],
   };
 }

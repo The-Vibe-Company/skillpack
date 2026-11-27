@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B gets the learner to state the misconception and then reason out from the parent-hash link that rebase creates new commits and what that does to a teammate's pull, whereas A explains new hashes up front and corrects the learner by telling them, then lectures at length."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

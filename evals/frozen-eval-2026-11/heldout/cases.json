@@ -1,0 +1,22 @@
+[
+  { "input": "120", "throws": true },
+  { "input": "3M", "expected": 180 },
+  { "input": "1H1M", "expected": 3660 },
+  { "input": "15S", "expected": 15 },
+  { "input": "1m1h", "expected": 3660 },
+  { "input": "1h1h", "throws": true },
+  { "input": "-5m", "throws": true },
+  { "input": "10", "throws": true },
+  { "input": "2h 0m", "expected": 7200 },
+  { "input": "0s", "expected": 0 },
+  { "input": "  1h  2m  3s ", "expected": 3723 },
+  { "input": "3d", "throws": true },
+  { "input": "h", "throws": true },
+  { "input": "1 h", "throws": true },
+  { "input": "30s1m", "expected": 90 },
+  { "input": "1h2m3s4s", "throws": true },
+  { "input": "2.0m", "throws": true },
+  { "input": "   ", "throws": true },
+  { "input": "10m5", "throws": true },
+  { "input": "1s 1m 1h", "expected": 3661 }
+]

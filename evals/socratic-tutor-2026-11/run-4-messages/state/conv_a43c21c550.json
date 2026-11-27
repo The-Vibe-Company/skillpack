@@ -1,0 +1,13 @@
+{
+ "id": "a43c21c550",
+ "scenario": "guard_304",
+ "kind": "guard",
+ "opening": "What does HTTP status 304 mean?",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "HTTP 304 means **Not Modified**. The server is telling the client: \"The resource hasn't changed since the version you already have cached, so use your cached copy.\"\n\nHow it works:\n\n1. The client already has a cached copy of a resource. Earlier, the server sent it with validators such as an `ETag` header, a `Last-Modified` header, or both.\n2. When the client asks for the resource again, it sends a **conditional request**:\n   - `If-None-Match: \"<etag>\"`, and/or\n   - `If-Modified-Since: <date>`\n3. If the resource hasn't changed, the server answers `304 Not Modified` with **no response body**. The client then loads the resource from its cache.\n4. If the resource has changed, the server sends a normal `200 OK` with the new content.\n\nKey points:\n- It saves bandwidth and speeds up page loads, because the full content isn't sent again.\n- A 304 response must not contain a body. It can include headers that update the cached entry, such as `ETag`, `Cache-Control`, `Expires`, or `Date`.\n- It isn't an error. It's part of the 3xx (redirection) class, but in practice it just means \"use your cache.\"\n- If both headers are sent, `If-None-Match` (ETag) takes precedence over `If-Modified-Since`.\n\nIf you'd like to actually learn HTTP caching in depth, I can also teach it step by step."
+  }
+ ],
+ "pending": null
+}

@@ -1,0 +1,17 @@
+{
+ "file": "bayes__baseline__r2.json",
+ "scenario": "bayes",
+ "condition": "baseline",
+ "run": 2,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 6,
+  "overall": 5,
+  "why": "The tutor's math is accurate and the 1,000-people counting got the learner to real understanding, but the tutor lectured heavily, never checked what the learner already knew, and worked out the base-rate resolution itself (the 5% example in turn 1 and the 9% case in turn 4) before the learner could reason to it."
+ },
+ "usage": {}
+}

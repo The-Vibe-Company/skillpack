@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B gives away the 15% answer up front, but after that the learner does almost all the reasoning: they compute the counts, make predictions, and overrule their own base-rate-neglect intuition across several problems, while A spends most of the exchange on a rigid diagnostic that holds back feedback and never resolves the misconception."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

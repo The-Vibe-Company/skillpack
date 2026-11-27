@@ -1,0 +1,41 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "baseline",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "75357d685f238b6afd7738be9786fdafde641eb6ca9a3be7471939715a68a4de",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it. Here's how this will go: I ask one question at a time, you answer in your own words, and I'll tell you what you got right, fix what's off, and adjust the next question to match. Wrong answers are useful here because they show me where the gaps are, so guess when you're not sure.\n\nWe'll go in roughly this order:\n1. What each command actually does to the commit history\n2. Reading before/after diagrams\n3. When to use which (and the \"golden rule\")\n4. Conflicts, `--force-with-lease`, and recovering with reflog\n5. Curveball scenarios\n\n**Setup for Question 1:**\n\nYou branched `feature` off `main` a few days ago. Since then:\n\n```\n          C---D   feature\n         /\n    A---B---E---F   main\n```\n\nYou're on `feature`.\n\n**Question 1:** Draw (rough ASCII is fine) or describe what the history looks like after each of these:\n\n- (a) `git merge main`\n- (b) `git rebase main`\n\nBonus: after (b), are commits C and D the *same* commits they were before? Why or why not?\n\nTake your shot."
+  },
+  {
+   "role": "student",
+   "text": "For (a) you'd get a new merge commit on feature that ties D and F together, so C and D stay where they are plus a merge commit M. For (b) it'd look like A-B-E-F-C-D, with feature just sitting on top of F. And yeah, C and D are the same commits, rebase just picks up the branch pointer and moves it onto F, the hashes don't change."
+  },
+  {
+   "role": "tutor",
+   "text": "Nice start. Two of your three answers are right, and the wrong one matters a lot, so it's worth slowing down on.\n\n**(a) `git merge main`: correct.**\n\n```\n          C---D---M   feature\n         /       /\n    A---B---E---F     main\n```\n\nC and D don't change. Git adds a new merge commit M with two parents, D and F. History stays exactly as it happened, with one extra commit recording the moment the two lines joined.\n\n**(b) `git rebase main`: the shape is right.**\n\n```\n                  C'--D'   feature\n                 /\n    A---B---E---F          main\n```\n\nYes, the result is linear: A-B-E-F-C-D, with feature sitting on top of F.\n\n**Bonus: this one's wrong, and it's the key idea of the whole topic.**\n\nC and D are *not* the same commits afterward. Rebase doesn't move the old commits. It **replays** them: it takes the change each one introduced and creates brand-new commits, C' and D', on top of F. They have the same messages and (usually) the same diffs, but different hashes.\n\nWhy the hashes have to change: a commit's hash is computed from its contents, and those contents include its **parent hash**. Before the rebase, C's parent was B. After, C' has F as its parent. Different parent means different hash. D' then has a new parent (C' instead of C), so its hash changes too. The change cascades down the whole branch.\n\nThe old C and D still exist. Nothing points to them anymore, but they're still in the repo (and reachable via `git reflog`) until garbage collection removes them. Remember that, because it comes back in part 4.\n\nYour guess makes sense, by the way. \"Just move the branch pointer\" is exactly what a **fast-forward** merge does. It just isn't what rebase does.\n\n**Question 2:**\n\nBuilding on that: you rebased `feature` onto `main` like in (b). But before you rebased, you had already pushed `feature` to `origin`, and your teammate Sam pulled it and started adding commits on top of D.\n\n1. What happens when you try a plain `git push` of your rebased `feature`? Why?\n2. Say you force-push anyway. What problem does Sam now have?\n\nUse what you just learned about C/D vs C'/D' in your answer."
+  },
+  {
+   "role": "student",
+   "text": "Ok, that parent hash thing makes sense, I get it now. So for the plain push, I guess it gets rejected because origin still has C and D, and my branch has C' and D' instead, so git sees it as not a fast-forward?"
+  },
+  {
+   "role": "tutor",
+   "text": "**Part 1: correct, and you got the reason right too.**\n\nHere's what Git compares when you push. `origin/feature` points at D. Your local `feature` points at D'. A push is a fast-forward only if the remote's commit (D) is an **ancestor** of the commit you're pushing (D'). Follow D' back through its parents and you get C', F, E, B, A. D never shows up. As far as Git can tell, your branch and the remote have **diverged**, so it refuses the push:\n\n```\n ! [rejected]        feature -> feature (non-fast-forward)\n```\n\nGit isn't really complaining about the rebase here. It's protecting the remote. If it accepted your push, C and D would be dropped from `origin/feature`, and Git won't throw away commits on the remote unless you explicitly tell it to.\n\nOne small trap: the error message usually suggests `git pull`. **Don't do that** after a rebase. Pulling would merge the old C and D back in alongside C' and D', and you'd end up with every change in your history twice. After a rebase you either force-push, or you decide you shouldn't have rebased in the first place.\n\n**Now part 2, which you haven't answered yet:**\n\nYou force-push anyway, so `origin/feature` now points at D'. Sam's local branch looks like this:\n\n```\n          C---D---S1---S2   Sam's feature\n         /\n    A---B\n```\n\n(Sam's copy also has E and F somewhere, but they don't matter for this question.)\n\n1. Sam's commits S1 and S2 are built on top of which commits: the old ones or the new ones?\n2. What happens if Sam just runs `git pull`? What does the history end up looking like?\n\nHint: think about what you just said about C/D vs C'/D'. Git doesn't know they're \"the same work.\""
+  },
+  {
+   "role": "student",
+   "text": "Sam's S1 and S2 are sitting on the old C and D, since that's what Sam pulled before I rebased. So Sam's work is hanging off commits that aren't on origin anymore, right?"
+  },
+  {
+   "role": "tutor",
+   "text": "**Right.** S1 and S2 sit on the old C and D. On origin, C and D aren't on any branch now. They're still in Sam's repo, and they're still S1's ancestors, but the shared branch has moved on to C' and D'.\n\nThe tricky part is that Sam's local branch looks fine. Nothing breaks until Sam talks to origin again. After the next fetch, Sam's picture is:\n\n```\n          C---D---S1---S2      Sam's feature\n         /\n    A---B---E---F---C'--D'     origin/feature\n```\n\nRemember that Git compares commits by hash, not by what they change. So as far as Git can tell, C/D and C'/D' are four separate commits that happen to have the same messages.\n\n**Now the second half of the question:** Sam runs a plain `git pull`, which is fetch + merge.\n\n1. Roughly what does Sam's history look like afterward? Sketch it if you can.\n2. How many times does the work from C and D show up in that history, and why is that a problem when you read `git log` or try to clean things up later?\n\nGuess if you're not sure."
+  }
+ ],
+ "usage": [],
+ "conv_id": "e3cb4f00cf"
+}

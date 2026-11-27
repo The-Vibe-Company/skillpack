@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 3,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Transcript A guided the learner through Socratic questions to discover themselves that a changed parent forces a new hash, whereas B corrected the core misconception by fiat in a long lecture and repeatedly had to re-prompt skipped questions."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

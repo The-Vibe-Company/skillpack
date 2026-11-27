@@ -1,0 +1,16 @@
+{
+ "scenario": "sqljoin",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "Both tutors first state the ON-vs-WHERE rule outright, but A then has the learner trace the Dan case step by step and reach the conclusion themselves, while B mostly hands over long explanations and answers (the Dave case, the corrected anti-join) and is much less efficient."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

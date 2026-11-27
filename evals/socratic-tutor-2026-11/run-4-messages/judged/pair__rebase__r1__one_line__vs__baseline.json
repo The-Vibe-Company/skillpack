@@ -1,0 +1,16 @@
+{
+ "scenario": "rebase",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "B surfaces the same-hash misconception by having the learner work out that a changed parent means a new hash, while A just tells the learner the rebase mechanism and lets them agree with it, even though A goes on to cover the shared-history consequences."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

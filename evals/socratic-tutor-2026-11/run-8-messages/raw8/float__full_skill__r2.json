@@ -1,0 +1,73 @@
+{
+ "scenario": "float",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 2,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Teach me why 0.1 + 0.2 is not equal to 0.3 in my code. I want to really understand it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do this properly. Here's the ground we'll cover. It's split into subskills so we can track your progress on each one:\n\n1. **Number bases**: how fractions are written in base 10 versus base 2\n2. **Terminating vs. repeating expansions**: which fractions end and which repeat forever, and why\n3. **Finite storage (IEEE 754 doubles)**: how a computer stores a real number in 64 bits\n4. **Representation error**: what value actually gets stored when you type `0.1`\n5. **Arithmetic rounding**: why adding two slightly-off numbers can land on a different slightly-off number\n6. **Printing vs. stored value**: why `0.1` *displays* as `0.1` even though it isn't exactly 0.1\n7. **Comparing floats correctly**: tolerances, decimal types, integers, and when each one fits\n\nFirst I'll ask a few diagnostic questions, one at a time, to see what you already know. I won't teach anything until we're done with those. Then I'll show you a skill map and suggest where to start.\n\nFirst question:\n\nIn ordinary base 10, can you write the fraction 1/3 exactly as a decimal with a finite number of digits? Why or why not?"
+  },
+  {
+   "role": "student",
+   "text": "No, it's 0.3333... and the 3s just go on forever, so you'd have to cut it off somewhere. But I don't really see what that has to do with JavaScript, 0.1 is just 0.1, right?"
+  },
+  {
+   "role": "tutor",
+   "text": "That's right about 1/3. Since this is a lot of digits that never end, any finite version is a cut-off approximation.\n\nHold on to your question about 0.1. It's exactly where we're heading, and you'll get more out of it if you work out the answer yourself. A few more diagnostic questions first.\n\nNext one:\n\nIn base 10, 1/3 repeats forever, but 1/4 comes out as 0.25 and stops. What do you think decides whether a fraction has a finite expansion or a repeating one?"
+  },
+  {
+   "role": "student",
+   "text": "Hmm, I'm not sure... maybe it's about the bottom number? Like 4 goes into 100 evenly but 3 doesn't go into 10 or 100 or anything?"
+  },
+  {
+   "role": "tutor",
+   "text": "You're looking at the right thing: the denominator, and whether it divides some power of 10. That's still a hunch, though, not a rule, so let's see if it holds up. (Still diagnosing here. I'm not teaching yet.)\n\nUse your idea on these three: 1/8, 1/6, and 1/20. Which ones have a finite decimal expansion in base 10, and what is it about each denominator that decides it?"
+  },
+  {
+   "role": "student",
+   "text": "Ok so 1/8 is 0.125 and 1/20 is 0.05, those stop because 8 goes into 1000 and 20 goes into 100. But 1/6 is 0.1666... forever, I guess because of the 3 in it, since 6 is 2 times 3 and nothing like 10 or 100 divides by 3?"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct, and your reasoning holds up. 8 = 2x2x2 and 20 = 2x2x5 are made only of the factors in 10 (2 and 5), so some power of 10 divides by them evenly. 6 has a factor of 3, and no power of 10 will ever divide by 3. So the rule you've worked out is: a fraction (in lowest terms) terminates in base 10 exactly when its denominator has no prime factors other than 2 and 5.\n\nNow let's push that idea somewhere new. (Still diagnosing.)\n\nComputers store numbers in base 2, not base 10. Apply your rule to base 2: which of these could be written with a finite number of binary digits after the point, and why? 1/4, 3/8, 1/10"
+  },
+  {
+   "role": "student",
+   "text": "So in base 2 the only factor is 2, so 1/4 and 3/8 would stop since 4 and 8 are just 2s. But 1/10 is 2 times 5, and no power of 2 divides by 5... wait, so 0.1 would repeat forever in binary like 1/3 does in decimal?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes. You applied your own rule to a new base, and it gave you the answer to the question you asked at the start.\n\nIn base 2, a fraction in lowest terms terminates only if its denominator is a power of 2. 1/4 and 3/8 qualify. 1/10 has a factor of 5, so in binary it's 0.0001100110011... and the \"0011\" repeats forever. So 0.1 is to binary what 1/3 is to decimal. It isn't \"just 0.1\" once a computer has to store it.\n\nDon't count it as fully settled yet, though. You've worked it out once, and I'll come back to it later from a different angle.\n\nLast diagnostic question, and then I'll show you the skill map:\n\nIf the computer can't store 0.1 exactly, then `console.log(0.1)` still prints `0.1`, not some long string of digits. What do you think is going on there?"
+  },
+  {
+   "role": "student",
+   "text": "Maybe it rounds it off when it prints? Like it's storing something really close to 0.1 and console.log just shows the short version so it looks normal."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the right direction. The computer stores something very close to 0.1, and printing shows a shorter version. But \"rounds it off\" leaves a lot open. Rounds to how many digits? Why does it pick 0.1 and not 0.10000000000000001? And why doesn't the same trick hide the error in `0.1 + 0.2`? So I'm treating this as a good hunch for now, not something you understand yet. We'll come back to it.\n\nThat's the end of the diagnostic. Here's where you stand:\n\n    Topic: Why 0.1 + 0.2 !== 0.3            overall: ███░░░░░░░ 31%\n    -----------------------------------------------------------------\n    1. Number bases               [██████░░░░]  3/5\n    2. Terminating vs. repeating  [██████░░░░]  3/5\n    3. Finite storage (IEEE 754)  [░░░░░░░░░░]  0/5  <- proposed start\n    4. Representation error       [████░░░░░░]  2/5\n    5. Arithmetic rounding        [██░░░░░░░░]  1/5\n    6. Printing vs. stored value  [████░░░░░░]  2/5\n    7. Comparing floats correctly [░░░░░░░░░░]  0/5\n    -----------------------------------------------------------------\n\nWhy these levels:\n- **1 and 2 (3/5):** You worked out the terminating rule yourself and used it in a new base. That's strong, but it only happened once and I was guiding you. You'll need to show it again later without prompting before it goes higher.\n- **4 (2/5):** You figured out that 0.1 repeats forever in binary, so whatever gets stored has to be an approximation. You haven't yet said what is actually stored, or whether it's above or below 0.1.\n- **6 (2/5):** Right idea, but no explanation of how it works yet.\n- **3, 5, 7:** We haven't tested these. You know the 0.1 + 0.2 result exists, which is why 5 gets a 1. Everything else is still open.\n\n**Proposed start: subskill 3, finite storage.** You already know 0.1 repeats forever in binary. The next question is where the computer cuts it off and how it decides which way to round. Subskills 4, 5 and 6 all build on that. If you'd rather start somewhere else, like jumping straight to comparing floats in your code, tell me.\n\nShould we start with finite storage?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah let's start with finite storage. But wait, if 0.1 repeats forever in binary, does that mean Python and Java have the same problem too? I always thought this was just a JavaScript thing."
+  },
+  {
+   "role": "tutor",
+   "text": "It's not just JavaScript. Python's `float` and Java's `double` work the same way, and so does C#'s `double`, C's `double`, and most other languages. That's because none of them invent their own number format. They all use the same standard, **IEEE 754**, which the CPU hardware itself implements. Try `0.1 + 0.2 == 0.3` in Python and you'll get `False`, and the sum prints as `0.30000000000000004`, just like in JavaScript. Your own reasoning already points to this: the problem comes from base 2, not from any one language.\n\nThat standard is exactly what this subskill is about, so here's the one piece of new material you need:\n\nA 64-bit \"double\" stores a number like scientific notation, but in binary: a sign, an exponent (a power of 2), and **53 significant binary digits**. No more. So when a number's binary expansion goes on forever, like 0.1's does, the computer has to stop after 53 digits and decide what to do with the rest.\n\nLet's figure out how it decides, using decimal first since your intuition is solid there.\n\nImagine a decimal calculator that can only keep 4 significant digits. It stores 1/3 as `0.3333` and 2/3 as `0.6667`. For each one, is the stored value a bit above or a bit below the true value, and why did the calculator go in different directions for the two?"
+  },
+  {
+   "role": "student",
+   "text": "0.3333 is a little below 1/3 because it just chops off the rest of the 3s. But 0.6667 is a bit above 2/3 since the next digit would be a 6, so it rounds up instead of down."
+  },
+  {
+   "role": "tutor",
+   "text": "Your directions are right: 0.3333 is a little below 1/3, and 0.6667 is a little above 2/3. Your explanation of 0.6667 is right too. The next digit is a 6, so the calculator rounds up.\n\nLook at how you explained the two cases, though. For 1/3 you said the calculator \"just chops off the rest,\" and for 2/3 you said it \"rounds up.\" That sounds like two different rules. A real calculator, and the IEEE 754 hardware, uses a single rule for both.\n\nIs the calculator really chopping in one case and rounding in the other? What single rule gives `0.3333` for 1/3 and also `0.6667` for 2/3?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "86ed5c74ad"
+}

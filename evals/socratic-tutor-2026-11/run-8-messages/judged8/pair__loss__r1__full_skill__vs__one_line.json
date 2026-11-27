@@ -1,0 +1,16 @@
+{
+ "scenario": "loss",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "Tutor A had the learner find the 50%-recovery error on their own by working through concrete dollar amounts, while Tutor B opened with a long lecture that gave away the asymmetry and the +100% answer before the learner reasoned at all."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

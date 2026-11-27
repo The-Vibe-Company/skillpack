@@ -1,0 +1,17 @@
+{
+ "file": "pydefault__baseline__r3.json",
+ "scenario": "pydefault",
+ "condition": "baseline",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": true,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 4,
+  "overall": 5,
+  "why": "The tutor opened with a long lecture that explained the definition-time evaluation before probing or letting the learner reason it out, though later prediction checks and exercise feedback were accurate and helped the learner state the correct model in their own words."
+ },
+ "usage": {}
+}

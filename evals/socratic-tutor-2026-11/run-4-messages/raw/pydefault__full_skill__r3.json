@@ -1,0 +1,41 @@
+{
+ "scenario": "pydefault",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "I want to master Python function default arguments. Teach me.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's do it properly. Here's how I've split \"Python function default arguments\" into subskills:\n\n1. Basic syntax and rules: defining defaults, why non-default parameters can't follow default ones, calling with positional vs. keyword arguments\n2. When defaults are evaluated: once, at definition time, not on every call\n3. The mutable default trap: `def f(x=[])` and why the list sticks around between calls\n4. The `None` sentinel idiom, plus custom sentinels (`_MISSING = object()`) for when `None` is a valid value\n5. Interaction with `*args`, keyword-only parameters, `/`, and `**kwargs`\n6. Introspection: `__defaults__`, `__kwdefaults__`, and `inspect.signature`\n7. Late binding in closures and lambdas, and the `lambda i=i:` trick\n8. Edge cases and design: defaults that reference globals or other defaults, defaults in methods and dataclasses (`field(default_factory=...)`), and when a default is the wrong choice\n\nI'll start by asking a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Answer in your own words, and \"I don't know\" is a useful answer too.\n\nQuestion 1: What does this code print, and why?\n\n```python\ndef add_item(item, bucket=[]):\n    bucket.append(item)\n    return bucket\n\nprint(add_item(1))\nprint(add_item(2))\nprint(add_item(3, []))\nprint(add_item(4))\n```"
+  },
+  {
+   "role": "student",
+   "text": "I think it prints [1], then [2], then [3], then [4]. The default bucket=[] gets made fresh as an empty list each time you call the function, so every call without a bucket starts empty and you just get the one item back."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I won't say yet whether that's right; we'll come back to it once the diagnostic is done.\n\nQuestion 2: Which of these function definitions are valid Python, and for any that aren't, what rule do they break?\n\n```python\ndef a(x, y=2, z): ...\ndef b(x=1, *args, y): ...\ndef c(x, /, y=2, *, z): ...\ndef d(*, x=1, y): ...\n```"
+  },
+  {
+   "role": "student",
+   "text": "I'm pretty sure a is invalid because you can't put a parameter without a default (z) after one that has a default. I think b, c and d are all fine since anything after * or *args is keyword-only, so it's allowed to have no default there, though I'm a bit fuzzy on what the / in c does exactly."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it, including that you're unsure about `/`. I'll come back to all of these after the diagnostic.\n\nQuestion 3: What does this code print, and why?\n\n```python\nfuncs = []\nfor i in range(3):\n    funcs.append(lambda: i)\n\nprint([f() for f in funcs])\n\nfuncs2 = []\nfor i in range(3):\n    funcs2.append(lambda i=i: i)\n\nprint([f() for f in funcs2])\n```"
+  },
+  {
+   "role": "student",
+   "text": "I'd guess both print [0, 1, 2], since each lambda gets made during a different loop iteration so it should hold onto that iteration's i. I'm honestly not sure what the i=i adds in the second one, it looks like it does the same thing just written differently."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. That includes your guess that `i=i` does the same thing. We'll come back to it.\n\nQuestion 4: Suppose you want a function that adds an item to a list. If the caller passes a list, it should use that one. If they don't, it should start with a fresh empty list. The catch is that `None` is a legitimate item someone might want to store, and someone might also pass `bucket=None` on purpose to mean \"no list given\". How would you write the signature and the first few lines of the body? Then: how would you check what default values a function has without calling it?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "2de330809d"
+}

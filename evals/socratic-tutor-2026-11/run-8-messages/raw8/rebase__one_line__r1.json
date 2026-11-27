@@ -1,0 +1,73 @@
+{
+ "scenario": "rebase",
+ "kind": "tutor",
+ "condition": "one_line",
+ "run": 1,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "fde63d591e177cf2deeac0c3ab58df21c37ba8c61e0947be1c069fd3b025fb43",
+ "opening": "Drill me on git rebase vs merge until I actually get it.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Deal. Here's how it'll go: I ask one question at a time, you answer in your own words, and if your answer has a hole in it, I won't correct you. I'll ask a smaller question that points right at the hole until you spot it yourself. Guessing is fine. Wrong answers are where the learning happens.\n\nHere's the setup we'll use the whole time:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\nYou branched `feature` off `main` at B. Since then, someone added C to `main`, and you made D and E on `feature`.\n\n**Question 1:** You're on `feature` and you run `git merge main`. Draw (or describe) what the history looks like afterward. How many new commits exist that didn't exist before, and what's special about any of them?\n\nAnswer that, and then we'll do the same scenario with `git rebase main` and compare."
+  },
+  {
+   "role": "student",
+   "text": "After the merge I think you get A-B-C on main and D-E on feature, plus one new merge commit that has two parents, E and C. So just one new commit, and the special thing is it ties the two lines together."
+  },
+  {
+   "role": "tutor",
+   "text": "That's right. Exactly one new commit, the merge commit (call it M), with two parents: E and C. Nothing that already existed gets changed. A, B, C, D and E all keep their exact identities.\n\n```\nmain:     A---B---C\n               \\   \\\nfeature:        D---E---M\n```\n\nOne detail to lock in: only the `feature` pointer moves (it now points at M). `main` still points at C, because you were on `feature` when you merged.\n\nNow let's do the other version. Same starting picture:\n\n```\nmain:     A---B---C\n               \\\nfeature:        D---E\n```\n\n**Question 2:** You're on `feature` and you run `git rebase main` instead. Draw what the history looks like afterward. Then tell me:\n- Are D and E in the result the *same* commits as before, or something else? Why?\n- Is there a merge commit this time?\n\nTake a guess even if you're unsure about the first part. That's the bit that matters most."
+  },
+  {
+   "role": "student",
+   "text": "I think it ends up as A-B-C-D-E in a straight line, and no merge commit this time. D and E are the same commits, rebase just picks them up and moves the feature pointer so they sit after C instead of B, same hashes."
+  },
+  {
+   "role": "tutor",
+   "text": "Two of your three answers are right. The result is a straight line, and there's no merge commit. Good.\n\nThe \"same commits, same hashes\" part is the hole, so let's dig into it.\n\nHere's a fact you can rely on: a commit's hash is computed from its contents. That includes the snapshot of files, the author, the message, and **the hash of its parent commit**. Change any of those and you get a different hash.\n\nWith that in mind:\n\n**Question 2a:** Before the rebase, what is D's parent? After the rebase, in your straight line A-B-C-D-E, what is D's parent?\n\nThen tell me what that means for D's hash. And once you've worked out D, do the same for E."
+  },
+  {
+   "role": "student",
+   "text": "Before the rebase D's parent is B, and after it's C. Hmm, so if the parent hash is part of D's hash, then D would have to get a different hash... wait, so it's not really the same D?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, you've got it. It's not the same D. The rebased D has the same changes and the same message, but its parent is now C instead of B. Since the parent hash goes into the commit hash, it gets a new hash, so it's a new commit. People usually write it as D' (\"D prime\").\n\nYou said you'd do the same for E, so do that next.\n\n**Question 2b:** After the rebase, what is E's parent? Is it the old D or the new D'? Given that, does E keep its old hash?\n\nOnce you've answered that, draw the full picture after `git rebase main`, labeling which commits are new. Then think about this: the original D and E still exist in the repository for a while. Which branch, if any, still points at them?"
+  },
+  {
+   "role": "student",
+   "text": "E's parent would be D' now, not the old D, so yeah E gets a new hash too, E'. So the picture is A-B-C-D'-E' and both of those are new commits. I guess nothing points at the old D and E anymore since feature moved to E'?"
+  },
+  {
+   "role": "tutor",
+   "text": "Correct on all three counts. After the rebase:\n\n```\nmain:     A---B---C\n                   \\\nfeature:            D'---E'\n\n(orphaned:  B---D---E   <- no branch points here anymore)\n```\n\nD' and E' are both new commits. The old D and E aren't deleted right away. No branch points at them, but Git still remembers them for a while in the reflog (`git reflog`) and in `ORIG_HEAD`. That's how you undo a rebase that went wrong. Eventually garbage collection cleans them up.\n\nCompare that with the merge: merge **adds** one commit and leaves everything else alone, while rebase **replaces** your commits with new copies. Keep that difference in mind, because the next question depends on it.\n\n**Question 3:** Say that before you rebased, you had already pushed `feature` to the shared remote, and your teammate Sam pulled it and started building on top of E:\n\n```\nSam's machine:   A---B---D---E---F\n```\n\nNow you rebase locally (so your `feature` is A-B-C-D'-E') and force-push it.\n\nWhen Sam next runs `git pull`, his F has parent E. Does E exist on the remote's `feature` branch anymore? What do you think Sam's history looks like after the pull, and how many copies of \"the D changes\" might he end up with?"
+  },
+  {
+   "role": "student",
+   "text": "No, the remote's feature now has D' and E', so the old E isn't on it anymore. I guess when Sam pulls, Git sees his F sitting on the old E and has to merge that with E', so he'd have both D and D' in his history, like two copies of the same changes?"
+  },
+  {
+   "role": "tutor",
+   "text": "Yes, that's exactly what happens. By default `git pull` fetches and then merges. Sam's local `feature` still has D, E and F, and the remote now has C, D' and E'. Git doesn't know that D' is \"really\" D. As far as it's concerned they're unrelated commits that happen to make the same changes. So it merges them:\n\n```\nSam's machine after pull:\n\n          D---E---F\n         /         \\\nA---B             M     <- Sam's feature\n         \\         /\n          C---D'--E'\n```\n\nSo Sam ends up with two copies of the D changes (D and D') and two copies of E (E and E'), plus a merge commit tying them together. If he pushes that, the duplicates go to everyone. Often the merge goes through cleanly because the changes are identical. But if you had edited anything during the rebase, like resolving a conflict or rewording something, Sam can get conflicts on code he never touched. And the history now looks confusing for no good reason.\n\nThat leads straight to the main rule people quote about rebase.\n\n**Question 4:** Based on what you've worked out so far (rebase replaces commits with new copies, merge only adds), finish this rule in your own words:\n\n> \"It's safe to rebase commits that ________, but you shouldn't rebase commits that ________.\"\n\nThen use it on two cases. Which command would you choose for each, and why?\n1. You have three local commits on `feature` that you haven't pushed yet, and `main` has moved on. You want your work to sit on top of the latest `main` before you open a PR.\n2. `feature` was merged into the shared `main` last week, and you want to \"tidy up\" those commits on `main`."
+  },
+  {
+   "role": "student",
+   "text": "Okay, I'd say it's safe to rebase commits that only exist on my machine and nobody else has pulled yet, but you shouldn't rebase commits that are already pushed somewhere other people are building on. Because rebasing makes new copies, and everyone else is still holding the old ones."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the rule, and your reason is the important part: rebase makes new copies, and everyone else still has the old ones. Most people can recite \"don't rebase public branches\" without knowing why. You just worked out the why.\n\nOne small adjustment that will help later: the question isn't really \"is it on my machine.\" It's \"could anyone else have a copy of these commits?\" Pushing to a branch only you use, like your own fork or a PR branch nobody else touches, is usually still fine to rebase, as long as you know nobody has built on it. Shared branches like `main` are the dangerous ones.\n\nYou haven't applied the rule to the two cases yet, so do that now:\n\n1. You have three local commits on `feature` that you haven't pushed, and `main` has moved on. You want your work on top of the latest `main` before opening a PR. **Rebase or merge?** Why?\n2. `feature` was merged into the shared `main` last week, and you want to \"tidy up\" those commits on `main`. **Should you rebase?** Who has copies of those commits, and what would happen to them? Think about Sam.\n\nFor case 2, also tell me what you'd do instead if you really wanted to fix something in those commits."
+  },
+  {
+   "role": "student",
+   "text": "For case 1 I'd rebase, since those three commits are only on my machine and nobody has copies yet, so making new versions of them hurts no one. It also gives a clean straight line on top of the latest main for the PR."
+  },
+  {
+   "role": "tutor",
+   "text": "Right on case 1, and for the right reason. Nobody else has copies of those three commits, so replacing them with new versions can't strand anyone the way Sam got stranded. You also get the benefit you mentioned: your PR is a straight line on top of the latest `main`, so reviewers see only your changes. And if `main` changed something your commits touch, you'll deal with any conflicts now, one commit at a time, instead of the person merging your PR having to.\n\nNow case 2, which is the one the rule is really for:\n\n`feature` was merged into the shared `main` last week, and you want to \"tidy up\" those commits on `main`.\n\n**Question 4b:** Start with just this. Who has copies of those commits right now? Think about everyone who has run `git pull` on `main` since last week.\n\nThen use what happened to Sam: if you rebased those commits on `main` and force-pushed, what would each of those people see the next time they pulled?\n\nOnce you've answered that, tell me what you'd do instead if one of those commits really did have a bug or a mistake you needed to fix. Hint: think about which of the two operations we've covered only *adds* to history."
+  }
+ ],
+ "usage": [],
+ "conv_id": "c1247a28a1"
+}

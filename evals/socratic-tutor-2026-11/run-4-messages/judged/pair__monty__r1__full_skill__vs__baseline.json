@@ -1,0 +1,16 @@
+{
+ "scenario": "monty",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "full_skill",
+ "raw": {
+  "winner": "B",
+  "why": "B has the learner state the 50/50 belief and work out the starting odds and the host's forced choice themselves, while A lectures the full answer up front and the learner mostly agrees, though B is slower and never reaches a resolution."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

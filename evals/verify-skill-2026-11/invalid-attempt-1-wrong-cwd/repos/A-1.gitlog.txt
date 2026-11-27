@@ -1,0 +1,10 @@
+## git log --stat
+commit 34dacc9
+    Initial tiny shop
+
+ .claude/skills/verify/SKILL.md |  9 +++++++
+ package.json                   |  8 +++++++
+ server.js                      | 54 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
+## git status --short
+## git diff HEAD~1 (if any)

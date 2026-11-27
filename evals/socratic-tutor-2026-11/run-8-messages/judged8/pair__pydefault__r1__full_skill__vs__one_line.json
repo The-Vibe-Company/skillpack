@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 1,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A brings the fresh-list misconception to the surface with a diagnostic and then a make_default() experiment, so the learner reasons their way to definition-time evaluation, while B states the answer up front in a long lecture and the learner just accepts it before doing the follow-up checks."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

@@ -1,0 +1,73 @@
+{
+ "scenario": "bigo",
+ "kind": "tutor",
+ "condition": "full_skill",
+ "run": 3,
+ "model": "claude-opus-5-5 (Claude Code general-purpose subagent, instructions in the task prompt)",
+ "system_sha256": "02f8a95be7967467f92704a5e4bc913eb5666fad6a52efb6bd57ba492ae6dae8",
+ "opening": "Quiz me on Big-O notation, I have an interview next week.",
+ "turns": [
+  {
+   "role": "tutor",
+   "text": "Let's get you ready for it. Here's how I'll break Big-O down for interview prep:\n\n1. What Big-O actually means (upper bound, dropping constants and lower-order terms)\n2. Common complexity classes and how they rank (O(1), O(log n), O(n), O(n log n), O(n^2), O(2^n), O(n!))\n3. Analyzing loops (sequential vs. nested, loops whose step isn't 1)\n4. Analyzing recursion (recursion trees, divide-and-conquer)\n5. Space complexity (including the call stack)\n6. Complexity of common data structures and algorithms (hash maps, heaps, sorting, BST operations)\n7. Amortized, best, worst, and average case (and Big-O vs. Big-Theta vs. Big-Omega)\n\nFirst I'll ask you a few questions, one at a time, to see what you already know. I won't teach anything until we're done with these. Then I'll show you a skill map and suggest where to start.\n\nQuestion 1: A function has one loop that runs n times. After it finishes, a second, separate loop runs n times, and inside that loop there's another loop that also runs n times. What's the Big-O of the whole function, and why?"
+  },
+  {
+   "role": "student",
+   "text": "I think it's O(n^3). The nested part is already n^2, and since there's another loop over the array on top of that, you multiply by n again, same way two separate loops would give you n^2."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll hold off on whether that's right until the diagnostic is done, and we'll come back to it.\n\nQuestion 2: Here's a loop:\n\n    i = 1\n    while i < n:\n        i = i * 2\n\nHow many times does the loop body run as a function of n, and what's the Big-O?"
+  },
+  {
+   "role": "student",
+   "text": "Since i doubles every time, it goes 1, 2, 4, 8... so it hits n after about log base 2 of n steps. So I'd say O(log n)."
+  },
+  {
+   "role": "tutor",
+   "text": "Got it. Next one.\n\nQuestion 3: Here's a recursive function:\n\n    def f(n):\n        if n <= 1:\n            return 1\n        return f(n - 1) + f(n - 1)\n\nWhat's the time complexity of f(n), and what's its space complexity? Explain how you got each one."
+  },
+  {
+   "role": "student",
+   "text": "Each call makes two more calls, so the number of calls doubles at every level and you get O(2^n) time. For space I'd also say O(2^n), since all those calls have to be stored somewhere."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. I'll come back to this one after the diagnostic too.\n\nQuestion 4: You append n items, one at a time, to a dynamic array (like a Python list or Java ArrayList). When the array is full, it allocates a new array twice the size and copies every existing element over. A single append can therefore cost O(n) when it triggers a resize. What's the total time to do all n appends, and what does that work out to per append? Explain your reasoning."
+  },
+  {
+   "role": "student",
+   "text": "Hmm, a resize can cost O(n) and you're doing n appends, so worst case I'd say O(n^2) total. That would make it O(n) per append, though I've heard people say appends are O(1) so maybe I'm missing something."
+  },
+  {
+   "role": "tutor",
+   "text": "Noted. We'll come back to this one too, along with your doubt about it.\n\nLast diagnostic question.\n\nQuestion 5: You need to return the k largest values from an unsorted array of n numbers, where k is much smaller than n. Approach A sorts the whole array and takes the last k. Approach B keeps a min-heap of size k while it scans the array: each new element is pushed, and if the heap grows past k, the smallest element is popped. What's the time complexity of each approach, and which one would you pick in an interview? Why?"
+  },
+  {
+   "role": "student",
+   "text": "Sorting is O(n log n), so A is O(n log n). For B, you scan n elements and each heap push or pop is log k, so O(n log k), and I'd pick B since k is way smaller than n."
+  },
+  {
+   "role": "tutor",
+   "text": "That's the end of the diagnostic. Here's where you stand.\n\nSolid: Q2 (the doubling loop) and Q5 (heap vs. sort for top-k). Your reasoning on both was correct and you explained why.\n\nNeeds work, and I'm not giving away the answers yet because we'll work through them together:\n- Q1: your answer is wrong. The problem is how you combined the separate loop with the nested part, and also your claim that \"two separate loops give n^2.\"\n- Q3: your time complexity is right. Your space complexity is wrong.\n- Q4: your instinct that you were missing something was right. O(n^2) total is not the answer.\n\nLevels are conservative because each subskill has only been checked once so far:\n\n    Topic: Big-O notation                   overall: ████░░░░░░ 43%\n    -----------------------------------------------------------------\n    1. Meaning of Big-O        [████░░░░░░]  2/5\n    2. Complexity classes      [██████░░░░]  3/5\n    3. Analyzing loops         [████░░░░░░]  2/5  <- proposed start\n    4. Analyzing recursion     [██████░░░░]  3/5\n    5. Space complexity        [██░░░░░░░░]  1/5\n    6. Common DS/algorithms    [██████░░░░]  3/5\n    7. Amortized/best/worst    [██░░░░░░░░]  1/5\n    -----------------------------------------------------------------\n\nMy suggestion: start with loops (sequential vs. nested), because an interviewer will catch that mistake immediately and it affects almost every analysis you'll do. After that, space complexity (Q3), then amortized analysis (Q4). We'll aim for 4/5 on every subskill before your interview.\n\nWant to start with loops, or would you rather begin somewhere else?"
+  },
+  {
+   "role": "student",
+   "text": "Yeah, let's start with loops. I'm honestly a bit confused though, because I was pretty sure two loops over the same array means n times n."
+  },
+  {
+   "role": "tutor",
+   "text": "That confusion is exactly what we'll sort out, so let's test that belief with real numbers rather than a rule.\n\nHere are two loops, one after the other. Neither is inside the other:\n\n    count = 0\n    for i in range(n):\n        count += 1\n    for j in range(n):\n        count += 1\n\nSay n = 10. What is the value of `count` when this finishes? And how does that number compare with n times n?"
+  },
+  {
+   "role": "student",
+   "text": "Okay so the first loop adds 10 and the second adds another 10, so count is 20. That's way less than 100... huh, but doesn't 2n still grow faster than n, so it's kind of in a bigger class anyway?"
+  },
+  {
+   "role": "tutor",
+   "text": "Right, count is 20, which is 2n and not n^2. So two separate loops add their work. They don't multiply it. Hold on to that.\n\nNow let's test your new idea that 2n is in a bigger class than n. Fill in this table:\n\n    n          n        2n       n^2\n    10         10       20       100\n    1,000      ?        ?        ?\n    1,000,000  ?        ?        ?\n\nThen look at two ratios as n gets bigger: 2n divided by n, and n^2 divided by n. What happens to each one, and what does that tell you about whether 2n belongs in a different class from n?"
+  }
+ ],
+ "usage": [],
+ "conv_id": "1c898683b4"
+}

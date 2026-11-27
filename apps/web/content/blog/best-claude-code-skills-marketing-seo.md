@@ -26,7 +26,7 @@ items:
   - lead: "Marketing and SEO skills do different jobs."
     text: "Some audit a live site (seo-audit, firecrawl-seo-audit). Some teach technical SEO or AEO principles (Addy Osmani's seo, Sanity's seo-aeo-best-practices). One hub routes many SEO sub-skills (AgriciDaniel's seo)."
   - lead: "One skill per repository."
-    text: "Corey Haines' marketingskills repo alone has copywriting, ai-seo and programmatic-seo above 150K installs. We kept seo-audit, the top install in that repo, and diversified the rest."
+    text: "Corey Haines' [marketingskills repo](/blog/seo-geo-skill-packs-claude-code) alone has copywriting, ai-seo and programmatic-seo above 150K installs. We kept seo-audit, the top install in that repo, and diversified the rest."
   - lead: "Some skills need an API or CLI."
     text: "firecrawl-seo-audit expects a Firecrawl API key. seo-geo ships scripts that can call DataForSEO. Without those, you still get the method; you lose the automated pulls."
   - lead: "Install counts are a snapshot."

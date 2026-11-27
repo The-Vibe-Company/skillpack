@@ -1,0 +1,17 @@
+{
+ "file": "bayes__one_line__r3.json",
+ "scenario": "bayes",
+ "condition": "one_line",
+ "run": 3,
+ "judge": {
+  "answer_leaked": true,
+  "leak_turn": 1,
+  "learner_reached_truth": false,
+  "diagnosed_first": false,
+  "flattery_count": 0,
+  "lecture_count": 1,
+  "overall": 5,
+  "why": "The first tutor message lectured the full formula and a worked solution showing that a positive test gives only ~15%, not 90%, before asking what the learner knew. Later turns used good Socratic questions that got the learner to say the 90% is of the sick group, but the learner never stated the posterior idea themselves."
+ },
+ "usage": {}
+}

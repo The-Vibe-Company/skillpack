@@ -1,0 +1,16 @@
+{
+ "scenario": "pydefault",
+ "run": 2,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "baseline",
+ "B": "one_line",
+ "raw": {
+  "winner": "B",
+  "why": "Both open with a long lecture, but B asks for answers with reasoning instead of handing over an answer key, then uses targeted follow-up questions so the learner works out the stale-timestamp and lambda-capture cases, while A mostly confirms answers and re-explains them in long tables."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

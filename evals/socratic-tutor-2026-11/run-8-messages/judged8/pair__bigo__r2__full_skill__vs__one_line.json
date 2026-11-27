@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 2,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "one_line",
+ "B": "full_skill",
+ "raw": {
+  "winner": "A",
+  "why": "A gets the learner to resolve both misconceptions themselves (constants dropping via the double-n test, and sequential loops adding rather than multiplying via their own 2n contradiction), while B spends most of the exchange on a feedback-withheld diagnostic, never addresses the two-sequential-loops misconception, and only begins on constants."
+ },
+ "winner": "one_line",
+ "usage": {}
+}

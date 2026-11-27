@@ -1,0 +1,16 @@
+{
+ "scenario": "bayes",
+ "run": 3,
+ "pair": [
+  "full_skill",
+  "one_line"
+ ],
+ "A": "full_skill",
+ "B": "one_line",
+ "raw": {
+  "winner": "A",
+  "why": "A elicits the base-rate-neglect misconception through diagnostic questions and has the learner build the count-based reasoning themselves, while B opens with a long lecture that hands over the formula, the worked answer and the '90% is wrong' point by fiat before turning Socratic."
+ },
+ "winner": "full_skill",
+ "usage": {}
+}

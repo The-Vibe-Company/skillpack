@@ -89,6 +89,14 @@ describe("blog post structured data", () => {
     });
   });
 
+  it("states dateModified only when the post was revised", () => {
+    expect(blogPostingStructuredData(FACTS)["@graph"][0]).not.toHaveProperty("dateModified");
+    expect(blogPostingStructuredData({ ...FACTS, dateModified: "2026-11-23" })["@graph"][0]).toMatchObject({
+      datePublished: "2026-10-13",
+      dateModified: "2026-11-23",
+    });
+  });
+
   it("credits a named author as a person and omits keywords for an untagged post", () => {
     const [posting] = blogPostingStructuredData({
       ...FACTS,
@@ -97,7 +105,32 @@ describe("blog post structured data", () => {
     })["@graph"];
 
     expect(posting).toMatchObject({ author: { "@type": "Person", name: "Ada Lovelace" } });
+    expect(posting).toHaveProperty("author", { "@type": "Person", name: "Ada Lovelace" });
     expect(posting).not.toHaveProperty("keywords");
+  });
+
+  it("states a profiled author's about page, portrait, job title and other profiles", () => {
+    const [posting] = blogPostingStructuredData({
+      ...FACTS,
+      author: {
+        kind: "person",
+        name: "Ada Lovelace",
+        url: "https://example.com/about",
+        jobTitle: "Co-founder",
+        sameAs: ["https://github.com/ada"],
+        avatar: "/images/authors/ada.webp",
+        imagePath: "/images/authors/ada-400.webp",
+      },
+    })["@graph"];
+
+    expect(posting).toHaveProperty("author", {
+      "@type": "Person",
+      name: "Ada Lovelace",
+      url: "https://example.com/about",
+      image: "https://skillpack.app/images/authors/ada-400.webp",
+      jobTitle: "Co-founder",
+      sameAs: ["https://github.com/ada"],
+    });
   });
 
   it("adds the Home › Blog › post breadcrumb trail", () => {

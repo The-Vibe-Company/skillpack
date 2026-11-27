@@ -1,0 +1,16 @@
+{
+ "scenario": "bigo",
+ "run": 1,
+ "pair": [
+  "one_line",
+  "baseline"
+ ],
+ "A": "one_line",
+ "B": "baseline",
+ "raw": {
+  "winner": "A",
+  "why": "When the learner showed the constant-factor misconception, Tutor A had them run the doubling test themselves until they saw the 1/2 cancel out, while Tutor B corrected O(3n) = O(n) by fiat in a long, lecture-heavy reply."
+ },
+ "winner": "one_line",
+ "usage": {}
+}
