@@ -1,23 +1,22 @@
 ---
-title: "Claude Skills Examples That Aren't Toy Demos (2026)"
-description: "Five real Claude skills examples with scripts, references and clear triggers: frontend-design, webapp-testing, grill-me, brainstorming and agent-browser."
+title: "Claude Skills Examples: 5 Real Skills Worth Copying (2026)"
+description: "Claude skills examples you can copy today: five real skills with scripts and smart triggers, plus ready-made skills for Word, PDF, slides and Excel."
 slug: claude-skills-examples
 date: 2026-11-03
+updated: 2026-11-25
 tags: ["Claude Code", "Agent Skills", "SKILL.md", "Examples", "Skillpack CLI"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Claude skills examples that aren't toy demos
+# Claude skills examples worth copying
 
-Search for Claude skills examples and you mostly get a hello-world `SKILL.md`. That shows the folder shape. It rarely shows how a real skill loads work in stages. Here are five public skills that ship progressive disclosure, scripts, references or careful trigger design, plus the anti-patterns they dodge.
-
-How we checked: layouts and frontmatter come from the public GitHub folders linked below, read on November 3, 2026. Install and validate commands were run the same day with Skillpack CLI 0.3.5. We didn't run Claude Code on these skills for this article. Trigger behavior below is inferred from their descriptions and the [Claude Code skills docs](https://code.claude.com/docs/en/skills).
+A Claude skill is a folder with a `SKILL.md` file that teaches Claude one job. Most Claude skills examples online are hello-world toys. They show the folder shape and stop there. These five are real: frontend-design, webapp-testing, grill-me, brainstorming and agent-browser. Each one has a pattern you can copy. The anti-patterns they dodge are listed too.
 
 ```takeaways
 title: Key Takeaways
 items:
-  - lead: "Study real folders, not toy SKILL.md files."
+  - lead: "Study real skill folders."
     text: "The useful examples keep a short body, push detail into scripts/ or references/, and write a description Claude can match."
   - lead: "Progressive disclosure is the pattern."
     text: "Agents load name and description first, then the full skill, then optional files. Good skills are built for that order."
@@ -26,12 +25,12 @@ items:
   - lead: "Some skills must stay manual."
     text: "grill-me sets disable-model-invocation: true so only /grill-me starts the interview."
   - lead: "Validate before you share."
-    text: "skillpack skills validate checks the folder locally. Both frontend-design and webapp-testing validated clean in our CLI run."
+    text: "skillpack skills validate checks the folder locally. Both frontend-design and webapp-testing validated clean in a Skillpack CLI 0.3.5 run."
 ```
 
 ## What makes a Claude skill example worth studying
 
-A skill is a folder with a `SKILL.md` file. Per the open [Agent Skills](https://agentskills.io/) format and Claude Code's docs, hosts load skills in stages: discover name and description, activate the full instructions when the task matches, then run bundled scripts or open references as needed. That's progressive disclosure. Toy demos skip it. They dump every tip into one file, write a vague description, and never show where a script or a reference belongs.
+A skill is a folder with a `SKILL.md` file. Per the open [Agent Skills](https://agentskills.io/) format and Claude Code's docs, hosts load skills in stages: discover name and description, activate the full instructions when the task matches, then run bundled scripts or open references as needed. That's progressive disclosure. Toy demos skip it. They dump every tip into one file under a vague description. You never see where a script or a reference belongs.
 
 If you're new to the format, start with [What is SKILL.md?](/blog/what-is-skill-md) and [how to create a Claude Code skill](/blog/how-to-create-a-claude-code-skill). The rest assumes you know the basics and want patterns worth copying.
 
@@ -43,7 +42,7 @@ Source: [anthropics/skills `skills/frontend-design`](https://github.com/anthropi
 skillpack install github:anthropics/skills/skills/frontend-design --scope project
 ```
 
-In our CLI 0.3.5 run this installed into `.agents/skills/frontend-design` and `.claude/skills/frontend-design`. `skillpack skills validate` returned `valid: true` with 2 files (SKILL.md plus LICENSE.txt). No `scripts/` folder.
+In a Skillpack CLI 0.3.5 run this installed into `.agents/skills/frontend-design` and `.claude/skills/frontend-design`. `skillpack skills validate` returned `valid: true` with 2 files (SKILL.md plus LICENSE.txt). No `scripts/` folder.
 
 What to copy:
 
@@ -61,7 +60,7 @@ Source: [anthropics/skills `skills/webapp-testing`](https://github.com/anthropic
 skillpack install github:anthropics/skills/skills/webapp-testing --scope project
 ```
 
-Our install wrote 6 files under the skill folder, including `scripts/with_server.py` and three files in `examples/`. Validate returned `valid: true`. The CLI warning flagged `scripts/with_server.py` as an executable file. Useful: you see what can run before you commit the skill.
+The install wrote 6 files under the skill folder, including `scripts/with_server.py` and three files in `examples/`. Validate returned `valid: true`. The CLI warning flagged `scripts/with_server.py` as an executable file. Useful: you see what can run before you commit the skill.
 
 What to copy:
 
@@ -96,7 +95,7 @@ What to copy:
 
 - `disable-model-invocation: true` keeps Claude from starting a hard interview on its own. You type `/grill-me` when you want it. Claude Code's docs recommend that for workflows with side effects or timing you control.
 - The body is a handoff. The real procedure lives in a paired `grilling` skill. Install both, or the stub does nothing useful.
-- The description is short and specific. It names the outcome (a sharper plan or design), not "helps with planning".
+- The description is short and specific. It names the outcome: a sharper plan or design.
 
 Pair this with the planning set in [best Claude Code skills for planning](/blog/best-claude-code-skills-planning) if you want the wider list.
 
@@ -116,7 +115,7 @@ What to copy:
 - The body sequences the conversation: check what you already know, ask one question whose answer would change the design most, size the design doc, get approval, then call `writing-plans`.
 - Extra files sit one hop from SKILL.md. That matches Anthropic's guidance to keep SKILL.md short and link detail instead of nesting references.
 
-It overlaps with grill-me. Most teams pick one planning interview style, not both.
+It overlaps with grill-me. Most teams pick one planning interview style.
 
 ## Example 5: agent-browser (stub that loads versioned guides)
 
@@ -137,6 +136,23 @@ What to copy:
 
 More browser and QA options sit in [best Claude Code skills for testing](/blog/best-claude-code-skills-testing).
 
+## Quick examples for everyday work (Word, PDF, slides, Excel)
+
+Skills also cover office work. The [anthropics/skills repo](https://github.com/anthropics/skills/tree/main/skills) has four of them, next to frontend-design and webapp-testing:
+
+- `docx`: create, read and edit Word documents such as reports, memos, letters and templates.
+- `pptx`: anything with a .pptx file, like slide decks, pitch decks and speaker notes.
+- `xlsx`: spreadsheets (.xlsx, .csv, .tsv), with formulas, formatting, charts and messy data cleanup.
+- `pdf`: extract text and tables, merge, split, fill forms, OCR scanned PDFs.
+
+Their descriptions list trigger words on purpose. `docx` triggers on "Word doc", "report", "memo" and "letter". `pptx` triggers on "deck", "slides" and "presentation". Same lesson as agent-browser: name the trigger words.
+
+The install pattern is the same. It wasn't tested for these four:
+
+```sh
+skillpack install github:anthropics/skills/skills/docx --scope project
+```
+
 ```cta
 title: "Want these skills on every laptop the same way?"
 text: "Install them into a free Skillpack workspace, lock the versions, and share the same copies across Claude Code and Codex."
@@ -146,13 +162,15 @@ secondary: { label: "How to install skills in Claude Code", href: /blog/how-to-i
 
 ## Side-by-side: what each example teaches
 
-| Skill | Repo path | Pattern to steal | Folder extras we saw |
+| Skill | Repo path | Pattern to steal | Folder extras |
 | :- | :- | :- | :- |
 | frontend-design | anthropics/skills/skills/frontend-design | Opinionated process, refuse generic defaults | SKILL.md + license only |
 | webapp-testing | anthropics/skills/skills/webapp-testing | Black-box scripts, decision tree, on-demand examples | `scripts/`, `examples/` |
 | grill-me | mattpocock/skills/skills/productivity/grill-me | Manual-only trigger, hand off to a partner skill | Tiny stub SKILL.md |
 | brainstorming | obra/superpowers/skills/brainstorming | Gate creative work, then call the next skill | `scripts/` + companion markdown |
 | agent-browser | vercel-labs/agent-browser/skills/agent-browser | Stub loads version-matched guides from the CLI | Discovery stub in git |
+
+The folders were read from public GitHub on November 3, 2026. Install and validate commands ran that day with Skillpack CLI 0.3.5. Claude Code itself was not run on these skills. Trigger behavior is inferred from their descriptions and the [Claude Code skills docs](https://code.claude.com/docs/en/skills).
 
 Install counts move. Treat skills.sh numbers as a discovery signal, not a quality score. Open the folder and read it.
 
@@ -178,7 +196,7 @@ If a skill is installed but never used, walk the checklist in [Claude Code skill
 5. Install into a scratch repo and run `skillpack skills validate ./path-to-skill`.
 6. Write three prompts you expect to trigger it, then decide if the description would match them.
 
-The same `SKILL.md` works in Codex if you keep to the shared fields. Codex reads `.agents/skills` in the repo and `~/.agents/skills` on your machine ([Codex skills docs](https://developers.openai.com/codex/skills)). Claude Code reads `.claude/skills`. A project install from Skillpack writes the shared copy plus the host copies so you don't maintain them by hand. More on that in [how to use skills in Codex](/blog/how-to-use-skills-in-codex).
+The same `SKILL.md` works in Codex if you keep to the [shared fields](/blog/agent-skills-open-standard-vs-vendor-folders). Codex reads `.agents/skills` in the repo and `~/.agents/skills` on your machine ([Codex skills docs](https://developers.openai.com/codex/skills)). Claude Code reads `.claude/skills`. A project install from Skillpack writes the shared copy plus the host copies so you don't maintain them by hand. More on that in [how to use skills in Codex](/blog/how-to-use-skills-in-codex).
 
 When the skill is worth keeping across repos, [create a free Skillpack workspace](/login) and publish or lock it so every machine runs the same version.
 
@@ -195,7 +213,9 @@ items:
   - question: "How do I install these example skills?"
     answer: "With Skillpack CLI 0.3.5, for example: skillpack install github:anthropics/skills/skills/frontend-design --scope project. Swap the GitHub path for webapp-testing, grill-me, brainstorming or agent-browser. Read the third-party warning before you pass --yes."
   - question: "How do I validate a skill folder?"
-    answer: "Run skillpack skills validate on the skill directory. In our November 3, 2026 run, frontend-design and webapp-testing both returned valid: true. Invalid frontmatter fails with a nonzero exit code."
+    answer: "Run skillpack skills validate on the skill directory. In a November 3, 2026 run, frontend-design and webapp-testing both returned valid: true. Invalid frontmatter fails with a nonzero exit code."
   - question: "Where can I find more Claude Code skill examples?"
     answer: "Browse the rankings on this site for planning, testing, [frontend design](/blog/best-claude-code-skills-frontend-design) and the overall hub, and check skills.sh for install counts. Always open the GitHub folder and read SKILL.md before you install a third-party skill."
+  - question: "Are there Claude skills examples for non-coding work?"
+    answer: "Yes, the anthropics/skills repo has docx, pptx, xlsx and pdf skills for Word documents, slide decks, spreadsheets and PDF files. Their descriptions list trigger words on purpose, like 'memo' for docx and 'slides' for pptx."
 ```
