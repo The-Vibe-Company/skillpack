@@ -29,7 +29,7 @@ import { blogTableOfContents } from "@/lib/blogMarkdown";
 import { inlineMarkdownText } from "@/lib/markdownText";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 import { blogPostingStructuredData, faqPageStructuredData, serializeJsonLd } from "@/lib/structuredData";
-// The "Release label" direction shared with the home page; only the blog routes load it.
+// Classique styles for the blog routes.
 import "@/styles/label.css";
 import "@/styles/blog-label.css";
 

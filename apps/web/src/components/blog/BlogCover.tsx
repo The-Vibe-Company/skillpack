@@ -3,7 +3,6 @@ import { BrandMark } from "./BrandMark";
 function CoverFrame({ variant, children }: { variant: "card" | "banner"; children?: React.ReactNode }) {
   return (
     <div className={`v10-cover v10-cover--${variant}`} aria-hidden="true">
-      <div className="v10-cover__bg" />
       <BrandMark size={120} className="v10-cover__mark" />
       <div className="v10-cover__inner">
         <p className="v10-cover__brand">
@@ -20,7 +19,7 @@ function CoverFrame({ variant, children }: { variant: "card" | "banner"; childre
 /**
  * A post's cover in listings, drawn from its own title and tags with the brand mark, so no stock
  * image or invented visual stands in for the content. It mirrors the post's Open Graph image and
- * is decorative: the title and tags are printed beside it.
+ * is decorative: the title and tags are printed in the card body.
  */
 export function BlogCover({ title, tags }: { title: string; tags: readonly string[] }) {
   return (

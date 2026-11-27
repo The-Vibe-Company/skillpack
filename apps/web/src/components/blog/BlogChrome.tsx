@@ -8,10 +8,16 @@ import { preloadDisplayFont } from "@/lib/displayFont";
 
 export const BLOG_CONTENT_ID = "blog-content";
 
-/**
- * `label` dresses the page in the home page's "Release label" direction (styles/label.css and
- * styles/blog-label.css, imported by the blog routes) and adds the lazy one-time reveal island.
- */
+const BLOG_NAV = (
+  <>
+    <Link href="/" className="v10-nav__link">Home</Link>
+    <Link href="/#how" className="v10-nav__link">How it works</Link>
+    <Link href="/#agents" className="v10-nav__link">Agents</Link>
+    <Link href="/#open-source" className="v10-nav__link">Open source</Link>
+    <Link href="/blog" className="v10-nav__link">Blog</Link>
+  </>
+);
+
 export function BlogShell({
   children,
   footerLabel = "Skillpack blog",
@@ -30,14 +36,26 @@ export function BlogShell({
           <Link className="v5-brand" href="/" aria-label="Skillpack home">
             <img className="v10-wordmark" src="/brand/skillpack-wordmark-dark-text.svg" alt="Skillpack" width={520} height={110} />
           </Link>
+          {label && <nav className="v10-nav__links" aria-label="Site">{BLOG_NAV}</nav>}
           <span className="v10-nav__spacer" />
           <div className="v10-nav__actions">
-            <Link href="/blog" className="v10-btn v10-btn--ghost v10-btn--sm">
-              Blog
-            </Link>
+            {!label && (
+              <Link href="/blog" className="v10-btn v10-btn--ghost v10-btn--sm">
+                Blog
+              </Link>
+            )}
             <Link href="/login" className="v10-btn v10-btn--primary v10-btn--sm">
               Get started
             </Link>
+            {label && (
+              <details className="hm-menu">
+                <summary className="hm-menu__toggle">
+                  <span className="hm-menu__bars" aria-hidden="true" />
+                  <span className="hm-menu__label">Menu</span>
+                </summary>
+                <nav className="hm-menu__panel" aria-label="Menu">{BLOG_NAV}</nav>
+              </details>
+            )}
           </div>
         </div>
       </header>

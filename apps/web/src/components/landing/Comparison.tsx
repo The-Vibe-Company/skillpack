@@ -87,38 +87,34 @@ export function Comparison() {
   const c = COMPARISON_COPY;
 
   return (
-    <section className="hm-sec" id="compare" data-screen-label="comparison">
-      <div className="hm-field">
-        <span className="hm-field__n">06</span>
-        <span className="hm-field__label">{c.kick}</span>
-      </div>
+    <section className="hm-sec hm-sec--subtle" id="compare" data-screen-label="comparison">
       <div className="hm-sec__body">
+        <p className="lp-kick">{c.kick}</p>
         <h2 className="lp-h2 v5-reveal">
           <em className="lp-em">{c.titleMark}</em>
           {c.titlePost}
         </h2>
         <p className="lp-sub v5-reveal">{c.sub}</p>
-        {/* Focusable so keyboard users can scroll the table when it overflows on narrow screens. */}
         <div className="lp-compare v5-reveal" role="region" aria-labelledby="lp-compare-caption" tabIndex={0}>
-          <table className="lp-compare__table">
+          <table className="lp-compare__table" role="table">
             <caption id="lp-compare-caption">{c.caption}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{c.columns.feature}</th>
-                <th scope="col" className="lp-compare__us">
+            <thead role="rowgroup">
+              <tr role="row">
+                <th scope="col" role="columnheader">{c.columns.feature}</th>
+                <th scope="col" role="columnheader" className="lp-compare__us">
                   {c.columns.skillpack}
                 </th>
-                <th scope="col">{c.columns.directories}</th>
-                <th scope="col">{c.columns.gists}</th>
+                <th scope="col" role="columnheader">{c.columns.directories}</th>
+                <th scope="col" role="columnheader">{c.columns.gists}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody role="rowgroup">
               {COMPARISON_ROWS.map((row) => (
-                <tr key={row.feature}>
-                  <th scope="row">{row.feature}</th>
-                  <td className="lp-compare__us">{row.skillpack}</td>
-                  <td>{row.directories}</td>
-                  <td>{row.gists}</td>
+                <tr role="row" key={row.feature}>
+                  <th scope="row" role="rowheader">{row.feature}</th>
+                  <td role="cell" className="lp-compare__us" data-label={c.columns.skillpack}>{row.skillpack}</td>
+                  <td role="cell" data-label={c.columns.directories}>{row.directories}</td>
+                  <td role="cell" data-label={c.columns.gists}>{row.gists}</td>
                 </tr>
               ))}
             </tbody>
