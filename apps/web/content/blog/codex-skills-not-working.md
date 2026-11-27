@@ -1,18 +1,19 @@
 ---
-title: "Codex Skills Not Loading? Fix .agents/skills Path Issues"
+title: "Codex Skills Not Working? Fix .agents/skills Path Issues"
 description: "Codex skill not showing up? Check .agents/skills vs .codex/skills, ~/.agents/skills, duplicate names, the skills budget and disabled skills, step by step."
 slug: codex-skills-not-working
 date: 2026-11-06
+updated: 2026-11-27
 tags: ["Codex", "Agent Skills", "Troubleshooting", "SKILL.md", "Skillpack CLI"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Codex skills not loading? How to debug .agents/skills and .codex/skills
+# Codex skills not working? Check the folder first
 
-You put a skill in a folder and Codex doesn't list it, or it lists the same skill twice. Most of the time the cause is a path. Codex reads `.agents/skills`, while older guides and some tools still write to `.codex/skills`. Below: how to find every copy, which ones Codex reads, and how to clean up duplicates.
+You put a skill in a folder and Codex doesn't list it, or it lists the same skill twice. Most of the time the cause is a path.
 
-How we checked: the loading rules come from the [official Codex skills docs](https://developers.openai.com/codex/skills), read on November 6, 2026. The install paths come from Skillpack CLI 0.3.5, run the same day in a scratch repo and a scratch home folder (`skillpack self update --dry-run` reported 0.3.5 as current). We didn't run Codex itself for this guide, so what we say about Codex behavior comes from its docs, not from our own runs.
+Codex reads `.agents/skills` from your working directory up to the repo root, plus `~/.agents/skills` for personal skills. The current docs don't list `.codex/skills`, where older guides and some tools still write. Run `/skills`, restart Codex if a new skill is missing, then check for duplicate names, the skills budget and disabled skills.
 
 ```takeaways
 title: Key Takeaways
@@ -67,7 +68,7 @@ What that means in practice:
 
 `~/.codex/skills` was the personal skills folder in earlier Codex versions. The pull request that added `~/.agents/skills` ([openai/codex#10437](https://github.com/openai/codex/pull/10437), merged on February 3, 2026) says it loads personal skills from `$HOME/.agents/skills` "in addition to" the project `.agents/skills`, and keeps backwards compatibility with `~/.codex/skills` "for now until we fully deprecate".
 
-The current docs table doesn't list `~/.codex/skills` at all, and for a repo it lists only `.agents/skills`. In the docs, the `.codex` folder shows up for configuration: `~/.codex/config.toml`, and a project `.codex/config.toml`. We didn't test whether the current Codex build still reads `~/.codex/skills`, so treat it as legacy and move personal skills to `~/.agents/skills`. A project-level `.codex/skills` is not in the docs table, so don't rely on it.
+The current docs table doesn't list `~/.codex/skills` at all, and for a repo it lists only `.agents/skills`. In the docs, the `.codex` folder shows up for configuration: `~/.codex/config.toml`, and a project `.codex/config.toml`. This guide didn't test whether the current Codex build still reads `~/.codex/skills`, so treat it as legacy and move personal skills to `~/.agents/skills`. A project-level `.codex/skills` is not in the docs table, so don't rely on it.
 
 The same folder question exists across tools. [Agent Skills open standard vs vendor folders](/blog/agent-skills-open-standard-vs-vendor-folders) compares what each tool reads.
 
@@ -85,7 +86,7 @@ Skillpack CLI 0.3.5, run on November 6, 2026 with `anthropics/skills/skills/weba
 
 So a project install for Codex gives you the folder Codex reads plus a second copy in `.codex/skills`, which the docs don't list. That second copy is the usual source of a duplicate name when you scan by hand. And a user-scope Codex install lands in the legacy folder, not in `~/.agents/skills`.
 
-On a fresh project, the `--tools opencode` rows are the way to get only the shared `.agents/skills` folders. `skillpack install --tools claude-code` in a project also writes `.agents/skills` next to `.claude/skills`, and no `.codex/skills` (retested on November 6, 2026). We track the path question as a product issue.
+On a fresh project, the `--tools opencode` rows are the way to get only the shared `.agents/skills` folders. `skillpack install --tools claude-code` in a project also writes `.agents/skills` next to `.claude/skills`, and no `.codex/skills` (retested on November 6, 2026). Skillpack tracks the path question as a product issue.
 
 ## Find the duplicates
 
@@ -97,7 +98,7 @@ for d in .agents/skills/*/ .codex/skills/*/ ~/.agents/skills/*/ ~/.codex/skills/
 done | sort
 ```
 
-Our scratch repo, after a default project install and a user-scope Codex install, printed the same name from three folders:
+A scratch repo, after a default project install and a user-scope Codex install, printed the same name from three folders:
 
 ```text
 webapp-testing  .agents/skills/webapp-testing/
@@ -105,17 +106,17 @@ webapp-testing  .codex/skills/webapp-testing/
 webapp-testing  /home/me/.codex/skills/webapp-testing/
 ```
 
-The script reads an unquoted `name:` line, so it won't match a name written as `name: "x"`. If you installed with Skillpack, `skillpack doctor` lists the same copies with their path, scope (`user` or `project`) and status, and exits 0. In our run it showed the user copy and both project copies as `verified`.
+The script reads an unquoted `name:` line, so it won't match a name written as `name: "x"`. If you installed with Skillpack, `skillpack doctor` lists the same copies with their path, scope (`user` or `project`) and status, and exits 0. In the test run it showed the user copy and both project copies as `verified`.
 
 ## Clean up without losing the skill
 
-Deleting a Skillpack-installed copy by hand doesn't stick. We removed `.codex/skills/webapp-testing` and ran `skillpack sync --frozen`: it restored the folder (`restored: 1`, `targets: 2`, exit 0), because the lockfile still lists that target.
+Deleting a Skillpack-installed copy by hand doesn't stick. Removing `.codex/skills/webapp-testing` and running `skillpack sync --frozen` restored the folder (`restored: 1`, `targets: 2`, exit 0), because the lockfile still lists that target.
 
-A cleanup order that held up in our tests:
+A cleanup order that held up in testing:
 
 1. Keep one source of truth. Pick `.agents/skills/` for the repo and `~/.agents/skills/` for your machine, since those are the documented Codex paths.
-2. To drop a `.codex/skills` copy from a Skillpack project, delete the folder and also remove its `codex` target entry from `.companion/skills.lock.json`. In our test, that ended with `skillpack sync --frozen` reporting `targets: 1` and `restored: 0`, and no `.codex` folder came back. Reinstalling with `--tools opencode --force` did not remove the entry, so the folder was restored again. Editing the lockfile by hand is our workaround, not a documented step.
-3. If you edited a copy by hand, the CLI refuses to overwrite it. In our earlier tests, `skillpack install` stopped with `local customization detected; existing files preserved` (exit 9) even with `--force`. Put the edit in the source skill and publish a new version instead.
+2. To drop a `.codex/skills` copy from a Skillpack project, delete the folder and also remove its `codex` target entry from `.companion/skills.lock.json`. In testing, that ended with `skillpack sync --frozen` reporting `targets: 1` and `restored: 0`, and no `.codex` folder came back. Reinstalling with `--tools opencode --force` did not remove the entry, so the folder was restored again. Editing the lockfile by hand is a workaround, not a documented step.
+3. If you edited a copy by hand, the CLI refuses to overwrite it. In earlier tests, `skillpack install` stopped with `local customization detected; existing files preserved` (exit 9) even with `--force`. Put the edit in the source skill and publish a new version instead.
 4. Run `skillpack sync --frozen` and the script above again. Each name should appear once.
 
 To catch drift in [code review](/blog/best-claude-code-skills-code-review) instead of by hand, see [how to check agent skills in CI](/blog/how-to-check-agent-skills-in-ci).
@@ -158,6 +159,8 @@ Two other switches stop a skill from firing on its own. `allow_implicit_invocati
 7. Too many skills? Shorten descriptions or raise `skills.max_context_tokens`.
 
 Setting up Codex from scratch instead? [Codex skills: how to install, use and create them](/blog/how-to-use-skills-in-codex) starts there. To keep one version across laptops, a free [Skillpack workspace](/login) publishes it once and installs it everywhere.
+
+Sources: the loading rules come from the [official Codex skills docs](https://developers.openai.com/codex/skills), read on November 6, 2026. The install paths come from Skillpack CLI 0.3.5, run the same day in a scratch repo and a scratch home folder (`skillpack self update --dry-run` reported 0.3.5 as current). Codex itself wasn't run for this guide, so the Codex behavior described here comes from its docs.
 
 ```faq
 items:
