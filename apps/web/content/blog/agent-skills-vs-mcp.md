@@ -1,16 +1,19 @@
 ---
-title: "Agent Skills vs MCP: Context Cost Measured, When to Use Each"
-description: "Agent Skills vs MCP, measured: what each puts in context at session start, what Claude Code actually loads, plus auth, trust, and when to use each one."
+title: "Agent Skills vs MCP: The Difference and When to Use Each"
+description: "Agent Skills vs MCP in plain words: MCP gives your agent access to a system, a skill teaches it your method. When to use each, or both, plus context cost."
 slug: agent-skills-vs-mcp
 date: 2026-10-14
+updated: 2026-11-26
 tags: ["Agent Skills", "MCP", "Claude Code"]
 author: "Stan Girard"
 authorRole: "co-founder of The Vibe Company, which builds Skillpack"
 ---
 
-# Agent Skills vs MCP: context cost measured, and when to use each
+# Agent Skills vs MCP: when to use each
 
-Agent skills vs MCP comes down to access and method: an MCP server connects your agent to a system, and a skill teaches it the workflow your team expects. The usual tiebreaker is context, with MCP said to fill it and skills said to stay light. Skillpack measured that claim on November 12, 2026. GitHub MCP Server 2.1.0 with its default toolsets lists 46 tools whose definitions total 49,408 characters. By Skillpack's count, that is about 5 times the 9,616 characters of names and descriptions for all 19 skills in `anthropics/skills`. Claude Code skips most of that bill by default. Its [tool search](https://code.claude.com/docs/en/mcp#scale-with-mcp-tool-search) loads only tool names and server instructions at session start, and skills carry a context budget of their own.
+An MCP server gives your agent access to a system: tickets, logs, a database, another app. An Agent Skill teaches the agent how to do a job your way, with instructions and scripts in a folder with a `SKILL.md` file. Need access? Add an MCP server. Need a method? Write a skill. The two also work together.
+
+The usual tiebreaker is context. MCP is said to fill it, and skills are said to stay light. Skillpack measured that claim on November 12, 2026. GitHub MCP Server 2.1.0 with its default toolsets lists 46 tools whose definitions total 49,408 characters. By Skillpack's count, that is about 5 times the 9,616 characters of names and descriptions for all 19 skills in `anthropics/skills`. Claude Code skips most of that bill by default. Its [tool search](https://code.claude.com/docs/en/mcp#scale-with-mcp-tool-search) loads only tool names and server instructions at session start, and skills carry a context budget of their own.
 
 - **Use MCP when** the agent has to reach a system it can't reach today: tickets, logs, a database, another app.
 - **Use a skill when** the agent can already do the work but doesn't do it your way, such as following your team's [code review checklist](/blog/best-claude-code-skills-code-review).
