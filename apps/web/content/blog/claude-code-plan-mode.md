@@ -14,7 +14,7 @@ Claude Code plan mode hands you a tidy numbered plan before Claude touches a fil
 
 Plan mode tells Claude to research and propose changes without making them. Claude reads your files and writes a plan, but does not edit your source. Press `Shift+Tab` until the status bar shows `⏸ plan mode on`, then ask for your change.
 
-Treat it as a checkpoint for human control, not a safety net. Stan Girard, whose name is on this article, asked for a plan before any code for a long time. He doesn't look at plans at all anymore.
+Treat it as a checkpoint for human control, not a safety net. Stan Girard, co-founder of The Vibe Company, asked for a plan before any code for a long time. He doesn't look at plans at all anymore.
 
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. The facts here come from the [Claude Code permission modes docs](https://code.claude.com/docs/en/permission-modes) as they stood on November 27, 2026. That same day, `claude --help` on Claude Code 2.1.332 listed `plan` among the `--permission-mode` choices.
 
