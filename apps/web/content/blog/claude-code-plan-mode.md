@@ -14,7 +14,7 @@ Claude Code plan mode hands you a tidy numbered plan before Claude touches a fil
 
 Plan mode tells Claude to research and propose changes without making them. Claude reads your files and writes a plan, but does not edit your source. Press `Shift+Tab` until the status bar shows `⏸ plan mode on`, then ask for your change.
 
-Treat it as a checkpoint for human control, not a safety net. Stan Girard, co-founder of The Vibe Company, asked for a plan before any code for a long time. He doesn't look at plans at all anymore.
+Treat it as a checkpoint for human control, not a safety net. For a long time I asked for a plan before any code. Today I don't look at plans at all.
 
 Disclosure: Skillpack, the site you're reading, publishes and installs `SKILL.md` packages. The facts here come from the [Claude Code permission modes docs](https://code.claude.com/docs/en/permission-modes) as they stood on November 27, 2026. That same day, `claude --help` on Claude Code 2.1.332 listed `plan` among the `--permission-mode` choices.
 
@@ -38,7 +38,7 @@ You get a key, a prefix and a flag.
 claude --permission-mode plan
 ```
 
-`Shift+Tab` cycles through the permission modes. From auto mode, the first press switches to `default`, then come `acceptEdits` and `plan`.
+`Shift+Tab` cycles through the permission modes. From auto mode, the first press switches to `default`, then come `acceptEdits` and `plan`. In the status bar, `default` shows as `⏸ manual mode on`.
 
 ## What happens when the plan is ready?
 
@@ -74,23 +74,23 @@ The way Claude talks is a separate setting, covered in the guide to [output styl
 
 ## When is plan mode worth it?
 
-Plan mode is worth it when you want a human to look before the edits start. Stan's example is a team new to agents, where seeing the plan before the edits can help people build trust. His warning: "Just don't mistake it for protection."
+Plan mode is worth it when you want a human to look before the edits start. My example is a team new to agents, where seeing the plan before the edits can help people build trust. My warning: "Just don't mistake it for protection."
 
 The sign to skip it is easy to spot. You skim, then you approve.
 
-Stan has been there. He used to ask for a plan before any code and read it line by line. Then he skimmed. By the end, he scanned for the few words that would have worried him and approved. "I approved because I had read it, not because I had checked it," he writes.
+I've been there. I used to ask for a plan before any code and read it line by line. Then I skimmed. By the end, I scanned for the few words that would have worried me and approved. I approved because I had read it, not because I had checked it.
 
-He writes that the mistake, when there is one, hides in what nobody decided beforehand, and rarely in the steps. He wrote skills to make plans faster and cheaper, and still skimmed them. So he stopped reading plans. The rest is in [Stan's longer take on plan mode](https://www.thevibecompany.co/en/resources/articles/claude-code-plan-mode).
+The mistake, when there is one, hides in what nobody decided beforehand, and rarely in the steps. I wrote skills to make plans faster and cheaper, and still skimmed them. So I stopped reading plans. The rest is in [my longer take on plan mode](https://www.thevibecompany.co/en/resources/articles/claude-code-plan-mode).
 
 ## What should you do instead of reading plans?
 
-Settle the decisions on the ticket, before Claude plans anything. Stan spends that time with Grill Me, a skill by Matt Pocock.
+Settle the decisions on the ticket, before Claude plans anything. I spend that time with Grill Me, a skill by Matt Pocock.
 
 You start it by typing `/grill-me`. The agent won't reach for it on its own. It interviews you in rounds and writes no files. Start it in a fresh conversation, and follow the [Grill Me docs](https://github.com/mattpocock/skills/blob/main/docs/productivity/grill-me.md) on one point: "Leave plan mode off. Plan mode makes the agent hurry to produce a plan, when you want it to keep asking questions."
 
-As Stan puts it, in plan mode the agent proposes and you approve. With Grill Me, the agent asks and you decide.
+In plan mode the agent proposes and you approve. With Grill Me, the agent asks and you decide.
 
-Once the ticket is grilled, he finds the AI smart enough to implement it almost every time. A plan would tell him nothing he hadn't already settled.
+Once the ticket is grilled, I find the AI smart enough to implement it almost every time. A plan would tell me nothing I hadn't already settled.
 
 One warning from the same docs: answer "agreed" to every question and you come out with "a plan the agent wrote and you nodded at". Push back.
 
@@ -99,7 +99,7 @@ Grill Me sits on the list of [planning skills](/blog/best-claude-code-skills-pla
 ```faq
 items:
   - question: "Can Claude run commands in plan mode?"
-    answer: "Yes, Claude runs shell commands to explore. What happens to a command depends on your session. When auto mode is available and the useAutoModeDuringPlan setting is on, which it is by default, a classifier reviews commands instead of prompting you. With bypass permissions available in a terminal session, they can run with no prompt at all. Otherwise, commands outside the built-in read-only set prompt for approval."
+    answer: "Yes, Claude runs shell commands to explore, and the first case that matches applies. With bypass permissions available in a terminal session, commands can run with no prompt at all. When auto mode is available and useAutoModeDuringPlan is on (the default), a classifier reviews them instead of prompting you. Otherwise, commands outside the built-in read-only set prompt for approval."
   - question: "Where are Claude Code plans saved?"
     answer: "Plan files live in ~/.claude/plans/, or in the plansDirectory you set."
   - question: "How do I leave plan mode?"
