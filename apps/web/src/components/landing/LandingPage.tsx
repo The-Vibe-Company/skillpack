@@ -115,12 +115,12 @@ const COPY = {
   trustText:
     "Keep a skill private in My Skills or share it with your organization. Skillpack can run its control plane and skill registry on your own servers, so governance stays on infrastructure you control.",
   trustFacts: [
-    { title: "MIT licensed", desc: "Read the code, fork it, run it. No black box." },
-    { title: "Private by default", desc: "Personal skills are visible to their creator only, with no admin override." },
-    { title: "Write-only secrets", desc: "Envelope-encrypted, referenced by id, never shown again." },
-    { title: "Checksummed releases", desc: "Public releases pin exact, immutable versions." },
-    { title: "GitHub mirror", desc: "Sync organization skills to a repository you own." },
-    { title: "Portable SKILL.md", desc: "An open format your skills can always leave with." },
+    { icon: "file-code", title: "MIT licensed", desc: "Read the code, fork it, run it. No black box." },
+    { icon: "lock", title: "Private by default", desc: "Personal skills are visible to their creator only, with no admin override." },
+    { icon: "key-round", title: "Write-only secrets", desc: "Envelope-encrypted, referenced by id, never shown again." },
+    { icon: "shield-check", title: "Checksummed releases", desc: "Public releases pin exact, immutable versions." },
+    { icon: "git-branch", title: "GitHub mirror", desc: "Sync organization skills to a repository you own." },
+    { icon: "package", title: "Portable SKILL.md", desc: "An open format your skills can always leave with." },
   ],
   trustRepo: "Read the code on GitHub ↗",
   finaleKick: "Get started",
@@ -286,9 +286,12 @@ function AgentsTerminal() {
   return (
     <figure className="hm-term v5-reveal" aria-label="Example terminal session: one install into three agents">
       <div className="hm-term__bar" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span className="hm-term__dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span className="hm-term__title">skillpack · cli</span>
       </div>
       <pre className="hm-term__body">
         <code>
@@ -517,6 +520,9 @@ function Trust({ c }: { c: Copy }) {
         <dl className="hm-spec v5-reveal">
           {c.trustFacts.map((f) => (
             <div className="lp-fact hm-spec__row" key={f.title}>
+              <span className="hm-spec__icon" aria-hidden="true">
+                <Icon name={f.icon} size={18} />
+              </span>
               <dt>{f.title}</dt>
               <dd>{f.desc}</dd>
             </div>

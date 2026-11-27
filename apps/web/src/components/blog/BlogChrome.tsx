@@ -8,13 +8,14 @@ import { preloadDisplayFont } from "@/lib/displayFont";
 
 export const BLOG_CONTENT_ID = "blog-content";
 
+const GITHUB_URL = "https://github.com/The-Vibe-Company/skillpack";
+
 const BLOG_NAV = (
   <>
-    <Link href="/" className="v10-nav__link">Home</Link>
     <Link href="/#how" className="v10-nav__link">How it works</Link>
     <Link href="/#agents" className="v10-nav__link">Agents</Link>
     <Link href="/#open-source" className="v10-nav__link">Open source</Link>
-    <Link href="/blog" className="v10-nav__link">Blog</Link>
+    <Link href="/blog" className="v10-nav__link" aria-current="page">Blog</Link>
   </>
 );
 
@@ -39,7 +40,11 @@ export function BlogShell({
           {label && <nav className="v10-nav__links" aria-label="Site">{BLOG_NAV}</nav>}
           <span className="v10-nav__spacer" />
           <div className="v10-nav__actions">
-            {!label && (
+            {label ? (
+              <a className="v10-btn v10-btn--ghost v10-btn--sm hm-nav-gh" href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                GitHub ↗
+              </a>
+            ) : (
               <Link href="/blog" className="v10-btn v10-btn--ghost v10-btn--sm">
                 Blog
               </Link>

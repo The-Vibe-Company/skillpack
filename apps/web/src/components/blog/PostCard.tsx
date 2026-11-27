@@ -21,6 +21,11 @@ export function PostCard({ post, featured = false, headingLevel }: { post: BlogP
         </Heading>
         <p className="v10-postcard__desc">{post.description}</p>
         <TagList tags={post.tags} />
+        {featured ? (
+          <span className="v10-postcard__cta" aria-hidden="true">
+            Read guide →
+          </span>
+        ) : null}
       </div>
     </article>
   );
