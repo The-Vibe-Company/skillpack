@@ -85,8 +85,7 @@
 .v10-postcard__title a { color: inherit; text-decoration: none; }
 /* The title link covers the whole card, so the card has one target and one tab stop. */
 .v10-postcard__title a::after { content: ""; position: absolute; inset: -8px; border-radius: calc(var(--lp-radius) + 6px); }
-.v10-postcard__title a:focus-visible { outline: none; }
-.v10-postcard__title a:focus-visible::after { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
+.v10-postcard__title a:focus-visible { outline: 2px solid var(--color-accent-ring); outline-offset: 2px; }
 .v10-postcard:hover .v10-postcard__title a {
   text-decoration: underline;
   text-decoration-color: var(--color-accent-edge);

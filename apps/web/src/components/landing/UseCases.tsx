@@ -97,15 +97,9 @@ function Snippet({ useCase }: { useCase: UseCase }) {
 
 export function UseCases() {
   return (
-    <section className="hm-sec" id="use-cases" data-screen-label="use-cases">
-      <div className="hm-field">
-        <span className="hm-field__n">04</span>
-        <span className="hm-field__label">Use cases</span>
-        <span className="hm-field__meta" aria-hidden="true">
-          {USE_CASES.length} × SKILL.md
-        </span>
-      </div>
+    <section className="hm-sec hm-sec--subtle" id="use-cases" data-screen-label="use-cases">
       <div className="hm-sec__body">
+        <p className="lp-kick">Use cases</p>
         <h2 className="lp-h2 v5-reveal">
           Claude skills examples <em className="lp-em">teams actually ship</em>
         </h2>

@@ -4,7 +4,7 @@ import { PostCard } from "@/components/blog/PostCard";
 import { BLOG_SHARE_IMAGE, blogPostPath, loadBlogPosts } from "@/lib/blog";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 import { blogIndexStructuredData, serializeJsonLd } from "@/lib/structuredData";
-// The "Release label" direction shared with the home page; only the blog routes load it.
+// Classique styles for the blog routes.
 import "@/styles/label.css";
 import "@/styles/blog-label.css";
 
@@ -50,7 +50,6 @@ export default function BlogIndexPage() {
     <BlogShell label>
       <div className="lp v10-bloghome">
         <header className="v10-bloghome__hero">
-          <div className="v10-bloghome__bg" aria-hidden="true" />
           <div className="v10-wrap v10-bloghome__intro">
             <p className="lp-kick">Skillpack blog</p>
             <h1 className="v10-bloghome__title">Guides to SKILL.md and Agent Skills</h1>

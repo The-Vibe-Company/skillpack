@@ -29,7 +29,7 @@ import { blogTableOfContents } from "@/lib/blogMarkdown";
 import { inlineMarkdownText } from "@/lib/markdownText";
 import { resolveSiteUrl } from "@/lib/siteUrl";
 import { blogPostingStructuredData, faqPageStructuredData, serializeJsonLd } from "@/lib/structuredData";
-// The "Release label" direction shared with the home page; only the blog routes load it.
+// Classique styles for the blog routes.
 import "@/styles/label.css";
 import "@/styles/blog-label.css";
 
@@ -115,22 +115,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <div className={ranking ? "lp v10-post v10-post--ranking" : "lp v10-post"}>
         <ReadingProgress targetId={ARTICLE_BODY_ID} />
         <article>
-          {ranking ? (
-            <RankingHeader
-              id={ARTICLE_HEADER_ID}
-              heading={heading}
-              lead={lead}
-              skillCount={skillCards(blocks).length}
-              author={author}
-              authorRole={post.authorRole}
-              date={post.date}
-              dataCollected={post.dataCollected}
-              updated={post.updated}
-              minutes={minutes}
-              tags={post.tags}
-            />
-          ) : (
-            <>
+          <div className="v10-post__hero">
+            {ranking ? (
+              <RankingHeader
+                id={ARTICLE_HEADER_ID}
+                heading={heading}
+                lead={lead}
+                skillCount={skillCards(blocks).length}
+                author={author}
+                authorRole={post.authorRole}
+                date={post.date}
+                dataCollected={post.dataCollected}
+                updated={post.updated}
+                minutes={minutes}
+                tags={post.tags}
+              />
+            ) : (
               <header id={ARTICLE_HEADER_ID} className="v10-wrap v10-post__header">
                 <nav className="v10-crumbs" aria-label="Breadcrumb">
                   <ol>
@@ -153,11 +153,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 />
                 <TagList tags={post.tags} />
               </header>
-
-              <div className="v10-wrap v10-post__cover">
-                <BlogBanner />
-              </div>
-            </>
+            )}
+          </div>
+          {!ranking && (
+            <div className="v10-wrap v10-post__cover">
+              <BlogBanner />
+            </div>
           )}
 
           <div className="v10-wrap v10-post__layout">

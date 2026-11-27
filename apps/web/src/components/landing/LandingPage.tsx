@@ -1,11 +1,4 @@
-/* Skillpack marketing landing (v12 "Release label").
-   Art direction chosen with AEOM (direction "etiquette"): the page reads top to bottom like the
-   sealed label of a shipped package. Each section opens on a numbered field bar, versions and
-   checksums are the visual material, and the one seal colour is the signal yellow of the product's
-   primary button. Product pictures follow the Stageshow rules (a believable miniature of the real
-   UI, real words only where the story is, cropped with intent); the "How it works" tiles sit on a
-   ruled bento grid. The page renders on the server; the portal demo (PortalCapture, lazy-loaded)
-   and the lazy motion island (LandingMotion -> LandingReveal) are the only client islands. Every word on the page is in the server HTML. */
+/* Classique marketing page. Copy and structured data render on the server. */
 
 import Link from "next/link";
 import { Fragment } from "react";
@@ -54,9 +47,7 @@ const COPY = {
     "A private, versioned skills registry for your team. Write and validate SKILL.md packages, share them across your organization, then install an exact version into Claude Code, Codex and OpenCode with one command. Self-host it or use skillpack.app.",
   ctaPrimary: "Start your library",
   ctaSecondary: "See how it works",
-  heroInstallLabel: "Install",
   heroCommand: "skillpack install code-review",
-  heroRelease: "Immutable release",
   heroFacts: [
     { label: "Format", value: "SKILL.md" },
     { label: "Releases", value: "Immutable, sha256" },
@@ -124,12 +115,12 @@ const COPY = {
   trustText:
     "Keep a skill private in My Skills or share it with your organization. Skillpack can run its control plane and skill registry on your own servers, so governance stays on infrastructure you control.",
   trustFacts: [
-    { title: "MIT licensed", desc: "Read the code, fork it, run it. No black box." },
-    { title: "Private by default", desc: "Personal skills are visible to their creator only, with no admin override." },
-    { title: "Write-only secrets", desc: "Envelope-encrypted, referenced by id, never shown again." },
-    { title: "Checksummed releases", desc: "Public releases pin exact, immutable versions." },
-    { title: "GitHub mirror", desc: "Sync organization skills to a repository you own." },
-    { title: "Portable SKILL.md", desc: "An open format your skills can always leave with." },
+    { icon: "file-code", title: "MIT licensed", desc: "Read the code, fork it, run it. No black box." },
+    { icon: "lock", title: "Private by default", desc: "Personal skills are visible to their creator only, with no admin override." },
+    { icon: "key-round", title: "Write-only secrets", desc: "Envelope-encrypted, referenced by id, never shown again." },
+    { icon: "shield-check", title: "Checksummed releases", desc: "Public releases pin exact, immutable versions." },
+    { icon: "git-branch", title: "GitHub mirror", desc: "Sync organization skills to a repository you own." },
+    { icon: "package", title: "Portable SKILL.md", desc: "An open format your skills can always leave with." },
   ],
   trustRepo: "Read the code on GitHub ↗",
   finaleKick: "Get started",
@@ -178,21 +169,6 @@ export const HOME_BLOG_LINKS = [
   { slug: "how-to-check-agent-skills-in-ci", title: "How to check agent skills in CI: validate, lock, sync" },
 ] as const;
 
-/* Sections in reading order, for the index rail. */
-const INDEX = [
-  { href: "#agents", label: "Install" },
-  { href: "#problem", label: "The problem" },
-  { href: "#how", label: "How it works" },
-  { href: "#use-cases", label: "Examples" },
-  { href: "#open-source", label: "Open source" },
-  { href: "#compare", label: "Compare" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#start", label: "Get started" },
-];
-
-/* ------------------------------------------------------------ utilities --- */
-
-/** The one highlighted idea in each headline: solid ink over a seal-yellow underline. */
 function Em({ children }: { children: React.ReactNode }) {
   return <em className="lp-em">{children}</em>;
 }
@@ -206,28 +182,6 @@ function Mark({ size = 28 }: { size?: number }) {
     </svg>
   );
 }
-
-/** A decorative barcode band, the label's signature. */
-function Barcode({ className }: { className?: string }) {
-  return <span className={"hm-barcode" + (className ? " " + className : "")} aria-hidden="true"></span>;
-}
-
-/** The numbered field bar that opens every section of the label. */
-function Field({ n, label, meta }: { n: string; label: string; meta?: string }) {
-  return (
-    <div className="hm-field">
-      <span className="hm-field__n">{n}</span>
-      <span className="hm-field__label">{label}</span>
-      {meta && (
-        <span className="hm-field__meta" aria-hidden="true">
-          {meta}
-        </span>
-      )}
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------- sections --- */
 
 function Nav({ c, catalog }: { c: Copy; catalog: boolean }) {
   const links = (
@@ -291,66 +245,37 @@ function Hero({ c }: { c: Copy }) {
   return (
     <section className="hm-hero" id="top" data-screen-label="hero" aria-labelledby="hero-title">
       <div className="v10-wrap">
-        <div className="hm-hero__label">
-          <Field n="00" label={c.heroBadge} />
-          <div className="hm-hero__body">
-            <div className="hm-hero__copy">
-              <h1 className="lp-h1" id="hero-title">
-                {c.heroTitlePre}
-                <span className="hm-nowrap">{c.heroTitleOpen}</span> <Em>{c.heroTitleMark}</Em>
-                {c.heroTitlePost}
-              </h1>
-              <p className="hm-hero__sub">{c.heroSub}</p>
-              <div className="hm-ctas">
-                <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg">
-                  {c.ctaPrimary}
-                </Link>
-                <a className="v10-btn v10-btn--ghost v10-btn--lg" href="#problem">
-                  {c.ctaSecondary}
-                </a>
-              </div>
-            </div>
-            <div className="hm-facts">
-              <dl>
-                {c.heroFacts.map((f) => (
-                  <div className="hm-facts__row" key={f.label}>
-                    <dt>{f.label}</dt>
-                    <dd>{f.value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="hm-facts__seal" aria-hidden="true">
-                <Barcode />
-                <code>code-review@1.3.0 · sha256:9f3c…a71e</code>
-              </div>
-            </div>
+        <div className="hm-hero__body">
+          <p className="hm-hero__badge">{c.heroBadge}</p>
+          <h1 className="lp-h1" id="hero-title">
+            {c.heroTitlePre}
+            <span className="hm-nowrap">{c.heroTitleOpen}</span> <Em>{c.heroTitleMark}</Em>
+            {c.heroTitlePost}
+          </h1>
+          <p className="hm-hero__sub">{c.heroSub}</p>
+          <div className="hm-ctas">
+            <Link href="/login" className="v10-btn v10-btn--primary v10-btn--lg">
+              {c.ctaPrimary}
+            </Link>
+            <a className="v10-btn v10-btn--ghost v10-btn--lg" href="#problem">
+              {c.ctaSecondary}
+            </a>
           </div>
-          <div className="hm-track" role="group" aria-label="Install command">
-            <Barcode className="hm-track__code" />
-            <div className="hm-track__line">
-              <span className="hm-track__label">{c.heroInstallLabel}</span>
-              <code className="hm-track__cmd">
-                <span className="hm-prompt" aria-hidden="true">
-                  ${" "}
-                </span>
-                {c.heroCommand}
-              </code>
-            </div>
-          </div>
+          <code className="hm-track__cmd" aria-label="Install command">
+            <span className="hm-prompt" aria-hidden="true">$ </span>
+            {c.heroCommand}
+          </code>
         </div>
+        <dl className="hm-facts">
+          {c.heroFacts.map((f) => (
+            <div className="hm-facts__row" key={f.label}>
+              <dt>{f.label}</dt>
+              <dd>{f.value}</dd>
+            </div>
+          ))}
+        </dl>
         <div className="hm-hero__stage">
           <PortalDemo />
-          <div className="hm-release" aria-hidden="true">
-            <div className="hm-release__head">
-              <span>code-review</span>
-              <span>1.3.0</span>
-            </div>
-            <Barcode className="hm-release__code" />
-            <div className="hm-release__foot">
-              <span className="hm-seal">{c.heroRelease}</span>
-              <code>sha256:9f3c…a71e</code>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -361,9 +286,12 @@ function AgentsTerminal() {
   return (
     <figure className="hm-term v5-reveal" aria-label="Example terminal session: one install into three agents">
       <div className="hm-term__bar" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span className="hm-term__dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span className="hm-term__title">skillpack · cli</span>
       </div>
       <pre className="hm-term__body">
         <code>
@@ -397,39 +325,41 @@ function AgentsTerminal() {
 function Agents({ c }: { c: Copy }) {
   return (
     <section className="hm-sec" id="agents" data-screen-label="agents">
-      <Field n="01" label={c.agentsKick} meta="--tools" />
       <div className="hm-sec__body">
-        <div className="hm-agents" data-screen-label="agents-strip">
-          <h2 className="lp-h2 v5-reveal">
-            {c.agentsTitlePre}
-            <Em>{c.agentsTitleMark}</Em>
-          </h2>
-          <p className="lp-sub v5-reveal">{c.agentsLead}</p>
-          <ul className="hm-ports" aria-label="Supported install targets">
-            {AGENTS.map((a) => (
-              <li className="lp-agent hm-port" key={a.name}>
-                <span className="hm-port__led" aria-hidden="true"></span>
-                <code className="hm-port__tool">{a.tool}</code>
-                <span className="hm-port__name">{a.name}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
         <div className="hm-split">
-          <AgentsTerminal />
-          <div className="hm-connect">
-            <h3 className="hm-h3">{c.connectTitle}</h3>
-            <p className="hm-body">{c.agentsSub}</p>
-            <ul className="hm-points">
-              {c.agentsPoints.map((p) => (
-                <li key={p.text}>
-                  <Icon name={p.icon} size={16} />
-                  {p.text}
+          <div data-screen-label="agents-strip">
+            <p className="lp-kick">{c.agentsKick}</p>
+            <h2 className="lp-h2 v5-reveal">
+              {c.agentsTitlePre}
+              <Em>{c.agentsTitleMark}</Em>
+            </h2>
+            <p className="lp-sub v5-reveal">{c.agentsLead}</p>
+            <ul className="hm-ports" aria-label="Supported install targets">
+              {AGENTS.map((a) => (
+                <li className="lp-agent hm-port" key={a.name}>
+                  <span className="hm-port__led" aria-hidden="true"></span>
+                  <code className="hm-port__tool">{a.tool}</code>
+                  <span className="hm-port__name">{a.name}</span>
                 </li>
               ))}
             </ul>
+          </div>
+          <AgentsTerminal />
+        </div>
+        <div className="hm-security">
+          <div>
+            <h3 className="hm-h3">{c.connectTitle}</h3>
+            <p className="hm-body">{c.agentsSub}</p>
             <p className="lp-note">{c.agentsNote}</p>
           </div>
+          <ul className="hm-points">
+            {c.agentsPoints.map((p) => (
+              <li key={p.text}>
+                <Icon name={p.icon} size={16} />
+                {p.text}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
@@ -438,10 +368,10 @@ function Agents({ c }: { c: Copy }) {
 
 function Problem({ c }: { c: Copy }) {
   return (
-    <section className="hm-sec" id="problem" data-screen-label="the-problem">
-      <Field n="02" label={c.problemKick} meta="5 copies · 0 versions" />
+    <section className="hm-sec hm-sec--subtle" id="problem" data-screen-label="the-problem">
       <div className="hm-sec__body hm-split hm-split--problem">
         <div>
+          <p className="lp-kick">{c.problemKick}</p>
           <h2 className="lp-h2 v5-reveal">
             {c.problemTitlePre}
             <Em>{c.problemTitleMark}</Em>
@@ -449,7 +379,7 @@ function Problem({ c }: { c: Copy }) {
           <p className="lp-sub v5-reveal">{c.problemSub}</p>
           <p className="lp-punch v5-reveal">{c.problemPunch}</p>
         </div>
-        <ul className="hm-returns v5-reveal" aria-hidden="true">
+        <ul className="hm-returns v5-reveal">
           {SCATTER.map((f) => (
             <li className="hm-returns__row" key={f.name}>
               <Icon name="file-text" size={14} />
@@ -554,17 +484,17 @@ function StepVisual({ n }: { n: string }) {
 function How({ c }: { c: Copy }) {
   return (
     <section className="hm-sec" id="how" data-screen-label="how-it-works">
-      <Field n="03" label={c.howKick} meta="01 → 04" />
       <div className="hm-sec__body">
+        <p className="lp-kick">{c.howKick}</p>
         <h2 className="lp-h2 v5-reveal">
           {c.howTitlePre}
           <Em>{c.howTitleMark}</Em>
         </h2>
         <ol className="hm-bento">
           {c.steps.map((s) => (
-            <li className={"lp-step hm-tile hm-tile--" + s.n + " v5-reveal"} key={s.n}>
+            <li className="lp-step hm-tile v5-reveal" key={s.n}>
               <div className="hm-tile__text">
-                <span className="hm-tile__n">{s.n}</span>
+                <span className="hm-tile__n" aria-hidden="true">{s.n}</span>
                 <h3>{s.title}</h3>
                 <p>{s.desc}</p>
               </div>
@@ -580,8 +510,8 @@ function How({ c }: { c: Copy }) {
 function Trust({ c }: { c: Copy }) {
   return (
     <section className="hm-sec" id="open-source" data-screen-label="trust">
-      <Field n="05" label={c.trustKick} meta="MIT" />
       <div className="hm-sec__body">
+        <p className="lp-kick">{c.trustKick}</p>
         <h2 className="lp-h2 v5-reveal">
           {c.trustTitlePre}
           <Em>{c.trustTitleMark}</Em>
@@ -590,13 +520,15 @@ function Trust({ c }: { c: Copy }) {
         <dl className="hm-spec v5-reveal">
           {c.trustFacts.map((f) => (
             <div className="lp-fact hm-spec__row" key={f.title}>
+              <span className="hm-spec__icon" aria-hidden="true">
+                <Icon name={f.icon} size={18} />
+              </span>
               <dt>{f.title}</dt>
               <dd>{f.desc}</dd>
             </div>
           ))}
         </dl>
         <p className="hm-repo">
-          <Barcode className="hm-repo__code" />
           <code>github.com/The-Vibe-Company/skillpack</code>
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
             {c.trustRepo}
@@ -609,9 +541,9 @@ function Trust({ c }: { c: Copy }) {
 
 function Finale({ c }: { c: Copy }) {
   return (
-    <section className="hm-sec hm-finale" id="start" data-screen-label="finale">
-      <Field n="08" label={c.finaleKick} />
+    <section className="hm-sec hm-sec--subtle hm-finale" id="start" data-screen-label="finale">
       <div className="hm-sec__body hm-finale__body">
+        <p className="lp-kick">{c.finaleKick}</p>
         <Mark size={48} />
         <h2 className="lp-h2">
           {c.finaleTitlePre}
@@ -629,25 +561,6 @@ function Finale({ c }: { c: Copy }) {
         <p className="hm-finale__small">{c.finaleSmall}</p>
       </div>
     </section>
-  );
-}
-
-/** The label's index: a numbered field block at the head of the sheet, one link per section. */
-function IndexStrip() {
-  return (
-    <nav className="hm-index" aria-label="On this page">
-      <span className="hm-index__title">Index</span>
-      <ol className="hm-index__list">
-        {INDEX.map((item, i) => (
-          <li key={item.href}>
-            <a href={item.href}>
-              <span className="hm-index__n">{String(i + 1).padStart(2, "0")}</span>
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ol>
-    </nav>
   );
 }
 
@@ -713,7 +626,6 @@ export function LandingPage() {
       <Nav c={c} catalog={catalog} />
       <main id="main-content" className="hm-main">
         <Hero c={c} />
-        <IndexStrip />
         <Agents c={c} />
         <Problem c={c} />
         <How c={c} />
