@@ -67,6 +67,7 @@ Manual placement works. It gets noisy once you keep Claude Code, Codex and Curso
 - [How to install skills in Claude Code](/blog/how-to-install-skills-in-claude-code)
 - [How to use skills in Codex](/blog/how-to-use-skills-in-codex)
 - [How to use skills in Cursor](/blog/how-to-use-skills-in-cursor)
+- [GitHub Copilot skills: add one in 5 minutes](/blog/github-copilot-skills)
 
 Want concrete folders to study first? See [Claude skills examples](/blog/claude-skills-examples).
 
